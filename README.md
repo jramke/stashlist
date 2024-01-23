@@ -10,3 +10,8 @@ An app where developers and designers can save inspirational websites, code snip
 - reading list
 - groups for saved objects
   
+
+## TECH
+- use appwrite (https://appwrite.io/docs/tutorials/sveltekit/step-1)
+- or supabase
+- or pocketbase with pockethost
