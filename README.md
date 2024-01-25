@@ -14,6 +14,7 @@ An app where developers and designers can save inspirational websites, code snip
 - https://github.com/isaacHagoel/svelte-dnd-action
 - https://github.com/samrum/vite-plugin-web-extension
 - https://github.com/adityaoberai/BackgroundRemover
+- https://github.com/huntabyte/cmdk-sv
 
 ## TECH
 - use appwrite (https://appwrite.io/docs/tutorials/sveltekit/step-1)
