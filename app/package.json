@@ -42,6 +42,7 @@
 		"formsnap": "^0.4.2",
 		"lucide-svelte": "^0.314.0",
 		"mode-watcher": "^0.1.2",
+		"node-appwrite": "^11.1.0",
 		"sveltekit-superforms": "^1.13.4",
 		"tailwind-merge": "^2.2.1",
 		"tailwind-variants": "^0.1.20",

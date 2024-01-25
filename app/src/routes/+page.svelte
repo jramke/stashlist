@@ -1,6 +1,5 @@
-
 <section>
-    <div class="container">
-        <h1>Login or register</h1>
-    </div>
+	<div class="container">
+		<h1>Save inspiration, code snippets and more!</h1>
+	</div>
 </section>
