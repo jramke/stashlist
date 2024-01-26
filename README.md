@@ -16,6 +16,7 @@ An app where developers and designers can save inspirational websites, code snip
 - https://github.com/adityaoberai/BackgroundRemover
 - https://github.com/huntabyte/cmdk-sv
 - https://github.com/haishanh/cherry-periphery
+- https://github.com/delay/sveltekit-auth-starter
 
 ## TECH
 - [Appwrite Console](https://cloud.appwrite.io/console/project-65b011e0ee19329fcae0/overview/platforms)
