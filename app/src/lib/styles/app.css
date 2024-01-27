@@ -1,5 +1,13 @@
+main {
+	padding-block: 3rem;
+}
 section {
-	div {
-		background-color: red;
+	&:not(:first-child, :last-child) {
+		padding-block: 3rem;
 	}
+}
+
+h1 {
+	font-size: 3rem;
+	font-weight: bold;
 }

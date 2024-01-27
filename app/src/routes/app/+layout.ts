@@ -6,5 +6,5 @@ import type { LayoutLoad } from './$types';
 // export const load: LayoutLoad = async ({ parent }) => {
 // 	const { account } = await parent();
 // 	console.log('app', account);
-// 	if (account === null) redirect(303, '/login');
+// 	if (!account) redirect(303, '/login');
 // };

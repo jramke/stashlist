@@ -1,12 +1,15 @@
 <script>
+	import '@fontsource-variable/plus-jakarta-sans';
 	import '../app.pcss';
 	import '$lib/styles/app.css';
 
 	import { ModeWatcher } from 'mode-watcher';
-	// import { user } from '$lib/db/user';
+	import Navigation from '$lib/components/nav/Navigation.svelte';
 
-	// $: console.log($user);
 </script>
 
 <ModeWatcher />
-<slot />
+<Navigation />
+<main>
+	<slot />
+</main>

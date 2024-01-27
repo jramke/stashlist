@@ -4,25 +4,25 @@
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import { Github, Loader2 } from 'lucide-svelte';
 	import type { FormOptions } from 'formsnap';
-	import { user } from '$lib/db/user';
+	// import { user } from '$lib/db/user';
 
 	export let form: SuperValidated<FormSchema>;
 
 	let isLoading = false;
 
 	const options: FormOptions<FormSchema> = {
-		onSubmit: async ({ formData, cancel }) => {
-			console.log(typeof window !== 'undefined');
-			isLoading = true;
-			const data = Object.fromEntries(formData);
-			const result = formSchema.safeParse(data);
-			if (!result.success) {
-				cancel();
-				return;
-			}
-			await user.register(result.data['email'], result.data['password'], result.data['name']);
-			isLoading = false;
-		}
+		// onSubmit: async ({ formData, cancel }) => {
+		// 	console.log(typeof window !== 'undefined');
+		// 	isLoading = true;
+		// 	const data = Object.fromEntries(formData);
+		// 	const result = formSchema.safeParse(data);
+		// 	if (!result.success) {
+		// 		cancel();
+		// 		return;
+		// 	}
+		// 	await user.register(result.data['email'], result.data['password'], result.data['name']);
+		// 	isLoading = false;
+		// }
 	};
 </script>
 
