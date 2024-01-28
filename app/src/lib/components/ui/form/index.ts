@@ -15,6 +15,7 @@ import RadioGroup from './form-radio-group.svelte';
 import Select from './form-select.svelte';
 import SelectTrigger from './form-select-trigger.svelte';
 import Button from './form-button.svelte';
+import Message from './form-message.svelte';
 
 const Root = FormPrimitive.Root;
 const Field = FormPrimitive.Field;
@@ -55,6 +56,7 @@ export {
 	SelectTrigger,
 	NativeSelect,
 	NativeRadio,
+	Message,
 	//
 	Root as Form,
 	Field as FormField,
@@ -78,5 +80,6 @@ export {
 	SelectItem as FormSelectItem,
 	SelectSeparator as FormSelectSeparator,
 	SelectTrigger as FormSelectTrigger,
-	Button as FormButton
+	Button as FormButton,
+	Message as FormMessage
 };

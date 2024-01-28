@@ -58,8 +58,8 @@ const config = {
 				sans: ['Plus Jakarta Sans Variable', ...fontFamily.sans]
 			},
 			aspectRatio: {
-				'4/3': '4 / 3',
-			},
+				'4/3': '4 / 3'
+			}
 		}
 	}
 };

@@ -3,9 +3,8 @@ import { twMerge } from 'tailwind-merge';
 import { cubicOut } from 'svelte/easing';
 import type { TransitionConfig } from 'svelte/transition';
 
-
 export function isImgUrl(url: string) {
-	return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url)
+	return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
 }
 
 export function cn(...inputs: ClassValue[]) {

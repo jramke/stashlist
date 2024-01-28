@@ -1,13 +1,15 @@
 import type { PageServerLoad, Actions } from './$types';
 
-import { fail } from '@sveltejs/kit';
-import { superValidate } from 'sveltekit-superforms/server';
+import { redirect } from '@sveltejs/kit';
+import { superValidate, message } from 'sveltekit-superforms/server';
 import { formSchema } from './schema';
-import { lucia } from "$lib/server/auth";
+import { lucia } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import { user } from '$lib/server/db/schema';
-import { Argon2id } from "oslo/password";
-
+import { Argon2id } from 'oslo/password';
+import { eq } from 'drizzle-orm';
+import { generateId } from 'lucia';
+import { siteConfig } from '$lib/config/site';
 
 export const load: PageServerLoad = async () => {
 	return {
@@ -15,45 +17,42 @@ export const load: PageServerLoad = async () => {
 	};
 };
 
-
-//! CONTINUE with login
-// https://lucia-auth.com/tutorials/username-and-password/sveltekit
-// https://github.com/bmdavis419/sveltekit-lucia-example
-// https://github.com/delay/sveltekit-auth
-// https://www.youtube.com/watch?v=dqdOqSLxeko
-// https://www.youtube.com/watch?v=4ZhtoOFKFP8
-// https://github.com/lucia-auth/examples/tree/main/sveltekit
-
 export const actions: Actions = {
 	default: async (event) => {
 		const form = await superValidate(event, formSchema);
 
 		if (!form.valid) {
-			return fail(400, {
-				form
-			});
+			return message(form, { type: 'error', text: 'Something went wrong. Please try again.' });
 		}
 
-		const userId = crypto.randomUUID();
-		const hashedPassword = await new Argon2id().hash(form.data.password);
+		try {
+			const userId = generateId(15);
+			const hashedPassword = await new Argon2id().hash(form.data.password);
+			const email = form.data.email.toLowerCase();
 
-		// TODO: check if email is already used
-		db.insert(user).values({
-			id: userId,
-			email: form.data.email,
-			hashedPassword: hashedPassword
-		})
+			const existingUser = await db.select().from(user).where(eq(user.email, email)).get();
+			if (existingUser) {
+				return message(form, { type: 'error', text: 'User with this email already exists.' });
+			}
 
-		const session = await lucia.createSession(userId, {});
-		const sessionCookie = lucia.createSessionCookie(session.id);
-		event.cookies.set(sessionCookie.name, sessionCookie.value, {
-			path: ".",
-			...sessionCookie.attributes
-		});
+			await db.insert(user).values({
+				id: userId,
+				name: form.data.name,
+				email: email,
+				hashedPassword: hashedPassword
+			});
 
+			const session = await lucia.createSession(userId, {});
+			const sessionCookie = lucia.createSessionCookie(session.id);
+			event.cookies.set(sessionCookie.name, sessionCookie.value, {
+				path: '.',
+				...sessionCookie.attributes
+			});
+		} catch (error) {
+			console.log('Register error', error);
+			return message(form, { type: 'error', text: 'Something went wrong. Please try again.' });
+		}
 
-		return {
-			form
-		};
+		redirect(302, siteConfig.appUrl);
 	}
 };

@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/libsql';
 import { createClient } from '@libsql/client';
-import { DATABASE_URL, DATABASE_AUTH_TOKEN } from '$env/dynamic/private';
+import { env } from '$env/dynamic/private';
 
-const client = createClient({ url: DATABASE_URL, authToken: DATABASE_AUTH_TOKEN });
+const client = createClient({ url: env.DATABASE_URL, authToken: env.DATABASE_AUTH_TOKEN });
 
 export const db = drizzle(client);
