@@ -15,19 +15,21 @@
 
 <div class="flex flex-wrap gap-6 items-center justify-between">
 	<Heading tag="h1">Inspiration</Heading>
-	<Dialog.Root>
-		<Dialog.Trigger class={buttonVariants({ variant: "default" })}>New stash</Dialog.Trigger>
-		<Dialog.Content>
-			<Dialog.Header>
-				<Dialog.Title>New stash</Dialog.Title>
-				<Dialog.Description>New stash description</Dialog.Description>
-			</Dialog.Header>
-			<form method="POST" action="/api/saves/new" use:enhance>
-                <input type="text" name="url" value="https://www.awwwards.com/">
-                <Button type="submit">Save</Button>
-            </form>
-		</Dialog.Content>
-	</Dialog.Root>
+	<div>
+		<Dialog.Root>
+			<Dialog.Trigger class={buttonVariants({ variant: "default" })}>New stash</Dialog.Trigger>
+			<Dialog.Content>
+				<Dialog.Header>
+					<Dialog.Title>New stash</Dialog.Title>
+					<Dialog.Description>New stash description</Dialog.Description>
+				</Dialog.Header>
+				<form method="POST" action="/api/saves/new" use:enhance>
+					<input type="text" name="url" value="https://www.awwwards.com/">
+					<Button type="submit">Save</Button>
+				</form>
+			</Dialog.Content>
+		</Dialog.Root>
+	</div>
 </div>
 {#await data.previewData}
 	<div class="grid grid-cols-3 gap-6">

@@ -45,8 +45,8 @@ importers:
         specifier: ^0.314.0
         version: 0.314.0(svelte@4.2.9)
       mode-watcher:
-        specifier: ^0.1.2
-        version: 0.1.2(svelte@4.2.9)
+        specifier: ^0.2.0
+        version: 0.2.0(svelte@4.2.9)
       oslo:
         specifier: ^1.0.2
         version: 1.0.2
@@ -2939,8 +2939,8 @@ packages:
       minimist: 1.2.8
     dev: true
 
-  /mode-watcher@0.1.2(svelte@4.2.9):
-    resolution: {integrity: sha512-XTdPCdqC3kqSvB+Q262Kor983YJkkB2Z3vj9uqg5IqKQpOdiz+xB99Jihp8sWbyM67drC7KKp0Nt5FzCypZi2g==}
+  /mode-watcher@0.2.0(svelte@4.2.9):
+    resolution: {integrity: sha512-NCo72EColWhNjMWXr+U9hjJS6ixCFEADfvj44XFLUWEkR/dsbJxnOX6bkxM+i1DWmP/nRhKI+rr2Z2nt+TZSGA==}
     peerDependencies:
       svelte: ^4.0.0
     dependencies:

@@ -8,6 +8,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) redirect(302, '/login');
 
 	const formData = await request.formData();
+    console.log(formData);
+    
     const url = String(formData.get('url'));
 
     await db.insert(save).values({
