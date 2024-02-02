@@ -7,6 +7,7 @@
 	import { Toaster } from '$lib/components/ui/sonner';
 	import Navigation from '$lib/components/nav/Navigation.svelte';
 	import { page } from '$app/stores';
+	console.log($page);
 	
 </script>
 

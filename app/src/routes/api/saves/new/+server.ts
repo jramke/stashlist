@@ -3,11 +3,12 @@ import { save } from '$lib/server/db/schema';
 import { generateId } from 'lucia';
 import type { RequestHandler } from './$types';
 import { json, redirect } from '@sveltejs/kit';
+// import { events } from 'sveltekit-sse';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.user) redirect(302, '/login');
+    if (!locals.user) redirect(302, '/login');
 
-	const formData = await request.formData();
+    const formData = await request.formData();
     console.log(formData);
     
     const url = String(formData.get('url'));
@@ -18,5 +19,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         url: url,
     })
 
-	return json({ success: true });
+    return json({ success: true });
+    // return events({
+    //     request,
+    //     start({ emit }) {
+    //         emit('message', 'hello world');
+    //     },
+    // })
 };

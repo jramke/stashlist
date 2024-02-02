@@ -24,9 +24,17 @@ export async function load({ setHeaders, fetch }) {
 	}
 
 	async function getSaves() {
-		const response = await fetch('/api/saves');
-		const saves = await response.json();
-		return saves;
+		try {
+			const response = await fetch('/api/saves');
+			if (!response.ok) {
+				throw new Error(`Error getting saves. Status: ${response.status}`);
+			}
+			const saves = await response.json();
+			return saves;
+		} catch (error) {
+			console.log('Error getting saves', error);
+			return null;
+		}
 	}
 
 	//TODO: cache headers not working

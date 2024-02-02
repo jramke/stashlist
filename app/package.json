@@ -58,6 +58,7 @@
 		"mode-watcher": "^0.2.0",
 		"oslo": "^1.0.2",
 		"svelte-sonner": "^0.3.11",
+		"sveltekit-sse": "^0.8.3",
 		"sveltekit-superforms": "^1.13.4",
 		"tailwind-merge": "^2.2.1",
 		"tailwind-variants": "^0.1.20",

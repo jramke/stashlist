@@ -9,7 +9,27 @@
 	import { enhance } from '$app/forms';
 	// import { Form } from '$lib/components/ui/form';
 
-	export let data: PageData;
+	// export let data: PageData;
+
+	// $: ({ previewData } = data);
+
+	async function getSaves() {
+		try {
+			const response = await fetch('/api/saves');
+			if (!response.ok) {
+				throw new Error(`Error getting saves. Status: ${response.status}`);
+			}
+			const saves = await response.json();
+			return saves;
+		} catch (error) {
+			console.log('Error getting saves', error);
+			return null;
+		}
+	}
+
+	$: saves = getSaves();
+
+	$: console.log(saves);
 
 </script>
 
@@ -31,7 +51,7 @@
 		</Dialog.Root>
 	</div>
 </div>
-{#await data.previewData}
+{#await saves}
 	<div class="grid grid-cols-3 gap-6">
 		{#each new Array(9) as _}
 			<Skeleton class="aspect-4/3" />
