@@ -11,7 +11,8 @@ const buttonVariants = tv({
 			outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
 			secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
 			ghost: 'hover:bg-accent hover:text-accent-foreground',
-			link: 'text-primary underline-offset-4 hover:underline'
+			link: 'text-primary underline-offset-4 hover:underline',
+			nav: 'transition-colors text-foreground/60 hover:text-foreground/80 [&.active]:text-foreground [&.active]:font-bold'
 		},
 		size: {
 			default: 'h-10 px-4 py-2',

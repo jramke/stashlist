@@ -5,6 +5,6 @@
 	export { className as class };
 </script>
 
-<section class={cn('py-10', className)}>
+<section class={cn('py-10 w-full', className)}>
 	<slot />
 </section>

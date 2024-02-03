@@ -1,6 +1,7 @@
+import type { RequestHandler } from './$types';
+
 import { db } from '$lib/server/db';
 import { save } from '$lib/server/db/schema';
-import type { RequestHandler } from './$types';
 import { error, json, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 

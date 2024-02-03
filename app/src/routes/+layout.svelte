@@ -7,14 +7,14 @@
 	import { Toaster } from '$lib/components/ui/sonner';
 	import Navigation from '$lib/components/nav/Navigation.svelte';
 	import { page } from '$app/stores';
-	console.log($page);
+	import { siteConfig } from '$lib/config/site';
 	
 </script>
 
 <ModeWatcher />
 <Toaster position="bottom-center" />
 
-{#if !$page.route?.id?.includes('(auth)')}
+{#if !$page.route?.id?.includes('(auth)') && !$page.route?.id?.includes(siteConfig.appUrl)}
 	<Navigation />
 {/if}
 

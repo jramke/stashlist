@@ -1,27 +1,4 @@
-import { getLinkPreview, getPreviewFromContent } from '$lib/helper/LinkPreview';
-import defaultSaves from '$lib/db/defaultSaves.json';
-import { isImgUrl } from '$lib/utils';
-
 export async function load({ setHeaders, fetch }) {
-	async function getPreviewItems() {
-		let previewData = [];
-		return await new Promise(async (resolve, reject) => {
-			try {
-				for (const link of defaultSaves) {
-					const data = await getLinkPreview(link);
-					previewData.push({
-						title: data?.title,
-						url: data?.url,
-						image: isImgUrl(data?.images[0] ?? '') ? data?.images[0] : undefined
-					});
-				}
-				resolve(previewData);
-			} catch (error) {
-				console.log('getPreviewLink failed:', error);
-				reject(error);
-			}
-		});
-	}
 
 	async function getSaves() {
 		try {

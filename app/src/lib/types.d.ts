@@ -1,5 +1,8 @@
-export type LinkPreview = {
+export type Save = {
 	title: string;
+	description: string;
 	url: string;
-	image: string;
-};
+	imageUrl: string;
+	faviconUrl: string;
+	createdAt: Date
+}

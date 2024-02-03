@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { cn } from '$lib/utils';
 	import { Button } from '$lib/components/ui/button';
 	import { siteConfig } from '$lib/config/site';
-	import Navlink from './Navlink.svelte';
+	import Link from './Link.svelte';
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
 
@@ -19,7 +18,7 @@
 				</span>
 			</a>
 			<nav class="flex items-center gap-6">
-				<Navlink path={siteConfig.appUrl}>App</Navlink>
+				<Link path={siteConfig.appUrl}>App</Link>
 			</nav>
 		</div>
 		<div class="flex flex-1 items-center justify-between space-x-2 md:justify-end">

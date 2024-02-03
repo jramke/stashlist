@@ -1,15 +1,11 @@
 <script lang="ts">
-	import LinkPreviewCard from '$lib/components/saves/LinkPreviewCard.svelte';
-	import Heading from '$lib/components/Heading.svelte';
-	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { page } from '$app/stores';
+    import LinkPreviewCard from '$lib/components/saves/LinkPreviewCard.svelte';
+    import { Skeleton } from '$lib/components/ui/skeleton';
 
 </script>
 
-<div class="flex flex-wrap gap-6 items-center justify-between">
-	<Heading tag="h1">All stashes</Heading>
-</div>
-{#await $page.data.saves}
+{#await $page.data.savesByGroup}
 	<div class="grid grid-cols-3 gap-6">
 		{#each new Array(9) as _}
 			<Skeleton class="aspect-4/3" />
