@@ -13,6 +13,8 @@
 	export let url: Save['url'];
 	export let imageUrl: Save['imageUrl'];
 	export let faviconUrl: Save['faviconUrl'];
+	export let saveGroups: any[] = []; //TODO
+	
 </script>
 
 <div class="overflow-hidden rounded-lg border bg-card text-card-foreground">
@@ -33,6 +35,11 @@
 					{cleanUrl(url)}
 				</a>
 			</div>
+			{#if saveGroups.length !== 0}
+				{#each saveGroups as group}
+					{group.group.title}
+				{/each}
+			{/if}
 		</div>
 		<div class="flex ml-auto">
 			<DropdownMenu.Root>

@@ -15,6 +15,8 @@ export const load: PageServerLoad = async ({ locals, params }) => {
             throw new Error('Failed to fetch current group');
         }
 
+        //TODO: get groups of each saves
+
         const savesByGroup = await db.select({...getTableColumns(save)})
             .from(save_group_mm)
             .innerJoin(user, eq(save_group_mm.userId, user.id))
@@ -26,6 +28,23 @@ export const load: PageServerLoad = async ({ locals, params }) => {
         return { 
             savesByGroup
         };
+
+        // const userId = locals.user.id;
+        // const savesByGroup = await db.query.save.findMany({
+        //     where: (save, { eq }) => eq(save.userId, userId),
+        //     with: {
+        //         saveGroups: {
+        //             with: {
+        //                 group: {
+        //                     // where: (group: { id: any; }, { eq }: any) => eq(group.id, currentGroup[0].id)
+        //                     // where: (group, { lt }) => lt(group.createdAt, new Date()),
+        //                     where: (group, { eq }) => eq(group.id, currentGroup[0].id)
+        //                 }
+        //             }
+        //         },
+        //     }
+        // })
+
     } catch (err) {
         console.error('Error fetching saves by group', err);
         return {

@@ -1,4 +1,7 @@
 // See https://kit.svelte.dev/docs/types#app
+
+import type { SuperValidated } from 'sveltekit-superforms';
+
 // for information about these interfaces
 declare global {
 	namespace App {
@@ -8,7 +11,11 @@ declare global {
 			session: import('lucia').Session | null;
 		}
 		// interface PageData {}
-		// interface PageState {}
+		interface PageState {
+			selected: {
+				form: SuperValidated | null | string;
+			}
+		}
 		// interface Platform {}
 		namespace Superforms {
 			type Message = {

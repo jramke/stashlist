@@ -8,11 +8,14 @@ import urlMetadata from 'url-metadata';
 import { getDomainFromUrl, isImageUrl, isAbsoluteUrl, makeAbsoluteUrl } from '$lib/utils';
 
 export const POST: RequestHandler = async ({ request, locals, params, url }) => {
+
+    //TODO: try catch error handling
+
     if (!locals.user) redirect(302, '/login');
-    const formData = await request.formData();
-    const edit = url.searchParams.get('edit');
+    const formData = await request.json();
+    // const edit = url.searchParams.get('edit');
     
-    const saveUrl = formData.get('url') as string;
+    const saveUrl = formData['url'];
     const metaData = await urlMetadata(saveUrl);  
     
     let faviconUrl = (metaData.favicons[0]?.href || '') as string;
@@ -29,13 +32,13 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
     const description = metaData.description || '';
     const title = metaData.title || metaData.name || saveUrl;
 
-    if (edit) {
-        return json({
-            url: saveUrl,
-            title: title, 
-            faviconUrl: faviconUrl
-        })
-    }
+    // if (edit) {
+    //     return json({
+    //         url: saveUrl,
+    //         title: title, 
+    //         faviconUrl: faviconUrl
+    //     })
+    // }
 
     await db.insert(save).values({
         id: generateId(15),
