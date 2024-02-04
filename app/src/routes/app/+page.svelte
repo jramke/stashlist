@@ -4,6 +4,7 @@
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { page } from '$app/stores';
 
+	$inspect($page.data.saves);
 </script>
 
 <div class="flex flex-wrap gap-6 items-center justify-between">

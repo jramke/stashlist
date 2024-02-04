@@ -4,7 +4,7 @@
 
 </script>
 
-<div class="flex h-screen">
+<div class="flex">
 	<Sidebar />
 	<Section class="px-10">
 		<slot />
