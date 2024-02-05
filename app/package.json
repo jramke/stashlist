@@ -11,9 +11,10 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"turso": "turso dev --db-file turso/dev.db",
-		"drizzle:studio": "drizzle-kit studio --config drizzle.config.ts",
-		"drizzle:generate": "drizzle-kit generate:sqlite --config drizzle.config.ts",
-		"drizzle:push": "drizzle-kit push:sqlite --config drizzle.config.ts",
+		"studio": "drizzle-kit studio --config drizzle.config.ts",
+		"generate": "drizzle-kit generate:sqlite --config drizzle.config.ts",
+		"migrate": "tsx src/lib/server/db/migrate.ts",
+		"push": "drizzle-kit push:sqlite --config drizzle.config.ts",
 		"preinstall": "npx only-allow pnpm"
 	},
 	"devDependencies": {
@@ -38,6 +39,7 @@
 		"svelte-check": "^3.6.0",
 		"tailwindcss": "^3.3.6",
 		"tslib": "^2.4.1",
+		"tsx": "^4.7.0",
 		"typescript": "^5.0.0",
 		"vite": "^5.0.3"
 	},

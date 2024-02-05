@@ -58,7 +58,7 @@ const config = {
 				sans: ['Plus Jakarta Sans Variable', ...fontFamily.sans]
 			},
 			aspectRatio: {
-				'og': '1.91 / 1'
+				og: '1.91 / 1'
 			}
 		}
 	}

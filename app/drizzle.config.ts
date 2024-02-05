@@ -6,7 +6,7 @@ const { DATABASE_URL, DATABASE_AUTH_TOKEN } = process.env;
 if (!DATABASE_URL) {
 	throw new Error('No url');
 }
-if (!DATABASE_URL) {
+if (!DATABASE_AUTH_TOKEN) {
 	throw new Error('No auth token');
 }
 
@@ -18,5 +18,5 @@ export default {
 		url: DATABASE_URL,
 		authToken: DATABASE_AUTH_TOKEN
 	},
-	strict: true,
+	// strict: true
 } satisfies Config;

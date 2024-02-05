@@ -8,6 +8,10 @@
 	export let path: string;
 </script>
 
-<Button variant="nav" href={path} class={cn('w-full justify-start', $page.url.pathname === path && 'active', className)}>
+<Button
+	variant="nav"
+	href={path}
+	class={cn('w-full justify-start', $page.url.pathname === path && 'active', className)}
+>
 	<slot />
 </Button>

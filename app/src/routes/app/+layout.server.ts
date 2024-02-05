@@ -1,7 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 
-export const load: LayoutServerLoad = async ({ locals, fetch }) => {	
+export const load: LayoutServerLoad = async ({ locals, fetch }) => {
 	if (!locals.user) redirect(302, '/login');
 
 	async function getGroups() {

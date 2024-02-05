@@ -1,5 +1,5 @@
 import { z } from 'zod';
 export const formSchema = z.object({
-	url: z.string().url()
+	id: z.string()
 });
 export type FormSchema = typeof formSchema;

@@ -14,7 +14,7 @@ declare global {
 		interface PageState {
 			selected: {
 				form: SuperValidated | null | string;
-			}
+			};
 		}
 		// interface Platform {}
 		namespace Superforms {

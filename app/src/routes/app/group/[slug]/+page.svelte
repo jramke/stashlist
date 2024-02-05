@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-    import LinkPreviewCard from '$lib/components/saves/LinkPreviewCard.svelte';
-    import { Skeleton } from '$lib/components/ui/skeleton';
+	import LinkPreviewCard from '$lib/components/saves/LinkPreviewCard.svelte';
+	import { Skeleton } from '$lib/components/ui/skeleton';
+
+	// $inspect($page.data.saves)
 
 </script>
 

@@ -4,5 +4,5 @@ export type Save = {
 	url: string;
 	imageUrl: string;
 	faviconUrl: string;
-	createdAt: Date
-}
+	createdAt: Date;
+};

@@ -4,10 +4,10 @@
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { page } from '$app/stores';
 
-	$inspect($page.data.saves);
+	// $inspect($page.data.saves);
 </script>
 
-<div class="flex flex-wrap gap-6 items-center justify-between">
+<div class="flex flex-wrap items-center justify-between gap-6">
 	<Heading tag="h1">All stashes</Heading>
 </div>
 {#await $page.data.saves}

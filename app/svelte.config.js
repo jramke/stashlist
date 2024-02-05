@@ -13,10 +13,9 @@ const config = {
 		// See https://kit.svelte.dev/docs/adapters for more information about adapters.
 		adapter: adapter(),
 		csrf: {
-			checkOrigin: false, // handled manually in hooks // https://github.com/sveltejs/kit/issues/6784
+			checkOrigin: false // handled manually in hooks // https://github.com/sveltejs/kit/issues/6784
 		}
 	}
-	
 };
 
 export default config;

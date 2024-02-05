@@ -4,7 +4,6 @@
 	import Link from './Link.svelte';
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
-
 </script>
 
 <header
