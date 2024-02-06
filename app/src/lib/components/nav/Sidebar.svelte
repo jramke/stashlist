@@ -18,8 +18,10 @@
 
 	let newGroupForm: HTMLFormElement | null;
 	let newGroupInput: HTMLInputElement | null;
-	let newGroupError = $state('');
-	let showNewGroupForm = $state(false);
+	$: newGroupError = '';
+	$: showNewGroupForm = false;
+	// let newGroupError = $state('');
+	// let showNewGroupForm = $state(false);
 
 	onMount(() => {
 		newGroupInput = document.querySelector('#new-group-input');

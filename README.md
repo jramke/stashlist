@@ -18,3 +18,5 @@ An app where developers and designers can save inspirational websites, code snip
 - https://github.com/haishanh/cherry-periphery
 - https://github.com/delay/sveltekit-auth
 - https://github.com/bmdavis419/sveltekit-lucia-example
+- https://github.com/ciscoheat/sveltekit-rate-limiter
+- https://github.com/ciscoheat/sveltekit-flash-message

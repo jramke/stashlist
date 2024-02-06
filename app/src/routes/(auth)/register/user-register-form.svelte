@@ -10,23 +10,21 @@
 	let isLoading = false;
 
 	const options: FormOptions<FormSchema> = {
-		onSubmit: () => {
-			setTimeout(() => {
+		onResult: ({ result }) => {
+			if (result.type !== 'failure') {
 				isLoading = true;
-			}, 1000);
-		},
-		onResult: () => {
-			isLoading = false;
+			}
 		},
 		onError: () => {
 			isLoading = false;
 		}
 	};
+
 </script>
 
 <div class="grid gap-6">
 	<Form.Root method="POST" {form} {options} schema={formSchema} let:config>
-		<Form.Message />
+		<Form.Message bind:loading={isLoading} />
 		<div class="grid gap-2">
 			<Form.Field {config} name="name">
 				<Form.Item>

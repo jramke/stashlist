@@ -3,12 +3,16 @@
 	import Heading from '$lib/components/Heading.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { page } from '$app/stores';
+	import type { PageData } from '../$types';
+	import Breadcrumb from '$lib/components/nav/Breadcrumb.svelte';
 
-	// $inspect($page.data.saves);
+	// export let data: PageData;
+	// const { data } = $props<PageData>()
 </script>
 
 <div class="flex flex-wrap items-center justify-between gap-6">
-	<Heading tag="h1">All stashes</Heading>
+	<!-- <Heading tag="h1">All stashes</Heading> -->
+	<Breadcrumb path={['Stashes', 'All']} />
 </div>
 {#await $page.data.saves}
 	<div class="grid grid-cols-3 gap-6">

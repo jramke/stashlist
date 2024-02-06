@@ -1,6 +1,6 @@
 // See https://kit.svelte.dev/docs/types#app
 
-import type { SuperValidated } from 'sveltekit-superforms';
+import type { TODO } from '$lib/types';
 
 // for information about these interfaces
 declare global {
@@ -13,7 +13,8 @@ declare global {
 		// interface PageData {}
 		interface PageState {
 			selected: {
-				form: SuperValidated | null | string;
+				form: import('sveltekit-superforms').SuperValidated | null | string;
+				save: TODO;
 			};
 		}
 		// interface Platform {}
