@@ -10,7 +10,7 @@
 	import { enhance, applyAction } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import { Skeleton } from '$lib/components/ui/skeleton';
-	import { Plus, FolderPlus, Folder, Check, Bookmark, Compass, LogOut } from 'lucide-svelte';
+	import { Plus, FolderPlus, Folder, Check, Bookmark, Compass, LogOut, Pencil } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import { cn } from '$lib/utils';
 	import { Input } from '$lib/components/ui/input';
@@ -20,6 +20,7 @@
 	let newGroupInput: HTMLInputElement | null;
 	$: newGroupError = '';
 	$: showNewGroupForm = false;
+	$: editGroups = false;
 	// let newGroupError = $state('');
 	// let showNewGroupForm = $state(false);
 
@@ -55,8 +56,8 @@
 	}
 </script>
 
-<aside class="sticky top-0 h-screen flex-[350px] border-r bg-card p-5">
-	<div class="flex flex-col items-start h-full overflow-hidden">
+<aside class="sticky top-0 h-screen flex-[350px] border-r bg-card">
+	<div class="flex flex-col items-start h-full overflow-hidden p-5">
 		<div class="flex w-full items-center justify-between gap-3">
 			<p class="px-3 text-xl font-bold">{siteConfig.name}</p>
 			<div>
@@ -94,7 +95,18 @@
 			<Link path={siteConfig.appUrl}><Bookmark class="me-2 h-4 w-4" />All stashes</Link>
 			<Link path={siteConfig.appUrl + '/explore'}><Compass class="me-2 h-4 w-4" />Explore</Link>
 		</div>
-		<p class="p-3 pt-8 font-bold">My groups</p>
+		<div class="pb-1 pt-5 flex items-center justify-between gap-2 w-full">
+			<p class="px-3 font-bold">My groups</p>
+			{#if editGroups}
+				<Button variant="ghost" on:click={() => editGroups = false}>
+					<Check class="h-4 w-4" />
+				</Button>
+			{:else}
+				<Button variant="ghost" on:click={() => editGroups = true}>
+					<Pencil class="h-4 w-4" />
+				</Button>
+			{/if}
+		</div>
 		<div class="w-full overflow-auto">
 			<div class="flex w-full flex-col items-start">
 				{#await $page.data.groups}
@@ -103,11 +115,27 @@
 					{/each}
 				{:then items}
 					{#if items?.length > 0}
-						{#each items as { title, id }}
-							<Link path={siteConfig.appUrl + '/group/' + id}>
-								<Folder class="me-2 h-4 w-4" />{title}
-							</Link>
-						{/each}
+						{#if editGroups}
+							<form method="POST" class="w-full" action={siteConfig + '/group/edit'} use:enhance>
+								{#each items as { title, id }}
+									<div class="flex items-center px-4 py-1">
+										<Folder class="me-2 h-4 w-4 shrink-0 animate-wiggle" />
+										<Input
+											type="text"
+											name="id"
+											class="rounded-none border-0 border-b-input px-0 border-b-2 focus-visible:ring-0"
+											value={title}
+										/>
+									</div>
+								{/each}
+							</form>
+						{:else}
+							{#each items as { title, id }}
+								<Link path={siteConfig.appUrl + '/group/' + id}>
+									<Folder class="me-2 h-4 w-4" />{title}
+								</Link>
+							{/each}
+						{/if}
 					{/if}
 				{:catch error}
 					<p>Couldnt fetch groups!</p>

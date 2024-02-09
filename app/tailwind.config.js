@@ -59,6 +59,15 @@ const config = {
 			},
 			aspectRatio: {
 				og: '1.91 / 1'
+			},
+			keyframes: {
+				wiggle: {
+					'0%, 100%': { transform: 'rotate(-6deg)' },
+					'50%': { transform: 'rotate(6deg)' },
+				}
+			},
+			animation: {
+				wiggle: 'wiggle .3s ease-in-out infinite',
 			}
 		}
 	}

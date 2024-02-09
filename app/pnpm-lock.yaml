@@ -44,6 +44,9 @@ importers:
       svelte-sonner:
         specifier: ^0.3.11
         version: 0.3.11(svelte@4.2.10)
+      svelte-tags-input:
+        specifier: ^6.0.0
+        version: 6.0.0
       sveltekit-superforms:
         specifier: ^1.13.4
         version: 1.13.4(@sveltejs/kit@2.4.3)(svelte@4.2.10)(zod@3.22.4)
@@ -3666,6 +3669,10 @@ packages:
       svelte: '>=3 <5'
     dependencies:
       svelte: 4.2.10
+    dev: false
+
+  /svelte-tags-input@6.0.0:
+    resolution: {integrity: sha512-SyqPj8MEOST7WdmtkGMtHI+FdVZyj3S/sEUAg3hr5HeitKgFUHrSYjkoVgn9ktx/N2UCOEcaudkYjJK2kyxbFg==}
     dev: false
 
   /svelte@4.2.10:

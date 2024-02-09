@@ -15,6 +15,7 @@ declare global {
 			selected: {
 				form: import('sveltekit-superforms').SuperValidated | null | string;
 				save: TODO;
+				groups: TODO;
 			};
 		}
 		// interface Platform {}

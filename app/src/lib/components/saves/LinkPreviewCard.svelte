@@ -36,14 +36,15 @@
 	const openDeleteDialog = () => deleteDialogOpen = true;
 	// const openEditDialog = () => editDialogOpen = true;
 	const openEditDialog = async () => {
-		const href = '/app/save/edit/' + id;
+		const href = siteConfig.appUrl + '/save/edit/' + id;
 		const result = await preloadData(href);
 		console.log('result from card preload', result);
 		
 		if (result.type === 'loaded' && result.status === 200) {
 			pushState(href, { selected: {
 				form: result.data.form,
-				save: result.data.save
+				save: result.data.save,
+				groups: result.data.groups
 			} })
 			editDialogOpen = true;
 		} else {
@@ -174,13 +175,20 @@
 		</AlertDialog.Content>
 </AlertDialog.Root>
 
-<Dialog.Root bind:open={editDialogOpen} onOpenChange={editDialogChange}>
-	<Dialog.Content>
-		<Dialog.Header>
-			<Dialog.Title>Edit stash</Dialog.Title>
-		</Dialog.Header>
-		{#if $page.state.selected}
-			<EditForm data={$page.state.selected} />
-		{/if}		
-	</Dialog.Content>
-</Dialog.Root>
+<AlertDialog.Root bind:open={editDialogOpen} onOpenChange={editDialogChange}>
+	{#if $page.state.selected}
+		<AlertDialog.Content>
+			<AlertDialog.Header>
+				<AlertDialog.Title>Edit stash</AlertDialog.Title>
+			</AlertDialog.Header>
+			<EditForm data={$page.state.selected}>
+				<AlertDialog.Footer class="pt-2">
+					<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+					<button type="submit">
+						<AlertDialog.Action>Update stash</AlertDialog.Action>
+					</button>
+				</AlertDialog.Footer>
+			</EditForm>
+		</AlertDialog.Content>
+	{/if}	
+</AlertDialog.Root>

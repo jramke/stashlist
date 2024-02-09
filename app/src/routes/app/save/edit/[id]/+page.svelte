@@ -1,17 +1,25 @@
 <script lang="ts">
-	import type { PageData } from "./$types";
 	import type { FormOptions } from "formsnap";
 	import { formSchema, type FormSchema } from "./schema";
     import type { SuperValidated } from "sveltekit-superforms";
 	import type { Save, TODO } from "$lib/types";
 
     import * as Form from "$lib/components/ui/form";
-	import Input from "$lib/components/ui/input/input.svelte";
+    import Tags from "$lib/components/ui/tags";
+    import * as Select from "$lib/components/ui/select";
 
     export let data: {
         form: SuperValidated<FormSchema>,
-        save: Save
+        save: TODO,
+        groups: TODO,
     };
+
+    const aviableGroups = data.groups;
+    console.log(data);
+    
+    let groups = data.save.saveGroups.map(item => item.group) || [];
+    $: groupIds = groups.map(item => item.id);
+    
 
     const options: FormOptions<FormSchema> = {
         onSubmit: () => {
@@ -21,43 +29,43 @@
             history.back();
         }
     };
-    // console.log(data.save);
-    // $: title = data.save.title;
-    $: console.log('save on form page', data.save, data.form);
 
-    let test = 'abc';
-    test = data.save.title;
-    
 </script>
 
-<Form.Root method="POST" form={data.form} {options} schema={formSchema} let:config>
-    <!-- <Input type="hidden" bind:value={data.save.id} /> -->
+<Form.Root method="POST" form={data.form} {options} schema={formSchema} let:config class="space-y-2">
     <input type="hidden" name="id" value={data.save.id}>
-    <!-- <Form.Field {config} name="id">
-        <Form.Item>
-            <Form.Input type="hidden" bind:value={data.save.id} />
-        </Form.Item>
-    </Form.Field> -->
     <Form.Field {config} name="title">
         <Form.Item>
             <Form.Label>Title</Form.Label>
-            <Form.Input value={test} />
+            <Form.Input />
             <Form.Validation />
         </Form.Item>
     </Form.Field>
     <Form.Field {config} name="description">
         <Form.Item>
             <Form.Label>Description</Form.Label>
-            <Form.Textarea value={data.save.description} />
+            <Form.Textarea />
             <Form.Validation />
         </Form.Item>
     </Form.Field>
-    <Form.Field {config} name="imageUrl">
+    <Form.Field {config} name="groups">
         <Form.Item>
-            <Form.Label>Image url</Form.Label>
-            <Form.Input value={data.save.imageUrl} />
+            <Form.Label>Groups</Form.Label>
+            <Form.Input type="hidden" bind:value={groupIds} />
+            <Tags
+                bind:tags={groups}
+                placeholder={"Add groups"}
+                autoComplete={aviableGroups}
+                minChars={0}
+                onlyUnique={true}
+                autoCompleteKey={'title'}
+                name={'Add groups'}
+                onlyAutocomplete
+            />
             <Form.Validation />
         </Form.Item>
     </Form.Field>
-    <Form.Button>Update stash</Form.Button>
+    <!-- <Form.Button>
+    </Form.Button> -->
+    <slot />
 </Form.Root>
