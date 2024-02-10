@@ -8,30 +8,24 @@ const sharedManifest: Partial<chrome.runtime.ManifestBase> = {
     },
   ],
   icons: {
-    16: "icons/16.png",
-    19: "icons/19.png",
-    32: "icons/32.png",
-    38: "icons/38.png",
-    48: "icons/48.png",
-    64: "icons/64.png",
-    96: "icons/96.png",
-    128: "icons/128.png",
-    256: "icons/256.png",
-    512: "icons/512.png",
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   },
-  options_ui: {
-    page: "src/entries/options/index.html",
-    open_in_tab: true,
-  },
+  // options_ui: {
+  //   page: "src/entries/options/index.html",
+  //   open_in_tab: true,
+  // },
   permissions: ["contextMenus"],
 };
 
 const browserAction = {
   default_icon: {
-    16: "icons/16.png",
-    19: "icons/19.png",
-    32: "icons/32.png",
-    38: "icons/38.png",
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   },
   // default_popup: "src/entries/popup/index.html",
 };
@@ -43,10 +37,10 @@ const ManifestV2 = {
     persistent: true,
   },
   browser_action: browserAction,
-  options_ui: {
-    ...sharedManifest.options_ui,
-    chrome_style: false,
-  },
+  // options_ui: {
+  //   ...sharedManifest.options_ui,
+  //   chrome_style: false,
+  // },
   permissions: [...sharedManifest.permissions, "*://*/*"],
 };
 

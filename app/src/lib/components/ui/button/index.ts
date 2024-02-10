@@ -8,7 +8,7 @@ const buttonVariants = tv({
 		variant: {
 			default: 'bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-md hover:shadow-primary/20',
 			destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:shadow-md hover:shadow-destructive/20',
-			outline: 'border border-input bg-background hover:text-accent-foreground hover:border-primary',
+			outline: 'border border-input hover:text-accent-foreground hover:border-primary',
 			secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:shadow-md hover:shadow-secondary/20',
 			ghost: 'border hover:text-accent-foreground hover:border-primary',
 			link: 'text-primary underline-offset-4 hover:underline',

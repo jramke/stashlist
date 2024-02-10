@@ -17,6 +17,10 @@
 	<Navigation />
 {/if}
 
+<svelte:head>
+	<title>Stashlist</title>
+</svelte:head>
+
 <main>
 	<slot />
 </main>

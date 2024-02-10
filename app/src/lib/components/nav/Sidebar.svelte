@@ -11,6 +11,7 @@
 	import { invalidateAll, goto } from '$app/navigation';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { Plus, FolderPlus, Folder, Check, Bookmark, Compass, LogOut, Pencil, Trash2, X } from 'lucide-svelte';
+	import Stash from "$lib/icons/stash.svelte"
 	import { page } from '$app/stores';
 	import { cn } from '$lib/utils';
 	import { Input } from '$lib/components/ui/input';
@@ -93,7 +94,12 @@
 <aside class="sticky top-0 h-screen flex-[350px] border-r bg-card">
 	<div class="flex flex-col items-start h-full overflow-hidden p-5">
 		<div class="flex w-full items-center justify-between gap-3">
-			<p class="px-3 text-xl font-bold">{siteConfig.name}</p>
+			<div class="flex items-center px-3">
+				<Stash class="me-3 h-5 w-5 text-primary" />
+				<p class="text-xl font-bold">
+					{siteConfig.name}
+				</p>
+			</div>
 			<div>
 				<Dialog.Root>
 					<Dialog.Trigger class={buttonVariants({ variant: 'ghost' })}>
@@ -126,7 +132,10 @@
 		</div>
 		<Separator />
 		<div class="flex w-full flex-col items-start">
-			<Link path={siteConfig.appUrl}><Bookmark class="me-2 h-4 w-4" />All stashes</Link>
+			<Link path={siteConfig.appUrl}>
+				<Stash class="me-2 h-4 w-4" />
+				All stashes
+			</Link>
 			<Link path={siteConfig.appUrl + '/explore'}><Compass class="me-2 h-4 w-4" />Explore</Link>
 		</div>
 		<div class="pb-1 pt-5 flex items-center justify-between gap-2 w-full">
@@ -171,7 +180,7 @@
 										<Input
 											type="text"
 											name={id}
-											class="rounded-none border-0 border-b-input px-0 border-b-2 focus-visible:ring-0"
+											class="rounded-none border-0 border-b-input px-0 border-b-2 focus-visible:ring-0 focus-visible:ring-offset-0"
 											value={title}
 										/>
 										<AlertDialog.Root>
@@ -228,7 +237,7 @@
 							id="new-group-input"
 							type="text"
 							name="title"
-							class="rounded-none border-0 border-b-input px-0 focus-visible:border-b-2 focus-visible:ring-0"
+							class="rounded-none border-0 border-b-input px-0 focus-visible:border-b-2 focus-visible:ring-0 focus-visible:ring-offset-0"
 						/>
 						<Button type="submit" variant="ghost" class="ms-2 h-auto p-2">
 							<Check class="h-4 w-4" />

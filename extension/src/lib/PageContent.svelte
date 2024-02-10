@@ -1,5 +1,6 @@
 <script lang="ts">
   import logo from "~/assets/logo.svg";
+	import { Button } from "./components/ui/button";
 
   const imageUrl = new URL(logo, import.meta.url).href;
 
@@ -13,16 +14,6 @@
 <h1>
   <slot></slot>
 </h1>
-<button type="button" on:click={increment}>
+<Button on:click={increment}>
   Clicks: {count}
-</button>
-
-<style>
-  h1 {
-    margin: 5px;
-  }
-  
-  button {
-    margin-top: 10px;
-  }
-</style>
+</Button>

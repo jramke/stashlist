@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-	:root {
+	#stashlist {
 		--background: 0 0% 100%;
 		--foreground: 20 14.3% 4.1%;
 		--card: 0 0% 98%;
@@ -25,7 +25,7 @@
 		--ring: 24.6 95% 53.1%;
 		--radius: 0.75rem;
 	}
-	.dark {
+	#stashlist.dark {
 		--background: 20 14.3% 4.1%;
 		--foreground: 60 9.1% 97.8%;
 		--card: 20 14.3% 5.5%;
@@ -49,10 +49,10 @@
 }
 
 @layer base {
-	* {
+	#stashlist * {
 		@apply border-border;
 	}
-	body {
+	#stashlist {
 		@apply bg-background text-foreground;
 	}
 }
