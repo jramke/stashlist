@@ -51,6 +51,7 @@ export const actions: Actions = {
 		try {
 			// const currentGroupIds = (await db.select().from(save_group_mm).where(eq(save_group_mm.saveId, form.data.id)).all()).map(group => group.groupId);
 			const newGroups = form.data.groups.split(',');
+			console.log(newGroups);
 
 			await db.update(save)
 				.set({
@@ -61,6 +62,7 @@ export const actions: Actions = {
 			await db.delete(save_group_mm).where(eq(save_group_mm.saveId, form.data.id));
 
 			for (const groupId of newGroups) {
+				if (groupId.length === 0) continue;
 				await db.insert(save_group_mm).values({
 					userId: event.locals.user?.id as string,
 					saveId: form.data.id,
@@ -69,7 +71,7 @@ export const actions: Actions = {
 			}
 
 		} catch (error) {
-			console.log('Error deleting save', error);
+			console.log('Error updating save', error);
 			return message(form, { type: 'error', text: 'Something went wrong. Please try again.' });
 		}
 	}

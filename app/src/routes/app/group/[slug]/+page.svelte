@@ -3,9 +3,6 @@
 	import LinkPreviewCard from '$lib/components/saves/LinkPreviewCard.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import Breadcrumb from "$lib/components/nav/Breadcrumb.svelte";
-
-	// $inspect($page.data.saves)
-	console.log($page);
 	
 </script>
 

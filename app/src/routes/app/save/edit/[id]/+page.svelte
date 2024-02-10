@@ -6,7 +6,6 @@
 
     import * as Form from "$lib/components/ui/form";
     import Tags from "$lib/components/ui/tags";
-    import * as Select from "$lib/components/ui/select";
 
     export let data: {
         form: SuperValidated<FormSchema>,
@@ -15,24 +14,26 @@
     };
 
     const aviableGroups = data.groups;
-    console.log(data);
     
+    //TODO: types
     let groups = data.save.saveGroups.map(item => item.group) || [];
     $: groupIds = groups.map(item => item.id);
     
 
-    const options: FormOptions<FormSchema> = {
-        onSubmit: () => {
-            history.back();
-        },
-        onError: () => {
-            history.back();
-        }
-    };
+    // const options: FormOptions<FormSchema> = {
+    //     onSubmit: () => {
+    //         console.log(history.state);
+            
+    //         // history.back();
+    //     },
+    //     onError: () => {
+    //         // history.back();
+    //     }
+    // };
 
 </script>
 
-<Form.Root method="POST" form={data.form} {options} schema={formSchema} let:config class="space-y-2">
+<Form.Root method="POST" form={data.form} schema={formSchema} let:config class="space-y-2">
     <input type="hidden" name="id" value={data.save.id}>
     <Form.Field {config} name="title">
         <Form.Item>
@@ -58,6 +59,7 @@
                 autoComplete={aviableGroups}
                 minChars={0}
                 onlyUnique={true}
+                cleanOnBlur={true}
                 autoCompleteKey={'title'}
                 name={'Add groups'}
                 onlyAutocomplete

@@ -12,7 +12,6 @@
 	import { buttonVariants } from '$lib/components/ui/button';
 	import { Badge } from "$lib/components/ui/badge";
 	import * as AlertDialog from "$lib/components/ui/alert-dialog";
-	import * as Dialog from "$lib/components/ui/dialog";
 	import Waves from '$lib/placeholder/waves.svelte';
 	import EditForm from '../../../routes/app/save/edit/[id]/+page.svelte';
 	import { page } from '$app/stores';
@@ -38,8 +37,6 @@
 	const openEditDialog = async () => {
 		const href = siteConfig.appUrl + '/save/edit/' + id;
 		const result = await preloadData(href);
-		console.log('result from card preload', result);
-		
 		if (result.type === 'loaded' && result.status === 200) {
 			pushState(href, { selected: {
 				form: result.data.form,
@@ -58,7 +55,7 @@
 		}
 	}
 
-	const handleDelete: SubmitFunction = ({ formElement, formData, action, cancel }) => {
+	const handleDelete: SubmitFunction = () => {
 		return async ({ result }) => {
 			if (result.type === 'success') {
 				invalidateAll();
@@ -69,7 +66,7 @@
 			}
 		};
 	};
-	const handlEdit: SubmitFunction = ({ formElement, formData, action, cancel }) => {
+	const handlEdit: SubmitFunction = () => {
 		return async ({ result }) => {
 			if (result.type === 'success') {
 				invalidateAll();
