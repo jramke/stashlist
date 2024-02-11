@@ -47,7 +47,7 @@
 				await applyAction(result);
 				newGroupInput && (newGroupInput.value = '');
 				showNewGroupForm = false;
-				toast.success('Successfuly created group');
+				toast.success('Successfully created group');
 			} else {
 				newGroupError = 'Invalid group name';
 				newGroupInput?.focus();
@@ -61,7 +61,7 @@
 				await applyAction(result);
 				editGroups = false;
 				editGroupsErrors = [];
-				toast.success('Successfuly updated groups');
+				toast.success('Successfully updated groups');
 			} else {
 				editGroupsErrors = result.data.form.errors; // ??: why Property 'data' does not exist on type???
 			}
@@ -77,7 +77,7 @@
 				if (result.type === 'redirect') {
 					goto(result.location);
 				}
-				toast.success('Successfuly deleted group');
+				toast.success('Successfully deleted group');
 				return
 			} 
 			toast.error('Something went wrong deleting the group');

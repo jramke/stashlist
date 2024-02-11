@@ -59,7 +59,7 @@
 		return async ({ result }) => {
 			if (result.type === 'success') {
 				invalidateAll();
-				toast.success('Successfuly deleted stash');
+				toast.success('Successfully deleted stash');
 				await applyAction(result);
 			} else {
 				toast.error('Failed to delete stash');
@@ -70,7 +70,7 @@
 		return async ({ result }) => {
 			if (result.type === 'success') {
 				invalidateAll();
-				toast.success('Successfuly updated stash');
+				toast.success('Successfully updated stash');
 				await applyAction(result);
 			} else {
 				toast.error('Failed to update stash');

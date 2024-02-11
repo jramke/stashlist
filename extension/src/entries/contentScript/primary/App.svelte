@@ -4,75 +4,95 @@
 	import browser from 'webextension-polyfill';
 	import logo from '~/assets/logo.svg';
 	import PageContent from '~/lib/PageContent.svelte';
-	import * as Dialog from '$lib/ui/dialog';
-	import { Input } from '~/lib/ui/input';
-	import { Label } from '~/lib/ui/label';
-	import { Button } from '~/lib/ui/button';
+	import * as Dialog from '~/lib/components/ui/dialog';
+	import { Input } from '~/lib/components/ui/input';
+	import { Label } from '~/lib/components/ui/label';
+	import { Button } from '~/lib/components/ui/button';
+	import { onMount } from 'svelte';
+	import { Toaster } from '~/lib/components/ui/sonner';
+	import { ModeWatcher } from 'mode-watcher';
+	import { toast } from 'svelte-sonner';
 
-	const logoImageUrl = new URL(logo, import.meta.url).href;
+	type NewStashEdit = {
+		[key: string]: {
+			label: string;
+			data: string;
+		};
+	};
 
 	let editDialogOpen = false;
-	let newStashData;
-	let newStashForm: HTMLFormElement | null;
+	let newStashData: NewStashEdit;
+	let newStashForm: HTMLFormElement | null | undefined;
+	let stashlistRoot: HTMLElement | null | undefined;
 
-	browser.runtime.onMessage.addListener(
-		(message: any, sender: any, sendResponse: any) => {
-			if (message.newStash) {
-				newStashData = message.newStash;
+	onMount(() => {
+		const stashlistContainer = document.getElementById('stashlist-container');
+		const stashlistContainerRoot = stashlistContainer && stashlistContainer.shadowRoot;
+		stashlistRoot = stashlistContainerRoot?.querySelector('#stashlist-root');
+	})
 
-				newStashForm = document.querySelector('#stashlist-ext-form');
-				if (!newStashForm) return;
-
-				newStashForm.addEventListener('submit', async (e) => {
-					e.preventDefault();
-					await newStash(newStashForm!);
-				})
+	browser.runtime.onMessage.addListener((message: any, sender: any, sendResponse: any) => {
+			if (message.editNewStash) {
+				newStashData = message.editNewStash;
 
 				editDialogOpen = true;
-				console.log(newStashData);
+
+				setTimeout(() => {
+					newStashForm = stashlistRoot?.querySelector('#stashlist-form');
+	
+					if (!newStashForm) return;
+	
+					newStashForm.addEventListener('submit', async (e) => {
+						e.preventDefault();
+						const form = e.target as HTMLFormElement;
+						const formData = new FormData(form);
+						
+						//TODO: error handling
+
+						browser.runtime.sendMessage({
+							newStash: Object.fromEntries(formData)
+						})
+					})
+				}, 100);
+			}
+
+			if (message.newStashAdded) {
+				editDialogOpen = false;
+				console.log(toast);
+				toast.success('Successfully created stash');
 			}
 		}
 	);
 
-	async function newStash(form: HTMLFormElement) {
-		const formData = new FormData(form);
-
-		try {
-			const response = await fetch("https://example.org/post", {
-				method: "POST",
-				body: formData,
-			});
-			console.log(await response.json());
-		} catch (e) {
-			console.error(e);
-		}
-	}
-
 </script>
 
 <div id="stashlist" class="dark">
-	<div class="fixed p-6 bottom-0 bg-card rounded-lg border">
-		<Button>Test</Button>
-		<Input value="test" />
-	</div>
+
+	<!-- both not working -->
+	<Toaster position="bottom-center" />
+	<ModeWatcher />
+
 	<Dialog.Root bind:open={editDialogOpen} portal={null} preventScroll={false}>
 		<Dialog.Content>
 			<Dialog.Header>
-				<Dialog.Title>Save stash</Dialog.Title>
-				<!-- <Dialog.Description>
-					Make changes to your profile here. Click save when you're
-					done.
-				</Dialog.Description> -->
+				<Dialog.Title>Save new stash</Dialog.Title>
 			</Dialog.Header>
-			<form action="POST" id="stashlist-ext-form" class="space-y-2">
-				<div class="space-y-2">
-					<Label class="text-right">Name</Label>
-					<Input id="name" value="Pedro Duarte" />
-				</div>
-				<Dialog.Footer>
+			<form id="stashlist-form" class="space-y-2">
+				{#each Object.entries(newStashData) as [key, value]}
+					{#if key === 'imageUrl' || key === 'faviconUrl'}
+						<Input type="hidden" name={key} value={value.data} />
+					{:else}
+						<div class="space-y-2">
+							<Label for={key}>{value.label}</Label>
+							<Input name={key} value={value.data} />
+						</div>
+					{/if}
+				{/each}
+				<Dialog.Footer class="pt-2">
 					<Button type="submit">Save stash</Button>
 				</Dialog.Footer>
 			</form>
 		</Dialog.Content>
 	</Dialog.Root>
+
 </div>

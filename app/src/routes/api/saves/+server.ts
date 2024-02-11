@@ -19,6 +19,12 @@ export const GET: RequestHandler = async ({ locals }) => {
 			}
 		});
 
+		savesWithGroups.sort((a, b) => {
+			const dateA = new Date(a.createdAt).getTime();
+			const dateB = new Date(b.createdAt).getTime();
+			return dateB - dateA; // Sorting in descending order
+		});
+
 		return json(savesWithGroups);
 	} catch (err) {
 		console.log('error fetch saves', err);

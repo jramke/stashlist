@@ -8,14 +8,32 @@ import urlMetadata from 'url-metadata';
 import { getDomainFromUrl, isImageUrl, isAbsoluteUrl, makeAbsoluteUrl } from '$lib/utils';
 
 export const POST: RequestHandler = async ({ request, locals, params, url }) => {
-	//TODO: try catch error handling
-
+	console.log(locals);
+	
 	if (!locals.user) redirect(302, '/login');	
+
 	try {
 		const formData = await request.json();
 		const edit = url.searchParams.get('edit');
 
 		const saveUrl = formData['url'];
+
+		console.log(formData);
+
+		if (saveUrl && formData['title'] && formData['description'] && formData['imageUrl'] && formData['faviconUrl']) {
+			await db.insert(save).values({
+				id: generateId(15),
+				userId: locals.user.id,
+				url: saveUrl,
+				faviconUrl: formData['faviconUrl'],
+				title: formData['title'],
+				description: formData['description'],
+				imageUrl: formData['imageUrl']
+			});
+	
+			return json({ success: true });
+		}
+
 		const metaData = await urlMetadata(saveUrl);
 
 		let faviconUrl = (metaData.favicons[0]?.href || '') as string;
@@ -30,9 +48,9 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 
 		if (edit) {
 		    return json({
-		        url: { label: 'Url', data: saveUrl },
 		        title: { label: 'Title', data: title },
 				description: { label: 'Description', data: description },
+		        url: { label: 'Url', data: saveUrl },
 				imageUrl: { label: 'Image url', data: imageUrl },
 		        faviconUrl: { label: 'Favicon url', data: faviconUrl }
 		    })
