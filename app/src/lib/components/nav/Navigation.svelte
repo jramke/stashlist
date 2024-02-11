@@ -21,7 +21,6 @@
 			</nav>
 		</div>
 		<div class="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-			<div class="w-full flex-1 md:w-auto md:flex-none">CommandMenu</div>
 			<nav class="flex items-center gap-6">
 				{#if $page.data.user}
 					<form method="post" action="/logout" use:enhance>
@@ -31,7 +30,7 @@
 					<Button href="/login">Login</Button>
 					<Button href="/register" variant="outline">Register</Button>
 				{/if}
-				ModeToggle
+					
 			</nav>
 		</div>
 	</div>
