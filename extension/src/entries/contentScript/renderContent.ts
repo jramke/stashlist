@@ -10,6 +10,7 @@ export default async function renderContent(
     mode: import.meta.env.MODE === "development" ? "open" : "closed",
   });
   const appRoot = document.createElement("div");
+  appRoot.id = 'stashlist-root';
 
   if (import.meta.hot) {
     const { addViteStyleTarget } = await import(

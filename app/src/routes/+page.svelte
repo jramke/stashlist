@@ -1,5 +1,5 @@
 <script>
-	import Section from '$lib/components/Section.svelte';
+	import Section from '$lib/components/ui/section';
 </script>
 
 <Section>

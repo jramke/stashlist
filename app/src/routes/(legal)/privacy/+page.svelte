@@ -1,6 +1,6 @@
 <script>
-	import Heading from '$lib/components/Heading.svelte';
-	import Section from '$lib/components/Section.svelte';
+	import Heading from '$lib/components/ui/heading';
+	import Section from '$lib/components/ui/section';
 </script>
 
 <Section>

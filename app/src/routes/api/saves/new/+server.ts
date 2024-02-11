@@ -30,11 +30,11 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 
 		if (edit) {
 		    return json({
-		        url: saveUrl,
-		        title: title,
-				description: description,
-				imageUrl: imageUrl,
-		        faviconUrl: faviconUrl
+		        url: { label: 'Url', data: saveUrl },
+		        title: { label: 'Title', data: title },
+				description: { label: 'Description', data: description },
+				imageUrl: { label: 'Image url', data: imageUrl },
+		        faviconUrl: { label: 'Favicon url', data: faviconUrl }
 		    })
 		}
 

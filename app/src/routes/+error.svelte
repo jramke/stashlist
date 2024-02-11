@@ -1,6 +1,6 @@
 <script>
-	import Section from '$lib/components/Section.svelte';
-	import Heading from '$lib/components/Heading.svelte';
+	import Section from '$lib/components/ui/section';
+	import Heading from '$lib/components/ui/heading';
 	import Button from '$lib/components/ui/button/button.svelte';
 </script>
 

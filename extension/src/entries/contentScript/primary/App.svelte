@@ -4,53 +4,75 @@
 	import browser from 'webextension-polyfill';
 	import logo from '~/assets/logo.svg';
 	import PageContent from '~/lib/PageContent.svelte';
-	import * as Dialog from '$lib/components/ui/dialog';
-	import { Input } from '~/lib/components/ui/input';
-	import { Label } from '~/lib/components/ui/label';
-  import { Button } from "~/lib/components/ui/button";
+	import * as Dialog from '$lib/ui/dialog';
+	import { Input } from '~/lib/ui/input';
+	import { Label } from '~/lib/ui/label';
+	import { Button } from '~/lib/ui/button';
 
 	const logoImageUrl = new URL(logo, import.meta.url).href;
 
 	let editDialogOpen = false;
+	let newStashData;
+	let newStashForm: HTMLFormElement | null;
 
 	browser.runtime.onMessage.addListener(
 		(message: any, sender: any, sendResponse: any) => {
 			if (message.newStash) {
-				const newStashData = message.newStash;
+				newStashData = message.newStash;
+
+				newStashForm = document.querySelector('#stashlist-ext-form');
+				if (!newStashForm) return;
+
+				newStashForm.addEventListener('submit', async (e) => {
+					e.preventDefault();
+					await newStash(newStashForm!);
+				})
+
 				editDialogOpen = true;
 				console.log(newStashData);
 			}
 		}
 	);
+
+	async function newStash(form: HTMLFormElement) {
+		const formData = new FormData(form);
+
+		try {
+			const response = await fetch("https://example.org/post", {
+				method: "POST",
+				body: formData,
+			});
+			console.log(await response.json());
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
 </script>
 
 <div id="stashlist" class="dark">
-  <div class="fixed p-6 bottom-0">
-    <Button>Test</Button>
-    <Input value="test" />
-  </div>
-	<Dialog.Root bind:open={editDialogOpen}>
+	<div class="fixed p-6 bottom-0 bg-card rounded-lg border">
+		<Button>Test</Button>
+		<Input value="test" />
+	</div>
+	<Dialog.Root bind:open={editDialogOpen} portal={null} preventScroll={false}>
 		<Dialog.Content>
 			<Dialog.Header>
-				<Dialog.Title>Edit profile</Dialog.Title>
-				<Dialog.Description>
+				<Dialog.Title>Save stash</Dialog.Title>
+				<!-- <Dialog.Description>
 					Make changes to your profile here. Click save when you're
 					done.
-				</Dialog.Description>
+				</Dialog.Description> -->
 			</Dialog.Header>
-			<div class="grid gap-4 py-4">
-				<div class="grid grid-cols-4 items-center gap-4">
+			<form action="POST" id="stashlist-ext-form" class="space-y-2">
+				<div class="space-y-2">
 					<Label class="text-right">Name</Label>
-					<Input id="name" value="Pedro Duarte" class="col-span-3" />
+					<Input id="name" value="Pedro Duarte" />
 				</div>
-				<div class="grid grid-cols-4 items-center gap-4">
-					<Label class="text-right">Username</Label>
-					<Input id="username" value="@peduarte" class="col-span-3" />
-				</div>
-			</div>
-			<Dialog.Footer>
-				<Button type="submit">Save changes</Button>
-			</Dialog.Footer>
+				<Dialog.Footer>
+					<Button type="submit">Save stash</Button>
+				</Dialog.Footer>
+			</form>
 		</Dialog.Content>
 	</Dialog.Root>
 </div>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import LinkPreviewCard from '$lib/components/saves/LinkPreviewCard.svelte';
-	import Heading from '$lib/components/Heading.svelte';
+	import Heading from '$lib/components/ui/heading';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { page } from '$app/stores';
 	import type { PageData } from '../$types';
