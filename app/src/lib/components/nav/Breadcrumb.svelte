@@ -3,7 +3,7 @@
 
 </script>
 
-<p class="mb-5 flex gap-2 items-center">
+<p class="flex gap-2 items-center">
     {#each path as item, i}
         {#if i === path.length - 1}
             <span class="font-bold">

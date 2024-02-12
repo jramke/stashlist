@@ -93,7 +93,7 @@
 
 <aside class="sticky top-0 h-screen flex-[350px] border-r bg-card">
 	<div class="flex flex-col items-start h-full overflow-hidden p-5">
-		<div class="flex w-full items-center justify-between gap-3">
+		<div class="flex w-full items-center justify-between gap-3 pb-5">
 			<div class="flex items-center px-3">
 				<Stash class="me-3 h-5 w-5 text-primary" />
 				<p class="text-xl font-bold">
@@ -130,7 +130,7 @@
 				</Dialog.Root>
 			</div>
 		</div>
-		<Separator />
+		<!-- <Separator /> -->
 		<div class="flex w-full flex-col items-start">
 			<Link path={siteConfig.appUrl}>
 				<Stash class="me-2 h-4 w-4" />

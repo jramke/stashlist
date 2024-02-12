@@ -10,10 +10,9 @@
 	// const { data } = $props<PageData>()
 </script>
 
-<div class="flex flex-wrap items-center justify-between gap-6">
-	<!-- <Heading tag="h1">All stashes</Heading> -->
+<!-- <div class="flex flex-wrap items-center justify-between gap-6">
 	<Breadcrumb path={['Stashes', 'All']} />
-</div>
+</div> -->
 {#await $page.data.saves}
 	<div class="grid grid-cols-3 gap-6">
 		{#each new Array(9) as _}

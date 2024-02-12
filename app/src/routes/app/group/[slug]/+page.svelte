@@ -2,11 +2,8 @@
 	import { page } from '$app/stores';
 	import LinkPreviewCard from '$lib/components/saves/LinkPreviewCard.svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
-	import Breadcrumb from "$lib/components/nav/Breadcrumb.svelte";
 	
 </script>
-
-<Breadcrumb path={['Stashes', $page.data.currentGroup.title]} />
 
 {#await $page.data.savesByGroup}
 	<div class="grid grid-cols-3 gap-6">

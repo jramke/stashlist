@@ -8,7 +8,7 @@
 	<Sidebar />
 	<div class="w-full">
 		<Topbar />
-		<Section class="p-5 pt-0">
+		<Section class="p-5">
 			<slot />
 		</Section>
 	</div>
