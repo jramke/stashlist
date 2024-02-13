@@ -1,6 +1,7 @@
 <!-- https://github.com/agustinl/svelte-tags-input -->
 <script>
     import { cn } from '$lib/utils';
+	import { Badge } from '$lib/components/ui/badge';
 
     let tag = "";
     let arrelementsmatch = [];
@@ -395,16 +396,16 @@
 
     {#if tags.length > 0}
         {#each tags as tag, i}
-            <button type="button" class="whitespace-nowrap inline-flex items-center cursor-default rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 select-none border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80 me-2" on:click={onTagClick(tag)}>
-                {#if typeof tag === 'string'}
-                    {tag}
-                {:else}
-                    {tag[autoCompleteShowKey]}
-                {/if}
-                {#if !disable && !readonly}
-                    <button type="button" class="ms-1 mb-[3px]" on:pointerdown={() => removeTag(i)} on:keydown|preventDefault={() => removeTag(i)}>&#215;</button>
-                {/if}   
-            </button>
+        <Badge type="button" class="whitespace-nowrap me-2" on:click={onTagClick(tag)}>
+            {#if typeof tag === 'string'}
+                {tag}
+            {:else}
+                {tag[autoCompleteShowKey]}
+            {/if}
+            {#if !disable && !readonly}
+                <button type="button" class="ms-1 mb-[3px]" on:pointerdown={() => removeTag(i)} on:keydown|preventDefault={() => removeTag(i)}>&#215;</button>
+            {/if}   
+        </Badge>
         {/each}
     {/if}
     <input

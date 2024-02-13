@@ -20,7 +20,7 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 
 		console.log(formData);
 
-		if (saveUrl && formData['title'] && formData['description'] && formData['imageUrl'] && formData['faviconUrl']) {
+		if (saveUrl && formData['title'] && formData['imageUrl'] && formData['faviconUrl']) {
 			await db.insert(save).values({
 				id: generateId(15),
 				userId: locals.user.id,
@@ -48,11 +48,11 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 
 		if (edit) {
 		    return json({
-		        title: { label: 'Title', data: title },
-				description: { label: 'Description', data: description },
-		        url: { label: 'Url', data: saveUrl },
-				imageUrl: { label: 'Image url', data: imageUrl },
-		        faviconUrl: { label: 'Favicon url', data: faviconUrl }
+		        title: { label: 'Title', data: title, error: null },
+				description: { label: 'Description', data: description, error: null },
+		        url: { label: 'Url', data: saveUrl, error: null },
+				imageUrl: { label: 'Image url', data: imageUrl, error: null },
+		        faviconUrl: { label: 'Favicon url', data: faviconUrl, error: null }
 		    })
 		}
 

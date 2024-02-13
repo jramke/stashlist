@@ -14,7 +14,7 @@ browser.contextMenus.create({
 });
 
 browser.runtime.onMessage.addListener(async (message: any, sender: any) => {
-  if (message.newStash) {
+  if (message.newStash) {   
     const result = await makePostRequest("http://127.0.0.1:5173/api/saves/new", message.newStash);
     await browser.tabs.sendMessage(sender.tab.id, {
       newStashAdded: result

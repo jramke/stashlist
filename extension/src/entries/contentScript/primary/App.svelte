@@ -2,8 +2,6 @@
 	import '../../../app.pcss';
 
 	import browser from 'webextension-polyfill';
-	import logo from '~/assets/logo.svg';
-	import PageContent from '~/lib/PageContent.svelte';
 	import * as Dialog from '~/lib/components/ui/dialog';
 	import { Input } from '~/lib/components/ui/input';
 	import { Label } from '~/lib/components/ui/label';
@@ -12,11 +10,13 @@
 	import { Toaster } from '~/lib/components/ui/sonner';
 	import { ModeWatcher } from 'mode-watcher';
 	import { toast } from 'svelte-sonner';
+	import { z } from 'zod';
 
 	type NewStashEdit = {
 		[key: string]: {
 			label: string;
 			data: string;
+			error: any;
 		};
 	};
 
@@ -34,7 +34,8 @@
 	browser.runtime.onMessage.addListener((message: any, sender: any, sendResponse: any) => {
 			if (message.editNewStash) {
 				newStashData = message.editNewStash;
-
+				console.log(newStashData);
+				
 				editDialogOpen = true;
 
 				setTimeout(() => {
@@ -45,12 +46,29 @@
 					newStashForm.addEventListener('submit', async (e) => {
 						e.preventDefault();
 						const form = e.target as HTMLFormElement;
-						const formData = new FormData(form);
+						const formData = Object.fromEntries(new FormData(form));
 						
-						//TODO: error handling
+						// Generate a dynamic Zod schema based on the form data array
+						const formSchema = z.object({
+							title: z.string().min(1),
+							description: z.string().default('').optional(),
+							url: z.string().url(),
+							groups: z.string().default('').optional()
+						});
+						try {
+							formSchema.parse(formData);
+						} catch (err) {
+							if (err instanceof z.ZodError) {
+								console.log(err.issues);
+								err.issues.forEach(issue => {
+									newStashData[issue.path[0]].error = issue;
+								})
+							}
+							return
+						}
 
 						browser.runtime.sendMessage({
-							newStash: Object.fromEntries(formData)
+							newStash: formData
 						})
 					})
 				}, 100);
@@ -85,6 +103,9 @@
 						<div class="space-y-2">
 							<Label for={key}>{value.label}</Label>
 							<Input name={key} value={value.data} />
+							{#if value.error}
+								<p class="text-destructive text-sm">{value.error.message}</p>
+							{/if}
 						</div>
 					{/if}
 				{/each}
