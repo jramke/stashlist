@@ -12,20 +12,20 @@ if (!DATABASE_AUTH_TOKEN) {
 	throw new Error('No auth token');
 }
 
+const client = createClient({ url: DATABASE_URL as string, authToken: DATABASE_AUTH_TOKEN as string });
+const db = drizzle(client);
+
 async function main() {
-	const db = drizzle(createClient({ url: DATABASE_URL, authToken: DATABASE_AUTH_TOKEN }));
-
-	console.log('Running migrations');
-
-	await migrate(db, { migrationsFolder: 'drizzle' });
-
-	console.log('Migrated successfully');
-
-	process.exit(0);
+	try {
+		console.log('Migration started...');
+		await migrate(db, {
+			migrationsFolder: 'drizzle'
+		});
+		console.log('Tables migrated!');
+		process.exit(0);
+	} catch (error) {
+		console.error('Error performing migration: ', error);
+		process.exit(1);
+  	}
 }
-
-main().catch((e) => {
-	console.error('Migration failed');
-	console.error(e);
-	process.exit(1);
-});
+main();

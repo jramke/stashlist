@@ -28,7 +28,7 @@
 					</form>
 				{:else}
 					<Button href="/login">Login</Button>
-					<Button href="/register" variant="outline">Register</Button>
+					<!-- <Button href="/register" variant="outline">Register</Button> -->
 				{/if}
 					
 			</nav>

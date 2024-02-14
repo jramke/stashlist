@@ -48,6 +48,7 @@
 		"@fontsource-variable/plus-jakarta-sans": "^5.0.19",
 		"@libsql/client": "^0.4.0",
 		"@lucia-auth/adapter-drizzle": "^1.0.0",
+		"arctic": "^1.1.5",
 		"bits-ui": "^0.15.1",
 		"clsx": "^2.1.0",
 		"drizzle-orm": "^0.29.3",

@@ -19,4 +19,5 @@ export default {
 		authToken: DATABASE_AUTH_TOKEN
 	},
 	// strict: true
+	verbose: true,
 } satisfies Config;

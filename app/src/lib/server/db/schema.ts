@@ -2,17 +2,19 @@ import { sql, relations } from 'drizzle-orm';
 import { text, sqliteTable, integer, real, primaryKey } from 'drizzle-orm/sqlite-core';
 
 export const user = sqliteTable('user', {
-	id: text('id').notNull().primaryKey(),
-	name: text('name').notNull(),
-	email: text('email').notNull(),
-	hashedPassword: text('hashed_password').notNull(),
+	id: text('id').notNull().primaryKey().unique(),
+	// name: text('name').notNull(),
+	// email: text('email').notNull(),
+	// hashedPassword: text('hashed_password').notNull(),
+	githubId: text('github_id').unique(),
+	username: text('username'),
 	createdAt: text('created_at')
 		.default(sql`CURRENT_TIMESTAMP`)
 		.notNull()
 });
 
 export const session = sqliteTable('session', {
-	id: text('id').notNull().primaryKey(),
+	id: text('id').notNull().primaryKey().unique(),
 	userId: text('user_id')
 		.notNull()
 		.references(() => user.id),
@@ -20,7 +22,7 @@ export const session = sqliteTable('session', {
 });
 
 export const save = sqliteTable('save', {
-	id: text('id').notNull().primaryKey(),
+	id: text('id').notNull().primaryKey().unique(),
 	userId: text('user_id')
 		.notNull()
 		.references(() => user.id),
@@ -35,7 +37,7 @@ export const save = sqliteTable('save', {
 });
 
 export const group = sqliteTable('group', {
-	id: text('id').notNull().primaryKey(),
+	id: text('id').notNull().primaryKey().unique(),
 	userId: text('user_id')
 		.notNull()
 		.references(() => user.id),
