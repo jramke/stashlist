@@ -27,7 +27,7 @@
 						<Button type="submit" variant="outline">Logout</Button>
 					</form>
 				{:else}
-					<Button href="/login">Login</Button>
+					<Button href="/login" variant="outline">Login</Button>
 					<!-- <Button href="/register" variant="outline">Register</Button> -->
 				{/if}
 					

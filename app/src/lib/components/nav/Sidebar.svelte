@@ -11,7 +11,7 @@
 	import { invalidateAll, goto } from '$app/navigation';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { Plus, FolderPlus, Folder, Check, Bookmark, Compass, LogOut, Pencil, Trash2, X } from 'lucide-svelte';
-	import Stash from "$lib/icons/stash.svelte"
+	import { Stash } from "$lib/icons";
 	import { page } from '$app/stores';
 	import { cn } from '$lib/utils';
 	import { Input } from '$lib/components/ui/input';

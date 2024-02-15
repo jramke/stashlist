@@ -3,7 +3,7 @@ import { OAuth2RequestError } from "arctic";
 import { generateId } from "lucia";
 import { db } from "$lib/server/db";
 import { and, eq } from "drizzle-orm";
-import { user } from '$lib/server/db/schema';
+import { user, oauth_account } from '$lib/server/db/schema';
 
 import type { RequestEvent } from "@sveltejs/kit";
 
@@ -11,6 +11,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 	const code = event.url.searchParams.get("code");
 	const state = event.url.searchParams.get("state");
 	const storedState = event.cookies.get("github_oauth_state") ?? null;
+	
 	if (!code || !state || !storedState || state !== storedState) {
 		return new Response(null, {
 			status: 400
@@ -25,13 +26,13 @@ export async function GET(event: RequestEvent): Promise<Response> {
 			}
 		});
 		const githubUser: GitHubUser = await githubUserResponse.json();
-		const existingUser = await db.query.user.findFirst({
-			// where: and(eq(user.provider, 'github'), eq(user.githubId, githubUser.id))
-            where: (user, { eq }) => eq(user.githubId, githubUser.id),
+		
+		const existingUser = await db.query.oauth_account.findFirst({
+			where: and(eq(oauth_account.provider, 'github'), eq(oauth_account.providerId, githubUser.id))
 		});
 
 		if (existingUser) {
-			const session = await lucia.createSession(existingUser.id, {});
+			const session = await lucia.createSession(existingUser.userId, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			event.cookies.set(sessionCookie.name, sessionCookie.value, {
 				path: ".",
@@ -39,11 +40,20 @@ export async function GET(event: RequestEvent): Promise<Response> {
 			});
 		} else {
 			const userId = generateId(15);
+
             await db.insert(user).values({
                 id: userId,
-                githubId: githubUser.id,
-                username: githubUser.login
+                username: githubUser.login,
+				name: githubUser.name ?? '',
+				avatarUrl: githubUser.avatar_url ?? ''
+
             });
+			await db.insert(oauth_account).values({
+				provider: 'github',
+                providerId: githubUser.id,
+                userId: userId
+            });
+
 			const session = await lucia.createSession(userId, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			event.cookies.set(sessionCookie.name, sessionCookie.value, {
@@ -58,6 +68,8 @@ export async function GET(event: RequestEvent): Promise<Response> {
 			}
 		});
 	} catch (e) {
+		console.error('Error during Github callback: ', e);
+		
 		if (e instanceof OAuth2RequestError && e.message === "bad_verification_code") {
 			// invalid code
 			return new Response(null, {
@@ -71,6 +83,8 @@ export async function GET(event: RequestEvent): Promise<Response> {
 }
 
 interface GitHubUser {
+	name: string;
+	avatar_url: string;
 	id: string;
 	login: string;
 }

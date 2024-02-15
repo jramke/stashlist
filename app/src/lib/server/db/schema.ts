@@ -3,15 +3,24 @@ import { text, sqliteTable, integer, real, primaryKey } from 'drizzle-orm/sqlite
 
 export const user = sqliteTable('user', {
 	id: text('id').notNull().primaryKey().unique(),
-	// name: text('name').notNull(),
-	// email: text('email').notNull(),
-	// hashedPassword: text('hashed_password').notNull(),
-	githubId: text('github_id').unique(),
-	username: text('username'),
+	username: text('username').default(''),
+	name: text('name').default(''),
+	avatarUrl: text('avatar_url').default(''),
 	createdAt: text('created_at')
 		.default(sql`CURRENT_TIMESTAMP`)
 		.notNull()
 });
+
+export const oauth_account = sqliteTable(
+	'oauth_account', {
+		provider: text('provider',{ enum: ['google', 'github'] }).notNull(),
+		providerId: text('provider_id').notNull().unique(),
+		userId: text('user_id').notNull().unique().references(() => user.id)
+	},
+	(t) => ({
+		pk: primaryKey(t.userId, t.providerId)
+	})
+);
 
 export const session = sqliteTable('session', {
 	id: text('id').notNull().primaryKey().unique(),
@@ -69,10 +78,18 @@ export const save_group_mm = sqliteTable(
 );
 
 
-export const userRelations = relations(user, ({ many }) => ({
+export const userRelations = relations(user, ({ one, many }) => ({
 	saves: many(save),
 	groups: many(group),
-	saveGroupMm: many(save_group_mm)
+	saveGroupMm: many(save_group_mm),
+	// oauthAccount: one(oauth_account)
+}));
+
+export const oauthAccountRelations = relations(oauth_account, ({ one }) => ({
+	user: one(user, {
+		fields: [oauth_account.userId],
+		references: [user.id]
+	}),
 }));
 
 export const groupRelations = relations(group, ({ one, many }) => ({

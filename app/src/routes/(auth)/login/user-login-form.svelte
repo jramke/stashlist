@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { Github, Loader2 } from 'lucide-svelte';
+	import { Loader2 } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button';
+	import { Google, GitHub } from '$lib/icons';
 
 	let isLoading = false;
 
@@ -8,11 +9,11 @@
 </script>
 
 <div class="grid gap-6">
-	<Button variant="outline" type="button" href="/login/oauth/github" disabled={isLoading}>
+	<Button variant="outline" type="button" href="/login/github" disabled={isLoading}>
 		{#if isLoading}
 			<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 		{:else}
-			<Github class="mr-2 h-4 w-4" />
+			<GitHub class="mr-2 h-4 w-4" />
 		{/if}
 		{' '}
 		GitHub
@@ -25,11 +26,11 @@
 			<span class="bg-background px-2 text-muted-foreground"> Or continue with </span>
 		</div>
 	</div>
-	<Button variant="outline" type="button" href="/login/oauth/github" disabled={isLoading}>
+	<Button variant="outline" type="button" href="/login/google" disabled={isLoading}>
 		{#if isLoading}
 			<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 		{:else}
-			<Github class="mr-2 h-4 w-4" />
+			<Google class="mr-2 h-4 w-4" />
 		{/if}
 		{' '}
 		Google

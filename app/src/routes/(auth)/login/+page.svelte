@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import UserLoginForm from './user-login-form.svelte';
-	import type { PageData } from './$types';
+	// import type { PageData } from './$types';
 
-	export let data: PageData;
 </script>
 
 <div
@@ -28,10 +27,10 @@
 	<div class="lg:p-8">
 		<div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
 			<div class="flex flex-col space-y-2 text-center">
-				<h1 class="text-2xl font-semibold tracking-tight">Log in with your GitHub account</h1>
-				<!-- <p class="text-sm text-muted-foreground">Use your email or log in with GitHub</p> -->
+				<h1 class="text-2xl font-semibold tracking-tight">Unlock Your Stashlist Experience</h1>
+				<p class="text-sm text-muted-foreground">Sign in effortlessly with your Google or GitHub account. Your digital vault awaits – let's get started!</p>
 			</div>
-			<UserLoginForm form={data.form} />
+			<UserLoginForm />
 			<p class="px-8 text-center text-sm text-muted-foreground">
 				By logging in, you agree to our{' '}
 				<a href="/terms" class="underline underline-offset-4 hover:text-primary">

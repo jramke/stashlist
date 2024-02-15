@@ -23,3 +23,6 @@ An app where developers and designers can save inspirational websites, code snip
 
 ## Extension
 - https://addons.mozilla.org/de/developers/addons
+
+## Google OAuth client
+- https://console.cloud.google.com/apis/credentials?project=stashlist-414419
