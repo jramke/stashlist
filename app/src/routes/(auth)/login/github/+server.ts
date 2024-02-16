@@ -7,12 +7,12 @@ import { redirect } from "@sveltejs/kit";
 export async function GET(event: RequestEvent): Promise<Response> {
 	const state = generateState();
 	const url = await github.createAuthorizationURL(state);
-	
+
 	event.cookies.set("github_oauth_state", state, {
 		path: "/",
 		secure: import.meta.env.PROD,
 		httpOnly: true,
-		maxAge: 60 * 10,
+		maxAge: 60 * 10, // 10 min
 		sameSite: "lax"
 	});
 
