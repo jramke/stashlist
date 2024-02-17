@@ -1,32 +1,28 @@
-# Turborepo Svelte starter
+# ✨ stashlist
+An app where developers and designers can save inspirational websites, code snippets, and other things.
 
-This is an official starter Turborepo.
+## IDEA
+- like savee but for devs
+- with extensions
+- also save links
+- save codesnippets
+- provide list of inspirational
+- reading list
+- groups for saved objects
 
-## Using this example
+## LINKS
+- https://github.com/isaacHagoel/svelte-dnd-action
+- https://github.com/samrum/vite-plugin-web-extension
+- https://github.com/adityaoberai/BackgroundRemover
+- https://github.com/huntabyte/cmdk-sv
+- https://github.com/haishanh/cherry-periphery
+- https://github.com/delay/sveltekit-auth
+- https://github.com/bmdavis419/sveltekit-lucia-example
+- https://github.com/ciscoheat/sveltekit-rate-limiter
+- https://github.com/ciscoheat/sveltekit-flash-message
 
-Run the following command:
+## Extension
+- https://addons.mozilla.org/de/developers/addons
 
-```sh
-npx create-turbo@latest -e with-svelte
-```
-
-## What's inside?
-
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [svelte-kit](https://kit.svelte.dev/) app
-- `web`: another [svelte-kit](https://kit.svelte.dev/) app
-- `ui`: a stub Svelte component library shared by both `web` and `docs` applications
-- `eslint-config-custom`: `eslint` configurations (includes `eslint-plugin-svelte` and `eslint-config-prettier`)
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+## Google OAuth client
+- https://console.cloud.google.com/apis/credentials?project=stashlist-414419

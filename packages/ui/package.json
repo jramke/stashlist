@@ -1,20 +1,38 @@
 {
   "name": "@repo/ui",
   "version": "0.0.0",
-  "type": "module",
-  "module": "index.ts",
-  "main": "index.ts",
+  "private": true,
   "exports": {
-    ".": {
-      "types": "./index.ts",
-      "svelte": "./index.ts"
-    }
+    "./globals.pcss": "./src/globals.pcss",
+    "./postcss.config": "./postcss.config.cjs",
+    "./tailwind.config": "./tailwind.config.js",
+    "./lib/*": "./src/lib/*.ts",
+    "./components/*": "./src/components/*",
+    "./icons/*": "./src/icons/*"
   },
   "scripts": {
+    "ui:add": "pnpm dlx shadcn-svelte@latest add",
     "lint": "eslint ."
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
-    "svelte": "^4.2.8"
+    "@repo/tsconfig": "workspace:*",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "postcss-load-config": "^5.0.2",
+    "svelte": "^4.2.8",
+    "svelte-check": "^3.6.0",
+    "typescript": "^5.0.0",
+    "tailwindcss": "^3.3.6"
+  },
+  "dependencies": {
+    "bits-ui": "^0.15.1",
+    "clsx": "^2.1.0",
+    "lucide-svelte": "^0.323.0",
+    "mode-watcher": "^0.2.0",
+    "svelte-sonner": "^0.3.11",
+    "svelte-tags-input": "^6.0.0",
+    "tailwind-merge": "^2.2.1",
+    "tailwind-variants": "^0.1.20"
   }
 }

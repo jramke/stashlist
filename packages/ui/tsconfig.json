@@ -1,0 +1,11 @@
+{
+    "extends": "@repo/tsconfig/tsconfig-svelte-library.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@ui/*": ["./src/*"]
+        }
+    },
+    "include": ["src"],
+    "exclude": ["node_modules"]
+}
