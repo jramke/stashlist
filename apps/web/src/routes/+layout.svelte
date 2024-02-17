@@ -1,7 +1,8 @@
 <script>
-	import '@fontsource-variable/plus-jakarta-sans';
+	// import '@ui/fonts';
+	import '@ui/globals.pcss';
 	import '../app.pcss';
-	import '$lib/styles/app.css';
+	// import '$lib/styles/app.css';
 
 	import { ModeWatcher } from 'mode-watcher';
 	import { Toaster } from '@ui/components/ui/sonner';

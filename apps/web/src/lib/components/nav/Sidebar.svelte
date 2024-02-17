@@ -4,15 +4,14 @@
 	import { siteConfig } from '$lib/config/site';
 	import Link from '$lib/components/nav/Link.svelte';
 	import { Separator } from '@ui/components/ui/separator';
-	import { buttonVariants } from '@ui/components/ui/button';
-	import Button from '@ui/components/ui/button/button.svelte';
+	import { buttonVariants, Button } from '@ui/components/ui/button';
 	import * as Dialog from '@ui/components/ui/dialog';
 	import { enhance, applyAction } from '$app/forms';
 	import { invalidateAll, goto } from '$app/navigation';
 	import { Skeleton } from '@ui/components/ui/skeleton';
 	import { Plus, FolderPlus, Folder, Check, Bookmark, Compass, LogOut, Pencil, Trash, X, Stash } from '@ui/icons';
 	import { page } from '$app/stores';
-	import { cn } from '$lib/utils';
+	import { cn } from '@ui/lib/utils';
 	import { Input } from '@ui/components/ui/input';
 	import * as AlertDialog from "@ui/components/ui/alert-dialog";
 	import { onMount } from 'svelte';

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { FormOptions } from "formsnap";
 	import { formSchema, type FormSchema } from "./schema";
     import type { SuperValidated } from "sveltekit-superforms";
 	import type { Save, TODO } from "$lib/types";
@@ -19,17 +18,6 @@
     let groups = data.save.saveGroups.map(item => item.group) || [];
     $: groupIds = groups.map(item => item.id);
     
-
-    // const options: FormOptions<FormSchema> = {
-    //     onSubmit: () => {
-    //         console.log(history.state);
-            
-    //         // history.back();
-    //     },
-    //     onError: () => {
-    //         // history.back();
-    //     }
-    // };
 
 </script>
 

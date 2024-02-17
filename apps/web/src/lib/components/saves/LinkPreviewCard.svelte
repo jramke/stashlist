@@ -23,11 +23,13 @@
 	export let imageUrl: Save['imageUrl'];
 	export let faviconUrl: Save['faviconUrl'];
 	export let createdAt: Save['createdAt'];
-	export let userId: string = '';
 	export let saveGroups: TODO[] = [];
 	export let id: string;
+	export const userId: string = '';
 
 	// export let editForm: SuperValidated<FormSchema>;
+
+	console.log(createdAt);
 
 	let deleteDialogOpen = false;
 	let editDialogOpen = $page.state.selected?.form ? true : false;

@@ -2,13 +2,19 @@
   "name": "@repo/ui",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "exports": {
     "./globals.pcss": "./src/globals.pcss",
     "./postcss.config": "./postcss.config.cjs",
     "./tailwind.config": "./tailwind.config.js",
-    "./lib/*": "./src/lib/*.ts",
-    "./components/*": "./src/components/*",
-    "./icons/*": "./src/icons/*"
+    "./components/*": {
+      "default": "./src/components/*",
+      "svelte": "./src/components/*"
+    },
+    "./lib/*": {
+      "default": "./src/lib/*",
+      "svelte": "./src/lib/*"
+    }
   },
   "scripts": {
     "ui:add": "pnpm dlx shadcn-svelte@latest add",
@@ -26,6 +32,7 @@
     "tailwindcss": "^3.3.6"
   },
   "dependencies": {
+    "@fontsource-variable/plus-jakarta-sans": "^5.0.19",
     "bits-ui": "^0.15.1",
     "clsx": "^2.1.0",
     "lucide-svelte": "^0.323.0",
@@ -33,6 +40,7 @@
     "svelte-sonner": "^0.3.11",
     "svelte-tags-input": "^6.0.0",
     "tailwind-merge": "^2.2.1",
-    "tailwind-variants": "^0.1.20"
+    "tailwind-variants": "^0.1.20",
+    "formsnap": "^0.4.3"
   }
 }

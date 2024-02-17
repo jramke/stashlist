@@ -1,0 +1,1 @@
+declare module "@repo/ui/tailwind.config";

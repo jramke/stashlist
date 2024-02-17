@@ -6,7 +6,13 @@ export default defineConfig({
 	build: {
 		commonjsOptions: {
 		//   include: [/@repo-ui/, /node_modules/],
-		  include: [/@ui/, /node_modules/],
+		  	include: [/@ui/, /@repo-ui/, /node_modules/],
 		},
 	},
+	server: {
+		fs: {
+			// Allow serving files from two level up to the project root
+			allow: ['../..'],
+		},
+	}
 });

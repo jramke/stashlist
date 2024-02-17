@@ -1,9 +1,10 @@
+@import '@fontsource-variable/plus-jakarta-sans';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-	:root {
+	#stashlist {
 		--background: 0 0% 100%;
 		--foreground: 20 14.3% 4.1%;
 		--card: 0 0% 98%;
@@ -25,7 +26,7 @@
 		--ring: 24.6 95% 53.1%;
 		--radius: 0.75rem;
 	}
-	.dark {
+	#stashlist.dark {
 		--background: 20 14.3% 4.1%;
 		--foreground: 60 9.1% 97.8%;
 		--card: 20 14.3% 5.5%;
@@ -47,12 +48,3 @@
 		--ring: 20.5 90.2% 48.2%;
 	}
 }
-
-/* @layer base {
-	* {
-		@apply border-border;
-	}
-	body {
-		@apply bg-background text-foreground;
-	}
-} */

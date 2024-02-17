@@ -48,7 +48,6 @@
 		"@repo/ui": "workspace:*",
 		"arctic": "^1.1.5",
 		"drizzle-orm": "^0.29.3",
-		"formsnap": "^0.4.3",
 		"lucia": "^3.0.1",
 		"mode-watcher": "^0.2.0",
 		"oslo": "^1.0.2",
