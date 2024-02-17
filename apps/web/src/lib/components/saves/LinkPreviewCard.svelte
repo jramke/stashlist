@@ -6,7 +6,7 @@
 	import { goto, invalidateAll, preloadData, pushState } from '$app/navigation';
 	import { MoreHorizontal, Trash, Pencil, CircleDashed  } from '@ui/icons';
 	import { toast } from '@ui/components/ui/sonner';
-	import { cleanUrl } from '$lib/utils';
+	import { cleanUrl, formatRelativeTime } from '$lib/utils';
 	import { siteConfig } from '$lib/config/site';
 	import * as DropdownMenu from '@ui/components/ui/dropdown-menu';
 	import { buttonVariants } from '@ui/components/ui/button';
@@ -15,6 +15,7 @@
 	import Waves from '$lib/placeholder/waves.svelte';
 	import EditForm from '../../../routes/app/save/edit/[id]/+page.svelte';
 	import { page } from '$app/stores';
+	import { listLayout } from '$lib/stores';
 
 	// TODO: use let { a,b } = $props();
 	export let title: Save['title'];
@@ -25,11 +26,13 @@
 	export let createdAt: Save['createdAt'];
 	export let saveGroups: TODO[] = [];
 	export let id: string;
-	export const userId: string = '';
 
 	// export let editForm: SuperValidated<FormSchema>;
 
-	console.log(createdAt);
+	let creationDate: Date;
+	if (createdAt) {
+		creationDate = new Date(createdAt);
+	}
 
 	let deleteDialogOpen = false;
 	let editDialogOpen = $page.state.selected?.form ? true : false;
@@ -60,47 +63,38 @@
 	const handleDelete: SubmitFunction = () => {
 		return async ({ result }) => {
 			if (result.type === 'success') {
+				await applyAction(result);
 				invalidateAll();
 				toast.success('Successfully deleted stash');
-				await applyAction(result);
 			} else {
 				toast.error('Failed to delete stash');
-			}
-		};
-	};
-	const handlEdit: SubmitFunction = () => {
-		return async ({ result }) => {
-			if (result.type === 'success') {
-				invalidateAll();
-				toast.success('Successfully updated stash');
-				await applyAction(result);
-			} else {
-				toast.error('Failed to update stash');
 			}
 		};
 	};
 
 </script>
 
-<div class="overflow-hidden rounded-lg border bg-card text-card-foreground">
-	<a
-		href={url}
-		{title}
-		rel="norefferrer noopener"
-		target="_blank"
-		class="relative flex aspect-og overflow-hidden border-b"
-	>
-		<!-- TODO: cool css or svg placeholder -->
-		<Waves class="absolute inset-0 h-full w-full" />
-		{#if imageUrl}	
-			<img
-				loading="lazy"
-				src={imageUrl}
-				alt={title}
-				class="absolute inset-0 h-full w-full object-cover"
-			/>
-		{/if}
-	</a>
+<div class="overflow-hidden rounded-lg border bg-card text-card-foreground flex flex-col">
+	{#if $listLayout === 'grid'}
+		<a
+			href={url}
+			{title}
+			rel="norefferrer noopener"
+			target="_blank"
+			class="relative flex aspect-og overflow-hidden border-b"
+		>
+			<!-- TODO: cool css or svg placeholder -->
+			<Waves class="absolute inset-0 h-full w-full" />
+			{#if imageUrl}	
+				<img
+					loading="lazy"
+					src={imageUrl}
+					alt={title}
+					class="absolute inset-0 h-full w-full object-cover"
+				/>
+			{/if}
+		</a>
+	{/if}
 	<div class="flex gap-4 p-4">
 		<div class="flex flex-col gap-2">
 			<span class="line-clamp-2 text-lg font-bold">{title}</span>
@@ -123,15 +117,7 @@
 					{cleanUrl(url)}
 				</a>
 			</div>
-			{#if saveGroups.length !== 0}
-				<div class="flex flex-wrap gap-1 pt-2">
-					{#each saveGroups as group}
-						<Badge variant="outline">
-							{group.group.title}
-						</Badge>
-					{/each}
-				</div>
-			{/if}
+			
 		</div>
 		<div class="ml-auto flex">
 			<DropdownMenu.Root>
@@ -152,6 +138,22 @@
 					</DropdownMenu.Group>
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
+		</div>
+	</div>
+	<div class="border-t flex gap-4 px-4 py-3 bg-background justify-between items-center flex-grow">
+		<div>
+			{#if saveGroups.length !== 0}
+				<div class="flex flex-wrap gap-1">
+					{#each saveGroups as group}
+						<Badge variant="outline">
+							{group.group.title}
+						</Badge>
+					{/each}
+				</div>
+			{/if}
+		</div>
+		<div class="text-xs text-muted-foreground tracking-none">
+			{formatRelativeTime(creationDate)}
 		</div>
 	</div>
 </div>

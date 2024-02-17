@@ -42,22 +42,22 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	// return await resolve(event);
 
-	// handle cors
-	// TODO: tighten before prod
-	// https://snippets.khromov.se/configure-cors-in-sveltekit-to-access-your-api-routes-from-a-different-host/
-	// TODO: check if this check is better https://github.com/sveltejs/kit/issues/6784#issuecomment-1416104897
-	if (event.url.pathname.startsWith('/api')) {
-		// Required for CORS to work
-		if (event.request.method === 'OPTIONS') {
-			return new Response(null, {
-				headers: {
-					'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
-					'Access-Control-Allow-Origin': '*',
-					'Access-Control-Allow-Headers': '*'
-				}
-			});
-		}
-	}
+	// // handle cors
+	// // TODO: tighten before prod
+	// // https://snippets.khromov.se/configure-cors-in-sveltekit-to-access-your-api-routes-from-a-different-host/
+	// // TODO: check if this check is better https://github.com/sveltejs/kit/issues/6784#issuecomment-1416104897
+	// if (event.url.pathname.startsWith('/api')) {
+	// 	// Required for CORS to work
+	// 	if (event.request.method === 'OPTIONS') {
+	// 		return new Response(null, {
+	// 			headers: {
+	// 				'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+	// 				'Access-Control-Allow-Origin': '*',
+	// 				'Access-Control-Allow-Headers': '*'
+	// 			}
+	// 		});
+	// 	}
+	// }
 
 	const response = await resolve(event);
 	if (event.url.pathname.startsWith('/api')) {

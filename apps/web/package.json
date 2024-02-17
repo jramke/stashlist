@@ -17,6 +17,7 @@
 		"push": "drizzle-kit push:sqlite --config drizzle.config.ts"
 	},
 	"devDependencies": {
+		"@repo/eslint-config": "workspace:*",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
@@ -26,7 +27,6 @@
 		"dotenv": "^16.4.1",
 		"drizzle-kit": "^0.20.13",
 		"eslint": "^8.56.0",
-		"@repo/eslint-config": "workspace:*",
 		"postcss": "^8.4.32",
 		"postcss-load-config": "^5.0.2",
 		"prettier": "^3.1.1",
@@ -51,6 +51,7 @@
 		"lucia": "^3.0.1",
 		"mode-watcher": "^0.2.0",
 		"oslo": "^1.0.2",
+		"svelte-persisted-store": "^0.9.1",
 		"sveltekit-superforms": "^1.13.4",
 		"url-metadata": "^3.4.7",
 		"zod": "^3.22.4"

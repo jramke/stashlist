@@ -1,3 +1,30 @@
+export function formatRelativeTime(date: Date): string {
+	const now = new Date();
+	const diffInMilliseconds = date.getTime() - now.getTime();
+
+	// Define units for different time intervals
+	const units: { unit: Intl.RelativeTimeFormatUnit; value: number }[] = [
+		{ unit: 'year', value: 365 * 24 * 60 * 60 * 1000 },
+		{ unit: 'month', value: 30 * 24 * 60 * 60 * 1000 },
+		{ unit: 'day', value: 24 * 60 * 60 * 1000 },
+		{ unit: 'hour', value: 60 * 60 * 1000 },
+		{ unit: 'minute', value: 60 * 1000 }
+	];
+
+	// Find the appropriate unit and value
+	for (const { unit, value } of units) {
+		const unitCount = Math.round(Math.abs(diffInMilliseconds) / value);
+		if (unitCount >= 1) {
+			const formatter = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+			const relativeTime = formatter.format(Math.sign(diffInMilliseconds) * unitCount, unit);
+			return relativeTime;
+		}
+	}
+
+	// If the date is less than a minute ago or in the future
+	return 'just now';
+}
+
 export function isImageUrl(url: string): boolean {
 	// Include query parameter support by adding \?.* after the file extension
 	return /\.(jpg|jpeg|png|webp|avif|gif|svg|ico)(\?.*)?$/i.test(url);

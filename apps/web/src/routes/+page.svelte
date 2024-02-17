@@ -5,6 +5,7 @@
 	import { Stash } from '@ui/icons';
 	
 </script>
+
 <Section class="py-20">
 	<div class="container max-w-[900px] flex flex-col items-center">
 		<div class="relative w-16 h-16 mb-10">
@@ -18,8 +19,4 @@
 			<Button variant="outline">Install extension</Button>
 		</div>
 	</div>
-</Section>
-
-<Section>
-
 </Section>

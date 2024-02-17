@@ -1,9 +1,6 @@
 import type { PageServerLoad } from './$types';
 
-import { db } from '$lib/server/db';
-import { save_group_mm, user, save, group } from '$lib/server/db/schema';
 import { redirect } from '@sveltejs/kit';
-import { eq, getTableColumns } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ locals, params, parent }) => {
 	if (!locals.user) redirect(302, '/login');
@@ -11,6 +8,8 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
 	const data = await parent();
 	const saves = await data.saves;
 	const groups = await data.groups;
+	console.log(data);
+	
 
 	const currentGroupId = params.slug;
 

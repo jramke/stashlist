@@ -9,6 +9,7 @@
 	import Navigation from '$lib/components/nav/Navigation.svelte';
 	import { page } from '$app/stores';
 	import { siteConfig } from '$lib/config/site';
+
 </script>
 
 <ModeWatcher />

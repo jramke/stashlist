@@ -5,9 +5,13 @@
 	import { base } from '$app/paths';
 	import { Button } from '@ui/components/ui/button';
 	import * as DropdownMenu from '@ui/components/ui/dropdown-menu';
-	import { Sun, Moon } from '@ui/icons';
+	import { Sun, Moon, LayoutGrid, StretchHorizontal } from '@ui/icons';
 	import { setMode, resetMode } from 'mode-watcher';
 	import Breadcrumb from './Breadcrumb.svelte';
+	import { Slider } from '@ui/components/ui/slider';
+	import { Label } from '@ui/components/ui/label';
+	import { listColumns, listLayout } from '$lib/stores';
+	import * as RadioGroup from '@ui/components/ui/radio-group';
 
 	//TODO: search https://www.youtube.com/watch?v=lrzHaTcpRh8
 
@@ -25,10 +29,20 @@
 			breadcrumbArray[1] = $page.data.currentGroup.title;
 		}
 	}
-	
+
+	function sliderValueChange(value: number[]) {
+		listColumns.set(value[0]);
+	}
+
+	function layoutValueChange(value: string | undefined) {
+		if (!value) return;
+		listLayout.set(value);
+	}
 </script>
 
-<div class="flex gap-5 p-5 justify-between bg-card/95 border-b sticky z-50 w-full top-0 backdrop-blur">
+<div
+	class="bg-card/95 sticky top-0 z-50 flex w-full justify-between gap-5 border-b p-5 backdrop-blur"
+>
 	<!-- <Input type="search" placeholder="Search" />
 	<div class="flex items-center gap-3">
 		<Avatar.Root>
@@ -41,6 +55,26 @@
 		</p>
 	</div> -->
 	<Breadcrumb path={breadcrumbArray} />
+	<div class="flex gap-6 items-center">
+		<RadioGroup.Root value={$listLayout} class="flex gap-2" onValueChange={layoutValueChange}>
+			<Label for="grid" class="flex flex-col items-center justify-between opacity-50 cursor-pointer [&:has([data-state=checked])]:opacity-100">
+				<RadioGroup.Item value="grid" id="grid" class="sr-only" aria-label="grid" />
+				<LayoutGrid class="h-5 w-5" />
+			</Label>
+			<Label for="list" class="flex flex-col items-center justify-between opacity-50 cursor-pointer [&:has([data-state=checked])]:opacity-100">
+				<RadioGroup.Item value="list" id="list" class="sr-only" aria-label="list" />
+				<StretchHorizontal class="h-5 w-5" />
+			</Label>
+		</RadioGroup.Root>
+		<Slider
+			class="w-[200px]"
+			value={[$listColumns]}
+			max={5}
+			step={1}
+			min={1}
+			onValueChange={sliderValueChange}
+		/>
+	</div>
 	<!-- <DropdownMenu.Root>
 		<DropdownMenu.Trigger asChild let:builder>
 			<Button builders={[builder]} variant="outline" size="icon">

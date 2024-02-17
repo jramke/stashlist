@@ -10,15 +10,15 @@ import { getDomainFromUrl, isImageUrl, isAbsoluteUrl, makeAbsoluteUrl } from '$l
 export const POST: RequestHandler = async ({ request, locals, params, url }) => {
 	console.log(locals);
 	
-	if (!locals.user) redirect(302, '/login');	
+	if (!locals.user) redirect(302, '/login');
 
 	try {
 		const formData = await request.json();
 		const edit = url.searchParams.get('edit');
 
-		const saveUrl = formData['url'];
+		const currentTime = new Date().toISOString();
 
-		console.log(formData);
+		const saveUrl = formData['url'];
 
 		if (saveUrl && formData['title'] && formData['imageUrl'] && formData['faviconUrl']) {
 			await db.insert(save).values({
@@ -28,7 +28,8 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 				faviconUrl: formData['faviconUrl'],
 				title: formData['title'],
 				description: formData['description'],
-				imageUrl: formData['imageUrl']
+				imageUrl: formData['imageUrl'],
+				createdAt: currentTime
 			});
 	
 			return json({ success: true });
@@ -63,7 +64,8 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 			faviconUrl: faviconUrl,
 			title: title,
 			description: description,
-			imageUrl: imageUrl
+			imageUrl: imageUrl,
+			createdAt: currentTime
 		});
 
 		return json({ success: true });
