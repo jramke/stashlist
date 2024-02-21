@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Button } from '@ui/components/ui/button';
-	import { Google, GitHub, Loader } from '@ui/icons';
+	import { Button } from '@repo/ui/components/button';
+	import { Google, GitHub, Loader } from '@repo/ui/icons';
 
 	let isLoading = false;
 

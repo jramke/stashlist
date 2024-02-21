@@ -1,6 +1,6 @@
 <script>
-	import Heading from '@ui/components/ui/heading';
-	import Section from '@ui/components/ui/section';
+	import Heading from '@repo/ui/components/heading';
+	import Section from '@repo/ui/components/section';
 </script>
 
 <Section>

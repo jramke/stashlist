@@ -15,9 +15,9 @@ const config = {
 		// csrf: {
 		// 	checkOrigin: false // handled manually in hooks // https://github.com/sveltejs/kit/issues/6784
 		// },
-		alias: {
-			"@ui/*": "../../packages/ui/src/*",
-		},
+		// alias: {
+		// 	"@ui/*": "../../packages/ui/src/*",
+		// },
 	}
 };
 

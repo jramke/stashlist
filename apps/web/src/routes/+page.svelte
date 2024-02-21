@@ -1,8 +1,8 @@
 <script>
-	import { Button } from '@ui/components/ui/button';
-	import Heading from '@ui/components/ui/heading';
-	import Section from '@ui/components/ui/section';
-	import { Stash } from '@ui/icons';
+	import { Button } from '@repo/ui/components/button';
+	import Heading from '@repo/ui/components/heading';
+	import Section from '@repo/ui/components/section';
+	import { Stash } from '@repo/ui/icons';
 	
 </script>
 

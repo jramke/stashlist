@@ -2,12 +2,12 @@
 	"$schema": "https://shadcn-svelte.com/schema.json",
 	"style": "default",
 	"tailwind": {
-		"config": "tailwind.config.js",
-		"css": "src/globals.pcss",
+		"config": "tailwind.config.ts",
+		"css": "globals.pcss",
 		"baseColor": "stone"
 	},
 	"aliases": {
-		"components": "@ui/components",
-		"utils": "@ui/lib/utils"
+		"components": "$ui/components",
+		"utils": "$ui/utils"
 	}
 }

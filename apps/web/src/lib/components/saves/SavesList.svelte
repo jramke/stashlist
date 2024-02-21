@@ -1,7 +1,7 @@
 <script lang="ts">
     import LinkPreviewCard from '$lib/components/saves/LinkPreviewCard.svelte';
 	import { page } from '$app/stores';
-	import { Skeleton } from '@ui/components/ui/skeleton';
+	import { Skeleton } from '@repo/ui/components/skeleton';
     import { listColumns } from '$lib/stores';
 	import type { Save } from '$lib/types';
 

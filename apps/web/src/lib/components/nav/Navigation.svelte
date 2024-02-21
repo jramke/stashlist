@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button } from '@ui/components/ui/button';
+	import { Button } from '@repo/ui/components/button';
 	import { siteConfig } from '$lib/config/site';
 	import Link from './Link.svelte';
 	import { page } from '$app/stores';

@@ -1,11 +1,11 @@
 <script>
 	// import '@ui/fonts';
-	import '@ui/globals.pcss';
+	import '@repo/ui/globals.pcss';
 	import '../app.pcss';
 	// import '$lib/styles/app.css';
 
 	import { ModeWatcher } from 'mode-watcher';
-	import { Toaster } from '@ui/components/ui/sonner';
+	import { Toaster } from '@repo/ui/components/sonner';
 	import Navigation from '$lib/components/nav/Navigation.svelte';
 	import { page } from '$app/stores';
 	import { siteConfig } from '$lib/config/site';

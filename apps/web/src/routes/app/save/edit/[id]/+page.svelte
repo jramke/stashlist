@@ -3,8 +3,8 @@
     import type { SuperValidated } from "sveltekit-superforms";
 	import type { Save, TODO } from "$lib/types";
 
-    import * as Form from "@ui/components/ui/form";
-    import Tags from "@ui/components/ui/tags";
+    import * as Form from "@repo/ui/components/form";
+    import Tags from "@repo/ui/components/tags";
 
     export let data: {
         form: SuperValidated<FormSchema>,

@@ -3,19 +3,19 @@
 
 	import { siteConfig } from '$lib/config/site';
 	import Link from '$lib/components/nav/Link.svelte';
-	import { Separator } from '@ui/components/ui/separator';
-	import { buttonVariants, Button } from '@ui/components/ui/button';
-	import * as Dialog from '@ui/components/ui/dialog';
+	import { Separator } from '@repo/ui/components/separator';
+	import { buttonVariants, Button } from '@repo/ui/components/button';
+	import * as Dialog from '@repo/ui/components/dialog';
 	import { enhance, applyAction } from '$app/forms';
 	import { invalidateAll, goto } from '$app/navigation';
-	import { Skeleton } from '@ui/components/ui/skeleton';
-	import { Plus, FolderPlus, Folder, Check, Bookmark, Compass, LogOut, Pencil, Trash, X, Stash } from '@ui/icons';
+	import { Skeleton } from '@repo/ui/components/skeleton';
+	import { Plus, FolderPlus, Folder, Check, Bookmark, Compass, LogOut, Pencil, Trash, X, Stash } from '@repo/ui/icons';
 	import { page } from '$app/stores';
-	import { cn } from '@ui/lib/utils';
-	import { Input } from '@ui/components/ui/input';
-	import * as AlertDialog from "@ui/components/ui/alert-dialog";
+	import { cn } from '@repo/ui/utils';
+	import { Input } from '@repo/ui/components/input';
+	import * as AlertDialog from "@repo/ui/components/alert-dialog";
 	import { onMount } from 'svelte';
-	import { toast } from '@ui/components/ui/sonner';
+	import { toast } from '@repo/ui/components/sonner';
 
 	let newGroupForm: HTMLFormElement | null;
 	let newGroupInput: HTMLInputElement | null;

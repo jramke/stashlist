@@ -1,7 +1,7 @@
 <script>
-	import Section from '@ui/components/ui/section';
-	import Heading from '@ui/components/ui/heading';
-	import Button from '@ui/components/ui/button/button.svelte';
+	import Section from '@repo/ui/components/section';
+	import Heading from '@repo/ui/components/heading';
+	import { Button } from '@repo/ui/components/button';
 </script>
 
 <Section>

@@ -1,11 +1,38 @@
+// {
+//     "extends": "@repo/tsconfig/tsconfig-svelte-library.json",
+//     "compilerOptions": {
+//         "baseUrl": ".",
+//         "paths": {
+// 			"$ui/components": ["./components"],
+// 			"$ui/components/*": ["./components/*"],
+// 			"$ui/utils": ["./utils"],
+// 			"$ui/utils/*": ["./utils/*"]
+// 		}
+//     },
+//     "include": ["."],
+//     "exclude": ["node_modules"]
+// }
 {
-    "extends": "@repo/tsconfig/tsconfig-svelte-library.json",
-    "compilerOptions": {
-        "baseUrl": ".",
-        "paths": {
-            "@ui/*": ["./src/*"]
-        }
-    },
-    "include": ["src"],
-    "exclude": ["node_modules"]
+	"extends": "@tsconfig/svelte/tsconfig.json",
+	"include": ["."],
+	"exclude": ["node_modules"],
+	"compilerOptions": {
+		"baseUrl": ".",
+		// "allowJs": true,
+		"checkJs": false,
+		"isolatedModules": true,
+		"resolveJsonModule": true,
+		"strict": true,
+		"target": "esnext",
+		"module": "esnext",
+		"moduleResolution": "node",
+		"ignoreDeprecations": "5.0",
+		"lib": ["esnext", "DOM", "DOM.Iterable"],
+		"paths": {
+			"$ui/components": ["./components"],
+			"$ui/components/*": ["./components/*"],
+			"$ui/utils": ["./utils"],
+			"$ui/utils/*": ["./utils/*"]
+		}
+	}
 }

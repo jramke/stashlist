@@ -1,17 +1,17 @@
 <script lang="ts">
-	import Input from '@ui/components/ui/input/input.svelte';
-	import * as Avatar from '@ui/components/ui/avatar';
+	// import Input from '@repo/ui/components/input/input';
+	import * as Avatar from '@repo/ui/components/avatar';
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
-	import { Button } from '@ui/components/ui/button';
-	import * as DropdownMenu from '@ui/components/ui/dropdown-menu';
-	import { Sun, Moon, LayoutGrid, StretchHorizontal } from '@ui/icons';
+	import { Button } from '@repo/ui/components/button';
+	import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
+	import { Sun, Moon, LayoutGrid, StretchHorizontal } from '@repo/ui/icons';
 	import { setMode, resetMode } from 'mode-watcher';
 	import Breadcrumb from './Breadcrumb.svelte';
-	import { Slider } from '@ui/components/ui/slider';
-	import { Label } from '@ui/components/ui/label';
+	import { Slider } from '@repo/ui/components/slider';
+	import { Label } from '@repo/ui/components/label';
 	import { listColumns, listLayout } from '$lib/stores';
-	import * as RadioGroup from '@ui/components/ui/radio-group';
+	import * as RadioGroup from '@repo/ui/components/radio-group';
 
 	//TODO: search https://www.youtube.com/watch?v=lrzHaTcpRh8
 

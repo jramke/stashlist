@@ -1,12 +1,12 @@
 <script lang="ts">
-	import '@ui/globals.pcss';
+	import '@repo/ui/globals.pcss';
 	import '../../../app.pcss';
 
 	import browser from 'webextension-polyfill';
-	import * as Dialog from '@ui/components/ui/dialog';
-	import { Input } from '@ui/components/ui/input';
-	import { Label } from '@ui/components/ui/label';
-	import { Button } from '@ui/components/ui/button';
+	import * as Dialog from '@repo/ui/components/dialog';
+	import { Input } from '@repo/ui/components/input';
+	import { Label } from '@repo/ui/components/label';
+	import { Button } from '@repo/ui/components/button';
 	import { onMount } from 'svelte';
 	// import { Toaster } from '@ui/components/ui/sonner';
 	// import { ModeWatcher } from 'mode-watcher';

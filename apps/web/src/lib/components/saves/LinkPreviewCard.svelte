@@ -4,14 +4,14 @@
 
 	import { applyAction, enhance } from '$app/forms';
 	import { goto, invalidateAll, preloadData, pushState } from '$app/navigation';
-	import { MoreHorizontal, Trash, Pencil, CircleDashed  } from '@ui/icons';
-	import { toast } from '@ui/components/ui/sonner';
+	import { MoreHorizontal, Trash, Pencil, CircleDashed  } from '@repo/ui/icons';
+	import { toast } from '@repo/ui/components/sonner';
 	import { cleanUrl, formatRelativeTime } from '$lib/utils';
 	import { siteConfig } from '$lib/config/site';
-	import * as DropdownMenu from '@ui/components/ui/dropdown-menu';
-	import { buttonVariants } from '@ui/components/ui/button';
-	import { Badge } from "@ui/components/ui/badge";
-	import * as AlertDialog from "@ui/components/ui/alert-dialog";
+	import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
+	import { buttonVariants } from '@repo/ui/components/button';
+	import { Badge } from "@repo/ui/components/badge";
+	import * as AlertDialog from "@repo/ui/components/alert-dialog";
 	import Waves from '$lib/placeholder/waves.svelte';
 	import EditForm from '../../../routes/app/save/edit/[id]/+page.svelte';
 	import { page } from '$app/stores';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button } from '@ui/components/ui/button';
+	import { Button } from '@repo/ui/components/button';
 	import UserLoginForm from './user-login-form.svelte';
 	// import type { PageData } from './$types';
 

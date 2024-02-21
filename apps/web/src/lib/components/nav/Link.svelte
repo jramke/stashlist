@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { Button } from '@ui/components/ui/button';
+	import { Button } from '@repo/ui/components/button';
 	import { page } from '$app/stores';
-	import { cn } from '@ui/lib/utils';
+	import { cn } from '@repo/ui/utils';
 
 	let className: string | undefined | null = undefined;
 	export { className as class };
