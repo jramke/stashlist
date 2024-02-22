@@ -1,12 +1,12 @@
 import { fontFamily } from 'tailwindcss/defaultTheme';
 import type { Config } from 'tailwindcss';
 
-export default {
+const config: Omit<Config, "content"> = {
 	darkMode: ['class'],
-	content: [
-		'./src/**/*.{html,js,svelte,ts}',
-		"../../packages/ui/src/**/*.{html,js,svelte,ts}",
-	],
+	// content: [
+	// 	'./src/**/*.{html,js,svelte,ts}',
+	//  "../../packages/ui/src/**/*.{html,js,svelte,ts}",
+	// ],
 	safelist: ['dark'],
 	theme: {
 		container: {
@@ -74,4 +74,5 @@ export default {
 			}
 		}
 	}
-} satisfies Config;
+};
+export default config;
