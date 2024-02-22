@@ -1,0 +1,28 @@
+<script>
+	// import '@ui/fonts';
+	import '@repo/ui/globals.pcss';
+	import '../app.pcss';
+	// import '$lib/styles/app.css';
+
+	import { ModeWatcher } from 'mode-watcher';
+	import { Toaster } from '@repo/ui/components/sonner';
+	import Navigation from '$lib/components/nav/Navigation.svelte';
+	import { page } from '$app/stores';
+	import { siteConfig } from '$lib/config/site';
+
+</script>
+
+<ModeWatcher />
+<Toaster position="bottom-center" />
+
+{#if !$page.route?.id?.includes('(auth)') && !$page.route?.id?.includes(siteConfig.appUrl)}
+	<Navigation />
+{/if}
+
+<svelte:head>
+	<title>Stashlist</title>
+</svelte:head>
+
+<main>
+	<slot />
+</main>

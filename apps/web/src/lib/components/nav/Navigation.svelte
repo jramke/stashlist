@@ -1,0 +1,44 @@
+<script lang="ts">
+	import { Button } from '@repo/ui/components/button';
+	import { siteConfig } from '$lib/config/site';
+	import Link from './Link.svelte';
+	import { page } from '$app/stores';
+	import { enhance } from '$app/forms';
+	console.log($page);
+	
+</script>
+
+<header
+	class="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+>
+	<div class="container flex max-w-screen-2xl items-center py-4">
+		<div class="mr-4 hidden md:flex">
+			<a href={$page.data.user ? siteConfig.appUrl : '/'} class="mr-6 flex items-center space-x-2">
+				<span class="text-lg font-bold sm:inline-block">
+					{siteConfig.name}
+				</span>
+			</a>
+			<!-- <nav class="flex items-center gap-6">
+				<Link path={siteConfig.appUrl}>App</Link>
+			</nav> -->
+		</div>
+		<div class="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+			<nav class="flex items-center gap-6">
+				{#if $page.url.pathname === '/boring-landingpage'}
+					<Link path="/">Looking for the minimalistic landingpage?</Link>
+				{:else}
+					<Link path="/boring-landingpage">Looking the trendy landingpage?</Link>
+				{/if}
+				{#if $page.data.user}
+					<form method="post" action="/logout" use:enhance>
+						<Button type="submit" variant="outline">Logout</Button>
+					</form>
+				{:else}
+					<Button href="/login" variant="outline">Login</Button>
+					<!-- <Button href="/register" variant="outline">Register</Button> -->
+				{/if}
+					
+			</nav>
+		</div>
+	</div>
+</header>
