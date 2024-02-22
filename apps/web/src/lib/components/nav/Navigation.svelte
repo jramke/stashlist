@@ -4,10 +4,12 @@
 	import Link from './Link.svelte';
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
+	console.log($page);
+	
 </script>
 
 <header
-	class="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+	class="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
 >
 	<div class="container flex max-w-screen-2xl items-center py-4">
 		<div class="mr-4 hidden md:flex">
@@ -16,12 +18,17 @@
 					{siteConfig.name}
 				</span>
 			</a>
-			<nav class="flex items-center gap-6">
+			<!-- <nav class="flex items-center gap-6">
 				<Link path={siteConfig.appUrl}>App</Link>
-			</nav>
+			</nav> -->
 		</div>
 		<div class="flex flex-1 items-center justify-between space-x-2 md:justify-end">
 			<nav class="flex items-center gap-6">
+				{#if $page.url.pathname === '/boring-landingpage'}
+					<Link path="/">Looking for the minimalistic landingpage?</Link>
+				{:else}
+					<Link path="/boring-landingpage">Looking the trendy landingpage?</Link>
+				{/if}
 				{#if $page.data.user}
 					<form method="post" action="/logout" use:enhance>
 						<Button type="submit" variant="outline">Logout</Button>
