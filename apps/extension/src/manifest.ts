@@ -18,6 +18,15 @@ const sharedManifest: Partial<chrome.runtime.ManifestBase> = {
   //   open_in_tab: true,
   // },
   permissions: ["contextMenus"],
+  commands: {
+    "stash-page": {
+      suggested_key: {
+        default: "Ctrl+B",
+        mac: "Command+B"
+      },
+      description: "Stash the current page"
+    }
+  }
 };
 
 const browserAction = {

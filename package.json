@@ -6,7 +6,12 @@
     "preview": "turbo run preview",
     "lint": "turbo run lint",
     "format": "prettier --write .",
-    "ui:add": "pnpm --filter @repo/ui ui:add"
+    "ui:add": "pnpm --filter @repo/ui ui:add",
+    "turso": "pnpm --filter web turso",
+    "studio": "pnpm --filter web studio",
+    "generate": "pnpm --filter web generate",
+		"migrate": "pnpm --filter web migrate",
+		"push": "pnpm --filter web push"
   },
   "devDependencies": {
     "eslint": "^8.56.0",

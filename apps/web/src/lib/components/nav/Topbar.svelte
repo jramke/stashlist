@@ -3,10 +3,7 @@
 	import * as Avatar from '@repo/ui/components/avatar';
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
-	import { Button } from '@repo/ui/components/button';
-	import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
-	import { Sun, Moon, LayoutGrid, StretchHorizontal } from '@repo/ui/icons';
-	import { setMode, resetMode } from 'mode-watcher';
+	import { LayoutGrid, StretchHorizontal } from '@repo/ui/icons';
 	import Breadcrumb from './Breadcrumb.svelte';
 	import { Slider } from '@repo/ui/components/slider';
 	import { Label } from '@repo/ui/components/label';
@@ -75,22 +72,4 @@
 			onValueChange={sliderValueChange}
 		/>
 	</div>
-	<!-- <DropdownMenu.Root>
-		<DropdownMenu.Trigger asChild let:builder>
-			<Button builders={[builder]} variant="outline" size="icon">
-				<Sun
-					class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
-				/>
-				<Moon
-					class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
-				/>
-				<span class="sr-only">Toggle theme</span>
-			</Button>
-		</DropdownMenu.Trigger>
-		<DropdownMenu.Content align="end">
-			<DropdownMenu.Item on:click={() => setMode('light')}>Light</DropdownMenu.Item>
-			<DropdownMenu.Item on:click={() => setMode('dark')}>Dark</DropdownMenu.Item>
-			<DropdownMenu.Item on:click={() => resetMode()}>System</DropdownMenu.Item>
-		</DropdownMenu.Content>
-	</DropdownMenu.Root> -->
 </div>

@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@fontsource-variable/plus-jakarta-sans": "^5.0.19",
-    "bits-ui": "^0.18.0",
+    "bits-ui": "^0.18.2",
     "clsx": "^2.1.0",
     "lucide-svelte": "^0.323.0",
     "mode-watcher": "^0.2.0",

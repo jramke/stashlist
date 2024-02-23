@@ -12,8 +12,6 @@
         'all': $page.data.saves,
         'savesByGroup': $page.data.savesByGroup
     }
-    
-    console.log($page.data.saves);
 
 </script>
 

@@ -30,6 +30,7 @@
 		const stashlistContainer = document.getElementById('stashlist-container');
 		const stashlistContainerRoot = stashlistContainer && stashlistContainer.shadowRoot;
 		stashlistRoot = stashlistContainerRoot?.querySelector('#stashlist-root');
+		stashlistRoot?.classList.add('dark');
 	})
 
 	browser.runtime.onMessage.addListener((message: any, sender: any, sendResponse: any) => {
@@ -85,13 +86,13 @@
 
 </script>
 
-<div id="stashlist" class="dark">
+<div>
 
 	<!-- both not working -->
 	<!-- <Toaster position="bottom-center" />
 	<ModeWatcher /> -->
 
-	<Dialog.Root bind:open={editDialogOpen} portal={null} preventScroll={false}>
+	<Dialog.Root bind:open={editDialogOpen} portal={stashlistRoot} preventScroll={false}>
 		<Dialog.Content>
 			<Dialog.Header>
 				<Dialog.Title>Save new stash</Dialog.Title>

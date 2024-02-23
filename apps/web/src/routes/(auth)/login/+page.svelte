@@ -25,7 +25,7 @@
 		</div>
 	</div>
 	<div class="lg:p-8">
-		<div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+		<div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px]">
 			<div class="flex flex-col space-y-2 text-center">
 				<h1 class="text-2xl font-semibold tracking-tight">Unlock Your Stashlist Experience</h1>
 				<p class="text-sm text-muted-foreground">Sign in effortlessly with your Google or GitHub account. Your digital vault awaits – let's get started!</p>

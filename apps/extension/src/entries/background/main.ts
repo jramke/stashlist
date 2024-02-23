@@ -1,4 +1,4 @@
-import browser from "webextension-polyfill";
+import browser, { type Tabs } from "webextension-polyfill";
 
 browser.action.onClicked.addListener((tab, info) => {
   browser.tabs.create({
@@ -24,7 +24,19 @@ browser.runtime.onMessage.addListener(async (message: any, sender: any) => {
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {  
   if (info.menuItemId === 'stash-page') {
-    const currentUrl = info?.pageUrl;
+    await initStashPage(tab)
+  }
+});
+
+browser.commands.onCommand.addListener(async (command, tab) => {
+  console.log(command, tab);
+  if (command === 'stash-page') {
+    await initStashPage(tab)
+  }
+})
+
+async function initStashPage(tab: Tabs.Tab | undefined) {
+  const currentUrl = tab?.url;
 
     if (!currentUrl) return;
 
@@ -33,8 +45,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
     await browser.tabs.sendMessage(tabId, {
         editNewStash: result
     })
-  }
-});
+}
 
 async function makePostRequest(url: string, body: {}) {
   try {
@@ -44,6 +55,7 @@ async function makePostRequest(url: string, body: {}) {
     });
 
     if (response.status !== 200) {
+      console.log(response);
       throw Error('Something went wrong');
     }
 

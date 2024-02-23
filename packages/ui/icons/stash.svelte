@@ -1,11 +1,12 @@
 
 <script lang="ts">
-	let className: string | undefined | null = undefined;
-	export { className as class };
+	import type { IconProps } from "lucide-svelte";
+	type $$Props = IconProps;
+	// let className: string | undefined | null = undefined;
+	// export { className as class };
 </script>
 
-<svg version="1.1" id="Ebene_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 32 32" style="enable-background:new 0 0 32 32;" xml:space="preserve" class={className}>
+<svg viewBox="0 0 32 32" {...$$restProps}>
 	<path class="st0" style="fill:currentColor;" d="M24.7,32c-0.3,0-0.5,0-0.8-0.1c-2.5-0.5-5.2-1.8-7.9-4c-2.8,2.2-5.4,3.5-7.9,4c-2.2,0.4-4.4-1.1-4.8-3.3
 		c-1.4-6.8-1.4-14,0-21.6c0.4-2.3,1.9-4.3,4-5.2C9.1,0.9,12.1-0.1,16,0c3.9,0,6.9,0.9,8.7,1.8c2.1,0.9,3.6,2.9,4,5.2
 		c1.4,7.6,1.4,14.9,0,21.6C28.4,30.6,26.6,32,24.7,32z M16,24.3c0.4,0,0.7,0.1,1,0.4c2.8,2.4,5.2,3.7,7.5,4.2
