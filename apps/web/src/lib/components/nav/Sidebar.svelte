@@ -16,6 +16,7 @@
 	import * as AlertDialog from "@repo/ui/components/alert-dialog";
 	import { onMount } from 'svelte';
 	import { toast } from '@repo/ui/components/sonner';
+	import Userinfo from '$lib/components/nav/Userinfo.svelte';
 
 	let newGroupForm: HTMLFormElement | null;
 	let newGroupInput: HTMLInputElement | null;
@@ -90,8 +91,8 @@
 </script>
 
 <aside class="sticky top-0 h-screen flex-[350px] border-r bg-card">
-	<div class="flex flex-col items-start h-full overflow-hidden p-5">
-		<div class="flex w-full items-center justify-between gap-3 pb-5">
+	<div class="flex flex-col items-start h-full overflow-hidden py-5">
+		<div class="px-5 flex w-full items-center justify-between gap-3 pb-5">
 			<div class="flex items-center px-3">
 				<Stash class="me-3 h-5 w-5 text-primary" />
 				<p class="text-xl font-bold">
@@ -129,14 +130,14 @@
 			</div>
 		</div>
 		<!-- <Separator /> -->
-		<div class="flex w-full flex-col items-start">
+		<div class="px-5 flex w-full flex-col items-start">
 			<Link path={siteConfig.appUrl}>
 				<Stash class="me-2 h-4 w-4" />
 				All stashes
 			</Link>
 			<Link path={siteConfig.appUrl + '/explore'}><Compass class="me-2 h-4 w-4" />Explore</Link>
 		</div>
-		<div class="pb-1 pt-5 flex items-center justify-between gap-2 w-full">
+		<div class="px-5 pb-1 pt-5 flex items-center justify-between gap-2 w-full">
 			<p class="px-3 font-bold">My groups</p>
 			{#await $page.data.groups}
 				{''}
@@ -162,7 +163,7 @@
 				{/if}
 			{/await}
 		</div>
-		<div class="w-full overflow-auto">
+		<div class="w-full scroll-area px-5">
 			<div class="flex w-full flex-col items-start">
 				{#await $page.data.groups}
 					{#each new Array(5) as _}
@@ -248,18 +249,17 @@
 				</form>
 			</div>
 		</div>
-		<div class="w-full pt-5">
+		<div class="w-full pt-5 px-5">
 			<Button variant="outline" class="w-full" on:click={handleShowGroupForm}>
 				<FolderPlus class="me-2 h-4 w-4" />New group
 			</Button>
 		</div>
 		<div class="w-full pt-5 mt-auto">
-			<form method="post" class="w-full" action="/logout" use:enhance>
-				<Button type="submit" variant="nav">
-					<LogOut class="w-4 h-4 me-1" />
-					Logout
-				</Button>
-			</form>
+			<div class="pt-5 border-t">
+				<div class="mx-5 relative">
+					<Userinfo />
+				</div>
+			</div>
 		</div>
 	</div>
 </aside>

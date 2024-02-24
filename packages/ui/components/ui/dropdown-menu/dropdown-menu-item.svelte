@@ -14,7 +14,10 @@
 
 <DropdownMenuPrimitive.Item
 	class={cn(
-		'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled]:pointer-events-none data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground data-[disabled]:opacity-50',
+		`border border-transparent 
+		relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none 
+		data-[disabled]:pointer-events-none data-[disabled]:opacity-50 
+		data-[highlighted]:bg-secondary data-[highlighted]:text-accent-foreground data-[highlighted]:shadow-inner data-[highlighted]:shadow-primary/20 data-[highlighted]:border-primary`,
 		inset && 'pl-8',
 		className
 	)}

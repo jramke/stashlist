@@ -81,11 +81,13 @@
     function setTag(e) {
         const currentTag = e.target.value;
         
+        
         if (addKeys) {
             addKeys.forEach(function(key) {
                 if (key === e.keyCode) {
                     
-                    if (currentTag) e.preventDefault();
+                    // prevent form submits on enter when input is focused and there is also no text written in the input
+                    if (currentTag || currentTag === '') e.preventDefault();
                                     
                     /* switch (input.keyCode) {
                     case 9:
@@ -107,10 +109,14 @@
                      * If onlyAutocomplete = true: You cannot add random tags
                      * If input element with ID
                      */
-                    if (autoComplete && onlyAutocomplete && document.getElementById(matchsID)) {
+                    if (minChars === 0) {
                         addTag(arrelementsmatch?.[autoCompleteIndex]?.label);
                     } else {
-                        addTag(currentTag);
+                        if (autoComplete && onlyAutocomplete) {
+                            addTag(arrelementsmatch?.[autoCompleteIndex]?.label);
+                        } else {
+                            addTag(currentTag);
+                        }
                     }
                 }
             });
@@ -131,7 +137,9 @@
         }
         
         // ArrowDown : focus on first element of the autocomplete
-        if (e.keyCode === 40 && autoComplete && document.getElementById(matchsID)) {
+        // if (e.keyCode === 40 && autoComplete && document.getElementById(matchsID)) {
+        //remove the check for the element in the dom, so it also can be used inside the shadowdowm from the extension
+        if (e.keyCode === 40 && autoComplete) {
             // Last element on the list ? Go to the first
             if (autoCompleteIndex + 1 === arrelementsmatch.length) autoCompleteIndex = 0
             else autoCompleteIndex++
@@ -206,7 +214,7 @@
         // Focus on svelte tags input
         arrelementsmatch = [];
         autoCompleteIndex = -1;
-        document.getElementById(id).focus();
+        document.getElementById(id)?.focus();
     
         if (maxTags && tags.length == maxTags) {
             document.getElementById(id).readOnly = true;
@@ -374,7 +382,6 @@
         }
     
         if (onlyUnique === true && !autoCompleteKey) {
-            console.log(matchs);
             matchs = matchs.filter(tag => !tags.includes(tag.label));
         }
     
@@ -432,10 +439,14 @@
         <ul id="{id}_matchs" class="absolute w-full p-1 z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md outline-none">
             {#each arrelementsmatch as element, index}
                 <li
-                    class="relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none data-[disabled]:pointer-events-none hover:bg-accent [&.focus]:bg-accent [&.focus]:text-accent-foreground hover:text-accent-foreground data-[disabled]:opacity-50"
-                    class:focus={index === autoCompleteIndex}
-                    on:pointerdown|preventDefault={() => addTag(element.label)}>
+                    class="border border-transparent 
+                        relative flex w-full cursor-pointer select-none rounded-sm text-sm outline-none 
+                        data-[disabled]:pointer-events-none data-[disabled]:opacity-50 
+                        hover:bg-secondary [&.focus]:bg-secondary hover:text-accent-foreground [&.focus]:text-accent-foreground hover:shadow-inner [&.focus]:shadow-inner hover:shadow-primary/20 [&.focus]:shadow-primary/20 hover:border-primary [&.focus]:border-primary"
+                    class:focus={index === autoCompleteIndex}>
+                    <button type="button" class="py-1.5 pl-8 pr-2 text-left w-full" on:pointerdown|preventDefault={() => addTag(element.label)} on:keydown|preventDefault={() => addTag(element.label)}>
                         {@html element.search}
+                    </button>
                 </li>
             {/each}
         </ul>

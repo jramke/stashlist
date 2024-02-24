@@ -8,8 +8,6 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
 	const data = await parent();
 	const saves = await data.saves;
 	const groups = await data.groups;
-	console.log(data);
-	
 
 	const currentGroupId = params.slug;
 

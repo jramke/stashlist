@@ -7,6 +7,7 @@
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
 	import { Button } from '@repo/ui/components/button';
+	import Tags from "@repo/ui/components/tags";
 	import { onMount } from 'svelte';
 	// import { Toaster } from '@ui/components/ui/sonner';
 	// import { ModeWatcher } from 'mode-watcher';
@@ -20,11 +21,16 @@
 			error: any;
 		};
 	};
+	
 
 	let editDialogOpen = false;
-	let newStashData: NewStashEdit;
+	let newStashFormData: NewStashEdit;
+	let aviableGroups: any[] = [];
 	let newStashForm: HTMLFormElement | null | undefined;
 	let stashlistRoot: HTMLElement | null | undefined;
+	let groups: any[] = [];
+
+	$: groupIds = groups.map(item => item.id);
 
 	onMount(() => {
 		const stashlistContainer = document.getElementById('stashlist-container');
@@ -35,8 +41,9 @@
 
 	browser.runtime.onMessage.addListener((message: any, sender: any, sendResponse: any) => {
 			if (message.editNewStash) {
-				newStashData = message.editNewStash;
-				console.log(newStashData);
+				newStashFormData = message.editNewStash.form;
+				console.log(newStashFormData);
+				aviableGroups = message.editNewStash.groups
 				
 				editDialogOpen = true;
 
@@ -63,7 +70,7 @@
 							if (err instanceof z.ZodError) {
 								console.log(err.issues);
 								err.issues.forEach(issue => {
-									newStashData[issue.path[0]].error = issue;
+									newStashFormData[issue.path[0]].error = issue;
 								})
 							}
 							return
@@ -92,19 +99,34 @@
 	<!-- <Toaster position="bottom-center" />
 	<ModeWatcher /> -->
 
-	<Dialog.Root bind:open={editDialogOpen} portal={stashlistRoot} preventScroll={false}>
+	<Dialog.Root bind:open={editDialogOpen} portal={null} preventScroll={false} closeOnOutsideClick={false}>
 		<Dialog.Content>
 			<Dialog.Header>
 				<Dialog.Title>Save new stash</Dialog.Title>
 			</Dialog.Header>
 			<form id="stashlist-form" class="space-y-2">
-				{#each Object.entries(newStashData) as [key, value]}
+				{#each Object.entries(newStashFormData) as [key, value]}
 					{#if key === 'imageUrl' || key === 'faviconUrl'}
 						<Input type="hidden" name={key} value={value.data} />
 					{:else}
 						<div class="space-y-2">
 							<Label for={key}>{value.label}</Label>
-							<Input name={key} value={value.data} />
+							{#if key === 'groups'}
+								<Input name={key} type="hidden" bind:value={groupIds} />
+								<Tags
+									bind:tags={groups}
+									placeholder={"Add groups"}
+									autoComplete={aviableGroups}
+									minChars={0}
+									onlyUnique={true}
+									cleanOnBlur={true}
+									autoCompleteKey={'title'}
+									name={'Add groups'}
+									onlyAutocomplete
+								/>
+							{:else}
+								<Input name={key} value={value.data} />
+							{/if}
 							{#if value.error}
 								<p class="text-destructive text-sm">{value.error.message}</p>
 							{/if}

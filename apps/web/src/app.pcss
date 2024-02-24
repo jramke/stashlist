@@ -8,8 +8,6 @@ body {
 .scroll-area {
 	overflow-y: auto;
 	background-clip: border-box;
-    /* scrollbar-gutter: stable; */
-	max-height: 90vh;
 
 	&::-webkit-scrollbar {
     	background: transparent;
@@ -25,6 +23,8 @@ body {
 	&::-webkit-scrollbar-thumb:hover {
 		background-color: hsl(var(--foreground) / 0.4);
 	}
-
 }
-
+#main-scrollarea {
+	max-height: calc(100vh - var(--topbar-height));
+	max-height: calc(100dvh - var(--topbar-height));
+}

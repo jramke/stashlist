@@ -12,6 +12,11 @@ browser.contextMenus.create({
   title: 'Stash page',
   contexts: ['all']
 });
+browser.contextMenus.create({
+  id: 'stash-image',
+  title: 'Stash Image',
+  contexts: ['image']
+});
 
 browser.runtime.onMessage.addListener(async (message: any, sender: any) => {
   if (message.newStash) {   
@@ -26,6 +31,9 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === 'stash-page') {
     await initStashPage(tab)
   }
+  if (info.menuItemId === 'stash-image') {
+    await initStashImage(tab, info.srcUrl)
+  }
 });
 
 browser.commands.onCommand.addListener(async (command, tab) => {
@@ -38,13 +46,23 @@ browser.commands.onCommand.addListener(async (command, tab) => {
 async function initStashPage(tab: Tabs.Tab | undefined) {
   const currentUrl = tab?.url;
 
-    if (!currentUrl) return;
+  if (!currentUrl) return;
 
-    const result = await makePostRequest('http://127.0.0.1:5173/api/saves/new?edit=true', { url: currentUrl });
-    const tabId = tab?.id || 0;
-    await browser.tabs.sendMessage(tabId, {
-        editNewStash: result
-    })
+  const result = await makePostRequest('http://127.0.0.1:5173/api/saves/new?edit=true', { url: currentUrl });
+  const tabId = tab?.id || 0;
+  await browser.tabs.sendMessage(tabId, {
+    editNewStash: result
+  })
+}
+
+async function initStashImage(tab: Tabs.Tab | undefined, imageUrl: string | undefined) {
+  if (!imageUrl) return;
+
+  const result = await makePostRequest('http://127.0.0.1:5173/api/saves/new?edit=true', { imageUrl: imageUrl });
+  const tabId = tab?.id || 0;
+  await browser.tabs.sendMessage(tabId, {
+    editNewStash: result
+  })
 }
 
 async function makePostRequest(url: string, body: {}) {

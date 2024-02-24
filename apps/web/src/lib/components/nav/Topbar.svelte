@@ -1,19 +1,20 @@
 <script lang="ts">
-	// import Input from '@repo/ui/components/input/input';
-	import * as Avatar from '@repo/ui/components/avatar';
 	import { page } from '$app/stores';
-	import { base } from '$app/paths';
-	import { LayoutGrid, StretchHorizontal } from '@repo/ui/icons';
+	import { LayoutGrid, StretchHorizontal, Masonry } from '@repo/ui/icons';
 	import Breadcrumb from './Breadcrumb.svelte';
 	import { Slider } from '@repo/ui/components/slider';
 	import { Label } from '@repo/ui/components/label';
 	import { listColumns, listLayout } from '$lib/stores';
 	import * as RadioGroup from '@repo/ui/components/radio-group';
+	import { onMount } from 'svelte';
 
 	//TODO: search https://www.youtube.com/watch?v=lrzHaTcpRh8
 
-	let name = $page.data.user.name;
 	$: breadcrumbArray = ['Stashes'];
+
+	onMount(() => {
+		document.documentElement.style.setProperty('--topbar-height', (document.getElementById('topbar')?.clientHeight ?? 0) + 'px');
+	})
 
 	$: if (breadcrumbArray) {
 		if ($page.route.id?.endsWith('explore')) {
@@ -37,9 +38,7 @@
 	}
 </script>
 
-<div
-	class="bg-card/95 sticky top-0 z-50 flex w-full justify-between gap-5 border-b p-5 backdrop-blur"
->
+<div id="topbar" class="bg-card/95 sticky top-0 z-50 flex w-full justify-between gap-5 border-b p-5 backdrop-blur">
 	<!-- <Input type="search" placeholder="Search" />
 	<div class="flex items-center gap-3">
 		<Avatar.Root>
@@ -61,6 +60,10 @@
 			<Label for="list" class="flex flex-col items-center justify-between opacity-50 cursor-pointer [&:has([data-state=checked])]:opacity-100">
 				<RadioGroup.Item value="list" id="list" class="sr-only" aria-label="list" />
 				<StretchHorizontal class="h-5 w-5" />
+			</Label>
+			<Label for="masonry" class="flex flex-col items-center justify-between opacity-50 cursor-pointer [&:has([data-state=checked])]:opacity-100">
+				<RadioGroup.Item value="masonry" id="masonry" class="sr-only" aria-label="masonry" />
+				<Masonry class="h-5 w-5" />
 			</Label>
 		</RadioGroup.Root>
 		<Slider

@@ -4,6 +4,8 @@
 	import { Skeleton } from '@repo/ui/components/skeleton';
     import { listColumns } from '$lib/stores';
 	import type { Save } from '$lib/types';
+	import Masonry from '@repo/ui/components/masonry';
+	import { listLayout } from '$lib/stores';
 
     type SaveListOptions = 'all' | 'savesByGroup';
     export let saves: SaveListOptions = 'all';
@@ -25,11 +27,19 @@
 	</div>
 {:then items}
     {#if items?.length > 0}
-		<div class="grid grid-cols-{$listColumns} gap-6">
-			{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id}}
-				<LinkPreviewCard {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} />
-			{/each}
-		</div>
+		{#if $listLayout === 'masonry'}
+			<Masonry gapSize={'6'} columns={$listColumns} items={items}>
+				{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id}}
+					<LinkPreviewCard {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} />
+				{/each}
+			</Masonry>
+		{:else}
+			<div class="grid grid-cols-{$listColumns} gap-6">
+				{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id}}
+					<LinkPreviewCard {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} />
+				{/each}
+			</div>
+		{/if}
 	{/if}
 {:catch error}
 	<p>Couldnt fetch stashes!</p>
