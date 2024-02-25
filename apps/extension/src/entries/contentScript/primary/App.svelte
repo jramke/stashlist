@@ -19,12 +19,14 @@
 			label: string;
 			data: string;
 			error: any;
+			hidden: boolean;
 		};
 	};
 	
 
 	let editDialogOpen = false;
 	let newStashFormData: NewStashEdit;
+	let newStashType: string;
 	let aviableGroups: any[] = [];
 	let newStashForm: HTMLFormElement | null | undefined;
 	let stashlistRoot: HTMLElement | null | undefined;
@@ -43,8 +45,26 @@
 			if (message.editNewStash) {
 				newStashFormData = message.editNewStash.form;
 				console.log(newStashFormData);
+				newStashType = message.editNewStash.type;
 				aviableGroups = message.editNewStash.groups
 				
+				let formSchema: any;
+				if (newStashType === 'website') {
+					formSchema = z.object({
+						title: z.string().min(1),
+						description: z.string().default('').optional(),
+						url: z.string().url(),
+						groups: z.string().default('').optional()
+					});
+				}
+				if (newStashType === 'image') {
+					formSchema = z.object({
+						title: z.string().default('').optional(),
+						description: z.string().default('').optional(),
+						groups: z.string().default('').optional()
+					});
+				}
+
 				editDialogOpen = true;
 
 				setTimeout(() => {
@@ -57,13 +77,6 @@
 						const form = e.target as HTMLFormElement;
 						const formData = Object.fromEntries(new FormData(form));
 						
-						// Generate a dynamic Zod schema based on the form data array
-						const formSchema = z.object({
-							title: z.string().min(1),
-							description: z.string().default('').optional(),
-							url: z.string().url(),
-							groups: z.string().default('').optional()
-						});
 						try {
 							formSchema.parse(formData);
 						} catch (err) {
@@ -75,12 +88,13 @@
 							}
 							return
 						}
-
+						console.log('save' + newStashType.toUpperCase());
+						
 						browser.runtime.sendMessage({
-							newStash: formData
+							['save' + newStashType.charAt(0).toUpperCase() + newStashType.slice(1)]: formData
 						})
 					})
-				}, 100);
+				}, 100); // needed
 			}
 
 			if (message.newStashAdded) {
@@ -102,11 +116,11 @@
 	<Dialog.Root bind:open={editDialogOpen} portal={null} preventScroll={false} closeOnOutsideClick={false}>
 		<Dialog.Content>
 			<Dialog.Header>
-				<Dialog.Title>Save new stash</Dialog.Title>
+				<Dialog.Title>Stash new {newStashType}</Dialog.Title>
 			</Dialog.Header>
 			<form id="stashlist-form" class="space-y-2">
 				{#each Object.entries(newStashFormData) as [key, value]}
-					{#if key === 'imageUrl' || key === 'faviconUrl'}
+					{#if value.hidden}
 						<Input type="hidden" name={key} value={value.data} />
 					{:else}
 						<div class="space-y-2">

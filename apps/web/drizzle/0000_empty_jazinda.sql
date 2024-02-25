@@ -19,11 +19,13 @@ CREATE TABLE `oauth_account` (
 CREATE TABLE `save` (
 	`id` text PRIMARY KEY NOT NULL,
 	`user_id` text NOT NULL,
-	`url` text NOT NULL,
+	`type` text NOT NULL,
+	`url` text DEFAULT '',
 	`title` text DEFAULT '',
 	`description` text DEFAULT '',
 	`favicon_url` text DEFAULT '',
 	`image_url` text DEFAULT '',
+	`code_text` text DEFAULT '',
 	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action
 );

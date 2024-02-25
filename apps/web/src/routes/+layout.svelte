@@ -1,17 +1,17 @@
 <script>
-	// import '@ui/fonts';
 	import '@repo/ui/globals.pcss';
 	import '../app.pcss';
-	// import '$lib/styles/app.css';
 
 	import { ModeWatcher } from 'mode-watcher';
 	import { Toaster } from '@repo/ui/components/sonner';
 	import Navigation from '$lib/components/nav/Navigation.svelte';
 	import { page } from '$app/stores';
 	import { siteConfig } from '$lib/config/site';
+	import Metadata from '$lib/components/site/Metadata.svelte';
 
 </script>
 
+<Metadata />
 <ModeWatcher />
 <Toaster position="bottom-center" />
 

@@ -1,16 +1,11 @@
 export const siteConfig = {
 	name: 'Stashlist',
+	slogan: 'Your Creative Vault',
 	appUrl: '/app',
-	url: 'https://shadcn-svelte.com',
-	ogImage: 'https://shadcn-svelte.com/og.png',
-	description: 'Beautifully designed components built with Melt UI and Tailwind CSS.',
-	links: {
-		twitter: 'https://twitter.com/huntabyte',
-		github: 'https://github.com/huntabyte/shadcn-svelte',
-		shadTwitter: 'https://twitter.com/shadcn',
-		shadGithub: 'https://github.com/shadcn/ui'
-	},
-	keywords: `shadcn,Svelte,SvelteKit,Svelte Components,TailwindCSS,Melt UI,Bit UI`
+	url: 'https://stashlist.app',
+	ogImage: 'https://stashlist.app/og.png',
+	description: 'The creative vault for developers and designers.',
+	keywords: `bookmarks, bookmark tool, code snippets, inspiration, stashlist, raindrop alternative, bookmark developers, raindrop developers`
 };
 
 export type SiteConfig = typeof siteConfig;

@@ -31,6 +31,7 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 			const id = generateId(15);
 			await db.insert(save).values({
 				id: id,
+				type: 'website',
 				userId: locals.user.id,
 				url: saveUrl,
 				faviconUrl: formData['faviconUrl'],
@@ -40,7 +41,7 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 				createdAt: currentTime
 			});
 
-			let groups = formData['groups'] || [];
+			let groups = formData['groups'] || '';
 			groups = groups.split(',');
 			if (groups.length > 0) {
 				for (const groupId of groups) {
@@ -71,13 +72,14 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 		if (edit) {
 			const groups = await db.select().from(group).where(eq(group.userId, locals.user.id)).all();
 		    return json({
+				type: 'website',
 				form: {
-					title: { label: 'Title', data: title, error: null },
-					description: { label: 'Description', data: description, error: null },
-					url: { label: 'Url', data: saveUrl, error: null },
-					imageUrl: { label: 'Image url', data: imageUrl, error: null },
-					faviconUrl: { label: 'Favicon url', data: faviconUrl, error: null },
-					groups: { label: 'Groups', data: '', error: null }
+					title: { label: 'Title', data: title, error: null, hidden: false },
+					description: { label: 'Description', data: description, error: null, hidden: false },
+					url: { label: 'Url', data: saveUrl, error: null, hidden: false },
+					imageUrl: { label: 'Image url', data: imageUrl, error: null, hidden: true },
+					faviconUrl: { label: 'Favicon url', data: faviconUrl, error: null, hidden: true },
+					groups: { label: 'Groups', data: '', error: null, hidden: false }
 				},
 				groups: groups,
 		    })
@@ -86,6 +88,7 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 		await db.insert(save).values({
 			id: generateId(15),
 			userId: locals.user.id,
+			type: 'website',
 			url: saveUrl,
 			faviconUrl: faviconUrl,
 			title: title,

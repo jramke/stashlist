@@ -114,6 +114,9 @@ importers:
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@rive-app/canvas':
+        specifier: ^2.10.2
+        version: 2.10.2
       '@sveltejs/adapter-vercel':
         specifier: ^5.1.0
         version: 5.1.0(@sveltejs/kit@2.5.0)
@@ -2034,6 +2037,10 @@ packages:
 
   /@polka/url@1.0.0-next.24:
     resolution: {integrity: sha512-2LuNTFBIO0m7kKIQvvPHN6UE63VjpmL9rnEEaOOaiSPbZK+zUOYIzBAWcED+3XYzhYsd/0mD57VdxAEqqV52CQ==}
+
+  /@rive-app/canvas@2.10.2:
+    resolution: {integrity: sha512-Jyj7eKa3InPV29rW7W0G4xha9OO1xwLx3cmnKOrzlyrws/aDhOQK7APEdwrNseHuymG0ZFEEq0zamTMX6hrGgA==}
+    dev: false
 
   /@rollup/plugin-alias@5.1.0(rollup@3.29.4):
     resolution: {integrity: sha512-lpA3RZ9PdIG7qqhEfv79tBffNaoDuukFDrmhLqg9ifv99u/ehn+lOg30x2zmhf8AQqQUZaMk/B9fZraQ6/acDQ==}

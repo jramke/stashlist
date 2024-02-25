@@ -5,6 +5,7 @@ import { Monitor, Plus, FolderPlus, Folder, Check, Bookmark, Compass, LogOut, Pe
 import GitHub from "./github.svelte";
 import Google from "./google.svelte";
 import Stash from "./stash.svelte";
+import Logo from "./logo.svelte";
 
 
 export type Icon = LucideIcon;
@@ -13,6 +14,7 @@ export {
     GitHub,
     Google, 
     Stash,
+    Logo,
     Plus, 
     FolderPlus, 
     Folder, 

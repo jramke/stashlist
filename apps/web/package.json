@@ -46,6 +46,7 @@
 		"@libsql/client": "^0.4.0",
 		"@lucia-auth/adapter-drizzle": "^1.0.0",
 		"@repo/ui": "workspace:*",
+		"@rive-app/canvas": "^2.10.2",
 		"@sveltejs/adapter-vercel": "^5.1.0",
 		"arctic": "^1.1.5",
 		"drizzle-orm": "^0.29.3",

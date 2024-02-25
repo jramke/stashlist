@@ -35,11 +35,13 @@ export const save = sqliteTable('save', {
 	userId: text('user_id')
 		.notNull()
 		.references(() => user.id),
-	url: text('url').notNull(),
+	type: text('type',{ enum: ['code', 'website', 'image'] }).notNull(),
+	url: text('url').default(''),
 	title: text('title').default(''),
 	description: text('description').default(''),
 	faviconUrl: text('favicon_url').default(''),
 	imageUrl: text('image_url').default(''),
+	codeText: text('code_text').default(''),
 	createdAt: text('created_at')
 		.default(sql`CURRENT_TIMESTAMP`)
 		.notNull()

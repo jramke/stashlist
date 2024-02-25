@@ -4,7 +4,7 @@
 	import Link from './Link.svelte';
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
-	import { Stash } from '@repo/ui/icons';
+	import { Logo } from '@repo/ui/icons';
 	
 </script>
 
@@ -14,7 +14,7 @@
 	<div class="container flex items-center py-4">
 		<div class="mr-4 flex">
 			<a href={$page.data.user ? siteConfig.appUrl : '/'} class="mr-6 flex items-center space-x-2">
-				<Stash class="h-4 w-4" />
+				<Logo class="h-5 w-5" />
 				<span class="text-lg font-bold sm:inline-block">
 					{siteConfig.name}
 				</span>

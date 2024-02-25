@@ -5,7 +5,7 @@
     import { Sun, Moon } from '@repo/ui/icons';
     import { setMode, resetMode } from 'mode-watcher';
     import { page } from '$app/stores';
-    import { Stash } from '@repo/ui/icons';
+    import { Logo } from '@repo/ui/icons';
     import { siteConfig } from '$lib/config/site';
 
 </script>
@@ -13,7 +13,7 @@
 <Section class="border-t">
     <footer class="container">
         <a href={$page.data.user ? siteConfig.appUrl : '/'} class="mr-6 flex items-center space-x-2">
-            <Stash class="h-4 w-4" />
+            <Logo class="h-5 w-5" />
             <span class="text-lg font-bold sm:inline-block">
                 {siteConfig.name}
             </span>

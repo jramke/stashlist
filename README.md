@@ -31,7 +31,7 @@ An app where developers and designers can save inspirational websites, code snip
 
 ## Landingpage (minimal)
 
-Never Search Again. Everything You Need, Right Here.
+Say goodbye to scattered bookmarks!
 
 Imagine this: you're on the hunt for inspiration. You've got browser bookmarks scattered like confetti, Twitter bookmarks lost in the noise, and a graveyard of saved links from CodePen, Dribbble, and Behance. Oh, and let's not forget diving deep into your GitHub stars, searching for that elusive snippet.
 
