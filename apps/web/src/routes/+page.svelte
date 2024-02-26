@@ -78,7 +78,7 @@
 				But what if there was a better way?
 			</p>
 			<h2 class="font-bold">
-				Introducing <span class="text-primary"><Logo class="h-5 w-5 inline -mt-1 me-1 ms-1" />Stashlist</span> — Your Creative Vault
+				Introducing <span class="text-primary"><Logo class="h-6 w-6 inline -mt-1 me-1 ms-1" />Stashlist</span> — Your Creative Vault
 			</h2>
 		</div>
 	</div>

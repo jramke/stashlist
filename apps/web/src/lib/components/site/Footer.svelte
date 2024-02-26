@@ -12,13 +12,13 @@
 
 <Section class="border-t">
     <footer class="container">
-        <a href={$page.data.user ? siteConfig.appUrl : '/'} class="mr-6 flex items-center space-x-2">
-            <Logo class="h-5 w-5" />
-            <span class="text-lg font-bold sm:inline-block">
-                {siteConfig.name}
-            </span>
-        </a>
-        <div class="w-full flex flex-wrap justify-between items-center">
+        <div class="w-full flex flex-col flex-wrap gap-4">
+            <a href={$page.data.user ? siteConfig.appUrl : '/'} class="flex items-center gap-2">
+                <Logo class="h-5 w-5" />
+                <span class="text-lg font-bold sm:inline-block">
+                    {siteConfig.name}
+                </span>
+            </a>
             <span class="text-sm text-muted-foreground">
                 Copyright © {new Date().getFullYear()} Stashlist. All rights reserved.
             </span>

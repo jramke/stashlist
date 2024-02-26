@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Logo } from '@repo/ui/icons';
+    import { Logo, Stash } from '@repo/ui/icons';
     import { onMount } from 'svelte';
 	import * as rive from "@rive-app/canvas";
 

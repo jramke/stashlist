@@ -12,7 +12,7 @@
 </script>
 
 <Metadata />
-<ModeWatcher />
+<ModeWatcher defaultMode="dark" />
 <Toaster position="bottom-center" />
 
 {#if !$page.route?.id?.includes('(auth)') && !$page.route?.id?.includes(siteConfig.appUrl)}
