@@ -48,6 +48,7 @@
 		"@repo/ui": "workspace:*",
 		"@rive-app/canvas": "^2.10.2",
 		"@sveltejs/adapter-vercel": "^5.1.0",
+		"@vercel/analytics": "^1.2.2",
 		"arctic": "^1.1.5",
 		"drizzle-orm": "^0.29.3",
 		"lucia": "^3.0.1",
