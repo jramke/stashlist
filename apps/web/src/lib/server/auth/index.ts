@@ -11,7 +11,7 @@ const adapter = new DrizzleSQLiteAdapter(db, session, user);
 
 export const github = new GitHub(GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET);
 
-const baseUrl = dev ? 'http://localhost:5173' : 'https://stashlist.vercel.app';
+const baseUrl = dev ? 'http://localhost:5173' : 'https://stashlist.app';
 const redirectUrl = `${baseUrl}/login/google/callback`;
 export const google = new Google(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, redirectUrl);
 
