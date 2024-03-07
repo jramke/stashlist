@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "c8ce37e7-376d-4733-a8e3-4726b84ad57f",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "38deea97-f40d-4247-8522-ca4eadd5d784",
+  "prevId": "c8ce37e7-376d-4733-a8e3-4726b84ad57f",
   "tables": {
     "group": {
       "name": "group",
@@ -153,10 +153,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": true
         },
         "slug": {
           "name": "slug",
