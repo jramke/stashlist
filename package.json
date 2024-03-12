@@ -10,12 +10,12 @@
     "turso": "pnpm --filter web turso",
     "studio": "pnpm --filter web studio",
     "generate": "pnpm --filter web generate",
-		"migrate": "pnpm --filter web migrate",
-		"push": "pnpm --filter web push"
+    "migrate": "pnpm --filter web migrate",
+    "push": "pnpm --filter web push"
   },
   "devDependencies": {
-    "eslint": "^8.56.0",
     "@repo/eslint-config": "workspace:*",
+    "eslint": "^8.56.0",
     "prettier": "^3.1.1",
     "prettier-plugin-svelte": "^3.1.2",
     "turbo": "latest"
@@ -23,5 +23,8 @@
   "packageManager": "pnpm@8.9.0",
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "apexcharts": "^3.47.0"
   }
 }

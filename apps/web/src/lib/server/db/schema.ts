@@ -61,31 +61,6 @@ export const group = sqliteTable('group', {
 		.notNull()
 });
 
-export const page_views = sqliteTable('page_views', {
-	id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }).unique(),
-	slug: text('slug').default(''),
-	count: integer('count').notNull(),
-	updatedAt: text('updated_at')
-		.default(sql`CURRENT_TIMESTAMP`)
-		.notNull()
-});
-
-export const page_visitors = sqliteTable('page_visitors', {
-	id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }).unique(),
-	sessionId: text('session_id').notNull(),
-	referrer: text('referrer').default(''),
-	userAgent: text('user_agent').default(''),
-	country: text('country').default(''),
-	createdAt: text('created_at')
-		.default(sql`CURRENT_TIMESTAMP`)
-		.notNull()
-});
-
-export const page_views_visitors_mm = sqliteTable('page_views_visitors_mm', {
-	pageViewId: text('page_view_id').notNull(),
-	pageVisitorId: text('page_visitor_id').default(''),
-});
-
 export const save_group_mm = sqliteTable(
 	'save_group_mm',
 	{

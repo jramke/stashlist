@@ -5,7 +5,8 @@
     ".": {
       "svelte": "./index.ts",
       "default": "./index.ts"
-    }
+    },
+    "./utils": "./utils.ts"
   },
   "scripts": {
     "lint": "eslint ."
@@ -29,6 +30,8 @@
   "dependencies": {
     "ahoy.js": "^0.4.3",
     "bits-ui": "^0.18.2",
-    "lucide-svelte": "^0.323.0"
+    "chart.js": "^4.4.2",
+    "lucide-svelte": "^0.323.0",
+    "ua-parser-js": "^1.0.37"
   }
 }

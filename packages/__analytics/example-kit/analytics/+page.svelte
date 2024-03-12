@@ -3,7 +3,8 @@
 	import { Dashboard } from "@repo/analytics";
 
 	export let form: ActionData;
-	
+	export let data: PageData;
+
 </script>
 
-<Dashboard {form} />
+<Dashboard {form} {data} />
