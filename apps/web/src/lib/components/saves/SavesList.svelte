@@ -6,6 +6,7 @@
 	import type { Save } from '$lib/types';
 	import Masonry from '@repo/ui/components/masonry';
 	import { listLayout } from '$lib/stores';
+	import EmptyState from '$lib/components/saves/EmptyState.svelte';
 
     type SaveListOptions = 'all' | 'savesByGroup' | 'unsorted';
     export let saves: SaveListOptions = 'all';
@@ -13,7 +14,11 @@
     $: saveOption = {
         'all': $page.data.saves.then(saves => saves.items),
         'savesByGroup': $page.data.savesByGroup,
-        'unsorted': $page.data.saves.then(saves => saves.items.filter(save => save.saveGroups.length === 0)),
+        'unsorted': $page.data.saves.then(saves => {
+			const items = saves.items;
+			if (!items || items.length === 0) return [];
+			return saves.items.filter(save => save.saveGroups.length === 0)
+		}),
     }
 	
 
@@ -42,6 +47,8 @@
 				{/each}
 			</div>
 		{/if}
+	{:else}
+		<EmptyState title="No stashes found" />
 	{/if}
 {:catch error}
 	<p>Couldnt fetch stashes!</p>

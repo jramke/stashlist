@@ -5,9 +5,7 @@ const baseUrl = 'http://127.0.0.1:5173';
 
 function isValidUrl(url: string) {
   // Regular expression to match the pattern *://*/*
-  var regex = /^(\*|https?|ftp):\/\/(\*|\w+\.\w+)(\/.*)?$/;
-  
-  // Test the URL against the regular expression
+  var regex = /^[^:]+:\/\/[^\/]+\/.*$/;
   return regex.test(url);
 }
 
@@ -43,7 +41,7 @@ browser.runtime.onMessage.addListener(async (message: any, sender: any) => {
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
   if (tab && tab.url && !isValidUrl(tab.url)) {
-    console.log('invalid url');
+    console.log('invalid url', tab.url);
     return
   }
 
