@@ -4,7 +4,7 @@ const sharedManifest: Partial<chrome.runtime.ManifestBase> = {
   content_scripts: [
     {
       js: ["src/entries/contentScript/primary/main.ts"],
-      matches: ["*://*/*"],
+      // matches: ["*://*/*"],
     },
   ],
   icons: {
@@ -17,12 +17,13 @@ const sharedManifest: Partial<chrome.runtime.ManifestBase> = {
   //   page: "src/entries/options/index.html",
   //   open_in_tab: true,
   // },
-  permissions: ["contextMenus"],
+  permissions: ["contextMenus", "activeTab"],
   commands: {
     "stash-page": {
       suggested_key: {
-        default: "Ctrl+Shift+S",
-        mac: "Command+Shift+S",
+        default: "Ctrl+B",
+        windows: "Ctrl+B",
+        mac: "Command+B",
       },
       description: "Stash the current page"
     }
@@ -59,7 +60,7 @@ const ManifestV3 = {
   background: {
     service_worker: "src/entries/background/serviceWorker.ts",
   },
-  host_permissions: ["*://*/*"],
+  // host_permissions: ["*://*/*"],
 };
 
 export function getManifest(manifestVersion: number): chrome.runtime.ManifestV2 | chrome.runtime.ManifestV3 {

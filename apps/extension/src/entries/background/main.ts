@@ -1,5 +1,16 @@
 import browser, { type Tabs } from "webextension-polyfill";
 
+const baseUrl = 'http://127.0.0.1:5173';
+// const baseUrl = 'https://stashlist.app';
+
+function isValidUrl(url: string) {
+  // Regular expression to match the pattern *://*/*
+  var regex = /^(\*|https?|ftp):\/\/(\*|\w+\.\w+)(\/.*)?$/;
+  
+  // Test the URL against the regular expression
+  return regex.test(url);
+}
+
 browser.action.onClicked.addListener((tab, info) => {
   browser.tabs.create({
     url: 'https://stashlist.app'
@@ -20,17 +31,22 @@ browser.contextMenus.create({
 browser.runtime.onMessage.addListener(async (message: any, sender: any) => {
   let result;
   if (message.saveWebsite) {   
-    result = await makePostRequest("http://127.0.0.1:5173/api/saves/new/website", message.saveWebsite);
+    result = await makePostRequest(baseUrl + "/api/saves/new/website", message.saveWebsite);
   }
   if (message.saveImage) {   
-    result = await makePostRequest("http://127.0.0.1:5173/api/saves/new/image", message.saveImage);
+    result = await makePostRequest(baseUrl + "/api/saves/new/image", message.saveImage);
   }
   await browser.tabs.sendMessage(sender.tab.id, {
     newStashAdded: result
   })
 })
 
-browser.contextMenus.onClicked.addListener(async (info, tab) => {  
+browser.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (tab && tab.url && !isValidUrl(tab.url)) {
+    console.log('invalid url');
+    return
+  }
+
   if (info.menuItemId === 'stash-page') {
     await initStashPage(tab)
   }
@@ -40,6 +56,13 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 });
 
 browser.commands.onCommand.addListener(async (command, tab) => {
+  console.log('command', command);
+  console.log('tab', tab);
+  if (tab && tab.url && !isValidUrl(tab.url)) {
+    console.log('invalid url');
+    return
+  }
+  
   if (command === 'stash-page') {
     await initStashPage(tab)
   }
@@ -50,7 +73,7 @@ async function initStashPage(tab: Tabs.Tab | undefined) {
 
   if (!currentUrl) return;
 
-  const result = await makePostRequest('http://127.0.0.1:5173/api/saves/new/website?edit=true', { url: currentUrl });
+  const result = await makePostRequest(baseUrl + '/api/saves/new/website?edit=true', { url: currentUrl });
   const tabId = tab?.id || 0;
   await browser.tabs.sendMessage(tabId, {
     editNewStash: result
@@ -60,7 +83,7 @@ async function initStashPage(tab: Tabs.Tab | undefined) {
 async function initStashImage(tab: Tabs.Tab | undefined, imageUrl: string | undefined) {
   if (!imageUrl) return;
 
-  const result = await makePostRequest('http://127.0.0.1:5173/api/saves/new/image?edit=true', { imageUrl: imageUrl });
+  const result = await makePostRequest(baseUrl + '/api/saves/new/image?edit=true', { imageUrl: imageUrl });
   const tabId = tab?.id || 0;
   await browser.tabs.sendMessage(tabId, {
     editNewStash: result
