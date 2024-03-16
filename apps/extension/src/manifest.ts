@@ -4,7 +4,7 @@ const sharedManifest: Partial<chrome.runtime.ManifestBase> = {
   content_scripts: [
     {
       js: ["src/entries/contentScript/primary/main.ts"],
-      // matches: ["*://*/*"],
+      matches: ["*://*/*"],
     },
   ],
   icons: {
