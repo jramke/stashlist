@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { Separator } from "@repo/ui/components/separator";
-
     export let path: string[];
 
 </script>

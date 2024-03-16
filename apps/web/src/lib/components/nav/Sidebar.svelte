@@ -9,7 +9,7 @@
 	import { enhance, applyAction } from '$app/forms';
 	import { invalidateAll, goto } from '$app/navigation';
 	import { Skeleton } from '@repo/ui/components/skeleton';
-	import { Plus, FolderPlus, Folder, Check, Inbox, Pencil, Trash, X, Logo, Stash } from '@repo/ui/icons';
+	import { Plus, FolderPlus, Folder, Check, Inbox, Pencil, Trash, X, Logo, Stash, Loader } from '@repo/ui/icons';
 	import { page } from '$app/stores';
 	import { cn } from '@repo/ui/utils';
 	import { Input } from '@repo/ui/components/input';
@@ -29,6 +29,7 @@
 	$: editGroupsErrors = [];
 	$: newStashFormError = '';
 	let newStashFormDialogOpen = false;
+	let busy = false;
 	// let newGroupError = $state('');
 	// let showNewGroupForm = $state(false);
 
@@ -38,7 +39,7 @@
 	onMount(async () => {
 		newGroupInput = document.querySelector('#new-group-input');
 		newGroupForm = document.querySelector('#new-group-form');
-		newGroupForm?.addEventListener('focusout', (e: any) => {
+		newGroupInput?.addEventListener('focusout', (e: any) => {
 			if (newGroupForm?.contains(e.relatedTarget)) return;
 			showNewGroupForm = false;
 			newGroupError = '';
@@ -46,7 +47,8 @@
 		});
 	});
 
-	const enhanceNewGroupForm: SubmitFunction = () => {
+	const enhanceNewGroupForm: SubmitFunction = () => {	
+		busy = true;
 		return async ({ result }) => {
 			if (result.type === 'success') {
 				invalidateAll();
@@ -57,10 +59,13 @@
 			} else {
 				newGroupError = 'Invalid group name';
 				newGroupInput?.focus();
+				showNewGroupForm = true;
 			}
+			busy = false;
 		};
 	};
 	const enhanceEditGroupForm: SubmitFunction = () => {
+		busy = true;
 		return async ({ result }) => {
 			if (result.type === 'success') {
 				invalidateAll();
@@ -71,9 +76,11 @@
 			} else {
 				editGroupsErrors = result.data.form.errors; // ??: why Property 'data' does not exist on type???
 			}
+			busy = false;
 		};
 	};
 	const enhanceDeleteGroupForm: SubmitFunction = () => {
+		busy = true;
 		return async ({ result }) => {		
 			if (result.type === 'success' || result.type === 'redirect') {
 				invalidateAll();
@@ -84,12 +91,15 @@
 					goto(result.location);
 				}
 				toast.success('Successfully deleted group');
+				busy = false;
 				return
 			} 
 			toast.error('Something went wrong deleting the group');
+			busy = false;
 		};
 	};
 	const enhanceNewStashForm: SubmitFunction = () => {
+		busy = true;
 		return async ({ result }) => {
 			if (result.type === 'success') {
 				invalidateAll();
@@ -100,6 +110,7 @@
 			} else {
 				newStashFormError = 'Something went wrong stashing the website';
 			}
+			busy = false;
 		};
 	};
 
@@ -141,7 +152,10 @@
 								<p class="text-sm text-destructive" aria-live="assertive">{newStashFormError}</p>
 							{/if}
 							<Dialog.Footer>
-								<Button type="submit" class="mt-3">Add</Button>
+								<Button type="submit" disabled={busy} class="mt-3">
+									{#if busy}<Loader class="h-4 w-4 animate-spin me-2" />{/if}
+									Add
+								</Button>
 							</Dialog.Footer>
 						</form>
 					</Dialog.Content>
@@ -177,13 +191,20 @@
 				{#if items.length !== 0}
 					{#if editGroups}
 						<div>
-							<Button variant="ghost" on:click={() => editGroups = false}>
-								<X class="h-4 w-4" />
-								<span class="sr-only">Cancel edit groups</span>
-							</Button>
-							<Button variant="ghost" on:click={() => editGroupForm?.requestSubmit()}>
-								<Check class="h-4 w-4" />
-								<span class="sr-only">Save groups</span>
+							{#if !busy}
+								<Button variant="ghost" on:click={() => editGroups = false}>
+									<X class="h-4 w-4" />
+									<span class="sr-only">Cancel edit groups</span>
+								</Button>
+							{/if}
+							<Button variant="ghost" disabled={busy} on:click={() => editGroupForm?.requestSubmit()}>
+								{#if busy}
+									<Loader class="h-4 w-4 animate-spin" />
+									<span class="sr-only">Saving groups</span>
+								{:else}
+									<Check class="h-4 w-4" />
+									<span class="sr-only">Save groups</span>
+								{/if}
 							</Button>
 						</div>
 					{:else}
@@ -232,7 +253,10 @@
 														<input type="hidden" name="id" value={id}>
 														<input type="hidden" name="isOnCurrentSlug" value={$page.params.slug ? true : false}>
 														<button type="submit">
-															<AlertDialog.Action>Delete group</AlertDialog.Action>
+															<AlertDialog.Action disabled={busy}>
+																{#if busy}<Loader class="h-4 w-4 animate-spin me-2" />{/if}
+																Delete group
+															</AlertDialog.Action>
 														</button>
 													</form>
 												</AlertDialog.Footer>
@@ -251,7 +275,7 @@
 										<Folder class="me-2 h-4 w-4" />
 										{title}
 									</div>
-									{#if savesData?.groupCounts[id]}
+									{#if savesData?.groupCounts && savesData.groupCounts[id]}
 										<div class="ms-auto">{savesData?.groupCounts[id]}</div>
 									<!-- {:else}
 										<div class="ms-auto"></div> -->
@@ -276,11 +300,17 @@
 							id="new-group-input"
 							type="text"
 							name="title"
+							required
 							class="rounded-none px-0 border-t-0 border-x-0 focus-visible:ring-0 focus-visible:ring-offset-0"
 						/>
-						<Button type="submit" variant="ghost" class="ms-2 h-auto p-2">
-							<Check class="h-4 w-4" />
-							<span class="sr-only">Create</span>
+						<Button type="submit" variant="ghost" class="ms-2 h-auto p-2" disabled={busy}>
+							{#if busy}
+								<Loader class="h-4 w-4 animate-spin" />
+								<span class="sr-only">Creating</span>
+							{:else}
+								<Check class="h-4 w-4" />
+								<span class="sr-only">Create</span>
+							{/if}
 						</Button>
 					</div>
 					{#if newGroupError}

@@ -7,6 +7,7 @@
 	import Masonry from '@repo/ui/components/masonry';
 	import { listLayout } from '$lib/stores';
 	import EmptyState from '$lib/components/saves/EmptyState.svelte';
+	import { Button } from '@repo/ui/components/button';
 
     type SaveListOptions = 'all' | 'savesByGroup' | 'unsorted';
     export let saves: SaveListOptions = 'all';
@@ -48,7 +49,9 @@
 			</div>
 		{/if}
 	{:else}
-		<EmptyState title="No stashes found" />
+		<EmptyState title="No stashes found" message="Your stashes will be dispayed here. Download the extension to easily stash your items.">
+			<Button href="/extension" variant="outline">Get the extension</Button>
+		</EmptyState>
 	{/if}
 {:catch error}
 	<p>Couldnt fetch stashes!</p>

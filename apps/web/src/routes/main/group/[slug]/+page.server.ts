@@ -6,21 +6,26 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
 	if (!locals.user) redirect(302, '/login');
 
 	const data = await parent();
-	const saves= (await data.saves)?.items;
+	const saves = (await data.saves)?.items;
 	const groups = await data.groups;
 
 	const currentGroupId = params.slug;
 
+	
 	//TODO: types
 	const currentGroup = groups.filter((group: { id: string; }) => {
 		return group.id === currentGroupId;
 	})[0];
 
-	try {
-		if (saves.length === 0) {
-			throw Error('No saves found');
-		}
+	if (!currentGroup) return;
 
+	if (!saves || saves.length === 0) {
+		return {
+			savesByGroup: null,
+			currentGroup: currentGroup
+		};
+	};
+	try {
 		//TODO: types
 		const savesByGroup = saves.filter((save: { saveGroups: any; }) => {
 			const groups = save.saveGroups;
@@ -31,7 +36,7 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
 		if (savesByGroup.length === 0) {
 			return {
 				savesByGroup: null,
-				currentGroup: null
+				currentGroup: currentGroup
 			};
 			// throw Error('No saves found for this group');
 		}
