@@ -16,13 +16,6 @@ CREATE TABLE `oauth_account` (
 	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-CREATE TABLE `page_views` (
-	`id` text PRIMARY KEY NOT NULL,
-	`slug` text DEFAULT '',
-	`count` integer NOT NULL,
-	`updated_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
---> statement-breakpoint
 CREATE TABLE `save` (
 	`id` text PRIMARY KEY NOT NULL,
 	`user_id` text NOT NULL,
@@ -65,7 +58,6 @@ CREATE TABLE `user` (
 CREATE UNIQUE INDEX `group_id_unique` ON `group` (`id`);--> statement-breakpoint
 CREATE UNIQUE INDEX `oauth_account_provider_id_unique` ON `oauth_account` (`provider_id`);--> statement-breakpoint
 CREATE UNIQUE INDEX `oauth_account_user_id_unique` ON `oauth_account` (`user_id`);--> statement-breakpoint
-CREATE UNIQUE INDEX `page_views_id_unique` ON `page_views` (`id`);--> statement-breakpoint
 CREATE UNIQUE INDEX `save_id_unique` ON `save` (`id`);--> statement-breakpoint
 CREATE UNIQUE INDEX `session_id_unique` ON `session` (`id`);--> statement-breakpoint
 CREATE UNIQUE INDEX `user_id_unique` ON `user` (`id`);
