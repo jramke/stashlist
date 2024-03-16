@@ -43,7 +43,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@libsql/client": "^0.4.0",
+		"@libsql/client": "^0.5.0",
 		"@lucia-auth/adapter-drizzle": "^1.0.0",
 		"@repo/ui": "workspace:*",
 		"@rive-app/canvas": "^2.10.2",

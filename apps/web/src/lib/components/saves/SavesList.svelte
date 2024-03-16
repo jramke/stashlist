@@ -15,8 +15,6 @@
         'savesByGroup': $page.data.savesByGroup,
         'unsorted': $page.data.saves.then(saves => saves.items.filter(save => save.saveGroups.length === 0)),
     }
-
-	$: console.log(saveOption);
 	
 
 </script>
