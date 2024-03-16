@@ -2,8 +2,8 @@
 	import { cn } from '$ui/utils';
 	import { onMount, onDestroy, tick } from 'svelte';
 
-	export let gapSize = '6';
-    export let columns: string;
+	export let gapSize: number = 6;
+    export let columns: number;
 	export let items: any[] = []; // pass in data if it's dynamically updated
 	let grids: any[] = [];
 	let masonryElement: HTMLDivElement;

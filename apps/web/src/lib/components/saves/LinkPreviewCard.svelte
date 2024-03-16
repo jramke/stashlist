@@ -13,7 +13,7 @@
 	import { Badge } from "@repo/ui/components/badge";
 	import * as AlertDialog from "@repo/ui/components/alert-dialog";
 	import Waves from '$lib/placeholder/waves.svelte';
-	import EditForm from '../../../routes/app/save/edit/[id]/+page.svelte';
+	import EditForm from '../../../routes/main/save/edit/[id]/+page.svelte';
 	import { page } from '$app/stores';
 	import { listLayout } from '$lib/stores';
 
@@ -26,6 +26,7 @@
 	export let createdAt: Save['createdAt'];
 	export let saveGroups: TODO[] = [];
 	export let id: string;
+	export let type: Save['type'];
 
 	// export let editForm: SuperValidated<FormSchema>;
 
@@ -76,48 +77,69 @@
 
 <div class="overflow-hidden rounded-lg border bg-card text-card-foreground grid content-between">
 	<div>
-		{#if $listLayout !== 'list'}
+		{#if type === 'image'}
 			<a
-				href={url}
+				href={imageUrl}
 				{title}
 				rel="norefferrer noopener"
 				target="_blank"
-				class="relative flex aspect-og overflow-hidden border-b"
+				class="flex overflow-hidden m-4 mb-0 rounded-sm"
 			>
-				<!-- TODO: cool css or svg placeholder -->
-				<Waves class="absolute inset-0 h-full w-full" />
 				{#if imageUrl}	
 					<img
 						loading="lazy"
 						src={imageUrl}
 						alt={title}
-						class="absolute inset-0 h-full w-full object-cover"
+						class="w-full"
 					/>
 				{/if}
 			</a>
+		{:else}
+			{#if $listLayout !== 'list'}
+				<a
+					href={url}
+					{title}
+					rel="norefferrer noopener"
+					target="_blank"
+					class="relative flex aspect-og overflow-hidden m-4 mb-0 rounded-sm"
+				>
+					<!-- TODO: cool css or svg placeholder -->
+					<Waves class="absolute inset-0 h-full w-full" />
+					{#if imageUrl}	
+						<img
+							loading="lazy"
+							src={imageUrl}
+							alt={title}
+							class="absolute inset-0 h-full w-full object-cover"
+						/>
+					{/if}
+				</a>
+			{/if}
 		{/if}
 		<div class="flex gap-4 p-4">
 			<div class="flex flex-col gap-2">
-				<span class="line-clamp-2 text-lg font-bold">{title}</span>
+				<span class="line-clamp-2 text-lg font-bold break-all">{title}</span>
 				{#if description}
 					<span class="mb-2 line-clamp-2 text-sm">{description}</span>
 				{/if}
-				<div class="flex items-center gap-2">
-					{#if faviconUrl}
-						<img loading="lazy" class="h-4 w-4" src={faviconUrl} alt={title} />
-					{:else}
-						<CircleDashed class="h-4 w-4 text-muted-foreground" />
-					{/if}
-					<a
-						href={url}
-						{title}
-						rel="norefferrer noopener"
-						target="_blank"
-						class="line-clamp-1 text-sm text-muted-foreground"
-					>
-						{cleanUrl(url)}
-					</a>
-				</div>
+				{#if type !== 'image'}
+					<div class="flex items-center gap-2">
+						{#if faviconUrl}
+							<img loading="lazy" class="h-4 w-4" src={faviconUrl} alt={title} />
+						{:else}
+							<CircleDashed class="h-4 w-4 text-muted-foreground" />
+						{/if}
+						<a
+							href={url}
+							{title}
+							rel="norefferrer noopener"
+							target="_blank"
+							class="line-clamp-1 text-sm text-muted-foreground break-all"
+						>
+							{cleanUrl(url)}
+						</a>
+					</div>
+				{/if}
 				
 			</div>
 			<div class="ml-auto flex">
@@ -142,7 +164,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="border-t min-h-12 flex gap-4 px-4 py-3 bg-background justify-between items-center self-end">
+	<div class="min-h-10 flex gap-4 p-4 pt-0 justify-between items-end self-end">
 		<div>
 			{#if saveGroups.length !== 0}
 				<div class="flex flex-wrap gap-1">
@@ -154,7 +176,7 @@
 				</div>
 			{/if}
 		</div>
-		<div class="text-xs text-muted-foreground tracking-none">
+		<div class="text-xs leading-none text-muted-foreground tracking-none">
 			{formatRelativeTime(creationDate)}
 		</div>
 	</div>

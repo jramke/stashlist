@@ -12,8 +12,8 @@
 
 <SeparatorPrimitive.Root
 	class={cn(
-		'shrink-0 bg-border',
-		orientation === 'horizontal' ? 'my-3 h-[1px] w-full' : 'mx-3 h-full w-[1px]',
+		'shrink-0',
+		orientation === 'horizontal' ? 'my-3 h-[1px] w-full bg-gradient-to-r from-border/0 via-border to-border/0' : 'mx-3 h-full w-[1px] bg-gradient-to-t from-border/0 via-border to-border/0',
 		className
 	)}
 	{orientation}

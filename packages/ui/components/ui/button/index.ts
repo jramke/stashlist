@@ -3,7 +3,7 @@ import { tv, type VariantProps } from 'tailwind-variants';
 import type { Button as ButtonPrimitive } from 'bits-ui';
 
 const buttonVariants = tv({
-	base: 'inline-flex items-center justify-center rounded-md text-sm font-medium whitespace-nowrap ring-offset-background border-transparent transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+	base: 'inline-flex items-center justify-center rounded-md text-sm font-medium whitespace-nowrap ring-offset-background border-transparent transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[.98]',
 	variants: {
 		variant: {
 			default: 'bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20',
@@ -12,7 +12,7 @@ const buttonVariants = tv({
 			secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:shadow-md hover:shadow-secondary/20',
 			ghost: 'border hover:shadow-inner hover:shadow-primary/20 hover:text-accent-foreground hover:border-primary hover:bg-secondary',
 			link: 'decoration-primary underline-offset-4 hover:underline',
-			nav: 'transition-colors text-foreground/60 hover:text-foreground/80 [&.active]:text-foreground [&.active]:font-bold'
+			nav: 'transition-colors text-foreground/60 hover:text-foreground/80 [&.active]:text-foreground [&.active]:font-bold active:scale-100'
 		},
 		size: {
 			default: 'h-10 px-4 py-2',

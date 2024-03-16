@@ -24,11 +24,21 @@ export const load: LayoutServerLoad = async ({ locals, fetch }) => {
 			if (!response.ok) {
 				throw new Error(`Error getting saves. Status: ${response.status}`);
 			}
-			const saves = await response.json();
-			return saves;
+			//TODO use the new counts
+			const saveData = await response.json();
+			
+			return {
+				items: saveData.saves,
+				groupCounts: saveData.groupCounts,
+				noGroupCount: saveData.noGroupCount
+			};
 		} catch (error) {
 			console.log('Error getting saves', error);
-			return null;
+			return {
+				items: null,
+				groupCounts: null,
+				noGroupCount: null
+			};
 		}
 	}
 

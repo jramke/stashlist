@@ -10,7 +10,6 @@ import { eq } from 'drizzle-orm';
 
 export const POST: RequestHandler = async ({ request, locals, params, url }) => {
 	if (!locals.user) redirect(302, '/login');
-	console.log(locals);
 	
 	try {
 		const formData = await request.json();
@@ -22,10 +21,13 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 		const edit = url.searchParams.get('edit');
 		if (edit) {
 			const groups = await db.select().from(group).where(eq(group.userId, locals.user.id)).all();
+
+			const title = imageUrl.split('/').pop().split('.')[0];
+
 		    return json({
 				type: 'image',
 				form: {
-					title: { label: 'Title', data: '', error: null, hidden: false },
+					title: { label: 'Title', data: title, error: null, hidden: false },
 					description: { label: 'Description', data: '', error: null, hidden: false },
 					imageUrl: { label: 'Image url', data: imageUrl, error: null, hidden: true },
 					groups: { label: 'Groups', data: '', error: null, hidden: false }

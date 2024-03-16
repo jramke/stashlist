@@ -17,10 +17,10 @@
 	})
 
 	$: if (breadcrumbArray) {
-		if ($page.route.id?.endsWith('explore')) {
-			breadcrumbArray[1] = 'Explore';
+		if ($page.route.id?.endsWith('unsorted')) {
+			breadcrumbArray[1] = 'Unsorted';
 		}
-		if ($page.route.id?.endsWith('app')) {
+		if ($page.route.id?.endsWith('main')) {
 			breadcrumbArray[1] = 'All';
 		}
 		if ($page.data.currentGroup) {
@@ -38,7 +38,7 @@
 	}
 </script>
 
-<div id="topbar" class="bg-card/95 sticky top-0 z-50 flex w-full justify-between gap-5 border-b p-5 backdrop-blur">
+<div id="topbar" class="bg-card sticky top-0 flex w-full justify-between border-b gap-5 p-5 z-100">
 	<!-- <Input type="search" placeholder="Search" />
 	<div class="flex items-center gap-3">
 		<Avatar.Root>

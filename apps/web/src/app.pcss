@@ -28,3 +28,28 @@ body {
 	max-height: calc(100vh - var(--topbar-height));
 	max-height: calc(100dvh - var(--topbar-height));
 }
+
+#topbar {
+	position: relative;
+	&:before {
+		content: '';
+		position: absolute;
+		height: var(--radius);
+		width: var(--radius);
+		top: 100%;
+		left: 0;
+		@apply bg-card;
+	}
+	&:after {
+		content: '';
+		position: absolute;
+		height: var(--radius);
+		width: var(--radius);
+		top: 100%;
+		left: 0px;
+		border-top-width: 1px;
+		border-left-width: 1px;
+		border-top-left-radius: var(--radius);
+		border-color: hsl(var(--border) / 1)
+	}
+}

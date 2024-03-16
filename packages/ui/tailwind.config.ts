@@ -53,8 +53,8 @@ const config: Omit<Config, "content"> = {
 				}
 			},
 			borderRadius: {
-				lg: 'var(--radius)',
-				md: 'calc(var(--radius) - 2px)',
+				lg: 'calc(var(--radius) + 2px)',
+				md: 'var(--radius)',
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			fontFamily: {
@@ -71,7 +71,10 @@ const config: Omit<Config, "content"> = {
 			},
 			animation: {
 				wiggle: 'wiggle .3s ease-in-out infinite',
-			}
+			},
+			zIndex: {
+				'infinity': 'calc(infinity)',
+			},
 		}
 	}
 };

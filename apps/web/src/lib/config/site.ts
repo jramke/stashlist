@@ -1,7 +1,7 @@
 export const siteConfig = {
 	name: 'Stashlist',
 	slogan: 'Your Creative Vault',
-	appUrl: '/app',
+	appUrl: '/main',
 	url: 'https://stashlist.app',
 	ogImage: 'https://stashlist.app/og.png',
 	description: 'The creative vault for developers and designers.',

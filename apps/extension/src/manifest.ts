@@ -21,8 +21,8 @@ const sharedManifest: Partial<chrome.runtime.ManifestBase> = {
   commands: {
     "stash-page": {
       suggested_key: {
-        default: "Ctrl+B",
-        mac: "Command+B"
+        default: "Ctrl+Shift+S",
+        mac: "Command+Shift+S",
       },
       description: "Stash the current page"
     }

@@ -31,7 +31,7 @@
 					<form method="post" action="/logout" use:enhance>
 						<Button type="submit" variant="outline">Logout</Button>
 					</form>
-				{:else}
+				{:else if $page.url.pathname !== '/login'}
 					<Button href="/login" variant="outline">Login</Button>
 				{/if}
 					

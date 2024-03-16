@@ -10,7 +10,6 @@ import { eq } from 'drizzle-orm';
 
 export const POST: RequestHandler = async ({ request, locals, params, url }) => {
 	if (!locals.user) redirect(302, '/login');
-	console.log(locals);
 	
 	try {
 		const formData = await request.json();

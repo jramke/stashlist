@@ -7,13 +7,17 @@
 	import Masonry from '@repo/ui/components/masonry';
 	import { listLayout } from '$lib/stores';
 
-    type SaveListOptions = 'all' | 'savesByGroup';
+    type SaveListOptions = 'all' | 'savesByGroup' | 'unsorted';
     export let saves: SaveListOptions = 'all';
 
     $: saveOption = {
-        'all': $page.data.saves,
-        'savesByGroup': $page.data.savesByGroup
+        'all': $page.data.saves.then(saves => saves.items),
+        'savesByGroup': $page.data.savesByGroup,
+        'unsorted': $page.data.saves.then(saves => saves.items.filter(save => save.saveGroups.length === 0)),
     }
+
+	$: console.log(saveOption);
+	
 
 </script>
 
@@ -28,15 +32,15 @@
 {:then items}
     {#if items?.length > 0}
 		{#if $listLayout === 'masonry'}
-			<Masonry gapSize={'6'} columns={$listColumns} items={items}>
-				{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id}}
-					<LinkPreviewCard {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} />
+			<Masonry gapSize={6} columns={$listColumns} items={items}>
+				{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id, type}}
+					<LinkPreviewCard {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} {type} />
 				{/each}
 			</Masonry>
 		{:else}
 			<div class="grid grid-cols-{$listColumns} gap-6">
-				{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id}}
-					<LinkPreviewCard {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} />
+				{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id, type}}
+					<LinkPreviewCard {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} {type} />
 				{/each}
 			</div>
 		{/if}

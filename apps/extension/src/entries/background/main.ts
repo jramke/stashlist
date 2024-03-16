@@ -2,15 +2,14 @@ import browser, { type Tabs } from "webextension-polyfill";
 
 browser.action.onClicked.addListener((tab, info) => {
   browser.tabs.create({
-    // url: 'http://127.0.0.1:5173/'
-    url: 'https://stashlist.vercel.app'
+    url: 'https://stashlist.app'
   })
 })
 
 browser.contextMenus.create({
   id: 'stash-page',
   title: 'Stash page',
-  contexts: ['all']
+  contexts: ['page']
 });
 browser.contextMenus.create({
   id: 'stash-image',
@@ -41,7 +40,6 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 });
 
 browser.commands.onCommand.addListener(async (command, tab) => {
-  console.log(command, tab);
   if (command === 'stash-page') {
     await initStashPage(tab)
   }
@@ -78,7 +76,7 @@ async function makePostRequest(url: string, body: {}) {
 
     if (response.status !== 200) {
       console.log(response);
-      throw Error('Something went wrong');
+      throw Error('Something went wrong: ' + response.status + ' ' + response.statusText);
     }
 
     const result = await response.json();

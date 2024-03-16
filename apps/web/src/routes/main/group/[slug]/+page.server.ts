@@ -6,7 +6,7 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
 	if (!locals.user) redirect(302, '/login');
 
 	const data = await parent();
-	const saves = await data.saves;
+	const saves= (await data.saves)?.items;
 	const groups = await data.groups;
 
 	const currentGroupId = params.slug;
@@ -29,7 +29,11 @@ export const load: PageServerLoad = async ({ locals, params, parent }) => {
 		})
 
 		if (savesByGroup.length === 0) {
-			throw Error('No saves found for this group');
+			return {
+				savesByGroup: null,
+				currentGroup: null
+			};
+			// throw Error('No saves found for this group');
 		}
 
 		return {

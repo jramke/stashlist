@@ -15,7 +15,7 @@
 	<Sidebar />
 	<div class="w-full">
 		<Topbar />
-		<Section class="p-5 scroll-area" id="main-scrollarea">
+		<Section class="p-5 scroll-area h-full border-l" id="main-scrollarea">
 			<slot />
 		</Section>
 	</div>

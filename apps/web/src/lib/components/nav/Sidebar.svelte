@@ -9,7 +9,7 @@
 	import { enhance, applyAction } from '$app/forms';
 	import { invalidateAll, goto } from '$app/navigation';
 	import { Skeleton } from '@repo/ui/components/skeleton';
-	import { Plus, FolderPlus, Folder, Check, Bookmark, Compass, LogOut, Pencil, Trash, X, Stash } from '@repo/ui/icons';
+	import { Plus, FolderPlus, Folder, Check, Inbox, Pencil, Trash, X, Logo, Stash } from '@repo/ui/icons';
 	import { page } from '$app/stores';
 	import { cn } from '@repo/ui/utils';
 	import { Input } from '@repo/ui/components/input';
@@ -17,6 +17,8 @@
 	import { onMount } from 'svelte';
 	import { toast } from '@repo/ui/components/sonner';
 	import Userinfo from '$lib/components/nav/Userinfo.svelte';
+	import type { TODO } from '$lib/types';
+	import { Label } from '@repo/ui/components/label';
 
 	let newGroupForm: HTMLFormElement | null;
 	let newGroupInput: HTMLInputElement | null;
@@ -25,10 +27,15 @@
 	$: showNewGroupForm = false;
 	$: editGroups = false;
 	$: editGroupsErrors = [];
+	$: newStashFormError = '';
+	let newStashFormDialogOpen = false;
 	// let newGroupError = $state('');
 	// let showNewGroupForm = $state(false);
 
-	onMount(() => {
+	let savesData: TODO;
+	$: $page.data.saves.then(data => savesData = data);
+
+	onMount(async () => {
 		newGroupInput = document.querySelector('#new-group-input');
 		newGroupForm = document.querySelector('#new-group-form');
 		newGroupForm?.addEventListener('focusout', (e: any) => {
@@ -82,6 +89,19 @@
 			toast.error('Something went wrong deleting the group');
 		};
 	};
+	const enhanceNewStashForm: SubmitFunction = () => {
+		return async ({ result }) => {
+			if (result.type === 'success') {
+				invalidateAll();
+				await applyAction(result);
+				newStashFormError = '';
+				newStashFormDialogOpen = false;
+				toast.success('Successfully stashed new website');
+			} else {
+				newStashFormError = 'Something went wrong stashing the website';
+			}
+		};
+	};
 
 	function handleShowGroupForm() {
 		showNewGroupForm = true;
@@ -90,40 +110,39 @@
 	}
 </script>
 
-<aside class="sticky top-0 h-screen flex-[350px] border-r bg-card">
+<aside class="sticky top-0 h-screen flex-[350px] bg-card">
 	<div class="flex flex-col items-start h-full overflow-hidden py-5">
 		<div class="px-5 flex w-full items-center justify-between gap-3 pb-5">
 			<div class="flex items-center px-3">
-				<Stash class="me-3 h-5 w-5 text-primary" />
+				<Logo class="me-3 h-5 w-5 text-primary" />
 				<p class="text-xl font-bold">
 					{siteConfig.name}
 				</p>
 			</div>
 			<div>
-				<Dialog.Root>
+				<Dialog.Root bind:open={newStashFormDialogOpen}>
 					<Dialog.Trigger class={buttonVariants({ variant: 'ghost' })}>
 						<span class="sr-only">New stash</span>
 						<Plus class="h-4 w-4" />
 					</Dialog.Trigger>
 					<Dialog.Content>
 						<Dialog.Header>
-							<Dialog.Title>New stash</Dialog.Title>
-							<Dialog.Description>New stash description</Dialog.Description>
+							<Dialog.Title>Stash a new website</Dialog.Title>
 						</Dialog.Header>
 						<form
 							method="POST"
 							action={siteConfig.appUrl + '/save/new'}
-							use:enhance={({ formElement, formData, action, cancel }) => {
-								//TODO: improve ui
-								return async ({ result }) => {
-									console.log(result);
-									await applyAction(result);
-									invalidateAll();
-								};
-							}}
-						>
-							<input type="text" name="url" value="https://www.awwwards.com/" />
-							<Button type="submit">Save</Button>
+							class="space-y-2"
+							use:enhance={enhanceNewStashForm}
+						>	
+							<Label for="url">Url</Label>
+							<Input type="text" name="url" />
+							{#if newStashFormError}
+								<p class="text-sm text-destructive" aria-live="assertive">{newStashFormError}</p>
+							{/if}
+							<Dialog.Footer>
+								<Button type="submit" class="mt-3">Add</Button>
+							</Dialog.Footer>
 						</form>
 					</Dialog.Content>
 				</Dialog.Root>
@@ -132,10 +151,23 @@
 		<!-- <Separator /> -->
 		<div class="px-5 flex w-full flex-col items-start">
 			<Link path={siteConfig.appUrl}>
-				<Stash class="me-2 h-4 w-4" />
-				All stashes
+				<div class="flex items-center">
+					<Stash class="me-2 h-4 w-4" />
+					All stashes
+				</div>
+				{#if savesData?.items?.length}
+					<div class="ms-auto">{savesData?.items?.length}</div>
+				{/if}
 			</Link>
-			<Link path={siteConfig.appUrl + '/explore'}><Compass class="me-2 h-4 w-4" />Explore</Link>
+			<Link path={siteConfig.appUrl + '/unsorted'}>
+				<div class="flex items-center">
+					<Inbox class="me-2 h-4 w-4" />
+					Unsorted
+				</div>
+				{#if savesData?.noGroupCount}
+					<div class="ms-auto">{savesData.noGroupCount}</div>
+				{/if}
+			</Link>
 		</div>
 		<div class="px-5 pb-1 pt-5 flex items-center justify-between gap-2 w-full">
 			<p class="px-3 font-bold">My groups</p>
@@ -166,9 +198,9 @@
 		<div class="w-full scroll-area px-5">
 			<div class="flex w-full flex-col items-start">
 				{#await $page.data.groups}
-					{#each new Array(5) as _}
+					<!-- {#each new Array(5) as _}
 						<Skeleton class="mx-4 my-2 h-4 w-1/2" />
-					{/each}
+					{/each} -->
 				{:then items}
 					{#if items?.length > 0}
 						{#if editGroups}
@@ -179,7 +211,7 @@
 										<Input
 											type="text"
 											name={id}
-											class="rounded-none border-0 border-b-input px-0 border-b-2 focus-visible:ring-0 focus-visible:ring-offset-0"
+											class="rounded-none px-0 border-t-0 border-x-0 focus-visible:ring-0 focus-visible:ring-offset-0"
 											value={title}
 										/>
 										<AlertDialog.Root>
@@ -215,7 +247,15 @@
 						{:else}
 							{#each items as { title, id }}
 								<Link path={siteConfig.appUrl + '/group/' + id}>
-									<Folder class="me-2 h-4 w-4" />{title}
+									<div class="flex items-center">
+										<Folder class="me-2 h-4 w-4" />
+										{title}
+									</div>
+									{#if savesData?.groupCounts[id]}
+										<div class="ms-auto">{savesData?.groupCounts[id]}</div>
+									<!-- {:else}
+										<div class="ms-auto"></div> -->
+									{/if}
 								</Link>
 							{/each}
 						{/if}
@@ -236,7 +276,7 @@
 							id="new-group-input"
 							type="text"
 							name="title"
-							class="rounded-none border-0 border-b-input px-0 focus-visible:border-b-2 focus-visible:ring-0 focus-visible:ring-offset-0"
+							class="rounded-none px-0 border-t-0 border-x-0 focus-visible:ring-0 focus-visible:ring-offset-0"
 						/>
 						<Button type="submit" variant="ghost" class="ms-2 h-auto p-2">
 							<Check class="h-4 w-4" />
@@ -249,17 +289,23 @@
 				</form>
 			</div>
 		</div>
-		<div class="w-full pt-5 px-5">
-			<Button variant="outline" class="w-full" on:click={handleShowGroupForm}>
+		<div class="w-full pt-2 px-5">
+			<Separator />
+			<Button
+				variant="nav"
+				on:click={handleShowGroupForm}
+				class="w-full justify-start "
+			>
 				<FolderPlus class="me-2 h-4 w-4" />New group
 			</Button>
 		</div>
-		<div class="w-full pt-5 mt-auto">
-			<div class="pt-5 border-t">
-				<div class="mx-5 relative">
-					<Userinfo />
-				</div>
+		<div class="w-full mt-auto px-8">
+			<Separator />
+			<div class="pt-3 relative">
+				<Userinfo />
 			</div>
+			<!-- <div class="pt-5 border-t">
+			</div> -->
 		</div>
 	</div>
 </aside>

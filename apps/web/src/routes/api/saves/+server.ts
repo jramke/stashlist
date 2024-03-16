@@ -25,7 +25,31 @@ export const GET: RequestHandler = async ({ locals }) => {
 			return dateB - dateA; // Sorting in descending order
 		});
 
-		return json(savesWithGroups);
+		if (savesWithGroups.length === 0) {
+			return json(savesWithGroups)
+		}
+		
+		const groupCounts: Record<string, number> = {};
+		let noGroupCount = 0;
+
+		savesWithGroups.forEach(item => {
+			if (item.saveGroups.length === 0) {
+				noGroupCount++;
+			} else {
+				item.saveGroups.forEach(saveGroup => {
+					const groupId = saveGroup.groupId;
+					// Increment count for saves with groups
+					groupCounts[groupId] = (groupCounts[groupId] || 0) + 1;
+				});
+			}
+		});
+
+		return json({
+			saves: savesWithGroups,
+			groupCounts: groupCounts,
+			noGroupCount: noGroupCount
+		});
+
 	} catch (err) {
 		console.log('error fetch saves', err);
 		return error(400, {

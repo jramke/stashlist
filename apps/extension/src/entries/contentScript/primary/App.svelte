@@ -44,7 +44,6 @@
 	browser.runtime.onMessage.addListener((message: any, sender: any, sendResponse: any) => {
 			if (message.editNewStash) {
 				newStashFormData = message.editNewStash.form;
-				console.log(newStashFormData);
 				newStashType = message.editNewStash.type;
 				aviableGroups = message.editNewStash.groups
 				
