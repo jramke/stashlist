@@ -1,6 +1,4 @@
 <script>
-	import Footer from '$lib/components/site/Footer.svelte';
-	import { Button } from '@repo/ui/components/button';
 	import Section from '@repo/ui/components/section';
 	import { Logo, GitHub } from '@repo/ui/icons';
 	import TwitterBookmark from '$lib/components/landing/twitter-bookmark.svelte';
@@ -83,5 +81,3 @@
 		</div>
 	</div>
 </Section>
-
-<Footer />

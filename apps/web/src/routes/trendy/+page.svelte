@@ -1,5 +1,4 @@
 <script>
-	import Footer from '$lib/components/site/Footer.svelte';
 	import { Button } from '@repo/ui/components/button';
 	import Heading from '@repo/ui/components/heading';
 	import Section from '@repo/ui/components/section';
@@ -21,5 +20,3 @@
 		</div>
 	</div>
 </Section>
-
-<Footer />
