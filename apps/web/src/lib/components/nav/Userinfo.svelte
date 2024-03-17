@@ -7,6 +7,7 @@
 	import * as Avatar from '@repo/ui/components/avatar';
 	import { onMount } from 'svelte';
     import { setMode, resetMode } from 'mode-watcher';
+	import { siteConfig } from '$lib/config/site';
     
     let logoutForm: HTMLFormElement;
     
@@ -39,11 +40,9 @@
     </DropdownMenu.Trigger>
     <DropdownMenu.Content class="min-w-[200px]" align="start">
         <DropdownMenu.Group>
-            <DropdownMenu.Label>Settings</DropdownMenu.Label>
-            <DropdownMenu.Separator />
-            <!-- <DropdownMenu.Item>Profile</DropdownMenu.Item>
-            <DropdownMenu.Item>Billing</DropdownMenu.Item>
-            <DropdownMenu.Item>Team</DropdownMenu.Item> -->
+            <!-- <DropdownMenu.Label>Settings</DropdownMenu.Label> -->
+            <!-- <DropdownMenu.Separator /> -->
+            <DropdownMenu.Item href={siteConfig.extensionUrl.chrome} target="_blank">Get extension</DropdownMenu.Item> 
             <DropdownMenu.Item>Connect to VS Code</DropdownMenu.Item> 
             <DropdownMenu.Sub>
                 <DropdownMenu.SubTrigger>
