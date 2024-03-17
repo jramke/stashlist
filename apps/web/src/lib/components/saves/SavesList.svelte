@@ -13,7 +13,11 @@
     export let saves: SaveListOptions = 'all';
 
     $: saveOption = {
-        'all': $page.data.saves,
+        'all': $page.data.saves.then(saves => {
+			const items = saves.items;
+			if (!items || items.length === 0) return [];
+			return items;
+		}),
         'savesByGroup': $page.data.savesByGroup,
         'unsorted': $page.data.saves.then(saves => {
 			const items = saves.items;
