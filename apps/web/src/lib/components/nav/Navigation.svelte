@@ -22,11 +22,9 @@
 		</div>
 		<div class="flex flex-1 items-center justify-between space-x-2 md:justify-end">
 			<nav class="flex items-center gap-6">
-				<!-- {#if $page.url.pathname === '/trendy'}
-					<Link path="/">Looking for the minimalistic landingpage?</Link>
-				{:else}
-					<Link path="/trendy">Looking the trendy landingpage?</Link>
-				{/if} -->
+				{#if $page.url.pathname !== '/extension'}
+					<Link path="/extension">Get the extension</Link>
+				{/if}
 				{#if $page.data.user}
 					<form method="post" action="/logout" use:enhance>
 						<Button type="submit" variant="outline">Logout</Button>

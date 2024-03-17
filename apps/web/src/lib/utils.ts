@@ -73,3 +73,11 @@ export function slugify(str: string): string {
 		.replace(/\s+/g, '-') // replace spaces with hyphens
 		.replace(/-+/g, '-'); // remove consecutive hyphens
 }
+
+export function setHeightOfElementAsVariable(element: HTMLElement | null, variableName: string): void {
+	if (!element) {
+		return;
+	}
+	const height = element.clientHeight;
+	document.documentElement.style.setProperty(variableName, `${height}px`);
+}

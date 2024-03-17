@@ -7,13 +7,20 @@
 	import { listColumns, listLayout } from '$lib/stores';
 	import * as RadioGroup from '@repo/ui/components/radio-group';
 	import { onMount } from 'svelte';
+	import { setHeightOfElementAsVariable } from '$lib/utils';
 
 	//TODO: search https://www.youtube.com/watch?v=lrzHaTcpRh8
 
 	$: breadcrumbArray = ['Stashes'];
 
 	onMount(() => {
-		document.documentElement.style.setProperty('--topbar-height', (document.getElementById('topbar')?.clientHeight ?? 0) + 'px');
+		const topbar = document.getElementById('topbar');
+		const setVar = () => {
+			setHeightOfElementAsVariable(topbar, '--topbar-height');
+		}
+		setVar();
+		window.addEventListener('resize', setVar);
+		return () => window.removeEventListener('resize', setVar);
 	})
 
 	$: if (breadcrumbArray) {
