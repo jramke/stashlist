@@ -35,7 +35,7 @@
 	</Button>
 	<!-- <span class="text-muted-foreground text-xs uppercase"> or </span> -->
 	<Button variant="outline" type="button" disabled={isSomethingLoading} on:click={() => {
-		loading.github = true
+		loading.google = true
 		goto('/login/google');
 	}}>
 		{#if loading.google}
