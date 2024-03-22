@@ -9,12 +9,13 @@
 	import Behance from '$lib/components/landing/behance.svelte';
 	import GithubStar from '$lib/components/landing/github-star.svelte';
 	import LogoPoof from '$lib/components/landing/LogoPoof.svelte';
+	import Typography from '@repo/ui/components/typography';
 
 
 </script>
 
 <Section class="py-20">
-	<div class="container max-w-[73ch]">
+	<Typography class="container">
 		<div class="text-2xl leading-normal font-medium space-y-10">
 			<h1 class="font-bold text-4xl">
 				Say goodbye to scattered bookmarks!
@@ -75,9 +76,9 @@
 				<br>
 				But what if there was a better way?
 			</p>
-			<h2 class="font-bold">
+			<h2 class="font-bold text-2xl">
 				Introducing <span class="text-primary"><Logo class="h-6 w-6 inline -mt-1 me-1 ms-1" />Stashlist</span> — Your Creative Vault
 			</h2>
 		</div>
-	</div>
+	</Typography>
 </Section>

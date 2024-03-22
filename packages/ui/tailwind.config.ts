@@ -7,6 +7,10 @@ const config: Omit<Config, "content"> = {
 	// 	'./src/**/*.{html,js,svelte,ts}',
 	//  "../../packages/ui/src/**/*.{html,js,svelte,ts}",
 	// ],
+	plugins: [
+		require('@tailwindcss/typography'),
+		// ...
+	],
 	safelist: ['dark'],
 	theme: {
 		container: {
@@ -75,6 +79,45 @@ const config: Omit<Config, "content"> = {
 			zIndex: {
 				'infinity': 'calc(infinity)',
 			},
+			typography: (theme: any) => ({
+				neutral: {
+					css: {
+						'--tw-prose-body': theme('colors.foreground'),
+						'--tw-prose-headings': theme('colors.primary.DEFAULT'),
+						'--tw-prose-lead': theme('colors.secondary.DEFAULT'),
+						'--tw-prose-links': theme('colors.primary.DEFAULT'),
+						'--tw-prose-bold': theme('colors.primary.DEFAULT'),
+						'--tw-prose-counters': theme('colors.secondary.DEFAULT'),
+						'--tw-prose-bullets': theme('colors.secondary.DEFAULT'),
+						'--tw-prose-hr': theme('colors.secondary.DEFAULT'),
+						'--tw-prose-quotes': theme('colors.primary.DEFAULT'),
+						'--tw-prose-quote-borders': theme('colors.secondary.DEFAULT'),
+						'--tw-prose-captions': theme('colors.secondary.DEFAULT'),
+						'--tw-prose-code': theme('colors.primary.DEFAULT'),
+						'--tw-prose-pre-code': theme('colors.primary.DEFAULT'),
+						'--tw-prose-pre-bg': theme('colors.secondary.DEFAULT'),
+						'--tw-prose-th-borders': theme('colors.secondary.DEFAULT'),
+						'--tw-prose-td-borders': theme('colors.secondary.DEFAULT'),
+						'--tw-prose-invert-body': theme('colors.foreground'),
+						'--tw-prose-invert-headings': theme('colors.primary.foreground'),
+						'--tw-prose-invert-lead': theme('colors.secondary.foreground'),
+						'--tw-prose-invert-links': theme('colors.primary.foreground'),
+						'--tw-prose-invert-bold': theme('colors.primary.foreground'),
+						'--tw-prose-invert-counters': theme('colors.secondary.foreground'),
+						'--tw-prose-invert-bullets': theme('colors.secondary.foreground'),
+						'--tw-prose-invert-hr': theme('colors.secondary.foreground'),
+						'--tw-prose-invert-quotes': theme('colors.primary.foreground'),
+						'--tw-prose-invert-quote-borders': theme('colors.secondary.foreground'),
+						'--tw-prose-invert-captions': theme('colors.secondary.foreground'),
+						'--tw-prose-invert-code': theme('colors.primary.foreground'),
+						'--tw-prose-invert-pre-code': theme('colors.primary.foreground'),
+						'--tw-prose-invert-pre-bg': theme('colors.secondary.foreground'),
+						'--tw-prose-invert-th-borders': theme('colors.secondary.foreground'),
+						'--tw-prose-invert-td-borders': theme('colors.secondary.foreground'),
+						maxWidth: '70ch'
+					},
+				}
+			}),
 		}
 	}
 };
