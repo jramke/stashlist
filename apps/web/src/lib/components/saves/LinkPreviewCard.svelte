@@ -75,7 +75,7 @@
 
 </script>
 
-<div class="overflow-hidden rounded-lg border bg-card text-card-foreground grid content-between">
+<div class="overflow-hidden rounded-lg border bg-card text-card-foreground flex flex-col justify-between content-between">
 	<div>
 		{#if type === 'image'}
 			<a
@@ -117,10 +117,10 @@
 			{/if}
 		{/if}
 		<div class="flex gap-4 p-4">
-			<div class="flex flex-col gap-2">
-				<span class="line-clamp-2 text-lg font-bold break-all">{title}</span>
+			<div class="flex flex-col gap-2 min-w-0">
+				<span class="line-clamp-2 text-lg font-bold break-words">{title}</span>
 				{#if description}
-					<span class="mb-2 line-clamp-2 text-sm break-all">{description}</span>
+					<span class="mb-2 line-clamp-2 text-sm break-words">{description}</span>
 				{/if}
 				{#if type !== 'image'}
 					<div class="flex items-center gap-2">
@@ -134,7 +134,7 @@
 							{title}
 							rel="norefferrer noopener"
 							target="_blank"
-							class="line-clamp-1 text-sm text-muted-foreground break-all"
+							class="line-clamp-1 text-sm text-muted-foreground break-words"
 						>
 							{cleanUrl(url)}
 						</a>
