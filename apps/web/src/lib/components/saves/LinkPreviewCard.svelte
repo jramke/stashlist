@@ -120,7 +120,7 @@
 			<div class="flex flex-col gap-2">
 				<span class="line-clamp-2 text-lg font-bold break-all">{title}</span>
 				{#if description}
-					<span class="mb-2 line-clamp-2 text-sm">{description}</span>
+					<span class="mb-2 line-clamp-2 text-sm break-all">{description}</span>
 				{/if}
 				{#if type !== 'image'}
 					<div class="flex items-center gap-2">
