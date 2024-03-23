@@ -43,7 +43,6 @@ export const load: LayoutServerLoad = async ({ locals, fetch }) => {
 	}
 
 	return {
-		user: locals.user,
 		groups: getGroups(),
 		saves: getSaves(),
 	};

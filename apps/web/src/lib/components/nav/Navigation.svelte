@@ -26,6 +26,9 @@
 					<Link path="/extension">Get the extension</Link>
 				{/if}
 				{#if $page.data.user}
+					<Link path={siteConfig.appUrl}>Go to app</Link>
+				{/if}
+				{#if $page.data.user}
 					<form method="post" action="/logout" use:enhance>
 						<Button type="submit" variant="outline">Logout</Button>
 					</form>
