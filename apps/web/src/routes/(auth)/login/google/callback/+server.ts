@@ -5,7 +5,7 @@ import { db } from "$lib/server/db";
 import { and, eq } from "drizzle-orm";
 import { user, oauth_account } from '$lib/server/db/schema';
 
-import type { RequestEvent } from "@sveltejs/kit";
+import { redirect, type RequestEvent } from "@sveltejs/kit";
 
 export async function GET(event: RequestEvent): Promise<Response> {
 	const code = event.url.searchParams.get("code");
@@ -14,10 +14,8 @@ export async function GET(event: RequestEvent): Promise<Response> {
 	const storedState = event.cookies.get('google_oauth_state');
 	const storedCodeVerifier = event.cookies.get('google_oauth_code_verifier');
 	
-	if (!code || !state || !storedState || !storedCodeVerifier || state !== storedState) {
-		return new Response(null, {
-			status: 400
-		});
+	if (!code || !state || !storedState || !storedCodeVerifier || state !== storedState) {	
+		redirect(307, "/login?error=true");
 	}
 
 	try {

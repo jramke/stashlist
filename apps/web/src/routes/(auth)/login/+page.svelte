@@ -1,7 +1,15 @@
 <script lang="ts">
 	import UserLoginForm from './user-login-form.svelte';
 	import Section from '@repo/ui/components/section';
+	import { page } from '$app/stores';
+	import { toast } from '@repo/ui/components/sonner';
+	import { onMount } from 'svelte';
 
+	onMount(() => {
+		if ($page.url.searchParams.has('error')) {
+			toast.error('Login failded. Please try again.');
+		}
+	})
 </script>
 
 <Section class="py-20">
