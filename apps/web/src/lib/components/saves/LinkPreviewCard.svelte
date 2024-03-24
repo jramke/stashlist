@@ -101,17 +101,17 @@
 					{title}
 					rel="norefferrer noopener"
 					target="_blank"
-					class="relative flex aspect-og overflow-hidden m-4 mb-0 rounded-sm"
-				>
-					<!-- TODO: cool css or svg placeholder -->
-					<Waves class="absolute inset-0 h-full w-full" />
-					{#if imageUrl}	
+					class="relative flex aspect-og overflow-hidden m-4 mb-0 rounded-sm border"
+				>			
+					{#if imageUrl}
 						<img
 							loading="lazy"
 							src={imageUrl}
 							alt={title}
 							class="absolute inset-0 h-full w-full object-cover"
 						/>
+					{:else}
+						<div class="absolute inset-0 h-full w-full bg-gradient-to-br from-primary from-10% to-[#fcb8d8] to-90%"></div>
 					{/if}
 				</a>
 			{/if}
@@ -164,7 +164,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="min-h-10 flex gap-4 p-4 pt-0 justify-between items-end self-end">
+	<div class="min-h-10 w-full flex gap-4 p-4 pt-0 justify-between items-end self-end">
 		<div>
 			{#if saveGroups.length !== 0}
 				<div class="flex flex-wrap gap-1">
