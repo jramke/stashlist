@@ -31,3 +31,7 @@ yarn-error.log*
 
 # excalidraw
 *.excalidraw
+
+# notes
+NOTES.md
+bookmarks.html
