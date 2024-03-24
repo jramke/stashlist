@@ -40,6 +40,7 @@ export const save = sqliteTable('save', {
 	title: text('title').default(''),
 	description: text('description').default(''),
 	faviconUrl: text('favicon_url').default(''),
+	gradientIndex: integer('gradient_index').default(0),
 	imageUrl: text('image_url').default(''),
 	codeText: text('code_text').default(''),
 	createdAt: text('created_at')

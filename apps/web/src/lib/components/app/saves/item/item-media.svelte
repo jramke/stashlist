@@ -2,11 +2,13 @@
     import type { Save } from '$lib/types';
 
     import { listLayout } from '$lib/stores';
+	import ItemGradient from './item-gradient.svelte';
 
     export let type: Save['type'];
     export let title: Save['title'];
 	export let imageUrl: Save['imageUrl'];
 	export let url: Save['url'];
+    export let gradientIndex: number;
 
 </script>
 
@@ -45,7 +47,7 @@
                     on:error={() => imageUrl = ''}
                 />
             {:else}
-                <div class="absolute inset-0 h-full w-full bg-gradient-to-br from-primary from-10% to-[#fcb8d8] to-90%"></div>
+                <ItemGradient {gradientIndex} />
             {/if}
         </a>
     {/if}

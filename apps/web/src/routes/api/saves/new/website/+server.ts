@@ -5,8 +5,9 @@ import { save, save_group_mm, group } from '$lib/server/db/schema';
 import { generateId } from 'lucia';
 import { error, json, redirect } from '@sveltejs/kit';
 import urlMetadata from 'url-metadata';
-import { getDomainFromUrl, isImageUrl, isAbsoluteUrl, makeAbsoluteUrl } from '$lib/utils';
+import { getDomainFromUrl, isImageUrl, isAbsoluteUrl, makeAbsoluteUrl, getRandomIndex } from '$lib/utils';
 import { eq } from 'drizzle-orm';
+import { gradients } from '$lib/constants';
 
 export const POST: RequestHandler = async ({ request, locals, params, url }) => {
 	if (!locals.user) redirect(302, '/login');
@@ -18,6 +19,8 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 		const currentTime = new Date().toISOString();
 
 		const saveUrl = formData['url'];
+		const id = generateId(15);
+		const gradientIndex = getRandomIndex(gradients);
 		
 		let hasOtherProperties = false;
 		for (let key in formData) {
@@ -27,7 +30,6 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 			}
 		}
 		if (saveUrl && hasOtherProperties) {
-			const id = generateId(15);
 			await db.insert(save).values({
 				id: id,
 				type: 'website',
@@ -37,6 +39,7 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 				title: formData['title'],
 				description: formData['description'],
 				imageUrl: formData['imageUrl'],
+				gradientIndex: gradientIndex,
 				createdAt: currentTime
 			});
 
@@ -85,7 +88,7 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 		}
 
 		await db.insert(save).values({
-			id: generateId(15),
+			id: id,
 			userId: locals.user.id,
 			type: 'website',
 			url: saveUrl,
@@ -93,6 +96,7 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 			title: title,
 			description: description,
 			imageUrl: imageUrl,
+			gradientIndex: gradientIndex,
 			createdAt: currentTime
 		});
 

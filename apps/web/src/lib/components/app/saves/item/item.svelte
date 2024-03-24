@@ -17,6 +17,7 @@
 	export let createdAt: Save['createdAt'];
 	export let saveGroups: TODO[] = [];
 	export let id: string;
+	export let gradientIndex: number;
 	export let type: Save['type'];
 
 
@@ -24,7 +25,7 @@
 
 <div class="overflow-hidden rounded-lg border bg-card text-card-foreground flex flex-col justify-between content-between">
 	<div>
-		<ItemMedia {type} {imageUrl} {title} {url} />
+		<ItemMedia {type} {imageUrl} {title} {url} {gradientIndex} />
 		<div class="flex gap-4 p-4">
 			<div class="flex flex-col gap-2 min-w-0">
 				<span class="line-clamp-2 text-lg font-bold break-words">{title}</span>

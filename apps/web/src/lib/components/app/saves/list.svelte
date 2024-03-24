@@ -50,14 +50,14 @@
     {#if items?.length > 0}
 		{#if $listLayout === 'masonry'}
 			<Masonry gapSize={6} columns={$listColumns} items={items}>
-				{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id, type}}
-					<Item {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} {type} />
+				{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id, type, gradientIndex}}
+					<Item {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} {type} {gradientIndex} />
 				{/each}
 			</Masonry>
 		{:else}
 			<div class="grid grid-cols-{$listColumns} gap-6">
-				{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id, type}}
-					<Item {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} {type} />
+				{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id, type, gradientIndex}}
+					<Item {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} {type} {gradientIndex} />
 				{/each}
 			</div>
 		{/if}

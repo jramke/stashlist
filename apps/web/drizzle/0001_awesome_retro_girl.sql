@@ -1,0 +1,1 @@
+ALTER TABLE save ADD `gradient_index` integer DEFAULT 0;

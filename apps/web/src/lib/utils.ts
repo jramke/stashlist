@@ -81,3 +81,10 @@ export function setHeightOfElementAsVariable(element: HTMLElement | null, variab
 	const height = element.clientHeight;
 	document.documentElement.style.setProperty(variableName, `${height}px`);
 }
+
+export function getRandomIndex<T>(array: readonly T[] = []): number {
+	if (array.length === 0) {
+        throw new Error("Array is empty");
+    }
+    return Math.floor(Math.random() * array.length);
+}
