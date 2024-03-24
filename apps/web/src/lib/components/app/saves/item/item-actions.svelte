@@ -61,7 +61,7 @@
         <MoreHorizontal class="h-4 w-4" />
         <span class="sr-only">Open menu</span>
     </DropdownMenu.Trigger>
-    <DropdownMenu.Content>
+    <DropdownMenu.Content align="end">
         <DropdownMenu.Group>
             <DropdownMenu.Item on:click={openEditDialog}>
                 <Pencil class="h-4 w-4 me-1" />
@@ -95,11 +95,11 @@
 </AlertDialog.Root>
 
 <AlertDialog.Root bind:open={editDialogOpen} onOpenChange={editDialogChange}>
-	{#if $page.state.selected}
-		<AlertDialog.Content>
-			<AlertDialog.Header>
-				<AlertDialog.Title>Edit stash</AlertDialog.Title>
-			</AlertDialog.Header>
+	<AlertDialog.Content>
+		<AlertDialog.Header>
+			<AlertDialog.Title>Edit stash</AlertDialog.Title>
+		</AlertDialog.Header>
+		<!-- {#if $page.state.selected} -->
 			<EditForm data={$page.state.selected}>
 				<AlertDialog.Footer class="pt-2">
 					<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
@@ -108,6 +108,6 @@
 					</button>
 				</AlertDialog.Footer>
 			</EditForm>
-		</AlertDialog.Content>
-	{/if}	
+		<!-- {/if}	 -->
+	</AlertDialog.Content>
 </AlertDialog.Root>

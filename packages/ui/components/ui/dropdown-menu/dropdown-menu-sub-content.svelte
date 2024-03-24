@@ -6,8 +6,8 @@
 	type $$Events = DropdownMenuPrimitive.SubContentEvents;
 
 	let className: $$Props['class'] = undefined;
-	export let transition: $$Props['transition'] = flyAndScale;
-	export let transitionConfig: $$Props['transitionConfig'] = {
+	export let outTransition: $$Props['outTransition'] = flyAndScale;
+	export let outTransitionConfig: $$Props['outTransitionConfig'] = {
 		x: -10,
 		y: 0
 	};
@@ -15,8 +15,8 @@
 </script>
 
 <DropdownMenuPrimitive.SubContent
-	{transition}
-	{transitionConfig}
+	{outTransition}
+	{outTransitionConfig}
 	class={cn(
 		'z-50 min-w-[8rem] rounded-md border bg-popover p-1 text-popover-foreground shadow-lg focus:outline-none',
 		className
