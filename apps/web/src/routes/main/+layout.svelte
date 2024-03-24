@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Section from '@repo/ui/components/section';
-	import Sidebar from '$lib/components/nav/Sidebar.svelte';
-	import Topbar from '$lib/components/nav/Topbar.svelte';
+	import { Sidebar, Topbar } from '$lib/components/app/nav';
 	import { onMount } from 'svelte';
 
 	onMount(() => {

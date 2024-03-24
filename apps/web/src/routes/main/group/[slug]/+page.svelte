@@ -1,5 +1,5 @@
 <script lang="ts">
-	import SavesList from '$lib/components/saves/SavesList.svelte';
+	import { SavesList } from '$lib/components/app/saves';
 	
 </script>
 

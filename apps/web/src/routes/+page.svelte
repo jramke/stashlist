@@ -1,14 +1,7 @@
 <script>
 	import Section from '@repo/ui/components/section';
 	import { Logo, GitHub } from '@repo/ui/icons';
-	import TwitterBookmark from '$lib/components/landing/twitter-bookmark.svelte';
-	import Chrome from '$lib/components/landing/chrome.svelte';
-	import Arc from '$lib/components/landing/arc.svelte';
-	import Codepen from '$lib/components/landing/codepen.svelte';
-	import Dribbble from '$lib/components/landing/dribbble.svelte';
-	import Behance from '$lib/components/landing/behance.svelte';
-	import GithubStar from '$lib/components/landing/github-star.svelte';
-	import LogoPoof from '$lib/components/landing/LogoPoof.svelte';
+	import { TwitterBookmark, Chrome, Codepen, Dribbble, Behance, GithubStar, Arc, LogoPoof } from '$lib/components/site/logos';
 	import Typography from '@repo/ui/components/typography';
 
 

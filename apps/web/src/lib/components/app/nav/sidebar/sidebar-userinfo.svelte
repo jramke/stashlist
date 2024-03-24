@@ -35,13 +35,9 @@
             </span>
         </div>
         <ChevronsUpDown class="h-4 w-4" />
-        <!-- <Button variant="ghost" builders={[builder]} class="w-full justify-between h-auto">
-        </Button> -->
     </DropdownMenu.Trigger>
     <DropdownMenu.Content class="min-w-[200px]" align="start">
         <DropdownMenu.Group>
-            <!-- <DropdownMenu.Label>Settings</DropdownMenu.Label> -->
-            <!-- <DropdownMenu.Separator /> -->
             <DropdownMenu.Item href={siteConfig.extensionUrl.chrome} target="_blank">Get extension</DropdownMenu.Item> 
             <DropdownMenu.Item>Connect to VS Code</DropdownMenu.Item> 
             <DropdownMenu.Sub>

@@ -12,7 +12,6 @@
         {:else}
             <span class="text-muted-foreground">{item}</span>
             <span class="text-muted-foreground">/</span>
-            <!-- <Separator orientation="vertical" class="w-[1px] mx-[1px] rotate-12 h-[120%] via-foreground/30" /> -->
         {/if}
     {/each}
 </p>

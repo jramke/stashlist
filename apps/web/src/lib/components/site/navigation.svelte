@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '@repo/ui/components/button';
 	import { siteConfig } from '$lib/config/site';
-	import Link from './Link.svelte';
+	import { Link } from '$lib/components/app/nav';
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
 	import { Logo } from '@repo/ui/icons';

@@ -1,6 +1,6 @@
 <script>
 	import Section from '@repo/ui/components/section';
-	import Heading from '../../../../../packages/ui/components/ui/heading/heading.svelte';
+	import Heading from '@repo/ui/components/heading';
 	import { Button } from '@repo/ui/components/button';
 	import { siteConfig } from '$lib/config/site';
 

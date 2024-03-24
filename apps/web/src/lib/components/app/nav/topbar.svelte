@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { LayoutGrid, StretchHorizontal, Masonry } from '@repo/ui/icons';
-	import Breadcrumb from './Breadcrumb.svelte';
+	import { Breadcrumb } from '$lib/components/app/nav';
 	import { Slider } from '@repo/ui/components/slider';
 	import { Label } from '@repo/ui/components/label';
 	import { listColumns, listLayout } from '$lib/stores';
