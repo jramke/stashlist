@@ -16,8 +16,13 @@ export const actions: Actions = {
 				method: 'POST',
 				body: JSON.stringify(form.data)
 			});
+
+			if (!response.ok) {
+				throw new Error(`Error creating save. Status: ${response.status}`);
+			}
+
 		} catch (error) {
-			console.log('Error creating new group', error);
+			console.log('Error creating new save', error);
 			return message(form, { type: 'error', text: 'Something went wrong. Please try again.' });
 		}
 	}

@@ -51,7 +51,6 @@ export const actions: Actions = {
 		try {
 			// const currentGroupIds = (await db.select().from(save_group_mm).where(eq(save_group_mm.saveId, form.data.id)).all()).map(group => group.groupId);
 			const newGroups = form.data.groups.split(',');
-			console.log(newGroups);
 
 			await db.update(save)
 				.set({
