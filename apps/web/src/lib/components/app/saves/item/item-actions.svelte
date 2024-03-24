@@ -99,7 +99,7 @@
 		<AlertDialog.Header>
 			<AlertDialog.Title>Edit stash</AlertDialog.Title>
 		</AlertDialog.Header>
-		<!-- {#if $page.state.selected} -->
+		{#if $page.state.selected}
 			<EditForm data={$page.state.selected}>
 				<AlertDialog.Footer class="pt-2">
 					<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
@@ -108,6 +108,6 @@
 					</button>
 				</AlertDialog.Footer>
 			</EditForm>
-		<!-- {/if}	 -->
+		{/if}	
 	</AlertDialog.Content>
 </AlertDialog.Root>
