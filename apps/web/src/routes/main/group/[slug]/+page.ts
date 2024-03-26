@@ -1,17 +1,25 @@
-import type { PageServerLoad } from './$types';
+import { browser } from '$app/environment';
+import { goto } from '$app/navigation';
+import type { PageLoad } from './$types';
 
 import { redirect } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ locals, params, parent }) => {
-	if (!locals.user) redirect(302, '/login');
-
+export const load: PageLoad = async ({ params, parent }) => {
 	const data = await parent();
+	
+	if (!data.user) {
+		if (browser) {
+			goto('/login');
+		} else {
+			redirect(302, '/login');
+		}
+	}
+
 	const saves = (await data.saves)?.items;
 	const groups = await data.groups;
 
 	const currentGroupId = params.slug;
 
-	
 	//TODO: types
 	const currentGroup = groups.filter((group: { id: string; }) => {
 		return group.id === currentGroupId;
