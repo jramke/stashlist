@@ -2,26 +2,35 @@
 	import { formSchema, type FormSchema } from "./schema";
     import type { SuperValidated } from "sveltekit-superforms";
 	import type { Save, TODO } from "$lib/types";
+	import type { PageData } from "./$types";
 
     import * as Form from "@repo/ui/components/form";
     import Tags from "@repo/ui/components/tags";
+	import { Button } from "@repo/ui/components/button";
+	import { invalidateAll } from "$app/navigation";
 
     export let data: {
         form: SuperValidated<FormSchema>,
         save: TODO,
         groups: TODO,
+        isDialog: boolean,
     };
+    // export let data: PageData;
 
-    const aviableGroups = data.groups;
+    const aviableGroups = data?.groups;
     
-    //TODO: types
-    let groups = data.save.saveGroups.map(item => item.group) || [];
+    // //TODO: types
+    let groups = data?.save.saveGroups.map(item => item.group) || [];
     $: groupIds = groups.map(item => item.id);
     
+    function onLegacyCancel() {
+        history.back();
+        invalidateAll();
+    }
 
 </script>
 
-<Form.Root method="POST" form={data.form} schema={formSchema} let:config class="space-y-2">
+<Form.Root method="POST" form={data.form} schema={formSchema} let:config id="edit-stash-form" class="space-y-2">
     <input type="hidden" name="id" value={data.save.id}>
     <Form.Field {config} name="title">
         <Form.Item>
@@ -55,7 +64,13 @@
             <Form.Validation />
         </Form.Item>
     </Form.Field>
-    <!-- <Form.Button>
-    </Form.Button> -->
     <slot />
+    {#if !data.isDialog} 
+        <div class="space-x-2">
+            <Button on:click={onLegacyCancel} variant="outline">Cancel</Button>
+            <Button type="submit">Update stash</Button>
+        </div>
+    {/if}
 </Form.Root>
+<!-- {#if data}
+{/if} -->
