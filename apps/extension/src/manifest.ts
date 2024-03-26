@@ -4,8 +4,7 @@ const sharedManifest: Partial<chrome.runtime.ManifestBase> = {
   content_scripts: [
     {
       js: ["src/entries/contentScript/primary/main.ts"],
-      matches: [],
-      // matches: ["*://*/*"],
+      matches: ["*://*/*"],
     },
   ],
   icons: {
@@ -52,10 +51,7 @@ const ManifestV2 = {
   //   ...sharedManifest.options_ui,
   //   chrome_style: false,
   // },
-  permissions: [
-    ...sharedManifest.permissions, 
-    // "*://*/*"
-  ],
+  permissions: [...sharedManifest.permissions, "*://*/*"],
 };
 
 const ManifestV3 = {

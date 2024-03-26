@@ -87,7 +87,6 @@
 							}
 							return
 						}
-						console.log('save' + newStashType.toUpperCase());
 						
 						browser.runtime.sendMessage({
 							['save' + newStashType.charAt(0).toUpperCase() + newStashType.slice(1)]: formData
