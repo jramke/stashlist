@@ -4,7 +4,7 @@
     import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
 	import { buttonVariants } from '@repo/ui/components/button';
     import { toast } from '@repo/ui/components/sonner';
-    import { MoreHorizontal, Trash, Pencil } from '@repo/ui/icons';
+    import { MoreHorizontal, Trash, Pencil, Copy } from '@repo/ui/icons';
     import * as AlertDialog from "@repo/ui/components/alert-dialog";
     import { siteConfig } from '$lib/config/site';
     import { applyAction, enhance } from '$app/forms';
@@ -14,6 +14,7 @@
 
     export let id: Save['id'];
     export let title: Save['title'];
+	export let copyUrl: string;
 
     let deleteDialogOpen = false;
 
@@ -48,6 +49,11 @@
 		}
 	};
 
+	const handleCopyUrl = () => {
+		navigator.clipboard.writeText(copyUrl);
+		toast.success('URL copied to clipboard');
+	};
+
 </script>
 
 <DropdownMenu.Root>
@@ -58,11 +64,16 @@
     <DropdownMenu.Content align="end">
         <DropdownMenu.Group>
             <DropdownMenu.Item on:click={openEditDialog}>
-                <Pencil class="h-4 w-4 me-1" />
+                <Pencil class="h-4 w-4 me-2" />
                 Edit
             </DropdownMenu.Item>
+            <DropdownMenu.Item on:click={handleCopyUrl}>
+                <Copy class="h-4 w-4 me-2" />
+                Copy URL
+            </DropdownMenu.Item>
+			<DropdownMenu.Separator />
             <DropdownMenu.Item on:click={openDeleteDialog}>
-                <Trash class="h-4 w-4 me-1" />
+                <Trash class="h-4 w-4 me-2" />
                 Delte
             </DropdownMenu.Item>
         </DropdownMenu.Group>

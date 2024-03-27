@@ -20,6 +20,7 @@
 	export let gradientIndex: number;
 	export let type: Save['type'];
 
+	const copyUrl = type === 'image' ? imageUrl : url;
 
 </script>
 
@@ -53,7 +54,7 @@
 				
 			</div>
 			<div class="ml-auto flex">
-				<ItemActions {id} {title} />
+				<ItemActions {id} {title} {copyUrl} />
 			</div>
 		</div>
 	</div>
