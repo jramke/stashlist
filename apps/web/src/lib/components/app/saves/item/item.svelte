@@ -1,12 +1,11 @@
 <script lang="ts">
 	import type { Save, TODO } from '$lib/types';
-
-	import { CircleDashed } from '@repo/ui/icons';
 	
 	import { cleanUrl } from '$lib/utils';
 	import ItemFooter from './item-footer.svelte';
 	import ItemMedia from './item-media.svelte';
 	import ItemActions from './item-actions.svelte';
+	import ItemGradient from './item-gradient.svelte';
 
 	// TODO: use let { a,b } = $props();
 	export let title: Save['title'];
@@ -38,7 +37,9 @@
 						{#if faviconUrl}
 							<img loading="lazy" class="h-4 w-4 shrink-0" src={faviconUrl} alt={title} on:error={() => faviconUrl = ''} />
 						{:else}
-							<CircleDashed class="h-4 w-4 shrink-0 text-muted-foreground" />
+							<div class="rounded-full size-4 overflow-hidden relative">
+								<ItemGradient {gradientIndex} />
+							</div>
 						{/if}
 						<a
 							href={url}
