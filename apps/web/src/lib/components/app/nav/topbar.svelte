@@ -8,6 +8,9 @@
 	import * as RadioGroup from '@repo/ui/components/radio-group';
 	import { onMount } from 'svelte';
 	import { setHeightOfElementAsVariable } from '$lib/utils';
+	import { Input } from '@repo/ui/components/input';
+	import Section from '@repo/ui/components/section';
+	import Userinfo from './userinfo.svelte';
 
 	//TODO: search https://www.youtube.com/watch?v=lrzHaTcpRh8
 
@@ -45,19 +48,18 @@
 	}
 </script>
 
-<div id="topbar" class="bg-card sticky top-0 flex w-full justify-between border-b gap-5 p-5 z-100">
-	<!-- <Input type="search" placeholder="Search" />
-	<div class="flex items-center gap-3">
-		<Avatar.Root>
-			<Avatar.Image src={`${base}/gradient.png`} alt={name} />
-			<Avatar.Fallback>{name.substring(0, 2).toUpperCase()}</Avatar.Fallback>
-		</Avatar.Root>
-		<p class="whitespace-nowrap">
-			<span class="text-muted-foreground">Hi, </span>
-			<span class="font-bold">{name}</span>
-		</p>
-	</div> -->
-	<Breadcrumb path={breadcrumbArray} />
+<Section>
+	<div class="sticky top-0 flex justify-between gap-5">
+		<span class="text-xl">
+			<Breadcrumb path={breadcrumbArray} />
+		</span>
+		<Userinfo />
+	</div>
+</Section>
+<div id="topbar" class="sticky top-0 flex justify-between gap-5 z-100">
+	<div>
+		<Input type="search" placeholder="https://" class="min-w-[500px]" />
+	</div>
 	<div class="flex gap-6 items-center">
 		<RadioGroup.Root value={$listLayout} class="flex gap-2" onValueChange={layoutValueChange}>
 			<Label for="grid" class="flex flex-col items-center justify-between opacity-50 cursor-pointer [&:has([data-state=checked])]:opacity-100">
