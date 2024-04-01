@@ -4,7 +4,8 @@ import { db } from '$lib/server/db';
 import { group } from '$lib/server/db/schema';
 import { generateId } from 'lucia';
 import { json, redirect, error } from '@sveltejs/kit';
-import { slugify } from '$lib/utils';
+import { getRandomIndex } from '$lib/utils';
+import { gradients } from '$lib/constants';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) redirect(302, '/login');
@@ -14,16 +15,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
 		const title = data['title'];
 		if (title.length === 0) throw Error('Group title cant be empty');
-		// const slug = slugify(title);
 
-		//TODO: check if slug is already used and it cant be "new"
+		const gradientIndex = data['gradientIndex'] ?? getRandomIndex(gradients);
+
 		//TODO: handle parent id, index
 
 		await db.insert(group).values({
 			id: generateId(15),
 			userId: locals.user.id,
 			title: title,
-			// slug: slug
+			gradientIndex: gradientIndex,
 		});
 
 		return json({ success: true });

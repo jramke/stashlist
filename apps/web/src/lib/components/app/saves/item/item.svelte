@@ -5,7 +5,7 @@
 	import ItemFooter from './item-footer.svelte';
 	import ItemMedia from './item-media.svelte';
 	import ItemActions from './item-actions.svelte';
-	import ItemGradient from './item-gradient.svelte';
+	import { Gradient } from '$lib/components/app';
 
 	// TODO: use let { a,b } = $props();
 	export let title: Save['title'];
@@ -34,7 +34,7 @@
 							<img loading="lazy" class="size-4 shrink-0" src={faviconUrl} alt={title} on:error={() => faviconUrl = ''} />
 						{:else}
 							<div class="rounded-full size-4 shrink-0 overflow-hidden relative">
-								<ItemGradient {gradientIndex} />
+								<Gradient {gradientIndex} />
 							</div>
 						{/if}
 					{/if}

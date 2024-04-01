@@ -15,27 +15,4 @@ main {
 	flex-grow: 1;
 }
 
-.scroll-area {
-	overflow-y: auto;
-	background-clip: border-box;
-
-	&::-webkit-scrollbar {
-    	background: transparent;
-	}
-
-	&::-webkit-scrollbar-thumb {
-		border: 5px solid rgba(0,0,0,0);
-		background-clip: padding-box;
-		border-radius: 9999px;
-		background-color: hsl(var(--accent));
-	}
-
-	&::-webkit-scrollbar-thumb:hover {
-		background-color: hsl(var(--foreground) / 0.4);
-	}
-}
-#main-scrollarea {
-	max-height: calc(100vh - var(--topbar-height));
-	max-height: calc(100dvh - var(--topbar-height));
-}
 

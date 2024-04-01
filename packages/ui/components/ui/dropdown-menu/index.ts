@@ -9,6 +9,7 @@ import RadioGroup from './dropdown-menu-radio-group.svelte';
 import SubContent from './dropdown-menu-sub-content.svelte';
 import SubTrigger from './dropdown-menu-sub-trigger.svelte';
 import CheckboxItem from './dropdown-menu-checkbox-item.svelte';
+import Link from './dropdown-menu-link.svelte';
 
 const Sub = DropdownMenuPrimitive.Sub;
 const Root = DropdownMenuPrimitive.Root;
@@ -30,6 +31,7 @@ export {
 	SubTrigger,
 	RadioGroup,
 	CheckboxItem,
+	Link,
 	//
 	Root as DropdownMenu,
 	Sub as DropdownMenuSub,
@@ -44,5 +46,6 @@ export {
 	RadioGroup as DropdownMenuRadioGroup,
 	SubContent as DropdownMenuSubContent,
 	SubTrigger as DropdownMenuSubTrigger,
-	CheckboxItem as DropdownMenuCheckboxItem
+	CheckboxItem as DropdownMenuCheckboxItem,
+	Link as DropdownMenuLink
 };

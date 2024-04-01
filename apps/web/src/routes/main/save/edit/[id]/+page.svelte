@@ -68,9 +68,7 @@
     {#if !data.isDialog} 
         <div class="space-x-2">
             <Button on:click={onLegacyCancel} variant="outline">Cancel</Button>
-            <Button type="submit">Update stash</Button>
+            <Button type="submit">Update</Button>
         </div>
     {/if}
 </Form.Root>
-<!-- {#if data}
-{/if} -->

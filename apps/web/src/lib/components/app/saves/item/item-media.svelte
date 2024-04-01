@@ -2,7 +2,7 @@
     import type { Save } from '$lib/types';
 
     import { listLayout } from '$lib/stores';
-	import ItemGradient from './item-gradient.svelte';
+	import { Gradient } from '$lib/components/app';
 
     export let type: Save['type'];
     export let title: Save['title'];
@@ -47,7 +47,7 @@
                     on:error={() => imageUrl = ''}
                 />
             {:else}
-                <ItemGradient {gradientIndex} />
+                <Gradient {gradientIndex} />
             {/if}
         </a>
     {/if}

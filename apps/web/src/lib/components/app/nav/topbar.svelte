@@ -1,20 +1,22 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { listColumns, listLayout } from '$lib/stores';
 	import { page } from '$app/stores';
+	import { Groups } from '$lib/components/app/nav';
 	import { LayoutGrid, StretchHorizontal, Masonry } from '@repo/ui/icons';
-	import { Breadcrumb } from '$lib/components/app/nav';
 	import { Slider } from '@repo/ui/components/slider';
 	import { Label } from '@repo/ui/components/label';
-	import { listColumns, listLayout } from '$lib/stores';
 	import * as RadioGroup from '@repo/ui/components/radio-group';
-	import { onMount } from 'svelte';
 	import { setHeightOfElementAsVariable } from '$lib/utils';
 	import { Input } from '@repo/ui/components/input';
 	import Section from '@repo/ui/components/section';
 	import Userinfo from './userinfo.svelte';
+	import { Button } from '@repo/ui/components/button';
+	import { siteConfig } from '$lib/config/site';
 
 	//TODO: search https://www.youtube.com/watch?v=lrzHaTcpRh8
 
-	$: breadcrumbArray = ['Stashes'];
+	
 
 	onMount(() => {
 		const topbar = document.getElementById('topbar');
@@ -25,18 +27,6 @@
 		window.addEventListener('resize', setVar);
 		return () => window.removeEventListener('resize', setVar);
 	})
-
-	$: if (breadcrumbArray) {
-		if ($page.route.id?.endsWith('unsorted')) {
-			breadcrumbArray[1] = 'Unsorted';
-		}
-		if ($page.route.id?.endsWith('main')) {
-			breadcrumbArray[1] = 'All';
-		}
-		if ($page.data.currentGroup) {
-			breadcrumbArray[1] = $page.data.currentGroup.title;
-		}
-	}
 
 	function sliderValueChange(value: number[]) {
 		listColumns.set(value[0]);
@@ -49,10 +39,8 @@
 </script>
 
 <Section>
-	<div class="sticky top-0 flex justify-between gap-5">
-		<span class="text-xl">
-			<Breadcrumb path={breadcrumbArray} />
-		</span>
+	<div class="flex justify-between items-center gap-5">
+		<Groups />
 		<Userinfo />
 	</div>
 </Section>

@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "@fontsource-variable/plus-jakarta-sans": "^5.0.19",
-    "bits-ui": "^0.18.2",
+    "bits-ui": "^0.21.1",
     "clsx": "^2.1.0",
     "formsnap": "^0.4.3",
     "lucide-svelte": "^0.323.0",

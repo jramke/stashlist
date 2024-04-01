@@ -222,49 +222,6 @@ importers:
         specifier: ^4.3.1
         version: 4.3.2(typescript@5.4.2)(vite@5.1.6)
 
-  packages/__analytics:
-    dependencies:
-      '@sveltejs/kit':
-        specifier: ^2.0.0
-        version: 2.5.4(@sveltejs/vite-plugin-svelte@3.0.2)(svelte@4.2.10)(vite@5.1.6)
-      ahoy.js:
-        specifier: ^0.4.3
-        version: 0.4.3
-      bits-ui:
-        specifier: ^0.18.2
-        version: 0.18.6(svelte@4.2.10)
-      chart.js:
-        specifier: ^4.4.2
-        version: 4.4.2
-      lucide-svelte:
-        specifier: ^0.323.0
-        version: 0.323.0(svelte@4.2.10)
-      ua-parser-js:
-        specifier: ^1.0.37
-        version: 1.0.37
-    devDependencies:
-      '@repo/eslint-config':
-        specifier: workspace:*
-        version: link:../config-eslint
-      '@repo/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
-      '@tsconfig/svelte':
-        specifier: 5.0.2
-        version: 5.0.2
-      '@types/node':
-        specifier: 20.11.19
-        version: 20.11.19
-      svelte:
-        specifier: ^4.2.8
-        version: 4.2.10
-      svelte-check:
-        specifier: ^3.6.0
-        version: 3.6.7(@babel/core@7.24.0)(postcss-load-config@5.0.3)(postcss@8.4.35)(svelte@4.2.10)
-      typescript:
-        specifier: ^5.0.0
-        version: 5.4.2
-
   packages/config-eslint:
     dependencies:
       '@typescript-eslint/eslint-plugin':
@@ -298,8 +255,8 @@ importers:
         specifier: ^2.0.0
         version: 2.5.4(@sveltejs/vite-plugin-svelte@3.0.2)(svelte@4.2.10)(vite@5.1.6)
       bits-ui:
-        specifier: ^0.18.2
-        version: 0.18.6(svelte@4.2.10)
+        specifier: ^0.21.1
+        version: 0.21.1(svelte@4.2.10)
       clsx:
         specifier: ^2.1.0
         version: 2.1.0
@@ -1274,10 +1231,6 @@ packages:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.4.15
 
-  /@kurkle/color@0.3.2:
-    resolution: {integrity: sha512-fuscdXJ9G1qb7W8VdHi+IwRqij3lBkosAm4ydQtEmbY58OzHXqQhvlxqEkoz0yssNVn38bcpRWgA9PP+OGoisw==}
-    dev: false
-
   /@libsql/client@0.5.6:
     resolution: {integrity: sha512-UBjmDoxz75Z2sHdP+ETCROpeLA/77VMesiff8R4UWK1rnaWbh6/YoCLDILMJL3Rh0udQeKxjL8MjXthqohax+g==}
     dependencies:
@@ -1415,8 +1368,8 @@ packages:
     resolution: {integrity: sha512-DoHTZ/TjtNfUu9eiqJd+x3IcCQrhS+yOYU436TKUnlE36jZwNbK535D1CmTsSYdi/UcdCWNm5KRQZ9g1tlZCPw==}
     dev: true
 
-  /@melt-ui/svelte@0.74.4(svelte@4.2.10):
-    resolution: {integrity: sha512-EeDP3C1grK+bPTezJQXKid2k4RRGZakyHTghD/zg//fM6Gqe4JykVtV0Yih4QJs+yGTgJq/EaNQMQ6JkTnvHxg==}
+  /@melt-ui/svelte@0.76.2(svelte@4.2.10):
+    resolution: {integrity: sha512-7SbOa11tXUS95T3fReL+dwDs5FyJtCEqrqG3inRziDws346SYLsxOQ6HmX+4BkIsQh1R8U3XNa+EMmdMt38lMA==}
     peerDependencies:
       svelte: '>=3 <5'
     dependencies:
@@ -2897,10 +2850,6 @@ packages:
       - supports-color
     dev: false
 
-  /ahoy.js@0.4.3:
-    resolution: {integrity: sha512-l1WDqy4N+pK1LWWOjFabIeQpsuKIuKY08Mzgh6FHHJC2Ry1OJzOCFhSkuHUShMdaYeeaXo6CW5pfefj2GCsjkw==}
-    dev: false
-
   /ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
     dependencies:
@@ -3107,13 +3056,13 @@ packages:
       file-uri-to-path: 1.0.0
     dev: false
 
-  /bits-ui@0.18.6(svelte@4.2.10):
-    resolution: {integrity: sha512-UbBFuyG7qEM+VA1rA/7GRy94rXRFCW+B1LfK7uiBd6fZiPZtPmPPW1RjTblGaJjCW2E6e/ruxbuKjxW2oXDP7g==}
+  /bits-ui@0.21.1(svelte@4.2.10):
+    resolution: {integrity: sha512-G6agiFtmbgxV2XQBdsn3tYhZw4b4lETtxU1iTpiNOgMkhUo+oV+XDQA3coMzqKDfAsmfyaLEuYtSM/NiRHGjdw==}
     peerDependencies:
       svelte: ^4.0.0
     dependencies:
       '@internationalized/date': 3.5.2
-      '@melt-ui/svelte': 0.74.4(svelte@4.2.10)
+      '@melt-ui/svelte': 0.76.2(svelte@4.2.10)
       nanoid: 5.0.6
       svelte: 4.2.10
     dev: false
@@ -3288,13 +3237,6 @@ packages:
   /character-reference-invalid@1.1.4:
     resolution: {integrity: sha512-mKKUkUbhPpQlCOfIuZkvSEgktjPFIsZKRRbC6KWVEMvlzblj3i3asQv5ODsrwt0N3pHAEvjP8KTQPHkp0+6jOg==}
     dev: true
-
-  /chart.js@4.4.2:
-    resolution: {integrity: sha512-6GD7iKwFpP5kbSD4MeRRRlTnQvxfQREy36uEtm1hzHzcOqwWx0YEHuspuoNlslu+nciLIB7fjjsHkUv/FzFcOg==}
-    engines: {pnpm: '>=8'}
-    dependencies:
-      '@kurkle/color': 0.3.2
-    dev: false
 
   /cheerio-select@2.1.0:
     resolution: {integrity: sha512-9v9kG0LvzrlcungtnJtpGNxY+fzECQKhK4EGJX2vByejiMX84MFNQw4UxPJl3bFbTMw+Dfs37XaIkCwTZfLh4g==}
@@ -8422,10 +8364,6 @@ packages:
     resolution: {integrity: sha512-+2/g0Fds1ERlP6JsakQQDXjZdZMM+rqpamFZJEKh4kwTIn3iDkgKtby0CeNd5ATNZ4Ry1ax15TMx0W2V+miizQ==}
     engines: {node: '>=14.17'}
     hasBin: true
-
-  /ua-parser-js@1.0.37:
-    resolution: {integrity: sha512-bhTyI94tZofjo+Dn8SN6Zv8nBDvyXTymAdM3LDI/0IboIUwTu1rEhW7v2TfiVsoYWgkQ4kOVqnI8APUFbIQIFQ==}
-    dev: false
 
   /ufo@1.5.1:
     resolution: {integrity: sha512-HGyF79+/qZ4soRvM+nHERR2pJ3VXDZ/8sL1uLahdgEDf580NkgiWOxLk33FetExqOWp352JZRsgXbG/4MaGOSg==}

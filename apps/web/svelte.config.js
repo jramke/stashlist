@@ -21,6 +21,9 @@ const config = {
 			// checkOrigin: +DEV ? false : true 
 			checkOrigin: false,
 		},
+		alias: {
+			'$routes': './src/routes',
+		}
 	}
 };
 

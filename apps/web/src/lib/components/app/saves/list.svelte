@@ -11,7 +11,7 @@
 	import Masonry from '@repo/ui/components/masonry';
 	import { Button } from '@repo/ui/components/button';
 	import * as AlertDialog from "@repo/ui/components/alert-dialog";
-	import EditForm from '../../../../routes/main/save/edit/[id]/+page.svelte';
+	import EditForm from '$routes/main/save/edit/[id]/+page.svelte';
 
     type SaveListOptions = 'all' | 'savesByGroup' | 'unsorted';
     export let saves: SaveListOptions = 'all';
@@ -27,7 +27,7 @@
 
 	let editDialogOpen = false;
 
-	$: if ($page.state.selected) {
+	$: if ($page.state.editStash) {
 		editDialogOpen = true;
 	} else {
 		editDialogOpen = false;
@@ -98,10 +98,10 @@
 		<AlertDialog.Header>
 			<AlertDialog.Title>Edit stash</AlertDialog.Title>
 		</AlertDialog.Header>
-		<EditForm data={$page.state.selected}>
+		<EditForm data={$page.state.editStash}>
 			<AlertDialog.Footer class="pt-2">
 				<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-				<AlertDialog.Action type="submit" form="edit-stash-form">Update stash</AlertDialog.Action>
+				<AlertDialog.Action type="submit" form="edit-stash-form">Update</AlertDialog.Action>
 			</AlertDialog.Footer>
 		</EditForm>
 	</AlertDialog.Content>

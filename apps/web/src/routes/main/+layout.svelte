@@ -1,19 +1,14 @@
 <script lang="ts">
 	import Section from '@repo/ui/components/section';
-	import { Groups, Topbar } from '$lib/components/app/nav';
-	import { onMount } from 'svelte';
-
-	onMount(() => {
-		document.body.classList.add('overflow-y-hidden');
-		return () => document.body.classList.remove('overflow-y-hidden');
-	});
+	import { Topbar } from '$lib/components/app/nav';
 
 </script>
 
 <Section class="container">
-	<Topbar />
-	<Groups />
-	<Section class="scroll-area h-full" id="main-scrollarea">
+	<div class="sticky w-full top-0 bg-background/80 backdrop-blur z-50">
+		<Topbar />
+	</div>
+	<Section>
 		<slot />
 	</Section>
 </Section>
