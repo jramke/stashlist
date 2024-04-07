@@ -35,7 +35,7 @@
 		--secondary-foreground: var(--foreground);
 		--card: var(--secondary);
 		--card-foreground: var(--foreground);
-		--popover: var(--card);
+		--popover: var(--background);
 		--popover-foreground: var(--foreground);
 		--muted: var(--primary);
 		--muted-foreground: 24 5.4% 63.9%;
@@ -47,7 +47,8 @@
 		--input: var(--muted);
 		--ring: 12 6.5% 26%;
 	}
-	
+
+	/*
 	button, a, [role="menuitem"] {
 		@apply active:scale-[.97];
 	}
@@ -55,8 +56,16 @@
 	a:not([class]) {
 		display: inline-block;
 	}
+	a:not([class*="transition"]) {
+		@apply transition-transform
+	}
+	*/
 
 	.focusable {
 		@apply inline-block rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+	}
+
+	[data-sonner-toaster] {
+		z-index: calc(infinity);
 	}
 }

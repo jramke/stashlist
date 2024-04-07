@@ -3,20 +3,26 @@
 
     import { page } from '$app/stores';
     import { Gradient } from '$lib/components/app';
-	import { getRandomIndex, minDelay } from '$lib/utils';
+	import { findMiddleNumberInRange, getRandomIndex, minDelay } from '$lib/utils';
 	import { gradients } from '$lib/constants'; 
     import { siteConfig } from '$lib/config/site';
-    import { ChevronsUpDown, GripVertical, Inbox, Loader, Pencil, Plus } from '@repo/ui/icons';
+    import { ChevronsUpDown, GripVertical, Inbox, Loader, Pencil, Plus, Trash } from '@repo/ui/icons';
     import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
     import { Button, buttonVariants } from '@repo/ui/components/button';
     import * as Dialog from '@repo/ui/components/dialog';
+    import * as AlertDialog from '@repo/ui/components/alert-dialog';
     import { Input } from '@repo/ui/components/input';
     import { ScrollArea } from '@repo/ui/components/scroll-area';
 	import { applyAction, enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
-	import { invalidateAll } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { toast } from '@repo/ui/components/sonner';
 	import { Label } from '@repo/ui/components/label';
+    import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME } from "svelte-dnd-action";
+    import { fade } from 'svelte/transition';
+	import { cubicIn } from 'svelte/easing';
+	import { flip } from 'svelte/animate';
+	import { cn } from '@repo/ui/utils';
 
     let groupCounts: TODO;
     $: $page.data.saves.then(saves => groupCounts = saves?.groupCounts);
@@ -43,9 +49,17 @@
 
     let editDialogOpen = false;
     let newDialogOpen = false;
+    // let deleteDialogOpen = false;
     let gradientIndex = -1;
     let newGroupError = '';
     let editGroupsErrors: TODO[] = [];
+    let movedGroupStartIndex = -1;
+    let groupDeleteItems: TODO[] = [];
+    let groupsDragging = false;
+    $: deleteGroupId = '';
+    let deleteGroupForm: HTMLFormElement;
+    let deleteGroupZone: HTMLElement;
+    let draggedGroupEl: any;
 
     let busy = false;
 
@@ -84,6 +98,34 @@
 				newGroupError = 'Invalid group name';
 			}
 			busy = false;
+            gradientIndex = -1;
+		};
+	};
+
+    const enhanceDeleteGroupForm: SubmitFunction = ({ formData }) => {
+		busy = true;
+        let start = Date.now();
+
+        formData.set('id', deleteGroupId);
+        formData.set('isOnCurrentSlug', $page.params.slug ? 'true' : 'false');      
+
+		return async ({ result }) => {	
+            await minDelay(start);   	
+			if (result.type === 'success' || result.type === 'redirect') {
+				invalidateAll();
+				await applyAction(result);
+				editGroupsErrors = [];
+                toast.success('Successfully deleted group');
+				if (result.type === 'redirect') {
+					goto(result.location);
+                }
+            } else {
+                editDialogOpen = false;
+                invalidateAll();
+                toast.error('Failed to delete group');
+            }
+            busy = false;
+            deleteGroupId = '';
 		};
 	};
 
@@ -97,9 +139,117 @@
         gradientIndex = getRandomIndex(gradients);
     }
 
+    function handleDndFinalizeDelete(e: any) {
+        deleteGroupId = e.detail.info.id;
+        
+        if (!deleteGroupForm) {
+            toast.error('Failed to delete group');
+            editDialogOpen = false;
+            return;
+        }
+        
+        deleteGroupForm.requestSubmit();
+        groupsDragging = false;
+    }
+
+    function handleDndConsiderDelete(e: any) {        
+        groupsDragging = true;
+        deleteGroupZone.style.transform = 'scale(1.01)';
+        
+        if (draggedGroupEl.children) {
+            draggedGroupEl.children[0].style.transform = 'scale(0.99)';
+            draggedGroupEl.children[0].style.opacity = 0.75;
+        }
+    }
+
+    function handleDndConsider(e: any) {
+        groupsDragging = true;
+        movedGroupStartIndex = groups.findIndex((item: any) => item.id === e.detail.info.id);
+        groups = e.detail.items;
+        deleteGroupZone.style.transform = '';
+    }
+
+    async function handleDndFinalize(e: any) {
+        groups = e.detail.items;
+        groupsDragging = false;
+
+        if (e.detail.items.length === 1 || movedGroupStartIndex === -1) {
+            groups = e.detail.items;
+            return;
+        }
+
+        const movedItemNewPos = groups.findIndex((item: any) => item.id === e.detail.info.id);
+
+        if (movedGroupStartIndex === movedItemNewPos) {
+            groups = e.detail.items;
+            return;
+        }
+
+        busy = true;
+        let start = Date.now();
+
+        // const movedItemSortIndex = groups[movedItemNewPos].sortIndex;
+        const prevItemSortIndex = groups[movedItemNewPos - 1]?.sortIndex;
+        const nextItemSortIndex = groups[movedItemNewPos + 1]?.sortIndex;
+
+        let newSortIndex = 0;
+
+        // item was placed at the start
+        if (!prevItemSortIndex) {
+            newSortIndex = 0.5
+        }
+        
+        // item was placed at the end
+        if (!nextItemSortIndex) {
+            newSortIndex = prevItemSortIndex + 100;
+        }
+
+        if (prevItemSortIndex && nextItemSortIndex) {
+            newSortIndex = findMiddleNumberInRange(prevItemSortIndex, nextItemSortIndex);
+        }
+
+        if (newSortIndex === -1) {
+            // unexpected error
+            toast.error('Failed to update group order');
+            editDialogOpen = false;
+            return;
+        }
+        
+        let response = await fetch('/api/groups/sort?type=update', {
+            method: 'POST',
+            body: JSON.stringify({
+                id: e.detail.info.id,
+                sortIndex: newSortIndex,
+            }),
+        });
+
+        if (response.status === 200 && response.ok) {
+            if (newSortIndex % 1 !== 0 || newSortIndex >= Number.MAX_SAFE_INTEGER) {
+                response = await fetch('/api/groups/sort?type=reset', {
+                    method: 'POST',
+                });
+            }
+        }
+
+        if (response.status !== 200) {
+            toast.error('Failed to update group order');
+            editDialogOpen = false;
+        }
+
+        await minDelay(start, 350);
+        await invalidateAll();
+        busy = false;
+    }
+
+    function transformDraggedElement(draggedEl: any) {       
+        draggedEl.style.zIndex = 'calc(infinity)';
+        if (draggedEl.children[0]) {
+            draggedEl.children[0].style.transform = 'scale(1.02) rotate(-1deg)';
+        }
+        draggedGroupEl = draggedEl;
+    }
 
 </script>
-
 
 <div class="text-2xl">
     <p class="flex gap-2 items-baseline leading-none">
@@ -131,25 +281,29 @@
                                 <DropdownMenu.Separator />
                             </div>
                         {/if}
-                        <ScrollArea class="max-h-[50vh] data-[scrollbar-visible]:ps-1">
-                            {#each groups as { title, id, gradientIndex }}
-                                <DropdownMenu.Link href={siteConfig.appUrl + '/group/' + id}>
-                                    <div class="rounded-full size-4 overflow-hidden relative me-2">
-                                        <Gradient {gradientIndex} />
-                                    </div>
-                                    {title}
-                                    {#if groupCounts && groupCounts[id]}
-                                        <div class="ms-auto me-0 text-muted-foreground">{groupCounts[id]}</div>
-                                    {/if}
-                                </DropdownMenu.Link>
-                            {/each}
-                        </ScrollArea>
+                        {#if groups && groups.length > 0}
+                            <ScrollArea class="max-h-[30vh] px-1 data-[scrollbar-visible=true]:pe-0">
+                                {#each groups as { title, id, gradientIndex }}
+                                    <DropdownMenu.Link href={siteConfig.appUrl + '/group/' + id}>
+                                        <div class="rounded-full size-4 overflow-hidden relative me-2">
+                                            <Gradient {gradientIndex} />
+                                        </div>
+                                        {title}
+                                        {#if groupCounts && groupCounts[id]}
+                                            <div class="ms-auto me-0 text-muted-foreground">{groupCounts[id]}</div>
+                                        {/if}
+                                    </DropdownMenu.Link>
+                                {/each}
+                            </ScrollArea>
+                        {/if}
                         <div class="px-1">
-                            <DropdownMenu.Separator />
-                            <DropdownMenu.Item on:click={() => editDialogOpen = true}>
-                                <Pencil class="size-4 me-2" />
-                                Edit groups
-                            </DropdownMenu.Item>
+                            {#if groups && groups.length > 0}
+                                <DropdownMenu.Separator />
+                                <DropdownMenu.Item on:click={() => editDialogOpen = true}>
+                                    <Pencil class="size-4 me-2" />
+                                    Edit groups
+                                </DropdownMenu.Item>
+                            {/if}
                             <DropdownMenu.Item on:click={() => newDialogOpen = true}>
                                 <Plus class="size-4 me-2" />
                                 New Group 
@@ -180,23 +334,51 @@
                 Rename and sort your groups.
             </Dialog.Description>
         </Dialog.Header>
-        <ScrollArea class="max-h-[60vh]">
-            <form class="flex flex-col gap-3 py-2 px-1" method="POST" action={siteConfig.appUrl + '/group/edit'} id="group-edit-form" use:enhance={enhanceEditGroup}>
-                {#each groups as { title, id }}
-                    <div class="flex gap-2 items-center">
-                        <GripVertical class="size-4 cursor-grab text-muted" />
-                        <div class="w-full">
-                            <Input name={id} value={title} />
-                            {#if editGroupsErrors[id]}
-                                <p class="text-sm text-destructive mt-1" aria-live="assertive">{editGroupsErrors[id][0]}</p>
-                            {/if}
+        <ScrollArea class="p-1 ps-0 max-h-[60vh]">
+            <form method="POST" action={siteConfig.appUrl + '/group/edit'} id="group-edit-form" use:enhance={enhanceEditGroup}>
+                <div class={cn("flex flex-col gap-4 !outline-none", busy && 'pointer-events-none opacity-50')} use:dndzone={{items: groups, transformDraggedElement: transformDraggedElement, flipDurationMs: 300}} on:consider={handleDndConsider} on:finalize={handleDndFinalize}>
+                    {#each groups as item(item.id)}
+                        <div animate:flip={{ duration: 300}}>
+                            <div class="flex gap-2 items-center relative transition-transform">
+                                <GripVertical class="size-4 cursor-grab text-muted" />
+                                <div class="w-full">
+                                    <div class="relative">
+                                        <div class="absolute overflow-hidden left-2 top-2 bottom-2 aspect-square rounded-full">
+                                            <Gradient gradientIndex={item.gradientIndex} />
+                                        </div>
+                                        <Input class="ps-10 bg-background" name={item.id} value={item.title} />
+                                    </div>
+                                    {#if editGroupsErrors[item.id]}
+                                        <p class="text-sm text-destructive mt-1" aria-live="assertive">{editGroupsErrors[item.id][0]}</p>
+                                    {/if}
+                                </div>
+
+                                {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
+                                    <div in:fade={{duration:200, easing: cubicIn}} class="absolute  opacity-50 inset-0 m-0 visible">
+                                        <div class="ms-4 h-10 border border-dashed rounded-md"></div>
+                                    </div>
+                                {/if}
+                            </div>
                         </div>
-                    </div>
-                {/each}
+                    {/each}
+                </div>
             </form>
         </ScrollArea>
         <Dialog.Footer>
-            <Button type="submit" form="group-edit-form">
+            <div 
+                bind:this={deleteGroupZone}
+                use:dndzone={{items: groupDeleteItems, transformDraggedElement: transformDraggedElement, flipDurationMs: 300}} on:consider={handleDndConsiderDelete} on:finalize={handleDndFinalizeDelete} 
+                class={cn("ms-0 me-auto border border-dashed rounded-md py-3 px-4 text-sm text-muted-foreground !outline-none transition-all", groupsDragging && 'w-full border-destructive')}
+            >
+                <!-- <span class="sr-only">Delte group</span>
+                <Trash class="size-4" /> -->
+                Drop here to delete
+            </div>
+            <form bind:this={deleteGroupForm} class="hidden" method="POST" action={siteConfig.appUrl + '/group/delete'} use:enhance={enhanceDeleteGroupForm}>
+                <!-- <input type="hidden" name="id" bind:value={deleteGroupId}>
+                <input type="hidden" name="isOnCurrentSlug" value={$page.params.slug ? true : false}> -->
+            </form>
+            <Button type="submit" form="group-edit-form" disabled={busy} class={cn(groupsDragging && 'hidden')}>
                 {#if busy}
                     <Loader class="size-4 me-2 animate-spin" />
                 {/if}
@@ -225,7 +407,7 @@
             <input type="hidden" name="gradientIndex" value={gradientIndex}>
         </form>
         <Dialog.Footer>
-            <Button type="submit" form="group-new-form">
+            <Button type="submit" form="group-new-form" disabled={busy}>
                 {#if busy}
                     <Loader class="size-4 me-2 animate-spin" />
                 {/if}
@@ -234,3 +416,20 @@
         </Dialog.Footer>
     </Dialog.Content>
 </Dialog.Root>
+
+<!-- <AlertDialog.Root bind:open={deleteDialogOpen}>
+    <AlertDialog.Content>
+        <AlertDialog.Header>
+            <AlertDialog.Title>Delete group</AlertDialog.Title>
+        </AlertDialog.Header>
+        <AlertDialog.Description>
+            Are you sure you want to delete this group?
+        </AlertDialog.Description>
+        <AlertDialog.Footer class="pt-2">
+            <form method="POST" action={siteConfig.appUrl + '/group/delete'} id="delete-group-form" use:enhance={enhanceDeleteGroupForm}>
+            </form>
+            <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+            <AlertDialog.Action type="submit" form="delete-group-form">Delete</AlertDialog.Action>
+        </AlertDialog.Footer>
+    </AlertDialog.Content>
+</AlertDialog.Root> -->

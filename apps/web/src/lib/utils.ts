@@ -98,3 +98,23 @@ export async function minDelay(startTimestamp: number, minDelayMs: number = 500)
 		setTimeout(resolve, minDelayMs - elapsedTime);
 	});
 }
+
+// get middle number in range
+// return -1 if not possible
+// returns whole numbers if possible and only if not possible returns decimal
+export function findMiddleNumberInRange(min: number, max: number): number {
+	if (min === max) {
+		return -1 
+	}
+	const middle = (min + max) / 2;
+    if (middle % 1 === 0) {
+        return middle;
+    } else {
+        const roundedMiddle = Math.round(middle);
+        if (roundedMiddle > min && roundedMiddle < max) {
+            return roundedMiddle;
+        } else {
+            return middle;
+        }
+    }
+}
