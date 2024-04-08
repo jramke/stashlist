@@ -23,9 +23,12 @@
 
 </script>
 
-<div class="overflow-hidden rounded-lg bg-card text-card-foreground flex flex-col justify-between shadow">
+<div class="overflow-hidden rounded-lg text-card-foreground flex flex-col justify-between border shadow">
 	<div>
 		<ItemMedia {type} {imageUrl} {title} {url} {gradientIndex} />
+		<!-- <div class="aspect-video relative">
+			<iframe title={title} src={url} class="absolute scale-[.5] w-[200%] -left-1/2 -top-1/2 aspect-video"></iframe>
+		</div> -->
 		<div class="flex gap-4 p-4">
 			<div class="flex flex-col gap-2 min-w-0">
 				<div class="flex items-baseline gap-2">

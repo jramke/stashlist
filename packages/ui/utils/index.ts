@@ -56,3 +56,15 @@ export const flyAndScale = (
 		easing: cubicOut
 	};
 };
+
+export function scaleMain() {
+	if (typeof window === 'undefined') return;
+	const main = document?.querySelector('main');
+	main && (main.style.transform = 'scale(0.98)');
+}
+
+export function resetMain() {
+	if (typeof window === 'undefined') return;
+	const main = document?.querySelector('main');
+	main && (main.style.transform = '');
+}

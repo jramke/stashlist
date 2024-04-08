@@ -9,6 +9,8 @@
     import { setMode, resetMode } from 'mode-watcher';
 	import { siteConfig } from '$lib/config/site';
 	import { cn } from '@repo/ui/utils';
+	import { commandMenuOpen } from '$lib/stores';
+	import { Shortcut } from '@repo/ui/components/command';
     
     let logoutForm: HTMLFormElement;
     
@@ -48,7 +50,10 @@
         <DropdownMenu.Separator />
         <DropdownMenu.Group>
             <DropdownMenu.Item href={'/extension'}>Get extension</DropdownMenu.Item> 
-            <!-- <DropdownMenu.Item>Connect to VS Code</DropdownMenu.Item>  -->
+            <DropdownMenu.Item on:click={() => commandMenuOpen.set(true)}>
+                Command Menu
+                <DropdownMenu.Shortcut>⌘K</DropdownMenu.Shortcut>
+            </DropdownMenu.Item> 
             <!-- <DropdownMenu.Sub>
                 <DropdownMenu.SubTrigger>
                     Appearence

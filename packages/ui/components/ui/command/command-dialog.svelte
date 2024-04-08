@@ -3,11 +3,19 @@
 	import type { Command as CommandPrimitive } from "cmdk-sv";
 	import Command from "./command.svelte";
 	import * as Dialog from "$ui/components/ui/dialog";
+	import { scaleMain, resetMain } from '$ui/utils';
 
 	type $$Props = DialogPrimitive.Props & CommandPrimitive.CommandProps;
 
 	export let open: $$Props["open"] = false;
 	export let value: $$Props["value"] = undefined;
+
+	$: if (open === true) {
+        scaleMain();
+    } else {
+        resetMain();
+    }
+
 </script>
 
 <Dialog.Root bind:open {...$$restProps}>

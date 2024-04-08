@@ -1,8 +1,9 @@
 import { Dialog as DialogPrimitive } from 'bits-ui';
 
-const Root = DialogPrimitive.Root;
+// const Root = DialogPrimitive.Root;
 const Trigger = DialogPrimitive.Trigger;
 
+import Root from './dialog.svelte';
 import Title from './dialog-title.svelte';
 import Portal from './dialog-portal.svelte';
 import Footer from './dialog-footer.svelte';
