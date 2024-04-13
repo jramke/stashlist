@@ -191,6 +191,8 @@
 
         let newSortIndex = 0;
 
+        let response;
+
         // item was placed at the start
         if (!prevItemSortIndex) {
             newSortIndex = 0.5
@@ -205,16 +207,24 @@
             newSortIndex = findMiddleNumberInRange(prevItemSortIndex, nextItemSortIndex);
         }
 
+        console.log(newSortIndex, findMiddleNumberInRange(prevItemSortIndex, nextItemSortIndex));
+        
+
         if (newSortIndex === -1) {
             // unexpected error
+            response = await fetch('/api/groups/sort?type=reset', {
+                method: 'POST',
+            });
+            invalidateAll();
             toast.error('Failed to update group order');
             editGroupsDialogOpen.set(false);
+            busy = false;
             return;
         }
         
         //TODO: update the new sortindex in the groups array
         // call the db api only if user clicks update to reduce loaders
-        let response = await fetch('/api/groups/sort?type=update', {
+        response = await fetch('/api/groups/sort?type=update', {
             method: 'POST',
             body: JSON.stringify({
                 id: e.detail.info.id,

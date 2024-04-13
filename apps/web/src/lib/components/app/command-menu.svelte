@@ -25,9 +25,7 @@
         };
     })
 
-    const handleItemSelect = (data: string|Function) => {
-        console.log(data instanceof Function);
-        
+    const handleItemSelect = (data: string|Function) => {        
         if (data instanceof Function) {
             data();
         }
