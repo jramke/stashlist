@@ -14,7 +14,7 @@
     let image: HTMLImageElement;
 
     onMount(() => {
-        if (image.naturalHeight === 0 && image.naturalWidth === 0) {
+        if (image?.naturalHeight === 0 && image?.naturalWidth === 0 && image?.complete === true) {
             imageUrl = '';
         }
     });
