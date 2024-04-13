@@ -1,6 +1,7 @@
 import type { Actions } from './$types';
 
 import { superValidate, message } from 'sveltekit-superforms/server';
+import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { db } from '$lib/server/db';
 import { group } from '$lib/server/db/schema';
@@ -21,7 +22,7 @@ export const actions: Actions = {
 			}, formSchema)
 		);
 
-		const form = await superValidate(formData, dynamicFormSchema);
+		const form = await superValidate(formData, zod(dynamicFormSchema));
 
 		if (!form.valid) {
 			return message(form, { type: 'error', text: 'Something went wrong. Please try again.' });

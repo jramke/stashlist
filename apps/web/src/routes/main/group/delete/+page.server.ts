@@ -1,6 +1,7 @@
 import type { Actions } from './$types';
 
 import { superValidate, message } from 'sveltekit-superforms/server';
+import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from './schema';
 import { db } from '$lib/server/db';
 import { group, save_group_mm } from '$lib/server/db/schema';
@@ -10,7 +11,7 @@ import { siteConfig } from '$lib/config/site';
 
 export const actions: Actions = {
 	default: async (event) => {	
-		const form = await superValidate(event, formSchema);
+		const form = await superValidate(event, zod(formSchema));
 		console.log('form', form);
 		
 		if (!form.valid) {

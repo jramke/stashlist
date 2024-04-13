@@ -15,16 +15,13 @@
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
-    "eslint": "^8.56.0",
-    "prettier": "^3.1.1",
-    "prettier-plugin-svelte": "^3.1.2",
-    "turbo": "latest"
+    "eslint": "^8.0.0",
+    "prettier": "^3.2.5",
+    "prettier-plugin-svelte": "^3.2.3",
+    "turbo": "^1.13.2"
   },
   "packageManager": "pnpm@8.9.0",
   "engines": {
     "node": ">=18"
-  },
-  "dependencies": {
-    "apexcharts": "^3.47.0"
   }
 }

@@ -1,6 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 
 import { superValidate, message } from 'sveltekit-superforms/server';
+import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema, type FormSchema } from './schema';
 import { db } from '$lib/server/db';
 import { save, save_group_mm, user } from '$lib/server/db/schema';
@@ -34,7 +35,7 @@ export const load: PageServerLoad = async ({ params, fetch, parent }) => {
 	})
 
 	return {
-	  form: await superValidate(formSchemaWithDefaults),
+	  form: await superValidate(zod(formSchemaWithDefaults)),
 	  save: save,
 	  groups: await parentData.groups
 	};
@@ -42,7 +43,7 @@ export const load: PageServerLoad = async ({ params, fetch, parent }) => {
 
 export const actions: Actions = {
 	default: async (event) => {	
-		const form = await superValidate(event, formSchema);
+		const form = await superValidate(event, zod(formSchema));
 
 		if (!form.valid) {
 			return message(form, { type: 'error', text: 'Something went wrong. Please try again.' });
