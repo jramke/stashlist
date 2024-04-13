@@ -16,16 +16,12 @@
 	<div class="container max-w-[400px] mx-auto flex flex-col gap-6">
 		<div class="flex flex-col space-y-2">
 			<h1 class="text-2xl font-semibold tracking-tight">Login</h1>
-			<p class="text-sm text-muted-foreground">Your digital vault awaits – let's get started!</p>
+			<p class="text-muted-foreground">Your digital vault awaits – let's get started!</p>
 		</div>
 		<UserLoginForm />
-		<p class="text-sm text-muted-foreground">
+		<p class="text-xs text-muted-foreground">
 			By logging in, you agree to our{' '}
-			<a href="/terms" class="underline underline-offset-4 hover:text-primary">
-				Terms of Service
-			</a>{' '}
-			and{' '}
-			<a href="/privacy" class="underline underline-offset-4 hover:text-primary">
+			<a href="/privacy" class="underline underline-offset-4">
 				Privacy Policy
 			</a>
 			.

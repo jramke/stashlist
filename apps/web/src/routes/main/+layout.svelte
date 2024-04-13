@@ -8,11 +8,11 @@
 
 <CommandMenu />
 
-<Section class="container h-[100vh] h-[100dvh]">
+<Section class="container flex flex-col min-h-[100vh]">
 	<!-- <div class="sticky w-full top-0 bg-background/80 backdrop-blur z-50"> -->
 		<Topbar />
 	<!-- </div> -->
-	<Section>
+	<Section class="flex-grow grid">
 		<!-- <ScrollArea class="max-h-[755px] pb-5"> -->
 			<slot />
 		<!-- </ScrollArea> -->

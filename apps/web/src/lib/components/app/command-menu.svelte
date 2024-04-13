@@ -26,14 +26,16 @@
     })
 
     const handleItemSelect = (data: string|Function) => {
-        commandMenuOpen.set(false);
+        console.log(data instanceof Function);
+        
         if (data instanceof Function) {
             data();
         }
-        if (data instanceof String) {
+        if (typeof data === "string") {
             let url = data as string;
             goto(url);
         }
+        commandMenuOpen.set(false);
     }
 
     const filter = (value: string, search: string) => {
