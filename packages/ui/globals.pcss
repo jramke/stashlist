@@ -27,24 +27,51 @@
 		--radius: 0.6rem;
 	}
 	#stashlist.dark, #stashlist-root.dark {
-		--background: 20 14.3% 4.1%;
-		--foreground: 60 9.1% 97.8%;
-		--card: 20 14.3% 5.5%;
-		--card-foreground: 60 9.1% 97.8%;
-		--popover: 20 14.3% 4.1%;
-		--popover-foreground: 60 9.1% 97.8%;
-		--primary: 20.5 90.2% 48.2%;
-		--primary-foreground: 60 9.1% 97.8%;
-		--secondary: 20.5 90.2% 6%;
-		--secondary-foreground: 60 9.1% 97.8%;
-		--muted: 12 6.5% 15.1%;
+		--background: 20 14% 4%;
+		--foreground: 60 9% 97%;
+		--primary: 12 6.5% 15.1%;
+		--primary-foreground: var(--foreground);
+		--secondary: 20 14% 9%;
+		--secondary-foreground: var(--foreground);
+		--card: var(--secondary);
+		--card-foreground: var(--foreground);
+		--popover: var(--background);
+		--popover-foreground: var(--foreground);
+		--muted: var(--primary);
 		--muted-foreground: 24 5.4% 63.9%;
-		--accent: 12 6.5% 15.1%;
-		--accent-foreground: 60 9.1% 97.8%;
+		--accent: var(--muted);
+		--accent-foreground: var(--foreground);
 		--destructive: 0 72.2% 50.6%;
-		--destructive-foreground: 60 9.1% 97.8%;
-		--border: 12 6.5% 15.1%;
-		--input: 12 6.5% 15.1%;
-		--ring: 20.5 90.2% 48.2%;
+		--destructive-foreground: var(--foreground);
+		--border: var(--muted);
+		--input: var(--muted);
+		--ring: 12 6.5% 26%;
+	}
+
+	/*
+	button, a, [role="menuitem"] {
+		@apply active:scale-[.97];
+	}
+
+	a:not([class]) {
+		display: inline-block;
+	}
+	a:not([class*="transition"]) {
+		@apply transition-transform
+	}
+	*/
+
+	.focusable {
+		@apply inline-block rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+	}
+
+	[data-sonner-toaster] {
+		z-index: calc(infinity);
+	}
+
+	/* Remove browser autofill style */
+	input:-webkit-autofill,
+	input:-webkit-autofill:focus {
+		transition: background-color 0s 600000s, color 0s 600000s !important;
 	}
 }

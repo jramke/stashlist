@@ -12,9 +12,14 @@ declare global {
 		}
 		// interface PageData {}
 		interface PageState {
-			selected: {
+			editStash?: {
 				form: import('sveltekit-superforms').SuperValidated | null | string;
 				save: TODO;
+				groups: TODO;
+				isDialog: boolean;
+			};
+			editGroup?: {
+				form: import('sveltekit-superforms').SuperValidated | null | string;
 				groups: TODO;
 				isDialog: boolean;
 			};

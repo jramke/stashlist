@@ -15,6 +15,20 @@
       "when": 1711296133365,
       "tag": "0001_awesome_retro_girl",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1711987617809,
+      "tag": "0002_sparkling_norman_osborn",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1712413665578,
+      "tag": "0003_cute_hawkeye",
+      "breakpoints": true
     }
   ]
 }

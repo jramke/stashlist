@@ -54,9 +54,9 @@ export const group = sqliteTable('group', {
 		.notNull()
 		.references(() => user.id),
 	title: text('title').default(''),
-	// slug: text('slug').default(''),
+	gradientIndex: integer('gradient_index').default(0),
 	parentId: text('parent_id').default(''),
-	index: real('index').default(1.0),
+	sortIndex: integer('sort_index').notNull(),
 	createdAt: text('created_at')
 		.default(sql`CURRENT_TIMESTAMP`)
 		.notNull()

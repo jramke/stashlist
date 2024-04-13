@@ -4,7 +4,9 @@ import { db } from '$lib/server/db';
 import { group } from '$lib/server/db/schema';
 import { generateId } from 'lucia';
 import { json, redirect, error } from '@sveltejs/kit';
-import { slugify } from '$lib/utils';
+import { getRandomIndex } from '$lib/utils';
+import { gradients } from '$lib/constants';
+import { desc, eq } from 'drizzle-orm';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) redirect(302, '/login');
@@ -14,16 +16,25 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
 		const title = data['title'];
 		if (title.length === 0) throw Error('Group title cant be empty');
-		// const slug = slugify(title);
 
-		//TODO: check if slug is already used and it cant be "new"
+		const gradientIndex = data['gradientIndex'] ?? getRandomIndex(gradients);
+
+		let sortIndex;
 		//TODO: handle parent id, index
+		const highestSortIndexResult = await db.select({ sortIndex: group.sortIndex }).from(group).where(eq(group.userId, locals.user.id )).orderBy(desc(group.sortIndex)).limit(1);
 
+		if (highestSortIndexResult.length === 0) {
+			sortIndex = 100;
+		} else {
+			sortIndex = highestSortIndexResult[0].sortIndex + 100;
+		}
+		
 		await db.insert(group).values({
 			id: generateId(15),
 			userId: locals.user.id,
 			title: title,
-			// slug: slug
+			gradientIndex: gradientIndex,
+			sortIndex: sortIndex,
 		});
 
 		return json({ success: true });

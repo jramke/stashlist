@@ -1,21 +1,20 @@
 <script lang="ts">
 	import Section from '@repo/ui/components/section';
-	import { Sidebar, Topbar } from '$lib/components/app/nav';
-	import { onMount } from 'svelte';
-
-	onMount(() => {
-		document.body.classList.add('overflow-y-hidden');
-		return () => document.body.classList.remove('overflow-y-hidden');
-	});
+	import { Topbar } from '$lib/components/app/nav';
+	import { CommandMenu } from '$lib/components/app';
+	import { ScrollArea } from '@repo/ui/components/scroll-area';
 
 </script>
 
-<div class="flex">
-	<Sidebar />
-	<div class="w-full">
+<CommandMenu />
+
+<Section class="container h-[100vh] h-[100dvh]">
+	<!-- <div class="sticky w-full top-0 bg-background/80 backdrop-blur z-50"> -->
 		<Topbar />
-		<Section class="p-5 scroll-area h-full border-l" id="main-scrollarea">
+	<!-- </div> -->
+	<Section>
+		<!-- <ScrollArea class="max-h-[755px] pb-5"> -->
 			<slot />
-		</Section>
-	</div>
-</div>
+		<!-- </ScrollArea> -->
+	</Section>
+</Section>

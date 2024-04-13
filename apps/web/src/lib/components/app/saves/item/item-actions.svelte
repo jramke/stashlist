@@ -11,6 +11,7 @@
     import { goto, invalidateAll, preloadData, pushState } from '$app/navigation';
 	
 	import type { Save } from '$lib/types';
+	import { cn } from '@repo/ui/utils';
 
     export let id: Save['id'];
     export let title: Save['title'];
@@ -37,7 +38,7 @@
 		const result = await preloadData(href);
 
 		if (result.type === 'loaded' && result.status === 200) {
-			pushState(href, { selected: {
+			pushState(href, { editStash: {
 				form: result.data.form,
 				save: result.data.save,
 				groups: result.data.groups,
@@ -57,23 +58,23 @@
 </script>
 
 <DropdownMenu.Root>
-    <DropdownMenu.Trigger class={buttonVariants({ variant: 'ghost' })}>
-        <MoreHorizontal class="h-4 w-4" />
+    <DropdownMenu.Trigger class={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'size-8')}>
+        <MoreHorizontal class="size-4" />
         <span class="sr-only">Open menu</span>
     </DropdownMenu.Trigger>
     <DropdownMenu.Content align="end">
         <DropdownMenu.Group>
             <DropdownMenu.Item on:click={openEditDialog}>
-                <Pencil class="h-4 w-4 me-2" />
+                <Pencil class="size-4 me-2" />
                 Edit
             </DropdownMenu.Item>
             <DropdownMenu.Item on:click={handleCopyUrl}>
-                <Copy class="h-4 w-4 me-2" />
+                <Copy class="size-4 me-2" />
                 Copy URL
             </DropdownMenu.Item>
 			<DropdownMenu.Separator />
-            <DropdownMenu.Item on:click={openDeleteDialog}>
-                <Trash class="h-4 w-4 me-2" />
+            <DropdownMenu.Item on:click={openDeleteDialog} class="data-[highlighted]:bg-destructive/10 data-[highlighted]:shadow-destructive/10 data-[highlighted]:border-destructive/30">
+                <Trash class="size-4 me-2" />
                 Delte
             </DropdownMenu.Item>
         </DropdownMenu.Group>
@@ -84,14 +85,14 @@
 <AlertDialog.Root bind:open={deleteDialogOpen}>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
-			<AlertDialog.Title>Do you really want to delete the stash?</AlertDialog.Title>
-			<AlertDialog.Description>The stash "{title}" will be deleted.</AlertDialog.Description>
+			<AlertDialog.Title>Sure?</AlertDialog.Title>
+			<AlertDialog.Description>The stash "{title}" will be deleted and can't be restored afterwards.</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
 			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
 			<form action={siteConfig.appUrl + '/save/delete'} method="post" use:enhance={handleDelete} id="delete-stash-form">
 				<input type="hidden" name="id" value={id}>
-				<AlertDialog.Action type="submit" form="delete-stash-form">Delete stash</AlertDialog.Action>
+				<AlertDialog.Action class={buttonVariants({ variant: 'destructive' })} type="submit" form="delete-stash-form">Delete</AlertDialog.Action>
 			</form>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>

@@ -8,7 +8,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user) redirect(302, '/login');
 
 	try {
-		const groups = await db.select().from(group).where(eq(group.userId, locals.user.id)).all();
+		const groups = await db.select().from(group).where(eq(group.userId, locals.user.id)).orderBy(group.sortIndex).all();
 		return json(groups);
 	} catch (err) {
 		console.log('error fetch groups', err);

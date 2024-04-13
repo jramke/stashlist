@@ -16,12 +16,9 @@
 <DropdownMenuPrimitive.SubTrigger
 	class={cn(
 		`border border-transparent 
-		flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none 
-		data-[highlighted]:bg-secondary data-[state=open]:bg-secondary 
-		data-[highlighted]:text-accent-foreground data-[state=open]:text-accent-foreground 
-		data-[highlighted]:shadow-inner data-[state=open]:shadow-inner 
-		data-[highlighted]:shadow-primary/20 data-[state=open]:shadow-primary/20 
-		data-[highlighted]:border-primary data-[state=open]:border-primary`,
+		flex cursor-default select-none items-center rounded-sm px-2 py-1.5 my-1 text-sm outline-none 
+		data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground data-[highlighted]:shadow-inner data-[highlighted]:shadow-popover data-[highlighted]:border-accent 
+		data-[state=open]:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:shadow-inner data-[state=open]:shadow-popover data-[state=open]:border-accent`,
 		inset && 'pl-8',
 		className
 	)}

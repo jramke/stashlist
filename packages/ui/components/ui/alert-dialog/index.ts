@@ -1,8 +1,9 @@
 import { AlertDialog as AlertDialogPrimitive } from "bits-ui";
 
-const Root = AlertDialogPrimitive.Root;
+// const Root = AlertDialogPrimitive.Root;
 const Trigger = AlertDialogPrimitive.Trigger;
 
+import Root from './alert-dialog.svelte';
 import Title from "./alert-dialog-title.svelte";
 import Action from "./alert-dialog-action.svelte";
 import Cancel from "./alert-dialog-cancel.svelte";

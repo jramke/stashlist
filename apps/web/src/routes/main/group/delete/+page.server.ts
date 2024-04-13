@@ -11,6 +11,7 @@ import { siteConfig } from '$lib/config/site';
 export const actions: Actions = {
 	default: async (event) => {	
 		const form = await superValidate(event, formSchema);
+		console.log('form', form);
 		
 		if (!form.valid) {
 			return message(form, { type: 'error', text: 'Something went wrong. Please try again.' });

@@ -3,16 +3,16 @@ import { tv, type VariantProps } from 'tailwind-variants';
 import type { Button as ButtonPrimitive } from 'bits-ui';
 
 const buttonVariants = tv({
-	base: 'inline-flex items-center justify-center rounded-md text-sm font-medium whitespace-nowrap ring-offset-background border-transparent transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[.98]',
+	base: 'inline-flex items-center justify-center rounded-md text-sm font-medium whitespace-nowrap ring-offset-background border border-transparent transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
 	variants: {
 		variant: {
-			default: 'bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20',
-			destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:shadow-md hover:shadow-destructive/20',
-			outline: 'border border-input hover:bg-secondary hover:shadow-inner hover:shadow-primary/20 hover:text-accent-foreground hover:border-primary',
+			default: 'bg-primary text-primary-foreground hover:shadow-inner hover:shadow-secondary border-ring',
+			destructive: 'bg-destructive/10 shadow-inner shadow-destructive/10 border-destructive/30 text-destructive-foreground hover:bg-destructive/20 focus-visible:ring-destructive/30',
+			outline: 'border-input hover:shadow-inner hover:shadow-secondary hover:text-accent-foreground hover:border-accent hover:bg-accent',
 			secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:shadow-md hover:shadow-secondary/20',
-			ghost: 'border hover:shadow-inner hover:shadow-primary/20 hover:text-accent-foreground hover:border-primary hover:bg-secondary',
+			ghost: 'hover:shadow-inner hover:shadow-secondary hover:text-accent-foreground hover:border-accent hover:bg-accent',
 			link: 'decoration-primary underline-offset-4 hover:underline',
-			nav: 'transition-colors text-foreground/60 hover:text-foreground/80 [&.active]:text-foreground [&.active]:font-bold active:scale-100'
+			nav: 'transition-colors text-foreground/60 hover:text-foreground/80 [&.active]:text-foreground [&.active]:font-bold active:scale-100',
 		},
 		size: {
 			default: 'h-10 px-4 py-2',

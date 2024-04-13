@@ -1,8 +1,8 @@
 <script lang="ts">
     import type { Save } from '$lib/types';
 
-    import { listLayout } from '$lib/stores';
-	import ItemGradient from './item-gradient.svelte';
+    import { listLayout, liveView } from '$lib/stores';
+	import { Gradient } from '$lib/components/app';
 
     export let type: Save['type'];
     export let title: Save['title'];
@@ -31,24 +31,30 @@
     </a>
 {:else}
     {#if $listLayout !== 'list'}
-        <a
-            href={url}
-            {title}
-            rel="norefferrer noopener"
-            target="_blank"
-            class="relative flex aspect-og overflow-hidden m-4 mb-0 rounded-sm border"
-        >			
-            {#if imageUrl}
-                <img
-                    loading="lazy"
-                    src={imageUrl}
-                    alt={title}
-                    class="absolute inset-0 h-full w-full object-cover"
-                    on:error={() => imageUrl = ''}
-                />
-            {:else}
-                <ItemGradient {gradientIndex} />
-            {/if}
-        </a>
+        {#if $liveView}
+            <div class="aspect-video relative m-4 mb-0 rounded-sm border overflow-hidden">
+                <iframe title={title} src={url} class="absolute scale-[.5] w-[200%] -left-1/2 -top-1/2 aspect-video"></iframe>
+            </div>
+        {:else}
+            <a
+                href={url}
+                {title}
+                rel="norefferrer noopener"
+                target="_blank"
+                class="relative flex aspect-og overflow-hidden m-4 mb-0 rounded-sm border"
+            >			
+                {#if imageUrl}
+                    <img
+                        loading="lazy"
+                        src={imageUrl}
+                        alt={title}
+                        class="absolute inset-0 h-full w-full object-cover"
+                        on:error={() => imageUrl = ''}
+                    />
+                {:else}
+                    <Gradient {gradientIndex} />
+                {/if}
+            </a>
+        {/if}
     {/if}
 {/if}

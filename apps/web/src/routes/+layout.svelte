@@ -22,7 +22,7 @@
 	<Navigation />
 {/if}
 
-<main>
+<main id="stashlist-app">
 	<slot />
 </main>
 

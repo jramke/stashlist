@@ -5,7 +5,7 @@
 	import ItemFooter from './item-footer.svelte';
 	import ItemMedia from './item-media.svelte';
 	import ItemActions from './item-actions.svelte';
-	import ItemGradient from './item-gradient.svelte';
+	import { Gradient } from '$lib/components/app';
 
 	// TODO: use let { a,b } = $props();
 	export let title: Save['title'];
@@ -23,22 +23,24 @@
 
 </script>
 
-<div class="overflow-hidden rounded-lg border bg-card text-card-foreground flex flex-col justify-between content-between">
+<div class="overflow-hidden rounded-lg text-card-foreground flex flex-col justify-between border shadow">
 	<div>
 		<ItemMedia {type} {imageUrl} {title} {url} {gradientIndex} />
 		<div class="flex gap-4 p-4">
 			<div class="flex flex-col gap-2 min-w-0">
-				<span class="line-clamp-2 text-lg font-bold break-words">{title}</span>
-				{#if description}
+				<div class="flex items-baseline gap-2">
+					<h3 class="line-clamp-2 text-lg font-bold break-words">{title}</h3>
+				</div>
+				<!-- {#if description}
 					<span class="mb-2 line-clamp-2 text-sm break-words">{description}</span>
-				{/if}
+				{/if} -->
 				{#if type !== 'image'}
 					<div class="flex items-center gap-2">
 						{#if faviconUrl}
-							<img loading="lazy" class="h-4 w-4 shrink-0" src={faviconUrl} alt={title} on:error={() => faviconUrl = ''} />
+							<img loading="lazy" class="size-4 shrink-0 -mb-[1.5px]" src={faviconUrl} alt={title} on:error={() => faviconUrl = ''} />
 						{:else}
-							<div class="rounded-full size-4 overflow-hidden relative">
-								<ItemGradient {gradientIndex} />
+							<div class="rounded-full size-4 shrink-0 -mb-[1.5px] overflow-hidden relative">
+								<Gradient {gradientIndex} />
 							</div>
 						{/if}
 						<a
