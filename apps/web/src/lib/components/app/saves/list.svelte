@@ -58,26 +58,28 @@
 <div class="hidden grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4 grid-cols-5"></div>
 
 {#await saveOption[saves]}
-	<div class="grid grid-cols-{$listColumns} gap-6">
+	<div class="grid grid-cols-{$listColumns} gap-6 self-start">
 		{#each new Array(9) as _}
 			<Skeleton class="aspect-video" />
 		{/each}
 	</div>
 {:then items}
-    {#if items?.length > 0}
-		{#if $listLayout === 'masonry'}
-			<Masonry gapSize={6} columns={$listColumns} items={items}>
-				{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id, type, gradientIndex}}
-					<Item {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} {type} {gradientIndex} />
-				{/each}
-			</Masonry>
-		{:else}
-			<div class="grid grid-cols-{$listColumns} gap-6">
-				{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id, type, gradientIndex}}
-					<Item {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} {type} {gradientIndex} />
-				{/each}
-			</div>
-		{/if}
+	{#if items?.length > 0}
+		<div class="self-start">
+			{#if $listLayout === 'masonry'}
+				<Masonry gapSize={6} columns={$listColumns} items={items}>
+					{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id, type, gradientIndex}}
+						<Item {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} {type} {gradientIndex} />
+					{/each}
+				</Masonry>
+			{:else}
+				<div class="grid grid-cols-{$listColumns} gap-6">
+					{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id, type, gradientIndex}}
+						<Item {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} {type} {gradientIndex} />
+					{/each}
+				</div>
+			{/if}
+		</div>
 	{:else}
 		{#if saves === 'unsorted' && hasStashes}
 			<EmptyState title="Everything is clean" message="You seem very organized. All your stashes are stored in groups.">

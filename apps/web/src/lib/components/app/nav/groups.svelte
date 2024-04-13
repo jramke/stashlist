@@ -275,7 +275,7 @@
                                 <DropdownMenu.Link href={siteConfig.appUrl + '/unsorted'}>
                                     <Inbox class="size-4 me-2" />
                                     Unsorted
-                                    <div class="ms-auto me-0 text-muted-foreground">{noGroupCount}</div>
+                                    <div class="ps-3 ms-auto me-0 text-muted-foreground">{noGroupCount}</div>
                                 </DropdownMenu.Link>
                                 <DropdownMenu.Separator />
                             </div>
@@ -289,7 +289,7 @@
                                         </div>
                                         {title}
                                         {#if groupCounts && groupCounts[id]}
-                                            <div class="ms-auto me-0 text-muted-foreground">{groupCounts[id]}</div>
+                                            <div class="ps-3 ms-auto me-0 text-muted-foreground">{groupCounts[id]}</div>
                                         {/if}
                                     </DropdownMenu.Link>
                                 {/each}
