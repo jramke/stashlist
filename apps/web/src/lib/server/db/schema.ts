@@ -56,7 +56,7 @@ export const group = sqliteTable('group', {
 	title: text('title').default(''),
 	gradientIndex: integer('gradient_index').default(0),
 	parentId: text('parent_id').default(''),
-	sortIndex: integer('sort_index').notNull(),
+	sortIndex: integer('sort_index').notNull().default(100),
 	createdAt: text('created_at')
 		.default(sql`CURRENT_TIMESTAMP`)
 		.notNull()
