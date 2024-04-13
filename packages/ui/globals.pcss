@@ -68,4 +68,10 @@
 	[data-sonner-toaster] {
 		z-index: calc(infinity);
 	}
+
+	/* Remove browser autofill style */
+	input:-webkit-autofill,
+	input:-webkit-autofill:focus {
+		transition: background-color 0s 600000s, color 0s 600000s !important;
+	}
 }

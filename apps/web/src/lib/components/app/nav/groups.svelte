@@ -10,7 +10,6 @@
     import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
     import { Button, buttonVariants } from '@repo/ui/components/button';
     import * as Dialog from '@repo/ui/components/dialog';
-    import * as AlertDialog from '@repo/ui/components/alert-dialog';
     import { Input } from '@repo/ui/components/input';
     import { ScrollArea } from '@repo/ui/components/scroll-area';
 	import { applyAction, enhance } from '$app/forms';
@@ -23,6 +22,7 @@
 	import { cubicIn } from 'svelte/easing';
 	import { flip } from 'svelte/animate';
 	import { cn } from '@repo/ui/utils';
+	import { editGroupsDialogOpen, newGroupDialogOpen } from '$lib/stores';
 
     let groupCounts: TODO;
     $: $page.data.saves.then(saves => groupCounts = saves?.groupCounts);
@@ -47,9 +47,6 @@
 		}
 	}
 
-    let editDialogOpen = false;
-    let newDialogOpen = false;
-    // let deleteDialogOpen = false;
     let gradientIndex = -1;
     let newGroupError = '';
     let editGroupsErrors: TODO[] = [];
@@ -73,7 +70,7 @@
                 invalidateAll();
                 applyAction(result);
                 editGroupsErrors = [];
-                editDialogOpen = false;
+                editGroupsDialogOpen.set(false)
                 toast.success('Successfully updated groups');
             } else {
                 editGroupsErrors = result.data.form.errors ?? 'Invalid group name'; // ??: why Property 'data' does not exist on type???
@@ -92,7 +89,7 @@
 				invalidateAll();
 				await applyAction(result);
                 newGroupError = '';
-                newDialogOpen = false;
+                newGroupDialogOpen.set(false);
 				toast.success('Successfully created group');
 			} else {
 				newGroupError = 'Invalid group name';
@@ -120,7 +117,7 @@
 					goto(result.location);
                 }
             } else {
-                editDialogOpen = false;
+                editGroupsDialogOpen.set(false);
                 invalidateAll();
                 toast.error('Failed to delete group');
             }
@@ -144,7 +141,7 @@
         
         if (!deleteGroupForm) {
             toast.error('Failed to delete group');
-            editDialogOpen = false;
+            editGroupsDialogOpen.set(false);
             return;
         }
         
@@ -211,10 +208,12 @@
         if (newSortIndex === -1) {
             // unexpected error
             toast.error('Failed to update group order');
-            editDialogOpen = false;
+            editGroupsDialogOpen.set(false);
             return;
         }
         
+        //TODO: update the new sortindex in the groups array
+        // call the db api only if user clicks update to reduce loaders
         let response = await fetch('/api/groups/sort?type=update', {
             method: 'POST',
             body: JSON.stringify({
@@ -233,7 +232,7 @@
 
         if (response.status !== 200) {
             toast.error('Failed to update group order');
-            editDialogOpen = false;
+            editGroupsDialogOpen.set(false);
         }
 
         await minDelay(start, 350);
@@ -299,12 +298,12 @@
                         <div class="px-1">
                             {#if groups && groups.length > 0}
                                 <DropdownMenu.Separator />
-                                <DropdownMenu.Item on:click={() => editDialogOpen = true}>
+                                <DropdownMenu.Item on:click={() => editGroupsDialogOpen.set(true)}>
                                     <Pencil class="size-4 me-2" />
                                     Edit groups
                                 </DropdownMenu.Item>
                             {/if}
-                            <DropdownMenu.Item on:click={() => newDialogOpen = true}>
+                            <DropdownMenu.Item on:click={() => newGroupDialogOpen.set(true)}>
                                 <Plus class="size-4 me-2" />
                                 New Group 
                             </DropdownMenu.Item>
@@ -326,7 +325,8 @@
 </div>
 
 
-<Dialog.Root bind:open={editDialogOpen}>
+
+<Dialog.Root bind:open={$editGroupsDialogOpen}>
     <Dialog.Content>
         <Dialog.Header>
             <Dialog.Title>Edit groups</Dialog.Title>
@@ -388,7 +388,7 @@
     </Dialog.Content>
 </Dialog.Root>
 
-<Dialog.Root bind:open={newDialogOpen}>
+<Dialog.Root bind:open={$newGroupDialogOpen}>
     <Dialog.Content>
         <Dialog.Header>
             <Dialog.Title>New group</Dialog.Title>
@@ -416,20 +416,3 @@
         </Dialog.Footer>
     </Dialog.Content>
 </Dialog.Root>
-
-<!-- <AlertDialog.Root bind:open={deleteDialogOpen}>
-    <AlertDialog.Content>
-        <AlertDialog.Header>
-            <AlertDialog.Title>Delete group</AlertDialog.Title>
-        </AlertDialog.Header>
-        <AlertDialog.Description>
-            Are you sure you want to delete this group?
-        </AlertDialog.Description>
-        <AlertDialog.Footer class="pt-2">
-            <form method="POST" action={siteConfig.appUrl + '/group/delete'} id="delete-group-form" use:enhance={enhanceDeleteGroupForm}>
-            </form>
-            <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-            <AlertDialog.Action type="submit" form="delete-group-form">Delete</AlertDialog.Action>
-        </AlertDialog.Footer>
-    </AlertDialog.Content>
-</AlertDialog.Root> -->

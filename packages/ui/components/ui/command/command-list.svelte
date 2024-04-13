@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Command as CommandPrimitive } from "cmdk-sv";
 	import { cn } from "$ui/utils";
+    import { ScrollArea } from "$ui/components/ui/scroll-area";
 
 	type $$Props = CommandPrimitive.ListProps;
 	let className: string | undefined | null = undefined;
@@ -8,8 +9,10 @@
 </script>
 
 <CommandPrimitive.List
-	class={cn("max-h-[350px] overflow-y-auto overflow-x-hidden", className)}
+	class={cn("", className)}
 	{...$$restProps}
 >
-	<slot />
+	<ScrollArea class="max-h-[350px] p-2 data-[scrollbar-visible=true]:pe-0">
+		<slot />
+	</ScrollArea>
 </CommandPrimitive.List>

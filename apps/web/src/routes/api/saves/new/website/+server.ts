@@ -9,52 +9,38 @@ import { getDomainFromUrl, isImageUrl, isAbsoluteUrl, makeAbsoluteUrl, getRandom
 import { eq } from 'drizzle-orm';
 import { gradients } from '$lib/constants';
 
+
+
 export const POST: RequestHandler = async ({ request, locals, params, url }) => {
 	if (!locals.user) redirect(302, '/login');
 	
 	try {
 		const formData = await request.json();
 		const edit = url.searchParams.get('edit');
-
+		const fetchMetaData = url.searchParams.get('fetchMetaData');
+		
 		const currentTime = new Date().toISOString();
 
 		const saveUrl = formData['url'];
 		const id = generateId(15);
 		const gradientIndex = getRandomIndex(gradients);
+		let groups = formData['groups'] || '';
 		
-		let hasOtherProperties = false;
-		for (let key in formData) {
-			if (key !== 'url') {
-				hasOtherProperties = true;
-				break;
-			}
-		}
-		if (saveUrl && hasOtherProperties) {
+		if (saveUrl && fetchMetaData === 'false') {
 			await db.insert(save).values({
 				id: id,
 				type: 'website',
 				userId: locals.user.id,
 				url: saveUrl,
-				faviconUrl: formData['faviconUrl'],
-				title: formData['title'],
-				description: formData['description'],
-				imageUrl: formData['imageUrl'],
+				faviconUrl: formData['faviconUrl'] || '',
+				title: formData['title'] || '',
+				description: formData['description'] || '',
+				imageUrl: formData['imageUrl'] || '',
 				gradientIndex: gradientIndex,
 				createdAt: currentTime
 			});
 
-			let groups = formData['groups'] || '';
-			groups = groups.split(',');
-			if (groups.length > 0) {
-				for (const groupId of groups) {
-					if (groupId.length === 0) continue;
-					await db.insert(save_group_mm).values({
-						userId: locals.user?.id as string,
-						saveId: id,
-						groupId: groupId
-					})
-				}
-			}
+			await addGroups(groups, id);
 	
 			return json({ success: true });
 		}
@@ -100,6 +86,8 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 			createdAt: currentTime
 		});
 
+		await addGroups(groups, id);
+
 		return json({ success: true });
 
 	} catch (err) {
@@ -107,6 +95,20 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 		return error(400, {
 			message: 'Failed to create save'
 		});
+	}
+
+	async function addGroups(groups: string, id: string) {
+		let groupsArr = groups.split(',');
+		if (groups.length > 0) {
+			for (const groupId of groupsArr) {
+				if (groupId.length === 0) continue;
+				await db.insert(save_group_mm).values({
+					userId: locals.user?.id as string,
+					saveId: id,
+					groupId: groupId
+				})
+			}
+		}
 	}
 	
 };

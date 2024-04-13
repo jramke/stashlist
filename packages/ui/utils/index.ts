@@ -59,12 +59,12 @@ export const flyAndScale = (
 
 export function scaleMain() {
 	if (typeof window === 'undefined') return;
-	const main = document?.querySelector('main');
+	const main = document?.querySelector('main#stashlist-app') as HTMLElement;
 	main && (main.style.transform = 'scale(0.98)');
 }
 
 export function resetMain() {
 	if (typeof window === 'undefined') return;
-	const main = document?.querySelector('main');
+	const main = document?.querySelector('main#stashlist-app') as HTMLElement;
 	main && (main.style.transform = '');
 }

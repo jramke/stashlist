@@ -29,7 +29,7 @@ browser.contextMenus.create({
 browser.runtime.onMessage.addListener(async (message: any, sender: any) => {
   let result;
   if (message.saveWebsite) {   
-    result = await makePostRequest(baseUrl + "/api/saves/new/website", message.saveWebsite);
+    result = await makePostRequest(baseUrl + "/api/saves/new/website?fetchMetaData=false", message.saveWebsite);
   }
   if (message.saveImage) {   
     result = await makePostRequest(baseUrl + "/api/saves/new/image", message.saveImage);

@@ -27,6 +27,10 @@
 		overflow-y: auto;
 		background-clip: border-box;
 
+		@supports not selector(::-webkit-scrollbar) {
+			scrollbar-width: thin;
+			scrollbar-color: hsl(var(--accent)) hsl(var(--foreground));
+		}
 		&::-webkit-scrollbar {
 			background: transparent;
 		}

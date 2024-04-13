@@ -2,7 +2,7 @@
 	import { goto } from "$app/navigation";
 	import { page } from "$app/stores";
 	import { siteConfig } from "$lib/config/site";
-	import { commandMenuOpen } from "$lib/stores";
+	import { commandMenuOpen, editGroupsDialogOpen, newGroupDialogOpen } from "$lib/stores";
     import * as Command from "@repo/ui/components/command";
 	import { onMount } from "svelte";
 	import Gradient from "./gradient.svelte";
@@ -25,9 +25,15 @@
         };
     })
 
-    const handleItemSelect = (url: string) => {
-        goto(url);
+    const handleItemSelect = (data: string|Function) => {
         commandMenuOpen.set(false);
+        if (data instanceof Function) {
+            data();
+        }
+        if (data instanceof String) {
+            let url = data as string;
+            goto(url);
+        }
     }
 
     const filter = (value: string, search: string) => {
@@ -42,13 +48,12 @@
     <Command.List>
         <Command.Empty>No results found.</Command.Empty>
         <Command.Group heading="Views">
-            <Command.Item>All stashes</Command.Item>
-            <Command.Item>Unsorted</Command.Item>
+            <Command.Item onSelect={() => handleItemSelect(siteConfig.appUrl)}>All stashes</Command.Item>
+            <Command.Item onSelect={() => handleItemSelect(siteConfig.appUrl + '/unsorted')}>Unsorted</Command.Item>
         </Command.Group>
         <Command.Group heading="Commands">
-            <Command.Item>New Group</Command.Item>
-            <Command.Item>Edit Groups</Command.Item>
-            <Command.Item>New Stash</Command.Item>
+            <Command.Item onSelect={() => handleItemSelect(() => newGroupDialogOpen.set(true))}>New Group</Command.Item>
+            <Command.Item onSelect={() => handleItemSelect(() => editGroupsDialogOpen.set(true))}>Edit Groups</Command.Item>
         </Command.Group>
         {#if groups && groups.length > 0}    
             <Command.Group heading="Groups">
