@@ -2,9 +2,9 @@
 	import type { Save } from '$lib/types';
 
 	import { page } from '$app/stores';
-	import { invalidateAll } from '$app/navigation';
+	import { invalidateAll, pushState } from '$app/navigation';
 	import { siteConfig } from '$lib/config/site';
-	import { listLayout, listColumns } from '$lib/stores';
+	import { listLayout, listColumns, editStashDialogOpen } from '$lib/stores';
 	import { EmptyState } from '$lib/components/app';
     import { Item } from '$lib/components/app/saves';
 	import { Skeleton } from '@repo/ui/components/skeleton';
@@ -25,14 +25,6 @@
 	let hasStashes: boolean;
 	$: (async() => hasStashes = (await getAll()).length > 0)();
 
-	let editDialogOpen = false;
-
-	$: if ($page.state.editStash) {
-		editDialogOpen = true;
-	} else {
-		editDialogOpen = false;
-	}
-
 	async function getAll() {
 		const items = (await $page.data.saves)?.items || [];
 		if (!items || items.length === 0) return [];
@@ -45,10 +37,12 @@
 		return items.filter(save => save.saveGroups.length === 0);
 	}
 
-	function editDialogChange(open: boolean) {
+	async function editDialogChange(open: boolean) {
 		if (!open) {
+			await invalidateAll(); // if this is not there error: "pushstate Could not serialize state.form"
 			history.back();
-			invalidateAll(); // if this is not there error: "pushstate Could not serialize state.form"
+			// editStashDialogOpen.set(false);
+			// pushState($page.url.href, { editStash: undefined })
 		}
 	}
 
@@ -95,7 +89,7 @@
 	<p>Couldnt fetch stashes!</p>
 {/await}
 
-<AlertDialog.Root bind:open={editDialogOpen} onOpenChange={editDialogChange}>
+<AlertDialog.Root bind:open={$editStashDialogOpen} onOpenChange={editDialogChange}>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
 			<AlertDialog.Title>Edit stash</AlertDialog.Title>

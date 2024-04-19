@@ -20,7 +20,7 @@
     };
     // export let data: PageData;
 
-    const form = superForm(data.form, {
+    const form = superForm(data?.form, {
         validators: zodClient(formSchema),
     });
 
@@ -32,9 +32,9 @@
     let groups = data?.save.saveGroups.map(item => item.group) || [];
     $: groupIds = groups.map(item => item.id);
     
-    function onLegacyCancel() {
+    async function onLegacyCancel() {
+        await invalidateAll();
         history.back();
-        invalidateAll();
     }
 
 </script>
@@ -72,9 +72,9 @@
         </Form.Control>
         <Form.FieldErrors />
     </Form.Field>
-    <input type="hidden" name="id" value={data.save.id}>
+    <input type="hidden" name="id" bind:value={$formData.id}>
     <slot />
-    {#if !data.isDialog} 
+    {#if data?.isDialog === false} 
         <div class="space-x-2">
             <Button on:click={onLegacyCancel} variant="outline">Cancel</Button>
             <Button type="submit">Update</Button>

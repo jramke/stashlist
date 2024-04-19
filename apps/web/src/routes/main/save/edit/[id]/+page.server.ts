@@ -31,13 +31,14 @@ export const load: PageServerLoad = async ({ params, fetch, parent }) => {
 		title: formSchema.shape.title.default(save.title),
 		description: formSchema.shape.description.default(save.description),
 		groups: formSchema.shape.groups.default(groupIdsString),
-		// imageUrl: formSchema.shape.imageUrl.default(save.imageUrl),
+		id: formSchema.shape.id.default(save.id),
 	})
 
 	return {
 	  form: await superValidate(zod(formSchemaWithDefaults)),
 	  save: save,
-	  groups: await parentData.groups
+	  groups: await parentData.groups,
+	  isDialog: false,
 	};
 };
 

@@ -12,6 +12,7 @@
 	
 	import type { Save } from '$lib/types';
 	import { cn } from '@repo/ui/utils';
+	import { editStashDialogOpen } from '$lib/stores';
 
     export let id: Save['id'];
     export let title: Save['title'];
@@ -44,6 +45,9 @@
 				groups: result.data.groups,
 				isDialog: true,
 			} })
+			setTimeout(() => {
+				editStashDialogOpen.set(true);
+			}, 100);
 			
 		} else {
 			goto(href)
