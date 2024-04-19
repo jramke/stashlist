@@ -1,6 +1,6 @@
 {
-  "name": "stashlist-web-extension",
-  "version": "1.0.0",
+  "name": "extension",
+  "version": "1.0.1",
   "displayName": "Stashlist",
   "author": "Joost Ramke",
   "description": "The offical stashlist web extension to quickly save your stashes",
