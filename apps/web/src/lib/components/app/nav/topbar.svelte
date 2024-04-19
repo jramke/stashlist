@@ -148,9 +148,7 @@
 						</Select.Root>
 					{/if}
 				</div>
-				{#if $page.data.currentGroup}
-					<input type="hidden" name="groups" value={newStashSelectedGroup.value}>
-				{/if}
+				<input type="hidden" name="groups" value={newStashSelectedGroup.value}>
 			</div>
 			{#if newStashFormError}
 				<p class="text-sm text-destructive mt-1" aria-live="assertive">{newStashFormError}</p>
