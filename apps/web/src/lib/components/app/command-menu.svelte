@@ -8,7 +8,11 @@
 	import Gradient from "./gradient.svelte";
 
     let groups: TODO;
-    $: $page.data.groups.then(data => groups = data);
+    $: if (typeof $page.data.groups?.then === "function") {
+        $page.data.groups.then(data => groups = data);
+    } else {
+        groups = $page.data.groups;
+    }
 
     onMount(() => {
         function handleKeydown(e: KeyboardEvent) {

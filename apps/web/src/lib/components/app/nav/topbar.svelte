@@ -33,7 +33,11 @@
 	let newStashForm: HTMLFormElement;
 
 	let groups: TODO;
-    $: $page.data.groups.then(data => groups = data);
+    $: if (typeof $page.data.groups?.then === "function") {
+        $page.data.groups.then(data => groups = data);
+    } else {
+        groups = $page.data.groups;
+    }
 
 	afterNavigate(() => {
 		newStashSelectedGroup = getNewStashSelectedGroup();

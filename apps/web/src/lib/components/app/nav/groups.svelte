@@ -28,7 +28,11 @@
     $: $page.data.saves.then(saves => groupCounts = saves?.groupCounts);
 
     let groups: TODO;
-    $: $page.data.groups.then(data => groups = data);
+    $: if (typeof $page.data.groups?.then === "function") {
+        $page.data.groups.then(data => groups = data);
+    } else {
+        groups = $page.data.groups;
+    }
 
     let noGroupCount: number | undefined;
 	$: $page.data.saves.then(data => noGroupCount = data?.noGroupCount);
