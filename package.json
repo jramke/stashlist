@@ -20,7 +20,6 @@
     "prettier-plugin-svelte": "^3.2.3",
     "turbo": "^1.13.2"
   },
-  "packageManager": "pnpm@8.9.0",
   "engines": {
     "node": ">=18"
   }
