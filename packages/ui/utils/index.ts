@@ -45,7 +45,7 @@ export const flyAndScale = (
 			const y = scaleConversion(t, [0, 1], [params.y ?? 5, 0]);
 			const x = scaleConversion(t, [0, 1], [params.x ?? 0, 0]);
 			const scale = scaleConversion(t, [0, 1], [params.start ?? 0.95, 1]);
-			const blur = scaleConversion(t, [0, 1], [4, 0]);
+			const blur = scaleConversion(t, [0, 1], [8, 0]);
 
 			return styleToString({
 				transform: `${transform} translate3d(${x}px, ${y}px, 0) scale(${scale})`,
