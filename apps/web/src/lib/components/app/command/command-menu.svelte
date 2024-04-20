@@ -72,7 +72,7 @@
             }
             if (e.key === "l" && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault();
-                commandMenuOpen.update(state => !state);
+                commandMenuOpen.set(true);
                 handleItemSelect(() => changePage({name: 'layouts'}), undefined, false);
             }
             if (e.key === "Shift") {
