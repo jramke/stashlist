@@ -14,3 +14,9 @@ Check out the website: [stashlist.app](https://www.stashlist.app/)
 - Shadcn-svelte as base for ui
 - Turborepo for monorepo
 
+
+# TODOS
+
+- [ ] Caching
+- [ ] Types
+  
