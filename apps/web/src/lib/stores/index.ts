@@ -3,7 +3,8 @@ import { writable } from 'svelte/store';
 
 export const listColumns = persisted('stashlist-columns', 3);
 
-export const listLayout = persisted('stashlist-layout', 'grid');
+type ListLayout = 'grid' | 'list' | 'masonry';
+export const listLayout = persisted<ListLayout>('stashlist-layout', 'grid');
 
 export const commandMenuOpen = writable(false);
 

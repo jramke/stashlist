@@ -9,6 +9,7 @@ import Input from "./command-input.svelte";
 import List from "./command-list.svelte";
 import Separator from "./command-separator.svelte";
 import Shortcut from "./command-shortcut.svelte";
+import Footer from "./command-footer.svelte";
 
 const Loading = CommandPrimitive.Loading;
 
@@ -23,6 +24,7 @@ export {
 	Separator,
 	Shortcut,
 	Loading,
+	Footer,
 	//
 	Root as Command,
 	Dialog as CommandDialog,
@@ -34,4 +36,5 @@ export {
 	Separator as CommandSeparator,
 	Shortcut as CommandShortcut,
 	Loading as CommandLoading,
+	Footer as CommandFooter,
 };

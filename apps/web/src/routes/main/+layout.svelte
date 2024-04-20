@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Section from '@repo/ui/components/section';
 	import { Topbar } from '$lib/components/app/nav';
-	import { CommandMenu } from '$lib/components/app';
+	import { CommandMenu } from '$lib/components/app/command';
 	import { ScrollArea } from '@repo/ui/components/scroll-area';
 
 </script>

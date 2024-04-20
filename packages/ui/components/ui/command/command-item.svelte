@@ -14,7 +14,7 @@
 	{asChild}
 	class={cn(
 		`border border-transparent 
-		relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm leading-none outline-none 
+		relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none 
 		data-[disabled]:pointer-events-none data-[disabled]:opacity-50 
 		aria-selected:bg-accent aria-selected:text-accent-foreground aria-selected:shadow-inner aria-selected:shadow-popover aria-selected:border-accent`,
 		className

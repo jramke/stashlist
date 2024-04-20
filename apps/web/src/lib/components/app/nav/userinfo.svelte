@@ -1,16 +1,16 @@
 <script lang="ts">
-    import { Button, buttonVariants } from '@repo/ui/components/button';
-    import { LogOut, ChevronsUpDown,Sun, Moon, Monitor, GitHub, Google } from '@repo/ui/icons';
+    import { buttonVariants } from '@repo/ui/components/button';
+    import { LogOut, GitHub, Google, Info } from '@repo/ui/icons';
     import { enhance } from '$app/forms';
 	import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
     import { page } from '$app/stores';
 	import * as Avatar from '@repo/ui/components/avatar';
 	import { onMount } from 'svelte';
-    import { setMode, resetMode } from 'mode-watcher';
-	import { siteConfig } from '$lib/config/site';
 	import { cn } from '@repo/ui/utils';
 	import { commandMenuOpen } from '$lib/stores';
-	import { Shortcut } from '@repo/ui/components/command';
+	import { Shortcut } from '@repo/ui/components/shortcut';
+	import { siteConfig } from '$lib/config/site';
+	import { goto } from '$app/navigation';
     
     let logoutForm: HTMLFormElement;
     
@@ -19,13 +19,20 @@
     
     onMount(() => {
         document.addEventListener('keydown', (event) => {
-            if (event.ctrlKey && event.shiftKey && event.code === 'KeyQ') {
+            if (event.ctrlKey && event.shiftKey && event.key === 'q') {
+                event.preventDefault();
                 logoutForm.requestSubmit();
+            }
+            if (event.key === "h" && (event.metaKey || event.ctrlKey)) {
+                event.preventDefault();
+                goto('/help');
             }
         })
     })
 
 </script>
+
+<form class="hidden" method="post" bind:this={logoutForm} action="/logout" use:enhance></form>
 
 <DropdownMenu.Root>   
     <DropdownMenu.Trigger class="{cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'rounded-full')}">
@@ -49,31 +56,28 @@
         </DropdownMenu.Label>
         <DropdownMenu.Separator />
         <DropdownMenu.Group>
-            <DropdownMenu.Item href={'/extension'}>Get extension</DropdownMenu.Item> 
+            <DropdownMenu.Item href={'/extension'}>Get the extension</DropdownMenu.Item> 
             <DropdownMenu.Item on:click={() => commandMenuOpen.set(true)}>
                 Command Menu
-                <DropdownMenu.Shortcut>⌘K</DropdownMenu.Shortcut>
+                <DropdownMenu.Shortcut>
+                    <Shortcut keys={['command', 'K']} />
+                </DropdownMenu.Shortcut>
             </DropdownMenu.Item> 
-            <!-- <DropdownMenu.Sub>
-                <DropdownMenu.SubTrigger>
-                    Appearence
-                </DropdownMenu.SubTrigger>
-                <DropdownMenu.SubContent>
-                    <DropdownMenu.Item on:click={() => setMode('light')}><Sun class="me-2 h-4 w-4" />Light</DropdownMenu.Item>
-                    <DropdownMenu.Item on:click={() => setMode('dark')}><Moon class="me-2 h-4 w-4" />Dark</DropdownMenu.Item>
-                    <DropdownMenu.Item on:click={() => resetMode()}><Monitor class="me-2 h-4 w-4" />System</DropdownMenu.Item>
-                </DropdownMenu.SubContent>
-            </DropdownMenu.Sub> -->
+            <DropdownMenu.Item href={'/help'}>
+                <!-- <Info class="me-2 h-4 w-4" /> -->
+                Help
+                <DropdownMenu.Shortcut>
+                    <Shortcut keys={['command', 'H']} />
+                </DropdownMenu.Shortcut>
+            </DropdownMenu.Item> 
             <DropdownMenu.Separator />
-            <form method="post" bind:this={logoutForm} class="w-full" action="/logout" use:enhance>
-                <button type="submit" class="flex items-center w-full">
-                    <DropdownMenu.Item class="w-full">
-                        <LogOut class="me-2 h-4 w-4" />
-                        Logout
-                        <DropdownMenu.Shortcut>⇧⌘Q</DropdownMenu.Shortcut>
-                    </DropdownMenu.Item>
-                </button>
-            </form>
+            <DropdownMenu.Item on:click={() => logoutForm?.requestSubmit()}>
+                <LogOut class="me-2 h-4 w-4" />
+                Logout
+                <DropdownMenu.Shortcut>
+                    <Shortcut keys={['shift', 'command', 'Q']} />
+                </DropdownMenu.Shortcut>
+            </DropdownMenu.Item>
         </DropdownMenu.Group>
     </DropdownMenu.Content>
 </DropdownMenu.Root>
