@@ -4,7 +4,7 @@
 
 	export let title: string = siteConfig.name;
 
-	$: title = `${siteConfig.name} – ${siteConfig.slogan}`;
+	$: title = $page.data?.title ? `${$page.data?.title} – ${siteConfig.name}` : `${siteConfig.name} – ${siteConfig.slogan}`;
 </script>
 
 <svelte:head>

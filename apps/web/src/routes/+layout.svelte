@@ -7,12 +7,7 @@
 	import {Navigation, Footer, Metadata } from '$lib/components/site';
 	import { page } from '$app/stores';
 	import { siteConfig } from '$lib/config/site';
-
 </script>
-
-<svelte:head>
-	<title>Stashlist</title>
-</svelte:head>
 
 <Metadata />
 <ModeWatcher defaultMode="dark" />

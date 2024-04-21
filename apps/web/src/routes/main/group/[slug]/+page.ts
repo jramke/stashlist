@@ -30,7 +30,8 @@ export const load: PageLoad = async ({ params, parent }) => {
 	if (!saves || saves.length === 0) {
 		return {
 			savesByGroup: null,
-			currentGroup: currentGroup
+			currentGroup: currentGroup,
+			title: currentGroup.title
 		};
 	};
 	try {
@@ -44,14 +45,16 @@ export const load: PageLoad = async ({ params, parent }) => {
 		if (savesByGroup.length === 0) {
 			return {
 				savesByGroup: null,
-				currentGroup: currentGroup
+				currentGroup: currentGroup,
+				title: currentGroup.title
 			};
 			// throw Error('No saves found for this group');
 		}
 
 		return {
 			savesByGroup: savesByGroup,
-			currentGroup: currentGroup
+			currentGroup: currentGroup,
+			title: currentGroup.title
 		}
 
 		
@@ -59,7 +62,8 @@ export const load: PageLoad = async ({ params, parent }) => {
 		console.error('Error fetching saves by group', err);
 		return {
 			savesByGroup: null,
-			currentGroup: currentGroup
+			currentGroup: currentGroup,
+			title: currentGroup.title
 		};
 	}
 };
