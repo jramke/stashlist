@@ -75,6 +75,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 		'/api/saves/new/image',
 	];
 	const origin = event.request.headers.get('origin') || '';
+	console.log('-------');
+	console.log('origin', origin);
+	console.log('allowedOrigins', allowedOrigins);
+	console.log('event.url.origin', event.url.origin);
+	console.log('event.url.pathname', event.url.pathname);
+	console.log('-------');
 	const forbidden = event.request.method === 'POST' && origin !== event.url.origin && !(allowedOrigins.includes(origin) && allowedPaths.includes(event.url.pathname));
 
 	if (forbidden) {
