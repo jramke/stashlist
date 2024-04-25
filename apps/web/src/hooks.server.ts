@@ -1,7 +1,6 @@
 import { siteConfig } from '$lib/config/site';
 import { lucia } from '$lib/server/auth';
 import { redirect, error, json, text, type Handle } from '@sveltejs/kit';
-import { CHROME_EXTENSION_ID, CHROME_EXTENSION_ID_DEV } from "$env/static/private";
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const allowedPaths = [
