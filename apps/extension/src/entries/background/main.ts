@@ -95,11 +95,19 @@ async function makePostRequest(url: string, body: {}) {
     });
 
     if (response.status !== 200) {
-      console.log(response);
+      if (response.status === 401) {
+        browser.tabs.create({ url: baseUrl + '/login'})
+        return;
+      }
       throw Error('Something went wrong: ' + response.status + ' ' + response.statusText);
+    }
+    
+    if (response.headers.get("content-type") !== "application/json") {
+      throw Error('Response is not JSON');
     }
 
     const result = await response.json();
+
     return result;
 
   } catch (e) {
