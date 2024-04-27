@@ -65,7 +65,7 @@
                 commandMenuOpen.set(false);
                 goto(siteConfig.appUrl + '/unsorted');
             }
-            if (e.key === "v" && (e.metaKey || e.ctrlKey)) {
+            if (e.key === "g" && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault();
                 commandMenuOpen.set(false);
                 liveView.update(state => !state);

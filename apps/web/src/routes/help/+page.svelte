@@ -20,7 +20,7 @@
         <p class="mt-0 text-muted-foreground">You can create groups to organize your stashes. Each stash can belong to multiple groups. You can edit the group names and order via drag and drop. If you delete a group the stashes remain you can find them in the <a href={siteConfig.appUrl + '/unsorted'}>unsorted</a> page.</p>
 
         <p class="font-semibold mb-0">Live view</p>
-        <p class="mt-0 text-muted-foreground">The live view is a way to see your stashes side by side interactive and in realtime. You can toggle it by pressing <Shortcut class="inline-flex" keys={['command', 'V']} />.</p>
+        <p class="mt-0 text-muted-foreground">The live view is a way to see your stashes side by side interactive and in realtime. You can toggle it by pressing <Shortcut class="inline-flex" keys={['command', 'G']} />.</p>
         
         <p class="font-semibold mb-0">Command Dialog <Shortcut class="inline-flex ms-1" keys={['command', 'K']} /></p>
         <p class="mt-0 text-muted-foreground">The command dialog provides a quick way to navigate through the app. You can open it by pressing <Shortcut class="inline-flex" keys={['command', 'K']} />. You can search for stashes and groups or execute various actions, all from your keyboard.</p>
@@ -45,7 +45,7 @@
                 Change layout
             </div>
             <div class="flex gap-3">
-                <Shortcut keys={['command', 'V']} />
+                <Shortcut keys={['command', 'G']} />
                 Toggle the live view
             </div>
         </div>

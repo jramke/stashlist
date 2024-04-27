@@ -41,7 +41,7 @@
         <Tv class="me-2 shrink-0" />
         Toggle live view
         <Command.Shortcut>
-            <Shortcut keys={['command', 'V']} />
+            <Shortcut keys={['command', 'G']} />
         </Command.Shortcut>
     </Command.Item>
     <Command.Item onSelect={() => handleItemSelect(() => changePage({name: 'layouts'}), undefined, false)} value="Change layout">
