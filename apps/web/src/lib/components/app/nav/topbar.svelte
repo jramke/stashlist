@@ -72,14 +72,14 @@
 		return async ({ result }) => {
 			await minDelay(start);
 			console.log(result);
-			if (result.type === 'success') {
+			if (result.type !== 'success' || result?.data?.form.message.type === 'error') {
+				newStashFormError = 'Something went wrong stashing the website';
+			} else {
 				invalidateAll();
 				await applyAction(result);
 				newStashFormError = '';
 				newStashValue = '';
 				toast.success('Successfully stashed new website');
-			} else {
-				newStashFormError = 'Something went wrong stashing the website';
 			}
 			busy = false;
 		};

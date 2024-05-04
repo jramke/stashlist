@@ -45,17 +45,21 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 			return json({ success: true });
 		}
 
-		const metaData = await urlMetadata(saveUrl);
+		let metaData;
+		const saveUrlResponse = await fetch(saveUrl);
+		if (saveUrlResponse.ok) {
+			metaData = await urlMetadata(null, { parseResponseObject: saveUrlResponse });
+		}
 
-		let faviconUrl = (metaData.favicons[0]?.href || '') as string;
+		let faviconUrl = (metaData?.favicons[0]?.href || '') as string;
 
 		if (isImageUrl(faviconUrl) && !isAbsoluteUrl(faviconUrl)) {
 			faviconUrl = makeAbsoluteUrl(faviconUrl, getDomainFromUrl(saveUrl));
 		}
 
-		const imageUrl = metaData['og:image'];
-		const description = metaData.description || '';
-		const title = metaData.title || metaData.name || saveUrl;
+		const imageUrl = metaData?.['og:image'] || '';
+		const description = metaData?.description || '';
+		const title = metaData?.title || metaData?.name || saveUrl;
 
 		if (edit) {
 			const groups = await db.select().from(group).where(eq(group.userId, locals.user.id)).all();
