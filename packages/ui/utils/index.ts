@@ -57,14 +57,32 @@ export const flyAndScale = (
 	};
 };
 
+const SCALE_WRAPPER_ATTRIBUTE = 'data-scale-main-wrapper';
 export function scaleMain() {
 	if (typeof window === 'undefined') return;
-	const main = document?.querySelector('main#stashlist-app') as HTMLElement;
-	main && (main.style.transform = 'scale(0.98)');
+
+	const bodyInner = document?.querySelector('.body-inner');
+	if (!bodyInner) return;
+
+	const mainWrapper = document.querySelector(`[${SCALE_WRAPPER_ATTRIBUTE}]`) as HTMLElement;
+	if (mainWrapper) return;
+
+	const wrapper = document.createElement('div');
+	wrapper.setAttribute(SCALE_WRAPPER_ATTRIBUTE, '1');
+	document.body.insertBefore(wrapper, document.body.firstChild);
+	wrapper.appendChild(bodyInner);
+	setTimeout(() => {
+		wrapper.classList.add('scale');
+	}, 10);
 }
 
 export function resetMain() {
 	if (typeof window === 'undefined') return;
-	const main = document?.querySelector('main#stashlist-app') as HTMLElement;
-	main && (main.style.transform = '');
+	const mainWrapper = document.querySelector(`[${SCALE_WRAPPER_ATTRIBUTE}]`) as HTMLElement;
+	if (!mainWrapper) return;
+	mainWrapper.classList.remove('scale');
+	setTimeout(() => {
+		if (mainWrapper.classList.contains('scale')) return;
+		mainWrapper.replaceWith(...mainWrapper.childNodes);
+	}, 200); // transition duration, TODO: logic to get this dynamically
 }
