@@ -15,16 +15,19 @@
 			<p class="text-muted-foreground">
 				Install the extension for your browser to easily stash your items.
 			</p>
-            <div class="grid grid-cols-3 gap-6 pt-10">
-                <div class="rounded-lg p-4 border">
-                    <Heading tag="h3">Chrome</Heading>
-                    <Button variant="outline" href={siteConfig.extensionUrl.chrome} target="_blank">Get extension</Button>
+            <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 pt-10">
+                <div>
+                    <div class="rounded-lg p-4 border self-start">
+                        <Heading tag="h3">Chrome</Heading>
+                        <Button variant="outline" href={siteConfig.extensionUrl.chrome} target="_blank">Get extension</Button>
+                    </div>
+                    <p class="text-muted-foreground text-xs mt-2">Currently not working correctly.<br>See <a class="underline underline-offset-4" href="https://github.com/jramke/stashlist/issues/47" target="_blank">Github issue</a>.</p>
                 </div>
-                <div class="rounded-lg p-4 border">
+                <div class="rounded-lg p-4 border self-start">
                     <Heading tag="h3">Firefox</Heading>
                     <Button variant="outline" disabled>Coming soon</Button>
                 </div>
-                <div class="rounded-lg p-4 border">
+                <div class="rounded-lg p-4 border self-start">
                     <Heading tag="h3">Safari</Heading>
                     <Button variant="outline" disabled>Coming soon</Button>
                 </div>
