@@ -58,7 +58,7 @@
 
 <ItemContextMenu {id} {title} {copyUrl}>
 	<a 
-		href={url}
+		href={copyUrl}
 		{title}
 		rel="norefferrer noopener"
 		target="_blank" 

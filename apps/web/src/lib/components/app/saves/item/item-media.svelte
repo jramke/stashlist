@@ -22,28 +22,28 @@
 
 </script>
 
-<div class={cn("shadow-md rounded-sm shadow-[black]", $listLayout !== 'list' && "m-4 mb-0 border")}>
-    <div class="overflow-hidden rounded-sm">
-        {#if type === 'image'}
-            <a
-                href={imageUrl}
-                {title}
-                rel="norefferrer noopener"
-                target="_blank"
-                class="flex"
-                tabindex="-1"
-            >
-                {#if imageUrl}	
-                    <img
-                        loading="lazy"
-                        src={imageUrl}
-                        alt={title}
-                        class="w-full"
-                    />
-                {/if}
-            </a>
-        {:else}
-            {#if $listLayout !== 'list'}
+{#if $listLayout !== 'list'}
+    <div class={cn("shadow-md rounded-sm shadow-[black] m-4 mb-0 border")}>
+        <div class="overflow-hidden rounded-sm">
+            {#if type === 'image'}
+                <a
+                    href={imageUrl}
+                    {title}
+                    rel="norefferrer noopener"
+                    target="_blank"
+                    class="flex"
+                    tabindex="-1"
+                >
+                    {#if imageUrl}	
+                        <img
+                            loading="lazy"
+                            src={imageUrl}
+                            alt={title}
+                            class="w-full"
+                        />
+                    {/if}
+                </a>
+            {:else}
                 {#if $liveView}
                     <div class="aspect-video relative overflow-hidden">
                         <iframe title={title} src={url} class="absolute scale-[.5] w-[200%] -left-1/2 -top-1/2 aspect-video" tabindex="-1"></iframe>
@@ -72,6 +72,6 @@
                     </a>
                 {/if}
             {/if}
-        {/if}
+        </div>
     </div>
-</div>
+{/if}
