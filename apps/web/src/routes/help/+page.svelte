@@ -25,8 +25,8 @@
         <p class="font-semibold mb-0">Command Dialog</p>
         <p class="mt-0 text-muted-foreground">The command dialog provides a quick way to navigate through the app. You can open it by pressing <Shortcut class="inline-flex" keys={['command', 'K']} />. You can search for stashes and groups or execute various actions, all from your keyboard.</p>
 
-        <p class="font-semibold mb-0">Navigation</p>
-        <p class="mt-0 text-muted-foreground">You can easily navigate through the stashes using the arrow keys.</p>
+        <p class="font-semibold mb-0">List</p>
+        <p class="mt-0 text-muted-foreground">You can easily navigate through the list of your stashes using the arrow keys. To set the columns you can use the numbers <Shortcut class="inline-flex" keys={['1']} /> - <Shortcut class="inline-flex" keys={['5']} />.</p>
 
         <p class="font-semibold mb-0">Shortcuts</p>
         <p class="mt-0 text-muted-foreground">There are several shortcuts available. You can also see them in the command dialog.</p>

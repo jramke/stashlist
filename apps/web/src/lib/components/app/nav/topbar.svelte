@@ -5,7 +5,7 @@
 	import { Groups } from '$lib/components/app/nav';
 	import { Gradient } from '$lib/components/app';
 	import { LayoutGrid, StretchHorizontal, Masonry, Loader } from '@repo/ui/icons';
-	import { Slider } from '@repo/ui/components/slider';
+	
 	import { Label } from '@repo/ui/components/label';
 	import * as RadioGroup from '@repo/ui/components/radio-group';
 	import * as Select from '@repo/ui/components/select';
@@ -22,6 +22,7 @@
 	import { cn } from '@repo/ui/utils';
 	import type { TODO } from '$lib/types';
 	import { Switch } from '@repo/ui/components/switch';
+	import ColumnSlider from './column-slider.svelte';
 
 	//TODO: search https://www.youtube.com/watch?v=lrzHaTcpRh8
 
@@ -56,9 +57,6 @@
 		return () => window.removeEventListener('resize', setVar);
 	})
 
-	function sliderValueChange(value: number[]) {
-		listColumns.set(value[0]);
-	}
 
 	function layoutValueChange(value: string | undefined) {
 		if (!value) return;
@@ -179,14 +177,7 @@
 		</div>
 		<div>
 			<p class="text-xs text-muted-foreground mb-1">Columns</p>
-			<Slider
-				class="w-[200px]"
-				value={[$listColumns]}
-				max={5}
-				step={1}
-				min={1}
-				onValueChange={sliderValueChange}
-			/>
+			<ColumnSlider />
 		</div>
 	</div>
 </div>
