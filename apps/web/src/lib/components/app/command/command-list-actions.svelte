@@ -13,14 +13,14 @@
 </script>
 
 <Command.Group heading="Views">
-    <Command.Item onSelect={() => handleItemSelect(siteConfig.appUrl)} value="All stashes">
+    <Command.Item onSelect={() => handleItemSelect(siteConfig.appUrl)} value="Show all">
         <Stash class="me-2 shrink-0" />
         Show all
         <Command.Shortcut>
             <Shortcut keys={['command', 'A']} />
         </Command.Shortcut>
     </Command.Item>
-    <Command.Item onSelect={() => handleItemSelect(siteConfig.appUrl + '/unsorted')} value="Unsorted">
+    <Command.Item onSelect={() => handleItemSelect(siteConfig.appUrl + '/unsorted')} value="Show unsorted">
         <Inbox class="me-2 shrink-0" />
         Show unsorted
         <Command.Shortcut>

@@ -31,11 +31,10 @@
 
     setCommandMenuContext();
 
-    const { shiftPressed, commandPages, handleItemSelect, changePage } = getCommandMenuContext();
+    const { shiftPressed, commandPages, handleItemSelect, changePage, searchValue } = getCommandMenuContext();
     
     // let currentPage: string | undefined = undefined;
     let currentPage = $commandPages.length > 0 ? $commandPages[0] : undefined;
-    let search = '';
 
     $: currentPage = $commandPages[$commandPages.length - 1];
 
@@ -100,7 +99,7 @@
     }
 
     function onKeydown(e: KeyboardEvent) {
-        if (e.key === 'Escape' || (e.key === 'Backspace' && !search)) {
+        if (e.key === 'Escape' || (e.key === 'Backspace' && !$searchValue)) {
 			e.preventDefault();
             // dont close command dialog if going back from a page with escape key
             if ($commandPages.length > 0) { 
@@ -116,7 +115,7 @@
 </script>
    
 <Command.Dialog bind:open={$commandMenuOpen} {filter} {onKeydown}>
-    <Command.Input bind:value={search} placeholder="Type a command or search..." />
+    <Command.Input bind:value={$searchValue} placeholder="Type a command or search..." />
     <Command.List>
         <Command.Empty>No results found.</Command.Empty>
         {#if savesByGroup?.length > 0}

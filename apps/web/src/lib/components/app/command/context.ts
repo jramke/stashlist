@@ -6,6 +6,7 @@ import { toast } from '@repo/ui/components/sonner';
 import type { Command } from '@repo/ui/components/command';
 
 let shiftPressed = writable(false);
+let searchValue = writable('');
 
 type CommandPage = {
     name: string;
@@ -17,9 +18,11 @@ function changePage(newPage: CommandPage) {
     commandPages.update(pages => {
         return [...pages, newPage];
     });
+    searchValue.set('');
 }
 function resetPages() {
     commandPages.set([]);
+    searchValue.set('');
 }
 
 function handleItemSelect(mainAction: string|Function, secondAction?: string|Function, closeMenu = true) {
@@ -60,6 +63,7 @@ type CommandMenuContext = {
     changePage: typeof changePage;
     shiftPressed: typeof shiftPressed;
     commandPages: typeof commandPages;
+    searchValue: typeof searchValue;
 }
 
 export function setCommandMenuContext() {
@@ -68,6 +72,7 @@ export function setCommandMenuContext() {
         changePage,
         shiftPressed,
         commandPages,
+        searchValue,
     });
 }
 
