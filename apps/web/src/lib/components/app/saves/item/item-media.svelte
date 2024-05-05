@@ -4,6 +4,7 @@
     import { listLayout, liveView } from '$lib/stores';
 	import { Gradient } from '$lib/components/app';
 	import { onMount } from 'svelte';
+	import { cn } from '@repo/ui/utils';
 
     export let type: Save['type'];
     export let title: Save['title'];
@@ -21,7 +22,7 @@
 
 </script>
 
-<div class="m-4 mb-0 shadow-md rounded-sm shadow-[black] border ">
+<div class={cn("shadow-md rounded-sm shadow-[black]", $listLayout !== 'list' && "m-4 mb-0 border")}>
     <div class="overflow-hidden rounded-sm">
         {#if type === 'image'}
             <a
