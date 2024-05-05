@@ -11,6 +11,7 @@ export default async function renderContent(
   });
   const appRoot = document.createElement("div");
   appRoot.id = 'stashlist-root';
+  appRoot.className = 'dark';
 
   if (import.meta.hot) {
     const { addViteStyleTarget } = await import(
