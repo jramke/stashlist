@@ -3,7 +3,7 @@
     import type { ComponentType } from 'svelte';
 
     import { cn } from '$ui/utils';
-    import { ArrowBigUp, CornerDownLeft, Command } from 'lucide-svelte';
+    import { ArrowBigUp, CornerDownLeft, Command, Space } from 'lucide-svelte';
 
     let className: string | undefined | null = undefined;
     export { className as class };
@@ -16,6 +16,7 @@
         'shift': ArrowBigUp,
         'enter': CornerDownLeft,
         'command': Command,
+        'space': Space,
     } as KeysAsIcons;
 
 </script>
@@ -26,7 +27,7 @@
         <kbd class="bg-accent shadow-inner shadow-popover border border-accent size-[20px] flex items-center justify-center rounded-sm">
             {#if key in keysAsIcons}
                 <span class="sr-only">{key}</span>
-                {#if key === 'enter'}
+                {#if key === 'enter' || key === 'space'}
                     <svelte:component this={keysAsIcons[key]} class="!size-[12px] stroke-[2.5]" />
                 {:else if key === 'command'}
                     <svelte:component this={keysAsIcons[key]} class="!size-[11.5px] stroke-[2.5]" />

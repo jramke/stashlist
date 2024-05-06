@@ -2,13 +2,15 @@
     import * as Command from "@repo/ui/components/command";
     import { siteConfig } from "$lib/config/site";
 	import { getCommandMenuContext } from "./context";
-    import { newGroupDialogOpen, editGroupsDialogOpen, liveView } from "$lib/stores";
+    import { newGroupDialogOpen, editGroupsDialogOpen, liveView, newStashStore } from "$lib/stores";
 	import { Inbox, Masonry, Pencil, Plus, Stash, Tv } from "@repo/ui/icons";
 	import { Shortcut } from "@repo/ui/components/shortcut";
 
     const ctx = getCommandMenuContext();
     const handleItemSelect = ctx.handleItemSelect;
     const changePage = ctx.changePage;
+
+    const { focusNewStashInput } = newStashStore;
 
 </script>
 
@@ -29,6 +31,13 @@
     </Command.Item>
 </Command.Group>
 <Command.Group heading="Actions">
+    <Command.Item onSelect={() => handleItemSelect(() => focusNewStashInput())} value="Create new stash">
+        <Plus class="me-2 shrink-0" />
+        Create new stash
+        <Command.Shortcut>
+            <Shortcut keys={['command', 'space']} />
+        </Command.Shortcut>
+    </Command.Item>
     <Command.Item onSelect={() => handleItemSelect(() => newGroupDialogOpen.set(true))}>
         <Plus class="me-2 shrink-0" />
         Create new group
