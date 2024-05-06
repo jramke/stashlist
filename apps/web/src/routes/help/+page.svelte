@@ -36,6 +36,10 @@
                 Open command dialog
             </div>
             <div class="flex gap-3">
+                <Shortcut keys={['command', 'space']} />
+                Create new stash
+            </div>
+            <div class="flex gap-3">
                 <Shortcut keys={['command', 'A']} />
                 Show all stashes
             </div>
