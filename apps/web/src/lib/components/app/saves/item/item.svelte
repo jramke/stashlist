@@ -31,17 +31,17 @@
 	const handleContextMenu = (event: KeyboardEvent) => {
 		if (document.activeElement !== itemNode) return;
 		
-		if (event.key === 'c' && event.ctrlKey) {
+		if (event.key === 'c' && (event.metaKey || event.ctrlKey)) {
 			event.preventDefault();
 			copyUrlToClipboard(copyUrl);
 		}
 
-		if (event.key === 'e' && event.ctrlKey) {
+		if (event.key === 'e' && (event.metaKey || event.ctrlKey)) {
 			event.preventDefault();
 			openEditDialog(id);
 		}
 
-		if (event.key === 'd' && event.ctrlKey) {
+		if (event.key === 'd' && (event.metaKey || event.ctrlKey)) {
 			event.preventDefault();
 			openDeleteDialog(id, title);
 		}

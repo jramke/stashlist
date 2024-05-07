@@ -68,7 +68,7 @@
 	}
 
     const handleNewStashShortcut = (e: KeyboardEvent) => {        
-        if (e.code === 'Space' && e.ctrlKey) {
+        if (e.code === 'Space' && (e.metaKey || e.ctrlKey)) {
             e.preventDefault();
             focusNewStashInput();
             return;

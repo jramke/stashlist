@@ -19,7 +19,7 @@
     
     onMount(() => {
         document.addEventListener('keydown', (event) => {
-            if (event.ctrlKey && event.shiftKey && event.key === 'q') {
+            if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key === 'q') {
                 event.preventDefault();
                 logoutForm.requestSubmit();
             }
