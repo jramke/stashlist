@@ -136,7 +136,7 @@
         <Separator orientation="vertical" />
         <div class="flex items-center gap-2">
             Select / open item
-            <Shortcut keys={['enter', 'K']} />
+            <Shortcut keys={['enter']} />
         </div>
     </Command.Footer>
 </Command.Dialog>
