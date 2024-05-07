@@ -21,12 +21,15 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 		
 		const currentTime = new Date().toISOString();
 
+		console.log('formData', formData);
+
 		const saveUrl = formData['url'];
 		const id = generateId(15);
 		const gradientIndex = getRandomIndex(gradients);
 		let groups = formData['groups'] || '';
 		
 		if (saveUrl && fetchMetaData === 'false') {
+			console.log('inserting into db without fetching metadata');
 			await db.insert(save).values({
 				id: id,
 				type: 'website',
@@ -51,6 +54,8 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 			metaData = await urlMetadata(null, { parseResponseObject: saveUrlResponse });
 		}
 
+		console.log('metadata', metaData);
+
 		let faviconUrl = (metaData?.favicons[0]?.href || '') as string;
 
 		if (isImageUrl(faviconUrl) && !isAbsoluteUrl(faviconUrl)) {
@@ -63,6 +68,7 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 
 		if (edit) {
 			const groups = await db.select().from(group).where(eq(group.userId, locals.user.id)).all();
+			console.log('returning edit json');
 		    return json({
 				type: 'website',
 				form: {
@@ -76,6 +82,8 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 				groups: groups,
 		    })
 		}
+
+		console.log('inserting into db with fetching metadata');
 
 		await db.insert(save).values({
 			id: id,
