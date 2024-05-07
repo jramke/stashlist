@@ -28,6 +28,8 @@ class GridArrowKeyHandler {
         }
         if (this.grid.getAttribute(INIT_ATTRIBUTE) === 'true') return;
 
+        console.log('initialized');
+
         this.gridItems = this.getGridItems();
         if (this.gridItems.length === 0) {
             console.warn('No grid items found in GridArrowKeyHandler');
@@ -41,7 +43,7 @@ class GridArrowKeyHandler {
                 this.calcRowsAndColumns(this.grid!, this.gridItems);
             },
             keydown: (e: Event) => {
-                this.handleKeyDown(e as KeyboardEvent)
+                this.handleKeyDown(e as KeyboardEvent);
             }
         }
         
@@ -69,20 +71,21 @@ class GridArrowKeyHandler {
         if (this.params?.selector) {
             return Array.from(this.grid.querySelectorAll(this.params.selector)) as HTMLElement[];
         }
-        return Array.from(this.grid.children) as HTMLElement[]
+        return Array.from(this.grid.children) as HTMLElement[];
     }
     handleKeyDown(event: KeyboardEvent) {
         const key = event.key;
                 
         const isArrowKey = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key);
-        const isTargetGridItem = Array.from(this.gridItems).includes(event.target as HTMLElement);
-        if (!isArrowKey || (!isTargetGridItem  && document.activeElement !== document.body)) return;
+        const isTargetAGridItem = Array.from(this.gridItems).includes(event.target as HTMLElement);
+        if (!isArrowKey || (!isTargetAGridItem  && document.activeElement !== document.body)) return;
         
         event.preventDefault();
 
         const currentPosition = this.getCurrentRowAndColumn(event.target as HTMLElement);
         if (currentPosition.row === 0 && currentPosition.col === 0) {
-            this.focusGridItem(1, 1);
+            this.calcRowsAndColumns(this.grid!, this.gridItems);
+            this.focusGridItem(1, 1, false);
             return;
         }
 
@@ -112,11 +115,12 @@ class GridArrowKeyHandler {
         if (col > this.maxCol) col = 1;
        
         if (row < 1)  row = this.maxRow;
-        if (row > this.maxRow) row = 1;        
+        if (row > this.maxRow) row = 1;
 
         this.focusGridItem(row, col);
     }
     calcRowsAndColumns(grid: HTMLElement, gridItems: HTMLElement[]) {
+        if (!grid || gridItems.length === 0) return;
         const columnsCSS = getComputedStyle(grid).gridTemplateColumns;
         const columnsCount = columnsCSS.split(" ").length;
         const rowsCount = Math.ceil(gridItems.length / columnsCount);
@@ -146,11 +150,15 @@ class GridArrowKeyHandler {
         const col = parseInt(target.dataset.col || '0');
         return { row, col };
     }
-    focusGridItem(row: number, col: number) {
+    focusGridItem(row: number, col: number, recursive = true) {
         if (!this.grid) return;
         let el = this.grid.querySelector(`[data-row="${row}"][data-col="${col}"]`) as HTMLElement | null;
         if (!el) {
-            this.focusGridItem(row, col - 1);
+            if (recursive) {
+                this.focusGridItem(row, col - 1);
+            } else {
+                this.calcRowsAndColumns(this.grid, this.gridItems);
+            }
             return;
         };
         el.focus();

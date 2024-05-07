@@ -81,15 +81,17 @@
 	</div>
 {:then items}
 	{#if items?.length > 0}
-		<div class="self-start" use:gridArrowKeys={{ selector: '[data-grid-item]' }}>
+		<div class="self-start">
 			{#if $listLayout === 'masonry'}
+			<div use:gridArrowKeys={{ selector: '[data-grid-item]' }}>
 				<Masonry gapSize={6} columns={$listColumns} items={items}>
 					{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id, type, gradientIndex}}
 						<Item {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} {type} {gradientIndex} />
 					{/each}
 				</Masonry>
+			</div>
 			{:else}
-				<div class="grid grid-cols-{$listColumns} gap-6">
+				<div class="grid grid-cols-{$listColumns} gap-6" use:gridArrowKeys={{ selector: '[data-grid-item]' }}>
 					{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id, type, gradientIndex}}
 						<Item {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} {type} {gradientIndex} />
 					{/each}
