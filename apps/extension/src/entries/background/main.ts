@@ -1,5 +1,6 @@
 import browser, { type Tabs } from "webextension-polyfill";
 
+// const baseUrl = 'https://stashlist.app';
 const baseUrl = import.meta.env.MODE === 'development' ?'http://127.0.0.1:5173' : 'https://stashlist.app';
 
 function isValidUrl(url: string) {

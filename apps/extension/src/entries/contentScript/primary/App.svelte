@@ -68,13 +68,16 @@
 
 				setTimeout(() => {
 					newStashForm = stashlistRoot?.querySelector('#stashlist-form');
+					console.log('newStashForm', newStashForm);
 	
 					if (!newStashForm) return;
 	
 					newStashForm.addEventListener('submit', async (e) => {
+						console.log('newStash form submit');
 						e.preventDefault();
 						const form = e.target as HTMLFormElement;
 						const formData = Object.fromEntries(new FormData(form));
+						console.log('formData', formData);
 						
 						try {
 							formSchema.parse(formData);
