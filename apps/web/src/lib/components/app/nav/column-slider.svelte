@@ -5,6 +5,8 @@
 
     export let max = 5;
 
+    const excludedNodeNames = ['INPUT', 'TEXTAREA'];
+
     onMount(() => {
         
 		document.addEventListener('keydown', setListColumns);
@@ -16,6 +18,7 @@
 	}
 
     function setListColumns(e: KeyboardEvent) {
+        if (excludedNodeNames.includes(document.activeElement?.nodeName || '')) return;
         for (let i = 1; i <= max; i++) {
             if (e.key === i.toString()) {
                 listColumns.set(i);
