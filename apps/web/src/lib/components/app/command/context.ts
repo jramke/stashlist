@@ -3,9 +3,8 @@ import { getContext, setContext } from 'svelte';
 import { writable, get } from 'svelte/store';
 import { goto } from '$app/navigation';
 import { toast } from '@repo/ui/components/sonner';
-import type { Command } from '@repo/ui/components/command';
 
-let shiftPressed = writable(false);
+let cmdPressed = writable(false);
 let searchValue = writable('');
 
 type CommandPage = {
@@ -26,7 +25,7 @@ function resetPages() {
 }
 
 function handleItemSelect(mainAction: string|Function, secondAction?: string|Function, closeMenu = true) {
-    if (get(shiftPressed) && typeof secondAction !== 'undefined') {
+    if (get(cmdPressed) && typeof secondAction !== 'undefined') {
         if (secondAction instanceof Function) {
             secondAction();
             return;
@@ -61,7 +60,7 @@ function handleItemSelect(mainAction: string|Function, secondAction?: string|Fun
 type CommandMenuContext = {
     handleItemSelect: typeof handleItemSelect;
     changePage: typeof changePage;
-    shiftPressed: typeof shiftPressed;
+    cmdPressed: typeof cmdPressed;
     commandPages: typeof commandPages;
     searchValue: typeof searchValue;
 }
@@ -70,7 +69,7 @@ export function setCommandMenuContext() {
     setContext('commandMenu', {
         handleItemSelect,
         changePage,
-        shiftPressed,
+        cmdPressed,
         commandPages,
         searchValue,
     });

@@ -31,7 +31,7 @@
 
     setCommandMenuContext();
 
-    const { shiftPressed, commandPages, handleItemSelect, changePage, searchValue } = getCommandMenuContext();
+    const { cmdPressed, commandPages, handleItemSelect, changePage, searchValue } = getCommandMenuContext();
     
     // let currentPage: string | undefined = undefined;
     let currentPage = $commandPages.length > 0 ? $commandPages[0] : undefined;
@@ -79,13 +79,13 @@
                 commandMenuOpen.set(true);
                 handleItemSelect(() => changePage({name: 'layouts'}), undefined, false);
             }
-            if (e.key === "Shift") {
-                shiftPressed.set(true);
+            if (e.metaKey || e.ctrlKey) {
+                cmdPressed.set(true);
             }
         }
         function handleKeyup(e: KeyboardEvent) {
-            if (e.key === "Shift") {
-                shiftPressed.set(false);
+            if (e.metaKey || e.ctrlKey) {
+                cmdPressed.set(false);
             }
         }
 
@@ -136,7 +136,7 @@
     <Command.Footer class="flex items-center justify-end">
         <div class="flex items-center gap-2">
             Search in group / copy url
-            <Shortcut keys={['shift', 'enter']} />
+            <Shortcut keys={['command', 'enter']} />
         </div>
         <Separator orientation="vertical" />
         <div class="flex items-center gap-2">
