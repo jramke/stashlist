@@ -24,6 +24,8 @@
         groups = $page.data.groups;
     }
 
+	$: isGroupsPage = $page.route.id?.endsWith('groups');
+
 	onMount(() => {
 		const topbar = document.getElementById('topbar');
 		const setVar = () => {
@@ -53,30 +55,36 @@
 		<NewStashInput />
 	</div>
 	<div class="flex gap-6 flex-wrap">
-		<div>
-			<p class="text-xs text-muted-foreground mb-1">Live view</p>
-			<Switch checked={$liveView} onCheckedChange={(checked) => liveView.set(checked)} />
-		</div>
-		<div>
-			<p class="text-xs text-muted-foreground mb-1">Layout</p>
-			<RadioGroup.Root value={$listLayout} class="flex gap-2" onValueChange={layoutValueChange}>
-				<Label for="grid" class="flex flex-col items-center justify-between opacity-50 cursor-pointer [&:has([data-state=checked])]:opacity-100">
-					<RadioGroup.Item value="grid" id="grid" class="sr-only" aria-label="grid" />
-					<LayoutGrid class="h-5 w-5" />
-				</Label>
-				<Label for="list" class="flex flex-col items-center justify-between opacity-50 cursor-pointer [&:has([data-state=checked])]:opacity-100">
-					<RadioGroup.Item value="list" id="list" class="sr-only" aria-label="list" />
-					<StretchHorizontal class="h-5 w-5" />
-				</Label>
-				<Label for="masonry" class="flex flex-col items-center justify-between opacity-50 cursor-pointer [&:has([data-state=checked])]:opacity-100">
-					<RadioGroup.Item value="masonry" id="masonry" class="sr-only" aria-label="masonry" />
-					<Masonry class="h-5 w-5" />
-				</Label>
-			</RadioGroup.Root>
-		</div>
+		{#if !isGroupsPage}
+			<div>
+				<p class="text-xs text-muted-foreground mb-1">Live view</p>
+				<Switch checked={$liveView} onCheckedChange={(checked) => liveView.set(checked)} />
+			</div>
+			<div>
+				<p class="text-xs text-muted-foreground mb-1">Layout</p>
+				<RadioGroup.Root value={$listLayout} class="flex gap-2" onValueChange={layoutValueChange}>
+					<Label for="grid" class="flex flex-col items-center justify-between opacity-50 cursor-pointer [&:has([data-state=checked])]:opacity-100">
+						<RadioGroup.Item value="grid" id="grid" class="sr-only" aria-label="grid" />
+						<LayoutGrid class="h-5 w-5" />
+					</Label>
+					<Label for="list" class="flex flex-col items-center justify-between opacity-50 cursor-pointer [&:has([data-state=checked])]:opacity-100">
+						<RadioGroup.Item value="list" id="list" class="sr-only" aria-label="list" />
+						<StretchHorizontal class="h-5 w-5" />
+					</Label>
+					<Label for="masonry" class="flex flex-col items-center justify-between opacity-50 cursor-pointer [&:has([data-state=checked])]:opacity-100">
+						<RadioGroup.Item value="masonry" id="masonry" class="sr-only" aria-label="masonry" />
+						<Masonry class="h-5 w-5" />
+					</Label>
+				</RadioGroup.Root>
+			</div>
+		{/if}
 		<div>
 			<p class="text-xs text-muted-foreground mb-1">Columns</p>
-			<ColumnSlider />
+			<!-- {#if isGroupsPage}
+				<ColumnSlider max={5} min={2} />
+			{:else}
+			{/if} -->
+			<ColumnSlider max={5} min={1} />
 		</div>
 	</div>
 </div>

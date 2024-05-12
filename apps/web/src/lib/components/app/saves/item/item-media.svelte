@@ -2,9 +2,8 @@
     import type { Save } from '$lib/types';
 
     import { listLayout, liveView } from '$lib/stores';
-	import { Gradient } from '$lib/components/app';
-	import { onMount } from 'svelte';
 	import { cn } from '@repo/ui/utils';
+	import ItemImage from './item-image.svelte';
 
     export let type: Save['type'];
     export let title: Save['title'];
@@ -12,13 +11,7 @@
 	export let url: Save['url'];
     export let gradientIndex: number;
 
-    let image: HTMLImageElement;
-
-    onMount(() => {
-        if (image?.naturalHeight === 0 && image?.naturalWidth === 0 && image?.complete === true) {
-            imageUrl = '';
-        }
-    });
+    
 
 </script>
 
@@ -57,18 +50,7 @@
                         class="relative flex aspect-og overflow-hidden"
                         tabindex="-1"
                     >			
-                        {#if imageUrl}
-                            <img
-                                loading="lazy"
-                                src={imageUrl}
-                                alt={title}
-                                bind:this={image}
-                                class="absolute inset-0 h-full w-full object-cover"
-                                on:error={() => imageUrl = ''}
-                            />
-                        {:else}
-                            <Gradient {gradientIndex} />
-                        {/if}
+                        <ItemImage {imageUrl} {title} {gradientIndex} />
                     </a>
                 {/if}
             {/if}

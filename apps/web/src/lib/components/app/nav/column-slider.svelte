@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 
     export let max = 5;
+    export let min = 1;
 
     const excludedNodeNames = ['INPUT', 'TEXTAREA'];
 
@@ -33,6 +34,6 @@
     value={[$listColumns]}
     max={max}
     step={1}
-    min={1}
+    min={min}
     onValueChange={sliderValueChange}
 />

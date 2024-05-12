@@ -29,6 +29,13 @@
             <Shortcut keys={['command', 'U']} />
         </Command.Shortcut>
     </Command.Item>
+    <Command.Item onSelect={() => handleItemSelect(siteConfig.appUrl + '/gropus')} value="Show groups">
+        <Inbox class="me-2 shrink-0" />
+        Show groups
+        <Command.Shortcut>
+            <Shortcut keys={['command', 'G']} />
+        </Command.Shortcut>
+    </Command.Item>
 </Command.Group>
 <Command.Group heading="Actions">
     <Command.Item onSelect={() => handleItemSelect(() => focusNewStashInput())} value="Create new stash">
@@ -50,7 +57,7 @@
         <Tv class="me-2 shrink-0" />
         Toggle live view
         <Command.Shortcut>
-            <Shortcut keys={['command', 'G']} />
+            <Shortcut keys={['command', 'J']} />
         </Command.Shortcut>
     </Command.Item>
     <Command.Item onSelect={() => handleItemSelect(() => changePage({name: 'layouts'}), undefined, false)} value="Change layout">

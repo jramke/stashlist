@@ -6,7 +6,7 @@
 	import { findMiddleNumberInRange, getRandomIndex, minDelay } from '$lib/utils';
 	import { gradients } from '$lib/constants'; 
     import { siteConfig } from '$lib/config/site';
-    import { ChevronsUpDown, GripVertical, Inbox, Loader, Pencil, Plus, Trash } from '@repo/ui/icons';
+    import { ChevronsUpDown, Folders, GripVertical, Inbox, Loader, Pencil, Plus, Trash } from '@repo/ui/icons';
     import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
     import { Button, buttonVariants } from '@repo/ui/components/button';
     import * as Dialog from '@repo/ui/components/dialog';
@@ -45,6 +45,9 @@
 		}
 		if ($page.route.id?.endsWith('main')) {
 			breadcrumbArray[1] = { title: 'All', gradientIndex: null };
+		}
+        if ($page.route.id?.endsWith('groups')) {
+			breadcrumbArray[1] = { title: 'Groups', gradientIndex: null };
 		}
 		if ($page.data.currentGroup) {
 			breadcrumbArray[1] = { title: $page.data.currentGroup.title, gradientIndex: $page.data.currentGroup.gradientIndex };
@@ -291,10 +294,18 @@
                                     Unsorted
                                     <div class="ps-3 ms-auto me-0 text-muted-foreground">{noGroupCount}</div>
                                 </DropdownMenu.Link>
-                                <DropdownMenu.Separator />
+                                <!-- <DropdownMenu.Separator /> -->
                             </div>
                         {/if}
                         {#if groups && groups.length > 0}
+                            <div class="px-1">
+                                <DropdownMenu.Link href={siteConfig.appUrl + '/groups'}>
+                                    <Folders class="size-4 me-2" />
+                                    Groups
+                                    <div class="ps-3 ms-auto me-0 text-muted-foreground">{groups.length}</div>
+                                </DropdownMenu.Link>
+                                <DropdownMenu.Separator />
+                            </div>
                             <ScrollArea class="max-h-[30vh] px-1 data-[scrollbar-visible=true]:pe-0">
                                 {#each groups as { title, id, gradientIndex }}
                                     <DropdownMenu.Link href={siteConfig.appUrl + '/group/' + id}>

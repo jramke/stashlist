@@ -2,7 +2,11 @@
 	import { gradients } from "$lib/constants";
 	import { cn } from "@repo/ui/utils";
 
-    export let gradientIndex: number;
+    export let gradientIndex: number | null;
+
+    if (gradientIndex === null) {
+        gradientIndex = -1
+    }
     
 </script>
 

@@ -17,10 +17,10 @@
         <p class="mt-0 text-muted-foreground">When you stash a new page the metadata is fetched and stored in the database. If you stash a page using the extension, you can edit the title or description before its stored. If there is no favicon or og image a random peristent gradient is rendered as fallback.</p>
         
         <p class="font-semibold mb-0">Groups</p>
-        <p class="mt-0 text-muted-foreground">You can create groups to organize your stashes. Each stash can belong to multiple groups. You can edit the group names and order via drag and drop. If you delete a group the stashes remain you can find them in the <a href={siteConfig.appUrl + '/unsorted'}>unsorted</a> page.</p>
+        <p class="mt-0 text-muted-foreground">You can create groups to organize your stashes. Each stash can belong to multiple groups. You can edit the group names and order via drag and drop. The shortcut to view your groups is <Shortcut class="inline-flex" keys={['command', 'G']} />. If you delete a group the stashes remain and you can find them on the <a href={siteConfig.appUrl + '/unsorted'}>unsorted</a> page.</p>
 
         <p class="font-semibold mb-0">Live view</p>
-        <p class="mt-0 text-muted-foreground">The live view is a way to see your stashes side by side interactive and in realtime. You can toggle it by pressing <Shortcut class="inline-flex" keys={['command', 'G']} />.</p>
+        <p class="mt-0 text-muted-foreground">The live view is a way to see your stashes side by side interactive and in realtime. You can toggle it by pressing <Shortcut class="inline-flex" keys={['command', 'J']} />.</p>
         
         <p class="font-semibold mb-0">Command Dialog</p>
         <p class="mt-0 text-muted-foreground">The command dialog provides a quick way to navigate through the app. You can open it by pressing <Shortcut class="inline-flex" keys={['command', 'K']} />. You can search for stashes and groups or execute various actions, all from your keyboard.</p>
@@ -29,7 +29,7 @@
         <p class="mt-0 text-muted-foreground">You can easily navigate through the list of your stashes using the arrow keys. To set the columns you can use the numbers <Shortcut class="inline-flex" keys={['1']} /> - <Shortcut class="inline-flex" keys={['5']} />.</p>
 
         <p class="font-semibold mb-0">Shortcuts</p>
-        <p class="mt-0 text-muted-foreground">There are several shortcuts available. You can also see them in the command dialog.</p>
+        <p class="mt-0 text-muted-foreground mb-1">There are several shortcuts available. You can also see them in the command dialog.</p>
         <div class="text-muted-foreground">
             <div class="flex gap-3">
                 <Shortcut keys={['command', 'K']} />
@@ -48,11 +48,15 @@
                 Show unsorted stashes
             </div>
             <div class="flex gap-3">
+                <Shortcut keys={['command', 'G']} />
+                Show groups
+            </div>
+            <div class="flex gap-3">
                 <Shortcut keys={['command', 'L']} />
                 Change layout
             </div>
             <div class="flex gap-3">
-                <Shortcut keys={['command', 'G']} />
+                <Shortcut keys={['command', 'J']} />
                 Toggle the live view
             </div>
             <div class="flex gap-3">

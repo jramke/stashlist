@@ -13,7 +13,7 @@
 	import { Button, buttonVariants } from '@repo/ui/components/button';
 	import * as AlertDialog from "@repo/ui/components/alert-dialog";
 	import EditForm from '$routes/main/save/edit/[id]/+page.svelte';
-	import { gridArrowKeys } from './grid-arrow-keys-action';
+	import { gridArrowKeys } from '$lib/actions';
 	import { applyAction, enhance } from '$app/forms';
 	import { getItemsContext, setItemsContext } from './item/context';
 	import { toast } from '@repo/ui/components/sonner';
@@ -83,13 +83,13 @@
 	{#if items?.length > 0}
 		<div class="self-start">
 			{#if $listLayout === 'masonry'}
-			<div use:gridArrowKeys={{ selector: '[data-grid-item]' }}>
-				<Masonry gapSize={6} columns={$listColumns} items={items}>
-					{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id, type, gradientIndex}}
-						<Item {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} {type} {gradientIndex} />
-					{/each}
-				</Masonry>
-			</div>
+				<div use:gridArrowKeys={{ selector: '[data-grid-item]' }}>
+					<Masonry gapSize={6} columns={$listColumns} items={items}>
+						{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id, type, gradientIndex}}
+							<Item {title} {description} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} {type} {gradientIndex} />
+						{/each}
+					</Masonry>
+				</div>
 			{:else}
 				<div class="grid grid-cols-{$listColumns} gap-6" use:gridArrowKeys={{ selector: '[data-grid-item]' }}>
 					{#each items as {title, description, url, imageUrl, faviconUrl, createdAt, saveGroups, id, type, gradientIndex}}

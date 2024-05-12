@@ -45,6 +45,8 @@
 			event.preventDefault();
 			openDeleteDialog(id, title);
 		}
+
+		//TODO: open contextmenu if enter and (event.metaKey || event.ctrlKey)
 	};
 	
 	onMount(() => {
@@ -76,7 +78,7 @@
 			<div class="flex gap-4 p-4">
 				<div class="flex flex-col gap-2 min-w-0">
 					<div class="flex items-baseline gap-2">
-						<h3 class="line-clamp-2 text-lg font-bold break-words">{title}</h3>
+						<h3 class="line-clamp-1 text-lg font-bold break-words">{title}</h3>
 					</div>
 					<!-- {#if description}
 						<span class="mb-2 line-clamp-2 text-sm break-words">{description}</span>

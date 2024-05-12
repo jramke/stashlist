@@ -67,6 +67,11 @@
             if (e.key === "g" && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault();
                 commandMenuOpen.set(false);
+                goto(siteConfig.appUrl + '/groups');
+            }
+            if (e.key === "j" && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault();
+                commandMenuOpen.set(false);
                 liveView.update(state => !state);
             }
             if (e.key === "l" && (e.metaKey || e.ctrlKey)) {

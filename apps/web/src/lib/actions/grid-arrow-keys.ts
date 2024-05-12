@@ -81,7 +81,8 @@ class GridArrowKeyHandler {
         if (!isArrowKey || (!isTargetAGridItem  && document.activeElement !== document.body)) return;
         
         event.preventDefault();
-
+        
+        
         const currentPosition = this.getCurrentRowAndColumn(event.target as HTMLElement);
         if (currentPosition.row === 0 && currentPosition.col === 0) {
             this.calcRowsAndColumns(this.grid!, this.gridItems);
@@ -139,6 +140,8 @@ class GridArrowKeyHandler {
     
             item.dataset.col = colCurrentCount.toString();
             item.dataset.row = rowCurrentCount.toString();
+
+            item.tabIndex = 0;
     
             if (colCurrentCount <= columnsCount) {
                 colCurrentCount++;
@@ -153,6 +156,8 @@ class GridArrowKeyHandler {
     focusGridItem(row: number, col: number, recursive = true) {
         if (!this.grid) return;
         let el = this.grid.querySelector(`[data-row="${row}"][data-col="${col}"]`) as HTMLElement | null;
+        console.log(el, this);
+        
         if (!el) {
             if (recursive) {
                 this.focusGridItem(row, col - 1);
