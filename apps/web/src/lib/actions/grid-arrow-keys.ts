@@ -28,8 +28,6 @@ class GridArrowKeyHandler {
         }
         if (this.grid.getAttribute(INIT_ATTRIBUTE) === 'true') return;
 
-        console.log('initialized');
-
         this.gridItems = this.getGridItems();
         if (this.gridItems.length === 0) {
             console.warn('No grid items found in GridArrowKeyHandler');
@@ -156,8 +154,6 @@ class GridArrowKeyHandler {
     focusGridItem(row: number, col: number, recursive = true) {
         if (!this.grid) return;
         let el = this.grid.querySelector(`[data-row="${row}"][data-col="${col}"]`) as HTMLElement | null;
-        console.log(el, this);
-        
         if (!el) {
             if (recursive) {
                 this.focusGridItem(row, col - 1);
