@@ -6,6 +6,7 @@ import { and, eq } from "drizzle-orm";
 import { user, oauth_account } from '$lib/server/db/schema';
 
 import { redirect, type RequestEvent } from "@sveltejs/kit";
+import { createUser, getUserByProvider } from "$lib/server/db/queries";
 
 export async function GET(event: RequestEvent): Promise<Response> {
 	const code = event.url.searchParams.get("code");
@@ -27,9 +28,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		});
 		const googleUser: GoogleUser = await googleUserResponse.json();
 		
-		const existingUser = await db.query.oauth_account.findFirst({
-			where: and(eq(oauth_account.provider, 'google'), eq(oauth_account.providerId, googleUser.sub))
-		});
+		const existingUser = await getUserByProvider('google', googleUser.sub);
 
 		if (existingUser) {
 			const session = await lucia.createSession(existingUser.userId, {});
@@ -40,19 +39,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 			});
 		} else {
 			const userId = generateId(15);
-
-            await db.insert(user).values({
-                id: userId,
-                username: googleUser.name ?? '',
-				name: googleUser.given_name ?? '',
-				avatarUrl: googleUser.picture ?? ''
-
-            });
-			await db.insert(oauth_account).values({
-				provider: 'google',
-                providerId: googleUser.sub,
-                userId: userId
-            });
+			await createUser('google', googleUser.sub, userId, googleUser.name, googleUser.given_name, googleUser.picture);
 
 			const session = await lucia.createSession(userId, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);

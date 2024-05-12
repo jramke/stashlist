@@ -3,11 +3,9 @@ import type { Actions } from './$types';
 import { superValidate, message } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from './schema';
-import { db } from '$lib/server/db';
-import { group, save_group_mm } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
 import { redirect } from '@sveltejs/kit';
 import { siteConfig } from '$lib/config/site';
+import { deleteGroup } from '$lib/server/db/queries';
 
 export const actions: Actions = {
 	default: async (event) => {	
@@ -18,8 +16,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			await db.delete(save_group_mm).where(eq(save_group_mm.groupId, form.data.id));
-			await db.delete(group).where(eq(group.id, form.data.id));
+			await deleteGroup(form.data.id);
 			
 		} catch (error) {
 			console.log('Error deleting group', error);

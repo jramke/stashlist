@@ -3,9 +3,7 @@ import type { Actions } from './$types';
 import { superValidate, message } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from './schema';
-import { db } from '$lib/server/db';
-import { save, save_group_mm } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { deleteSave } from '$lib/server/db/queries';
 
 export const actions: Actions = {
 	default: async (event) => {
@@ -16,8 +14,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			await db.delete(save_group_mm).where(eq(save_group_mm.saveId, form.data.id));
-			await db.delete(save).where(eq(save.id, form.data.id));
+			await deleteSave(form.data.id);
 
 		} catch (error) {
 			console.log('Error deleting save', error);

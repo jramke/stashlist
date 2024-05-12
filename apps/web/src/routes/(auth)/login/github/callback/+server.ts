@@ -6,6 +6,7 @@ import { and, eq } from "drizzle-orm";
 import { user, oauth_account } from '$lib/server/db/schema';
 
 import { redirect, type RequestEvent } from "@sveltejs/kit";
+import { createUser, getUserByProvider } from "$lib/server/db/queries";
 
 export async function GET(event: RequestEvent): Promise<Response> {
 	const code = event.url.searchParams.get("code");
@@ -25,9 +26,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		});
 		const githubUser: GitHubUser = await githubUserResponse.json();
 		
-		const existingUser = await db.query.oauth_account.findFirst({
-			where: and(eq(oauth_account.provider, 'github'), eq(oauth_account.providerId, githubUser.id))
-		});
+		const existingUser = await getUserByProvider('github', githubUser.id);
 
 		if (existingUser) {
 			const session = await lucia.createSession(existingUser.userId, {});
@@ -39,18 +38,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		} else {
 			const userId = generateId(15);
 
-            await db.insert(user).values({
-                id: userId,
-                username: githubUser.login,
-				name: githubUser.name ?? '',
-				avatarUrl: githubUser.avatar_url ?? ''
-
-            });
-			await db.insert(oauth_account).values({
-				provider: 'github',
-                providerId: githubUser.id,
-                userId: userId
-            });
+			await createUser('github', githubUser.id, userId, githubUser.login, githubUser.name, githubUser.avatar_url);
 
 			const session = await lucia.createSession(userId, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);

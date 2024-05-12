@@ -1,14 +1,12 @@
-import { db } from '$lib/server/db';
-import { group } from '$lib/server/db/schema';
+import { getAllGroups } from '$lib/server/db/queries';
 import type { RequestHandler } from './$types';
 import { error, json, redirect } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
 
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user) redirect(302, '/login');
 
 	try {
-		const groups = await db.select().from(group).where(eq(group.userId, locals.user.id)).orderBy(group.sortIndex).all();
+		const groups = await getAllGroups(locals.user.id);
 		return json(groups);
 	} catch (err) {
 		console.log('error fetch groups', err);

@@ -1,9 +1,7 @@
 import type { RequestHandler } from './$types';
 
-import { db } from '$lib/server/db';
-import { group } from '$lib/server/db/schema';
 import { json, redirect, error } from '@sveltejs/kit';
-import { desc, eq } from 'drizzle-orm';
+import { resetGroupSortIndex, updateGroup } from '$lib/server/db/queries';
 
 export const POST: RequestHandler = async ({ request, locals, url }) => {
 	if (!locals.user) redirect(302, '/login');
@@ -21,18 +19,12 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
 	
 			if (!id || typeof sortIndex === 'undefined') throw Error('Group id and sort index are required');
 
-			await db.update(group).set({ sortIndex }).where(eq(group.id, id));
+			await updateGroup(id, { sortIndex });
 			return json({ success: true });
 		}
 		
 		if (type === 'reset') {
-			const groups = await db.select({ id: group.id, sortIndex: group.sortIndex }).from(group).where(eq(group.userId, locals.user.id)).orderBy(group.sortIndex);
-			
-			let sortIndex = 100;
-			for (const groupItem of groups) {
-				await db.update(group).set({ sortIndex }).where(eq(group.id, groupItem.id));
-				sortIndex += 100;
-			}
+			await resetGroupSortIndex(locals.user.id);
 			return json({ success: true });
 		}
 

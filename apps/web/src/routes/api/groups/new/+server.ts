@@ -1,12 +1,9 @@
 import type { RequestHandler } from './$types';
 
-import { db } from '$lib/server/db';
-import { group } from '$lib/server/db/schema';
-import { generateId } from 'lucia';
 import { json, redirect, error } from '@sveltejs/kit';
 import { getRandomIndex } from '$lib/utils';
 import { gradients } from '$lib/constants';
-import { desc, eq } from 'drizzle-orm';
+import { createNewGroup } from '$lib/server/db/queries';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) redirect(302, '/login');
@@ -19,23 +16,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		const gradientIndex = data['gradientIndex'] ?? getRandomIndex(gradients);
 
-		let sortIndex;
-		//TODO: handle parent id, index
-		const highestSortIndexResult = await db.select({ sortIndex: group.sortIndex }).from(group).where(eq(group.userId, locals.user.id )).orderBy(desc(group.sortIndex)).limit(1);
-
-		if (highestSortIndexResult.length === 0) {
-			sortIndex = 100;
-		} else {
-			sortIndex = highestSortIndexResult[0].sortIndex + 100;
-		}
-		
-		await db.insert(group).values({
-			id: generateId(15),
-			userId: locals.user.id,
-			title: title,
-			gradientIndex: gradientIndex,
-			sortIndex: sortIndex,
-		});
+		await createNewGroup(locals.user.id, title, gradientIndex);
 
 		return json({ success: true });
 	} catch (err) {

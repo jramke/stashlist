@@ -3,6 +3,7 @@ import { redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { oauth_account } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
+import { getUserProvider } from '$lib/server/db/queries';
 
 export const load: LayoutServerLoad = async ({ locals, fetch }) => {
 	if (!locals.user) redirect(302, '/login');
@@ -45,16 +46,9 @@ export const load: LayoutServerLoad = async ({ locals, fetch }) => {
 		}
 	}
 
-	async function getUserProvider() {
-		if (!locals.user) return null;
-		const oauthAccount = await db.select().from(oauth_account).where(eq(oauth_account.userId, locals.user.id)).limit(1);
-		if (oauthAccount.length === 0) return null;
-		return oauthAccount[0].provider;
-	}
-
 	return {
 		groups: getGroups(),
 		saves: getSaves(),
-		userProvider: await getUserProvider()
+		userProvider: await getUserProvider(locals.user?.id)
 	};
 };

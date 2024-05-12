@@ -10,6 +10,8 @@ export const user = sqliteTable('user', {
 		.default(sql`CURRENT_TIMESTAMP`)
 		.notNull()
 });
+export type InsertUser = typeof user.$inferInsert;
+export type SelectUser = typeof user.$inferSelect;
 
 export const oauth_account = sqliteTable(
 	'oauth_account', {
@@ -21,6 +23,8 @@ export const oauth_account = sqliteTable(
 		pk: primaryKey(t.userId, t.providerId)
 	})
 );
+export type InsertOAuthAccount = typeof oauth_account.$inferInsert;
+export type SelectGroupOAuthAccount = typeof oauth_account.$inferSelect;
 
 export const session = sqliteTable('session', {
 	id: text('id').notNull().primaryKey().unique(),
@@ -47,6 +51,8 @@ export const save = sqliteTable('save', {
 		.default(sql`CURRENT_TIMESTAMP`)
 		.notNull()
 });
+export type InsertSave = typeof save.$inferInsert;
+export type SelectSave = typeof save.$inferSelect;
 
 export const group = sqliteTable('group', {
 	id: text('id').notNull().primaryKey().unique(),
@@ -61,6 +67,8 @@ export const group = sqliteTable('group', {
 		.default(sql`CURRENT_TIMESTAMP`)
 		.notNull()
 });
+export type InsertGroup = typeof group.$inferInsert;
+export type SelectGroup = typeof group.$inferSelect;
 
 export const save_group_mm = sqliteTable(
 	'save_group_mm',

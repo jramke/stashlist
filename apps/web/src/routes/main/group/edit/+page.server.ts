@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { db } from '$lib/server/db';
 import { group } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
+import { updateGroup } from '$lib/server/db/queries';
 
 export const actions: Actions = {
 	default: async (event) => {
@@ -30,9 +31,7 @@ export const actions: Actions = {
 		
 		try {
 			for (const [key, value] of Object.entries(form.data)) {
-				await db.update(group).set({
-					title: value,
-				}).where(eq(group.id, key));
+				await updateGroup(key, { title: value });
 			}
 			
 		} catch (error) {
