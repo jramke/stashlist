@@ -42,7 +42,7 @@
         <Plus class="me-2 shrink-0" />
         Create new stash
         <Command.Shortcut>
-            <Shortcut keys={['command', 'space']} />
+            <Shortcut keys={['command', 'M']} />
         </Command.Shortcut>
     </Command.Item>
     <Command.Item onSelect={() => handleItemSelect(() => newGroupDialogOpen.set(true))}>
