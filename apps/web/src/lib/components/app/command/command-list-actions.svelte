@@ -3,7 +3,7 @@
     import { siteConfig } from "$lib/config/site";
 	import { getCommandMenuContext } from "./context";
     import { newGroupDialogOpen, editGroupsDialogOpen, liveView, newStashStore } from "$lib/stores";
-	import { Inbox, Masonry, Pencil, Plus, Stash, Tv } from "@repo/ui/icons";
+	import { Folders, Inbox, Masonry, Pencil, Plus, Stash, Tv } from "@repo/ui/icons";
 	import { Shortcut } from "@repo/ui/components/shortcut";
 
     const ctx = getCommandMenuContext();
@@ -29,8 +29,8 @@
             <Shortcut keys={['command', 'U']} />
         </Command.Shortcut>
     </Command.Item>
-    <Command.Item onSelect={() => handleItemSelect(siteConfig.appUrl + '/gropus')} value="Show groups">
-        <Inbox class="me-2 shrink-0" />
+    <Command.Item onSelect={() => handleItemSelect(siteConfig.appUrl + '/groups')} value="Show groups">
+        <Folders class="me-2 shrink-0" />
         Show groups
         <Command.Shortcut>
             <Shortcut keys={['command', 'G']} />
