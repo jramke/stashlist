@@ -29,6 +29,7 @@
 	let newStashType: string;
 	let aviableGroups: any[] = [];
 	let newStashForm: HTMLFormElement | null | undefined;
+	let newStashFormButton: HTMLButtonElement | null | undefined;
 	let stashlistRoot: HTMLElement | null | undefined;
 	let groups: any[] = [];
 
@@ -68,9 +69,33 @@
 
 				setTimeout(() => {
 					newStashForm = stashlistRoot?.querySelector('#stashlist-form');
+					newStashFormButton = stashlistRoot?.querySelector('#new-stash-button');
 					console.log('newStashForm', newStashForm);
 	
-					if (!newStashForm) return;
+					if (!newStashForm || !newStashFormButton) return;
+
+					newStashFormButton.addEventListener('click', async (e) => {
+						console.log('newStash form click');
+						e.preventDefault();
+						const formData = Object.fromEntries(new FormData(newStashForm as HTMLFormElement));
+						console.log('formData', formData);
+						
+						try {
+							formSchema.parse(formData);
+						} catch (err) {
+							if (err instanceof z.ZodError) {
+								console.log(err.issues);
+								err.issues.forEach(issue => {
+									newStashFormData[issue.path[0]].error = issue;
+								})
+							}
+							return
+						}
+						
+						browser.runtime.sendMessage({
+							['save' + newStashType.charAt(0).toUpperCase() + newStashType.slice(1)]: formData
+						})
+					})
 	
 					newStashForm.addEventListener('submit', async (e) => {
 						console.log('newStash form submit');
@@ -119,7 +144,7 @@
 			<Dialog.Header>
 				<Dialog.Title>Stash new {newStashType}</Dialog.Title>
 			</Dialog.Header>
-			<form id="stashlist-form" class="space-y-2">
+			<form id="stashlist-form" class="space-y-2" on:submit={(e) => e.preventDefault()}>
 				{#each Object.entries(newStashFormData) as [key, value]}
 					{#if value.hidden}
 						<Input type="hidden" name={key} value={value.data} />
@@ -149,7 +174,7 @@
 					{/if}
 				{/each}
 				<Dialog.Footer class="pt-2">
-					<Button type="submit">Save stash</Button>
+					<Button id="new-stash-button" type="button">Save stash</Button>
 				</Dialog.Footer>
 			</form>
 		</Dialog.Content>
