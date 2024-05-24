@@ -1,7 +1,7 @@
 import browser, { type Tabs } from "webextension-polyfill";
 
-// const baseUrl = 'https://stashlist.app';
-const baseUrl = import.meta.env.MODE === 'development' ?'http://127.0.0.1:5173' : 'https://stashlist.app';
+const baseUrl = 'https://stashlist.app';
+// const baseUrl = import.meta.env.MODE === 'development' ?'http://127.0.0.1:5173' : 'https://stashlist.app';
 
 function isValidUrl(url: string) {
   // Regular expression to match the pattern *://*/*
@@ -71,8 +71,13 @@ async function initStashPage(tab: Tabs.Tab | undefined) {
 
   if (!currentUrl) return;
 
-  const result = await makePostRequest(baseUrl + '/api/saves/new/website?edit=true', { url: currentUrl });
   const tabId = tab?.id || 0;
+
+  await browser.tabs.sendMessage(tabId, {
+    newStashStart: 1
+  })
+
+  const result = await makePostRequest(baseUrl + '/api/saves/new/website?edit=true', { url: currentUrl });
   await browser.tabs.sendMessage(tabId, {
     editNewStash: result
   })
@@ -81,8 +86,13 @@ async function initStashPage(tab: Tabs.Tab | undefined) {
 async function initStashImage(tab: Tabs.Tab | undefined, imageUrl: string | undefined) {
   if (!imageUrl) return;
 
-  const result = await makePostRequest(baseUrl + '/api/saves/new/image?edit=true', { imageUrl: imageUrl });
   const tabId = tab?.id || 0;
+
+  await browser.tabs.sendMessage(tabId, {
+    newStashStart: 1
+  })
+
+  const result = await makePostRequest(baseUrl + '/api/saves/new/image?edit=true', { imageUrl: imageUrl });
   await browser.tabs.sendMessage(tabId, {
     editNewStash: result
   })

@@ -9,10 +9,9 @@
 	import { Button } from '@repo/ui/components/button';
 	import Tags from "@repo/ui/components/tags";
 	import { onMount } from 'svelte';
-	// import { Toaster } from '@ui/components/ui/sonner';
-	// import { ModeWatcher } from 'mode-watcher';
-	// import { toast } from 'svelte-sonner';
+	import { Toaster, toast } from '@repo/ui/components/sonner';
 	import { z } from 'zod';
+	import { waitForElement } from '../utils';
 
 	type NewStashEdit = {
 		[key: string]: {
@@ -22,6 +21,8 @@
 			hidden: boolean;
 		};
 	};
+
+	// type StashState = 'loading' | 'fetched' | 'error';
 	
 
 	let editDialogOpen = false;
@@ -32,23 +33,31 @@
 	let newStashFormButton: HTMLButtonElement | null | undefined;
 	let stashlistRoot: HTMLElement | null | undefined;
 	let groups: any[] = [];
+	let formSchema: z.ZodSchema<any>;
+	// let stashState: Promise<StashState> = new Promise((resolve, reject) => resolve('loading'));
 
 	$: groupIds = groups.map(item => item.id);
 
+	let resolveStashPromise: () => void;
+	let rejectStashPromise: (reason?: any) => void;
+	const stashStatePromise = new Promise<void>((resolve, reject) => {
+		resolveStashPromise = resolve;
+		rejectStashPromise = reject;
+	});
+
 	onMount(() => {
 		const stashlistContainer = document.getElementById('stashlist-container');
-		const stashlistContainerRoot = stashlistContainer && stashlistContainer.shadowRoot;
-		stashlistRoot = stashlistContainerRoot?.querySelector('#stashlist-root');
+		const stashlistContainerRoot = stashlistContainer?.shadowRoot;
+		stashlistRoot = stashlistContainerRoot?.querySelector<HTMLElement>('#stashlist-root');
 		stashlistRoot?.classList.add('dark');
 	})
 
-	browser.runtime.onMessage.addListener((message: any, sender: any, sendResponse: any) => {
+	browser.runtime.onMessage.addListener(async (message: any) => {
 			if (message.editNewStash) {
 				newStashFormData = message.editNewStash.form;
 				newStashType = message.editNewStash.type;
 				aviableGroups = message.editNewStash.groups
 				
-				let formSchema: any;
 				if (newStashType === 'website') {
 					formSchema = z.object({
 						title: z.string().min(1),
@@ -64,82 +73,100 @@
 						groups: z.string().default('').optional()
 					});
 				}
-
+				
 				editDialogOpen = true;
+				resolveStashPromise();
+				console.log('dialog opened');
+				
+				try {
+					newStashForm = await waitForElement<HTMLFormElement>('#stashlist-form', stashlistRoot);
+					newStashFormButton = await waitForElement<HTMLButtonElement>('#new-stash-button', stashlistRoot);
 
-				setTimeout(() => {
-					newStashForm = stashlistRoot?.querySelector('#stashlist-form');
-					newStashFormButton = stashlistRoot?.querySelector('#new-stash-button');
-					console.log('newStashForm', newStashForm);
-	
-					if (!newStashForm || !newStashFormButton) return;
+					if (!newStashForm || !newStashFormButton) {
+						console.error('Could not find form or button', newStashForm, newStashFormButton);
+						rejectStashPromise();
+						return;
+					}
 
-					newStashFormButton.addEventListener('click', async (e) => {
-						console.log('newStash form click');
-						e.preventDefault();
-						const formData = Object.fromEntries(new FormData(newStashForm as HTMLFormElement));
-						console.log('formData', formData);
-						
-						try {
-							formSchema.parse(formData);
-						} catch (err) {
-							if (err instanceof z.ZodError) {
-								console.log(err.issues);
-								err.issues.forEach(issue => {
-									newStashFormData[issue.path[0]].error = issue;
-								})
-							}
-							return
-						}
-						
-						browser.runtime.sendMessage({
-							['save' + newStashType.charAt(0).toUpperCase() + newStashType.slice(1)]: formData
-						})
-					})
-	
-					newStashForm.addEventListener('submit', async (e) => {
-						console.log('newStash form submit');
-						e.preventDefault();
-						const form = e.target as HTMLFormElement;
-						const formData = Object.fromEntries(new FormData(form));
-						console.log('formData', formData);
-						
-						try {
-							formSchema.parse(formData);
-						} catch (err) {
-							if (err instanceof z.ZodError) {
-								console.log(err.issues);
-								err.issues.forEach(issue => {
-									newStashFormData[issue.path[0]].error = issue;
-								})
-							}
-							return
-						}
-						
-						browser.runtime.sendMessage({
-							['save' + newStashType.charAt(0).toUpperCase() + newStashType.slice(1)]: formData
-						})
-					})
-				}, 100); // needed
+					newStashFormButton.addEventListener('click', formButtonClickListener);
+					console.log('form listeners initialized');
+					
+				} catch (error) {
+					console.error('Error while initializing form listeners', error);
+					rejectStashPromise();
+				}
+
 			}
 
 			if (message.newStashAdded) {
 				editDialogOpen = false;
-				// console.log(toast);
-				// toast.success('Successfully created stash');
+				newStashFormButton?.removeEventListener('click', formButtonClickListener);
+				toast.success('Successfully created stash', {
+					action: {
+						label: 'View',
+						onClick: () => window.open('https://stashlist.app', '_blank')?.focus(),
+						// onClick: () => browser.tabs.create({ url: 'https://stashlist.app' }),
+					}
+				});
+				
+			}
+
+			if (message.newStashStart) {
+				toast.promise(stashStatePromise, {
+					loading: 'Stashing...',
+					// success: 'Successfully created stash',
+					error: 'Could not create stash'
+				});
 			}
 		}
 	);
+
+	async function formButtonClickListener(event: MouseEvent) {
+		await handleFormButtonClick(event, formSchema);
+	}
+
+	async function handleFormButtonClick(e: MouseEvent, formSchema: z.ZodSchema<any>) {
+		console.log('form button clicked');
+		e.preventDefault();
+		if (!newStashForm) {
+			rejectStashPromise();
+			return;
+		};
+
+		const formData = Object.fromEntries(new FormData(newStashForm));
+		try {
+			formSchema.parse(formData);
+		} catch (err) {
+			if (err instanceof z.ZodError) {
+				err.issues.forEach(issue => {
+					newStashFormData[issue.path[0]].error = issue;
+				});
+			}
+			rejectStashPromise();
+			return;
+		}
+		console.log('formdata parsed', formData);
+		browser.runtime.sendMessage({
+			['save' + newStashType.charAt(0).toUpperCase() + newStashType.slice(1)]: formData,
+		});
+		console.log('message sent to', 'save' + newStashType.charAt(0).toUpperCase() + newStashType.slice(1));
+	}
+
+	function handleDialogOpenChange(open: boolean) {
+		if (!open) {
+			// closing
+			newStashFormButton?.removeEventListener('click', formButtonClickListener);
+		}
+	}
 
 </script>
 
 <div>
 
 	<!-- both not working -->
-	<!-- <Toaster position="bottom-center" />
-	<ModeWatcher /> -->
+	<Toaster position="bottom-center" />
 
-	<Dialog.Root bind:open={editDialogOpen} portal={null} preventScroll={false} closeOnOutsideClick={false}>
+	<Dialog.Root bind:open={editDialogOpen} portal={null} onOpenChange={handleDialogOpenChange} preventScroll={false} closeOnOutsideClick={false}>
 		<Dialog.Content>
 			<Dialog.Header>
 				<Dialog.Title>Stash new {newStashType}</Dialog.Title>

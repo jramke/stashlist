@@ -54,7 +54,7 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 			metaData = await urlMetadata(null, { parseResponseObject: saveUrlResponse });
 		}
 
-		console.log('metadata', metaData);
+		// console.log('metadata', metaData);
 
 		let faviconUrl = (metaData?.favicons[0]?.href || '') as string;
 
