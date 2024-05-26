@@ -21,7 +21,6 @@
                         <Heading tag="h3">Chrome</Heading>
                         <Button variant="outline" href={siteConfig.extensionUrl.chrome} target="_blank">Get extension</Button>
                     </div>
-                    <p class="text-muted-foreground text-xs mt-2">Currently not working correctly.<br>See <a class="underline underline-offset-4" href="https://github.com/jramke/stashlist/issues/47" target="_blank">Github issue</a>.</p>
                 </div>
                 <div class="rounded-lg p-4 border self-start">
                     <Heading tag="h3">Firefox</Heading>

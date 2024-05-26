@@ -7,7 +7,8 @@ export default async function renderContent(
   const appContainer = document.createElement("div");
   appContainer.id = 'stashlist-container';
   const shadowRoot = appContainer.attachShadow({
-    mode: import.meta.env.MODE === "development" ? "open" : "closed",
+    // mode: import.meta.env.MODE === "development" ? "open" : "closed",
+    mode: "open",
   });
   const appRoot = document.createElement("div");
   appRoot.id = 'stashlist-root';
