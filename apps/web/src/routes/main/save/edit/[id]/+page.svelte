@@ -40,7 +40,7 @@
     
     // // //TODO: types
     let groups = data?.save.saveGroups.map(item => item.group) || [];
-    let groupIds = groups.map(item => item.id);
+    $: groupIds = groups.map(item => item.id);
 
     async function onLegacyCancel() {
         await invalidateAll();

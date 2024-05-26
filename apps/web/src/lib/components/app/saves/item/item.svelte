@@ -20,7 +20,7 @@
 	export let gradientIndex: number;
 	export let type: Save['type'];
 
-	const copyUrl = type === 'image' ? imageUrl : url;
+	$: copyUrl = type === 'image' ? imageUrl : url;
 
 	const { copyUrlToClipboard, openEditDialog, deletedItems, focusedItem, deleteItem } = itemsStore;
 
