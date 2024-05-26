@@ -3,15 +3,14 @@
     import { type SuperValidated, type Infer, superForm } from "sveltekit-superforms";
     import { zodClient } from "sveltekit-superforms/adapters";
 	import type { Save, TODO } from "$lib/types";
-	import type { PageData } from "./$types";
 
     import * as Form from "@repo/ui/components/form";
     import { Input } from "@repo/ui/components/input";
     import { Textarea } from "@repo/ui/components/textarea";
     import Tags from "@repo/ui/components/tags";
 	import { Button } from "@repo/ui/components/button";
+	import * as Tooltip from "@repo/ui/components/tooltip";
 	import { invalidateAll } from "$app/navigation";
-	import { ItemImage } from "$lib/components/app/saves/item";
 	import { formatRelativeTime } from "$lib/utils";
 	import { Copy } from "@repo/ui/icons";
 	import { itemsStore } from "$lib/stores";
@@ -25,7 +24,7 @@
     };
     // export let data: PageData;
 
-    const { copyUrlToClipboard, editDialogOpen } = itemsStore;
+    const { copyUrlToClipboard } = itemsStore;
 
     const form = superForm(data?.form, {
         validators: zodClient(formSchema),
@@ -42,14 +41,24 @@
     let groups = data?.save.saveGroups.map(item => item.group) || [];
     $: groupIds = groups.map(item => item.id);
 
+    let copyUrlText = 'Copy URL to clipboard';
+    let copyUrlOpen = false;
+
     async function onLegacyCancel() {
         await invalidateAll();
         history.back();
     }
 
     function handleUrlCopy(url: string) {
-        copyUrlToClipboard(url);
-        editDialogOpen.set(false);
+        copyUrlToClipboard(url, false);
+        copyUrlOpen = true;
+        copyUrlText = 'Copied!';
+    }
+
+    function handleUrlCopyOpenChange(open: boolean) {
+        if (!open) {
+            copyUrlText = 'Copy URL to clipboard';
+        }
     }
 
 </script>
@@ -97,9 +106,16 @@
                 <span class="text-sm font-medium leading-none">URL</span>
                 <div class="flex items-center gap-2 max-w-full">
                     <a href={data?.save.url} target="_blank" rel="noreferrer noopener" class="truncate max-w-[calc(100%-(1rem+0.5rem))] leading-tight text-sm text-muted-foreground underline underline-offset-4">{data?.save.url}</a>
-                    <button type="button" class="focusable" on:click={() => handleUrlCopy(data?.save.url)}>
-                        <Copy class="size-4 -mb-1" />
-                    </button>
+                    <Tooltip.Root disableHoverableContent={true} open={copyUrlOpen} closeOnPointerDown={false} onOpenChange={handleUrlCopyOpenChange}>
+                        <Tooltip.Trigger>
+                            <button type="button" class="focusable" on:click={() => handleUrlCopy(data?.save.url)}>
+                                <Copy class="size-4 -mb-1" />
+                            </button>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content>
+                            {copyUrlText}
+                        </Tooltip.Content>
+                    </Tooltip.Root>
                 </div>
             </div>
         {/if}

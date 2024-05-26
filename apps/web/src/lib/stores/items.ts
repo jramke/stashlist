@@ -16,9 +16,11 @@ function createContextMenuOpenState(state: boolean) {
     return open;
 }
 
-function copyUrlToClipboard(url: string) {
+function copyUrlToClipboard(url: string, showToast = true) {
     navigator.clipboard.writeText(url);
-    toast.success('URL copied to clipboard');
+    if (showToast) {
+        toast.success('URL copied to clipboard');
+    }
 }
 
 async function openEditDialog(id: string | undefined) {
