@@ -47,12 +47,13 @@ class GridArrowKeyHandler {
         
         const mutationObserver = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
-                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                if ((mutation.type === 'attributes' && mutation.attributeName === 'class') || this.wasNodesAddedOrRemoved(mutation.addedNodes) || this.wasNodesAddedOrRemoved(mutation.removedNodes)) {
+                    this.gridItems = this.getGridItems();
                     this.calcRowsAndColumns(this.grid!, this.gridItems);
                 }
             });
         })
-        mutationObserver.observe(this.grid, { attributes: true });
+        mutationObserver.observe(this.grid, { attributes: true, childList: true, subtree: true });
         window.addEventListener('resize', this.events.resize);
         document.addEventListener('keydown', this.events.keydown);
 
@@ -79,7 +80,6 @@ class GridArrowKeyHandler {
         if (!isArrowKey || (!isTargetAGridItem  && document.activeElement !== document.body)) return;
         
         event.preventDefault();
-        
         
         const currentPosition = this.getCurrentRowAndColumn(event.target as HTMLElement);
         if (currentPosition.row === 0 && currentPosition.col === 0) {
@@ -163,6 +163,14 @@ class GridArrowKeyHandler {
             return;
         };
         el.focus();
+    }
+    wasNodesAddedOrRemoved(nodes: NodeList) {
+        if (nodes.length === 0) return false;
+        const elements = Array.from(nodes).filter((node) => (node as Element).tagName);
+        if (elements.some((node) => (node as Element).matches(this.params?.selector || '*'))) {
+            return true;
+        }
+        return false;
     }
     destroy() {
         document.removeEventListener('keydown', this.events.keydown);
