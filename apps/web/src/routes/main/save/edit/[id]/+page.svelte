@@ -25,8 +25,6 @@
     };
     // export let data: PageData;
 
-    $: console.log('page rendered', data);
-
     const { copyUrlToClipboard, editDialogOpen } = itemsStore;
 
     const form = superForm(data?.form, {

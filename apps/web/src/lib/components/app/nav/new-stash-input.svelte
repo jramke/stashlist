@@ -86,7 +86,6 @@
 
 		return async ({ result }) => {
 			await minDelay(start);
-			console.log(result);
 			if (result.type !== 'success' || result?.data?.form.message.type === 'error') {
 				newStashFormError = 'Something went wrong stashing the website';
 			} else {

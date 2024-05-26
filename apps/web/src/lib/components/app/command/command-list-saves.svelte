@@ -18,7 +18,6 @@
     
     const handleKeydown = (event: KeyboardEvent) => {
         const itemNode = itemNodes.find(node => node.getAttribute('data-selected'));
-        console.log(itemNode, document.activeElement, itemNodes);
         
 		if (!itemNode) return;
 		

@@ -38,22 +38,15 @@
 		if (!items || items.length === 0) return [];
 		return items;
 	}
-	$: console.log($page, saveOption);
-	// async function getAll() {
-	// 	const items = (await $page.data.saves)?.items || [];
-	// 	if (!items || items.length === 0) return [];
-	// 	return items;
-	// }
 
-	async function getUnsorted() {
-		const items = (await $page.data.saves)?.items || [];
+	function getUnsorted() {
+		const items = $page.data.saves?.items || [];
 		if (!items || items.length === 0) return [];
 		return items.filter(save => save.saveGroups.length === 0);
 	}
 
 	async function editDialogChange(open: boolean) {
 		if (!open) {
-			console.log('closing', $page.state.editStash);
 			if ($page.state.editStash) {
 				await invalidateAll(); // if this is not there error: "pushstate Could not serialize state.form"
 				history.back();

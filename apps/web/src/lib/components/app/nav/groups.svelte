@@ -222,9 +222,6 @@
             newSortIndex = findMiddleNumberInRange(prevItemSortIndex, nextItemSortIndex);
         }
 
-        console.log(newSortIndex, findMiddleNumberInRange(prevItemSortIndex, nextItemSortIndex));
-        
-
         if (newSortIndex === -1) {
             // unexpected error
             response = await fetch('/api/groups/sort?type=reset', {
