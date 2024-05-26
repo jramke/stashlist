@@ -95,8 +95,8 @@
         {#if data?.save.url}
             <div class="space-y-2">
                 <span class="text-sm font-medium leading-none">URL</span>
-                <div class="flex items-center gap-2">
-                    <a href={data?.save.url} target="_blank" rel="noreferrer noopener" class="leading-none block text-sm text-muted-foreground underline underline-offset-4">{data?.save.url}</a>
+                <div class="flex items-center gap-2 max-w-full">
+                    <a href={data?.save.url} target="_blank" rel="noreferrer noopener" class="truncate max-w-[calc(100%-(1rem+0.5rem))] leading-tight text-sm text-muted-foreground underline underline-offset-4">{data?.save.url}</a>
                     <button type="button" class="focusable" on:click={() => handleUrlCopy(data?.save.url)}>
                         <Copy class="size-4 -mb-1" />
                     </button>
@@ -105,7 +105,7 @@
         {/if}
         <div class="space-y-2">
             <span class="text-sm font-medium leading-none">Created</span>
-            <span class="leading-none block text-sm text-muted-foreground">{formatRelativeTime(creationDate)} – {readableDate}</span>
+            <span class="leading-tight block text-sm text-muted-foreground">{formatRelativeTime(creationDate)} – {readableDate}</span>
         </div>
     </div>
     <div>

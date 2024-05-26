@@ -27,7 +27,7 @@
 			<div class="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted"></div>
 		{/if}
 		{#if layoutDirection === 'right'}
-			<div class="m-[1rem] rounded-[10px] flex flex-col basis-full border bg-background">
+			<div class="m-[16px] rounded-[10px] max-w-[calc(100%-(16px*2))] flex flex-col basis-full border bg-background">
 				<div class="absolute top-1/2 -translate-y-1/2 -left-4 p-4">
 					<div class="w-1 flex-shrink-0 h-[100px] rounded-full bg-accent-foreground/80"></div>
 				</div>
