@@ -17,6 +17,7 @@
 </script>
 
 {#if imageUrl}
+    <div class="absolute inset-0 h-full w-full object-cover bg-muted"></div>
     <img
         loading="lazy"
         src={imageUrl}

@@ -295,6 +295,9 @@ importers:
       tailwind-variants:
         specifier: ^0.2.1
         version: 0.2.1(tailwindcss@3.4.3)
+      vaul-svelte:
+        specifier: ^0.3.1
+        version: 0.3.1(svelte@4.2.14)
       zod:
         specifier: ^3.22.4
         version: 3.22.4
@@ -2146,6 +2149,11 @@ packages:
     resolution: {integrity: sha512-VMQVXwYIjYmDoudIRm2ZlS2guy97lUQk73DwSfTnaS0dhldImbDFMATNxjLSLsTDj8FqJ8Dv78wSctdxcloIbQ==}
     peerDependencies:
       svelte: ^4.0.0
+
+  bits-ui@0.21.9:
+    resolution: {integrity: sha512-tMoHi2QbsNKJsPDoXGi07OMx6F8LVMSNYMMcntFX4fPPvy+SJSeZYOKlBMmneiSg7smpWzg+h20q0q01OvyxZQ==}
+    peerDependencies:
+      svelte: ^4.0.0 || ^5.0.0-next.118
 
   bits-ui@0.9.9:
     resolution: {integrity: sha512-LkdkyTtpXdkjBzPZJVJgpcre4fut6DONoprMfadHFo82HNUhph+02CxDjYEcZcThb5z4YjSxMlCYvQPZm+YtfQ==}
@@ -5356,6 +5364,11 @@ packages:
     resolution: {integrity: sha512-Ii+sehpSfZy+At5nPdnyMhx78fEoPDkR2XW/zimHEL3MyGJQOCQ7WeP20jPYRz7ZCpcKLB21NxuXHF3bxjStBQ==}
     engines: {node: '>= 0.10'}
 
+  vaul-svelte@0.3.1:
+    resolution: {integrity: sha512-tCIJQMlwHZMPBvBLhLJhzYw6EvQLm808rWVzmd0uTFbfS/12Z6MJ4JGP6z9Fy/sW7Jl7xQVF625N2Zk3cwN1iQ==}
+    peerDependencies:
+      svelte: ^4.0.0
+
   verror@1.10.0:
     resolution: {integrity: sha512-ZZKSmDAEFOijERBLkmYfJ+vmk3w+7hOLYDNkRCuRuMJGEmqYNCNLyBBFwWKVMhfwaEF3WOd0Zlw86U/WC/+nYw==}
     engines: {'0': node >=0.6.0}
@@ -7342,6 +7355,13 @@ snapshots:
       file-uri-to-path: 1.0.0
 
   bits-ui@0.21.3(svelte@4.2.14):
+    dependencies:
+      '@internationalized/date': 3.5.2
+      '@melt-ui/svelte': 0.76.2(svelte@4.2.14)
+      nanoid: 5.0.7
+      svelte: 4.2.14
+
+  bits-ui@0.21.9(svelte@4.2.14):
     dependencies:
       '@internationalized/date': 3.5.2
       '@melt-ui/svelte': 0.76.2(svelte@4.2.14)
@@ -10731,6 +10751,11 @@ snapshots:
 
   validator@13.11.0:
     optional: true
+
+  vaul-svelte@0.3.1(svelte@4.2.14):
+    dependencies:
+      bits-ui: 0.21.9(svelte@4.2.14)
+      svelte: 4.2.14
 
   verror@1.10.0:
     dependencies:

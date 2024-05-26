@@ -1,4 +1,4 @@
-import { commandMenuOpen } from '$lib/stores';
+import { commandMenuOpen, itemsStore } from '$lib/stores';
 import { getContext, setContext } from 'svelte';
 import { writable, get } from 'svelte/store';
 import { goto } from '$app/navigation';
@@ -6,6 +6,8 @@ import { toast } from '@repo/ui/components/sonner';
 
 let cmdPressed = writable(false);
 let searchValue = writable('');
+
+const { openEditDialog, editDialogCloseCallback } = itemsStore;
 
 type CommandPage = {
     name: string;
@@ -24,7 +26,12 @@ function resetPages() {
     searchValue.set('');
 }
 
-function handleItemSelect(mainAction: string|Function, secondAction?: string|Function, closeMenu = true) {
+function closeMenu() {
+    commandMenuOpen.set(false);
+    resetPages();
+}
+
+function handleItemSelect(mainAction: string|Function, secondAction?: string|Function, closeMenuAfterAction = true) {
     if (get(cmdPressed) && typeof secondAction !== 'undefined') {
         if (secondAction instanceof Function) {
             secondAction();
@@ -32,11 +39,12 @@ function handleItemSelect(mainAction: string|Function, secondAction?: string|Fun
         }
 
         if (typeof secondAction === "string" && secondAction !== '') {
-            navigator.clipboard.writeText(secondAction);
-            toast.success('URL copied to clipboard');
-            if (closeMenu) {
-                commandMenuOpen.set(false);
-                resetPages();
+            openEditDialog(secondAction);
+            editDialogCloseCallback.set(() => {
+                commandMenuOpen.set(true);
+            });
+            if (closeMenuAfterAction) {
+                closeMenu();
             }
             return;
         }
@@ -51,15 +59,15 @@ function handleItemSelect(mainAction: string|Function, secondAction?: string|Fun
         goto(url);
     }
 
-    if (closeMenu) {
-        commandMenuOpen.set(false);
-        resetPages();
+    if (closeMenuAfterAction) {
+        closeMenu();
     }
 }
 
 type CommandMenuContext = {
     handleItemSelect: typeof handleItemSelect;
     changePage: typeof changePage;
+    closeMenu: typeof closeMenu;
     cmdPressed: typeof cmdPressed;
     commandPages: typeof commandPages;
     searchValue: typeof searchValue;
@@ -69,6 +77,7 @@ export function setCommandMenuContext() {
     setContext('commandMenu', {
         handleItemSelect,
         changePage,
+        closeMenu,
         cmdPressed,
         commandPages,
         searchValue,

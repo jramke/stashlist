@@ -19,7 +19,7 @@
 </script>
 
 <Dialog.Root bind:open {...$$restProps}>
-	<Dialog.Content class="overflow-hidden p-0 shadow-lg">
+	<Dialog.Content class="overflow-hidden p-0 shadow-lg max-w-xl">
 		<Command
 			class="[&_[data-cmdk-group-heading]]:px-2 [&_[data-cmdk-group-heading]]:font-medium [&_[data-cmdk-group-heading]]:text-muted-foreground [&_[data-cmdk-group]:not([hidden])_~[data-cmdk-group]]:pt-0 [&_[data-cmdk-input-wrapper]_svg]:h-5 [&_[data-cmdk-input-wrapper]_svg]:w-5 [&_[data-cmdk-input]]:h-[calc(3rem+1px)] [&_[data-cmdk-item]]:py-3 [&_[data-cmdk-item]_svg]:h-4 [&_[data-cmdk-item]_svg]:w-4"
 			{...$$restProps}

@@ -2,6 +2,7 @@ import { persisted } from 'svelte-persisted-store';
 import { writable } from 'svelte/store';
 
 import { newStashStore } from './new-stash';
+import { itemsStore } from './items';
 
 export const listColumns = persisted('stashlist-columns', 3);
 
@@ -16,6 +17,4 @@ export const editGroupsDialogOpen = writable(false);
 
 export const newGroupDialogOpen = writable(false);
 
-export const editStashDialogOpen = writable(false);
-
-export { newStashStore };
+export { newStashStore, itemsStore };

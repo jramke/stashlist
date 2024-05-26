@@ -6,9 +6,7 @@
 	import { Folders, Inbox, Masonry, Pencil, Plus, Stash, Tv } from "@repo/ui/icons";
 	import { Shortcut } from "@repo/ui/components/shortcut";
 
-    const ctx = getCommandMenuContext();
-    const handleItemSelect = ctx.handleItemSelect;
-    const changePage = ctx.changePage;
+    const { handleItemSelect, changePage } = getCommandMenuContext();
 
     const { focusNewStashInput } = newStashStore;
 
@@ -53,7 +51,7 @@
         <Pencil class="me-2 shrink-0" />
         Edit groups
     </Command.Item>
-    <Command.Item onSelect={() => handleItemSelect(() => liveView.update(state => !state))} value="Togle live view">
+    <Command.Item onSelect={() => handleItemSelect(() => liveView.update(state => !state))} value="Toggle live view">
         <Tv class="me-2 shrink-0" />
         Toggle live view
         <Command.Shortcut>

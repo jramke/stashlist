@@ -2,17 +2,15 @@
 	import type { Save, TODO } from '$lib/types';
 	
 	import { cleanUrl } from '$lib/utils';
-	import ItemFooter from './item-footer.svelte';
 	import ItemMedia from './item-media.svelte';
 	import { Gradient } from '$lib/components/app';
 	import { cn } from '@repo/ui/utils';
 	import ItemContextMenu from './item-context-menu.svelte';
 	import { onMount } from 'svelte';
-	import { getItemsContext } from './context';
+	import { itemsStore } from '$lib/stores';
 
 	// TODO: use let { a,b } = $props();
 	export let title: Save['title'];
-	export let description: Save['description'];
 	export let url: Save['url'];
 	export let imageUrl: Save['imageUrl'];
 	export let faviconUrl: Save['faviconUrl'];
@@ -24,7 +22,7 @@
 
 	const copyUrl = type === 'image' ? imageUrl : url;
 
-	const { copyUrlToClipboard, openEditDialog, openDeleteDialog } = getItemsContext();
+	const { copyUrlToClipboard, openEditDialog, openDeleteDialog, focusedItem } = itemsStore;
 
 	let itemNode: HTMLAnchorElement;
 
@@ -35,9 +33,10 @@
 			event.preventDefault();
 			copyUrlToClipboard(copyUrl);
 		}
-
-		if (event.key === 'e' && (event.metaKey || event.ctrlKey)) {
+		
+		if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
 			event.preventDefault();
+			focusedItem.set(document.activeElement as HTMLElement)
 			openEditDialog(id);
 		}
 
@@ -45,8 +44,6 @@
 			event.preventDefault();
 			openDeleteDialog(id, title);
 		}
-
-		//TODO: open contextmenu if enter and (event.metaKey || event.ctrlKey)
 	};
 	
 	onMount(() => {
@@ -80,9 +77,6 @@
 					<div class="flex items-baseline gap-2">
 						<h3 class="line-clamp-1 text-lg font-bold break-words">{title}</h3>
 					</div>
-					<!-- {#if description}
-						<span class="mb-2 line-clamp-2 text-sm break-words">{description}</span>
-					{/if} -->
 					{#if type !== 'image'}
 						<div class="flex items-center gap-2">
 							{#if faviconUrl}
@@ -92,22 +86,14 @@
 									<Gradient {gradientIndex} />
 								</div>
 							{/if}
-							<a
-								href={url}
-								{title}
-								rel="norefferrer noopener"
-								target="_blank"
-								class="line-clamp-1 text-sm text-muted-foreground break-words"
-								tabindex="-1"
-							>
+							<span class="line-clamp-1 text-sm text-muted-foreground break-words">
 								{cleanUrl(url)}
-							</a>
+							</span>
 						</div>
 					{/if}
 				</div>
 			</div>
 		</div>
-		<ItemFooter {saveGroups} {createdAt} />
 	</a>
 </ItemContextMenu>
 

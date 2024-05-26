@@ -47,8 +47,8 @@ export const load: LayoutServerLoad = async ({ locals, fetch }) => {
 	}
 
 	return {
-		groups: getGroups(),
-		saves: getSaves(),
+		groups: await getGroups(),
+		saves: await getSaves(),
 		userProvider: await getUserProvider(locals.user?.id)
 	};
 };

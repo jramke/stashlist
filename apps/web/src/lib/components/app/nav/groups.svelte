@@ -25,7 +25,11 @@
 	import { editGroupsDialogOpen, newGroupDialogOpen } from '$lib/stores';
 
     let groupCounts: TODO;
-    $: $page.data.saves.then(saves => groupCounts = saves?.groupCounts);
+    $: if (typeof $page.data.saves?.then === "function") {
+        $page.data.saves.then(saves => groupCounts = saves?.groupCounts);
+    } else {
+        groupCounts = $page.data.saves.groupCounts;
+    }
 
     let groups: TODO;
     $: if (typeof $page.data.groups?.then === "function") {
@@ -35,7 +39,11 @@
     }
 
     let noGroupCount: number | undefined;
-	$: $page.data.saves.then(data => noGroupCount = data?.noGroupCount);
+    $: if (typeof $page.data.saves?.then === "function") {
+        $page.data.saves.then(saves => noGroupCount = saves?.noGroupCount);
+    } else {
+        noGroupCount = $page.data.saves.noGroupCount;
+    }
 
     $: breadcrumbArray = [{ title: 'Stashes', gradientIndex: null }];
 
@@ -274,7 +282,7 @@
                 <DropdownMenu.Root>
                     <DropdownMenu.Trigger class={'flex focusable font-bold text-2xl items-baseline'}>
                         {#if item.gradientIndex !== null}
-                            <div class="rounded-full size-4 overflow-hidden relative me-2">
+                            <div class="rounded-full size-4 overflow-hidden relative me-2 flex-shrink-0">
                                 <Gradient gradientIndex={item.gradientIndex} />
                             </div>
                         {/if}

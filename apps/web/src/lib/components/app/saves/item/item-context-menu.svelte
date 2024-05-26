@@ -4,13 +4,15 @@
 	import * as ContextMenu from '@repo/ui/components/context-menu';
 	import { Shortcut } from '@repo/ui/components/shortcut';
     import { Trash, Pencil, Copy } from '@repo/ui/icons';
-	import { getItemsContext } from './context';
+	import { itemsStore } from '$lib/stores';
 
     export let id: Save['id'];
     export let title: Save['title'];
 	export let copyUrl: string;
-	
-	const { openContextMenus, createContextMenuOpenState, copyUrlToClipboard, openEditDialog, openDeleteDialog, deleteDialogOpen } = getItemsContext();
+
+	let triggerNode: HTMLDivElement;
+
+	const { openContextMenus, createContextMenuOpenState, copyUrlToClipboard, openEditDialog, openDeleteDialog } = itemsStore; 
 	const openState = createContextMenuOpenState(false);
 
 	const handleContextMenuOpen = (open: boolean) => {
@@ -27,16 +29,16 @@
 </script>
 
 <ContextMenu.Root onOpenChange={handleContextMenuOpen} bind:open={$openState} disableFocusFirstItem={true}>
-	<ContextMenu.Trigger>
+	<ContextMenu.Trigger bind:el={triggerNode}>
 		<slot />
 	</ContextMenu.Trigger>
 	<ContextMenu.Content>
 		<!-- <ContextMenu.Label>Actions</ContextMenu.Label> -->
 		<ContextMenu.Item on:click={() => openEditDialog(id)}>
 			<Pencil class="size-4 me-2" />
-			Edit
+			View details
 			<ContextMenu.Shortcut>
-				<Shortcut keys={['command', 'E']} />
+				<Shortcut keys={['command', 'enter']} />
 			</ContextMenu.Shortcut>
 		</ContextMenu.Item>
 		<ContextMenu.Item on:click={() => copyUrlToClipboard(copyUrl)}>

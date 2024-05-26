@@ -53,6 +53,7 @@
             if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault();
                 commandMenuOpen.set(!$commandMenuOpen);
+                cmdPressed.set(false);
             }
             if (e.key === "a" && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault();
@@ -135,7 +136,12 @@
     </Command.List>
     <Command.Footer class="flex items-center justify-end">
         <div class="flex items-center gap-2">
-            Search in group / copy url
+            Copy url
+            <Shortcut keys={['command', 'c']} />
+        </div>
+        <Separator orientation="vertical" />
+        <div class="flex items-center gap-2">
+            Search in group / detail view
             <Shortcut keys={['command', 'enter']} />
         </div>
         <Separator orientation="vertical" />
