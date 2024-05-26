@@ -10,8 +10,19 @@ body {
 	.body-inner {
 		display: flex;
 		flex-direction: column;
+		&[style*="transform:"] {
+			height: 100vh;
+		}
+		&:not([style*="transform:"]) {
+			animation: transformStylesHack 400ms;
+		}
+		min-height: 100vh;
+		min-height: 100dvh;
+	}
+}
+@keyframes transformStylesHack {
+	0%, 100% {
 		height: 100vh;
-		/* min-height: 100dvh; */
 	}
 }
 
