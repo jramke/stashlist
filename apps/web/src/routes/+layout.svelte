@@ -17,7 +17,7 @@
 	<Navigation />
 {/if}
 
-<main id="stashlist-app" data-vaul-drawer-wrapper>
+<main id="stashlist-app">
 	<slot />
 </main>
 
