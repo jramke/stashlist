@@ -7,12 +7,11 @@
 	import { itemsStore } from '$lib/stores';
 
     export let id: Save['id'];
-    export let title: Save['title'];
 	export let copyUrl: string;
 
 	let triggerNode: HTMLDivElement;
 
-	const { openContextMenus, createContextMenuOpenState, copyUrlToClipboard, openEditDialog, openDeleteDialog } = itemsStore; 
+	const { openContextMenus, createContextMenuOpenState, copyUrlToClipboard, openEditDialog, deleteItem } = itemsStore; 
 	const openState = createContextMenuOpenState(false);
 
 	const handleContextMenuOpen = (open: boolean) => {
@@ -48,7 +47,7 @@
 				<Shortcut keys={['command', 'C']} />
 			</ContextMenu.Shortcut>
 		</ContextMenu.Item>
-		<ContextMenu.Item on:click={() => openDeleteDialog(id, title)} class="data-[highlighted]:bg-destructive/10 data-[highlighted]:shadow-destructive/10 data-[highlighted]:border-destructive/30">
+		<ContextMenu.Item on:click={() => deleteItem(id)} class="data-[highlighted]:bg-destructive/10 data-[highlighted]:shadow-destructive/10 data-[highlighted]:border-destructive/30">
 			<Trash class="size-4 me-2" />
 			Delete
 			<ContextMenu.Shortcut>
