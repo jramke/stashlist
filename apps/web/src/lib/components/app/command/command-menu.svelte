@@ -85,7 +85,7 @@
             }
         }
         function handleKeyup(e: KeyboardEvent) {
-            if (e.metaKey || e.ctrlKey) {
+            if (e.key === 'Control' || e.key === 'Meta') {
                 cmdPressed.set(false);
             }
         }
