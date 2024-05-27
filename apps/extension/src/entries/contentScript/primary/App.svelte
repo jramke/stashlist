@@ -76,7 +76,7 @@
 				
 				editDialogOpen = true;
 				resolveStashPromise();
-				console.log('dialog opened');
+				// console.log('dialog opened');
 				
 				try {
 					newStashForm = await waitForElement<HTMLFormElement>('#stashlist-form', stashlistRoot);
@@ -89,7 +89,7 @@
 					}
 
 					newStashFormButton.addEventListener('click', formButtonClickListener);
-					console.log('form listeners initialized');
+					// console.log('form listeners initialized');
 					
 				} catch (error) {
 					console.error('Error while initializing form listeners', error);
@@ -126,7 +126,7 @@
 	}
 
 	async function handleFormButtonClick(e: MouseEvent, formSchema: z.ZodSchema<any>) {
-		console.log('form button clicked');
+		// console.log('form button clicked');
 		e.preventDefault();
 		if (!newStashForm) {
 			rejectStashPromise();
@@ -145,11 +145,11 @@
 			rejectStashPromise();
 			return;
 		}
-		console.log('formdata parsed', formData);
+		// console.log('formdata parsed', formData);
 		browser.runtime.sendMessage({
 			['save' + newStashType.charAt(0).toUpperCase() + newStashType.slice(1)]: formData,
 		});
-		console.log('message sent to', 'save' + newStashType.charAt(0).toUpperCase() + newStashType.slice(1));
+		// console.log('message sent to', 'save' + newStashType.charAt(0).toUpperCase() + newStashType.slice(1));
 	}
 
 	function handleDialogOpenChange(open: boolean) {
@@ -163,7 +163,6 @@
 
 <div>
 
-	<!-- both not working -->
 	<Toaster position="bottom-center" />
 
 	<Dialog.Root bind:open={editDialogOpen} portal={null} onOpenChange={handleDialogOpenChange} preventScroll={false} closeOnOutsideClick={false}>

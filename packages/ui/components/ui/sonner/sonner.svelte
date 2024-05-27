@@ -1,12 +1,16 @@
 <script lang="ts">
 	import { Toaster as Sonner, type ToasterProps as SonnerProps } from 'svelte-sonner';
-	import { mode } from 'mode-watcher';
 
 	type $$Props = SonnerProps;
+
+	// if we use modewatcher for the theme, the extension breaks pages. 
+	// Cause mode watcher sets the theme for the whole page.
+	// As long we only use darkmode we just set it manually here.
+	export let theme: $$Props['theme'] = 'dark';
 </script>
 
 <Sonner
-	theme={$mode}
+	theme={theme}
 	class="toaster group"
 	toastOptions={{
 		classes: {
