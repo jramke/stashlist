@@ -11,7 +11,7 @@ const buttonVariants = tv({
 			outline: 'border-input hover:shadow-inner hover:shadow-secondary hover:text-accent-foreground hover:border-accent hover:bg-accent',
 			secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:shadow-md hover:shadow-secondary/20',
 			ghost: 'hover:shadow-inner hover:shadow-secondary hover:text-accent-foreground hover:border-accent hover:bg-accent',
-			link: 'decoration-primary underline-offset-4 hover:underline',
+			link: 'decoration-primary-foreground underline-offset-4 hover:underline',
 			nav: 'transition-colors text-foreground/60 hover:text-foreground/80 [&.active]:text-foreground [&.active]:font-bold active:scale-100',
 		},
 		size: {

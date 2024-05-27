@@ -5,6 +5,32 @@
 	import Typography from '@repo/ui/components/typography';
 	import { Button } from '@repo/ui/components/button';
 
+	const features = [
+		{
+			title: 'Minimalistic UI',
+			description: 'Modern interface without missing any feature to help you organize your bookmarks.'
+		},
+		{
+			title: 'Keyboard focus',
+			description: 'Command menu with a lot of shortcuts for a faster workflow and navigation.'
+		},
+		{
+			title: 'Grouping system',
+			description: 'Tags to organize your bookmarks in a way that makes sense to you.'
+		},
+		{
+			title: 'Browser extension',
+			description: 'Save wesbites or images directly from your browser.'
+		},
+		{
+			title: 'Metadata',
+			description: 'Automatically fetches metadata for your bookmarks.'
+		},
+		{
+			title: 'More infos',
+			description: 'Get more information about the features and functionality <a class="underline underline-offset-4" href="/help">here</a>.'
+		}
+	];
 
 </script>
 
@@ -78,33 +104,25 @@
 </Section>
 <Section>
 	<div class="container">
-		<img class="border rounded-xl" src="/screenshot.png" alt="Screenshot of the stashlist app UI">
+		<img class="border rounded-xl shadow-xl" src="/screenshot.png" alt="Screenshot of the stashlist app UI">
 	</div>
 </Section>
 <Section>
 	<Typography class="container">
-		<div class="text-xl leading-normal font-medium space-y-10">
-			<h2 class="font-bold text-3xl mt-0">
+		<div class="space-y-10">
+			<h2 class="font-bold text-3xl mt-0 text-center">
 				Features
 			</h2>
-			<p>
-				Minimalistic UI without missing any feature to help you organize your bookmarks.
-			</p>
-			<p>
-				Keyboard accessibility and command menu with a lot of shortcuts for a faster workflow and navigation.
-			</p>
-			<p>
-				Grouping system to to help you categorize your bookmarks.
-			</p>
-			<p>
-				Browser extension to save wesbites or images directly from your browser.
-			</p>
-			<p>
-				Automatically fetches metadata for your bookmarks.
-			</p>
-			<p>
-				Get more information about the features and functionality <a class="underline underline-offset-4" href="/help">here</a>.
-			</p>
+			<div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+				{#each features as { title, description }}
+					<div class="rounded-lg p-4 border self-start shadow bg-card/30 h-full transition hover:bg-card/60 hover:shadow-xl">
+						<h3 class="mt-0 text-lg w-[90%]">{title}</h3>
+						<p class="leading-snug text-muted-foreground">
+							{@html description}
+						</p>
+					</div>
+				{/each}
+			</div>
 		</div>
 	</Typography>
 </Section>
