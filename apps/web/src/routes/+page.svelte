@@ -47,35 +47,35 @@
 				You've got 
 				<span class="whitespace-nowrap">
 					<LogoPoof>
-						<Chrome class="h-7 w-7 inline -mt-2" /> 
-    					<Arc class="h-8 w-8 inline -ms-4 -mt-2 rotate-[10deg]" />
+						<Chrome class="h-6 w-6 inline -mt-2" /> 
+    					<Arc class="h-7 w-7 inline -ms-4 -mt-2 rotate-[10deg]" />
 					</LogoPoof>
 					browser 
 				</span>
 				and  
 				<span class="whitespace-nowrap"> 
 					<LogoPoof>
-						<TwitterBookmark class="h-7 w-7 inline -mt-2" /> 
+						<TwitterBookmark class="h-6 w-6 inline -mt-2" /> 
 					</LogoPoof>
 					Twitter
 				</span>
 				bookmarks scattered like confetti, and a graveyard of your liked 
 				<span class="whitespace-nowrap"> 
 					<LogoPoof>
-						<Codepen class="h-7 w-7 inline -mt-2 text-foreground" /> 
+						<Codepen class="h-6 w-6 inline -mt-2 text-foreground" /> 
 					</LogoPoof>
 					CodePens,
 				</span> 
 				<span class="whitespace-nowrap"> 
 					<LogoPoof>
-						<Dribbble class="h-7 w-7 inline -mt-2" /> 
+						<Dribbble class="h-6 w-6 inline -mt-2" /> 
 					</LogoPoof>
 					Dribbble
 				</span> 
 				shots and 
 				<span class="whitespace-nowrap"> 
 					<LogoPoof>
-						<Behance class="h-7 w-7 inline -mt-2" /> 
+						<Behance class="h-6 w-6 inline -mt-2" /> 
 					</LogoPoof>
 					Behance
 				</span> 
@@ -92,8 +92,6 @@
 				stars, searching for that damn library.
 			</p>
 			<p>
-				<!-- Sound familiar? It's the repeating cycle of searching, clicking, and hoping you'll stumble upon what you need. 
-				<br> -->
 				But what if there was a better way?
 			</p>
 			<h2 class="font-bold text-2xl">

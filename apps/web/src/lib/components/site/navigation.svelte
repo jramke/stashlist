@@ -14,7 +14,7 @@
 	<div class="container flex items-center py-4">
 		<div class="mr-4 flex">
 			<a href={$page.data.user ? siteConfig.appUrl : '/'} class="mr-6 flex items-center space-x-2">
-				<Logo class="h-5 w-5" />
+				<Logo class="h-6 w-6" />
 				<span class="text-lg font-bold sm:inline-block">
 					{siteConfig.name}
 				</span>
