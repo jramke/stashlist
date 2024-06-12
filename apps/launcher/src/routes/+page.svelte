@@ -1,14 +1,32 @@
 <script lang="ts">
-  import { register } from '@tauri-apps/plugin-global-shortcut';
+  import '@repo/ui/globals.pcss';
+  import '../app.pcss';
 
-  register('CommandOrControl+Shift+C', (event) => {
-    if (event.state === 'Pressed') {
-      console.log('JS Shortcut triggered');
-    }
+  import { listen, emit } from '@tauri-apps/api/event'
+  import { onMount } from 'svelte';
+  import CommandMenu from './CommandMenu.svelte';
+
+  type Payload =  'opened' | 'closed';
+
+  onMount(async () => {
+    const unlisten = await listen<Payload>('toggle-window-rust', (event) => {
+      console.log(event.payload);
+      if (event.payload === 'opened') {
+        console.log('opened');
+      }
+      if (event.payload === 'closed') {
+        console.log('closed');
+      }
+    });
   });
+
+  function closeWindow() {
+    emit('toggle-window-svelte', 'close');
+  }
+
+
+
 </script>
-
-<div class="container">
-  <h1>Welcome to Tauri!</h1>
-
-</div>
+<main>
+  <CommandMenu />
+</main>

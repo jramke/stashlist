@@ -1,9 +1,16 @@
 import { defineConfig } from "vite";
 import { sveltekit } from "@sveltejs/kit/vite";
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 // https://vitejs.dev/config/
-export default defineConfig(async () => ({
-  plugins: [sveltekit()],
+export default defineConfig({
+  plugins: [
+    sveltekit(),
+    tsconfigPaths({ 
+			loose: true, 
+			root: '../../' 
+		})
+  ],
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
@@ -18,4 +25,4 @@ export default defineConfig(async () => ({
       ignored: ["**/src-tauri/**"],
     },
   },
-}));
+});

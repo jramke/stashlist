@@ -7,14 +7,19 @@
   ],
   "permissions": [
     "path:default",
-    "event:default",
+    "event:allow-listen",
+    "event:allow-unlisten",
+    "event:allow-emit",
+    "event:allow-emit-to",
     "window:default",
     "app:default",
-    "image:default",
     "resources:default",
     "menu:default",
     "tray:default",
-    "shell:allow-open",
-    "global-shortcut:default"
+    "window:allow-set-title",
+    "global-shortcut:allow-is-registered",
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-unregister",
+    "shell:allow-open"
   ]
 }

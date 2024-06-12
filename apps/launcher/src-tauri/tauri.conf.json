@@ -11,10 +11,15 @@
   "app": {
     "windows": [
       {
-        "title": "launcher",
-        "width": 800,
-        "height": 600,
-        "label": "launcher"
+        "title": "main",
+        "width": 600,
+        "height": 400,
+        "label": "main",
+        "decorations": false,
+        "transparent": true,
+        "center": true,
+        "visible": false,
+        "alwaysOnTop": true
       }
     ],
     "security": {
