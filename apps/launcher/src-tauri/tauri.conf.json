@@ -19,7 +19,12 @@
         "transparent": true,
         "center": true,
         "visible": false,
-        "alwaysOnTop": true
+        "alwaysOnTop": true,
+        "focus": true,
+        "hiddenTitle": true,
+        "minimizable": false,
+        "resizable": false,
+        "maximizable": false
       }
     ],
     "security": {

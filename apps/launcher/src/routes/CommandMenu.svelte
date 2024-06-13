@@ -6,6 +6,9 @@
     import { Stash } from "@repo/ui/icons";
 	import { onMount } from "svelte";
     import { open } from '@tauri-apps/plugin-shell';
+    import { listen, emit } from '@tauri-apps/api/event'
+
+    type Payload =  'opened' | 'closed';
 
     const cmdPressed = writable(false);
     const searchValue = writable('');
@@ -22,19 +25,31 @@
 	let saves: any[] = [];
     let groups: any[] = [];
 
+    const unlisten = listen<Payload>('toggle-window-rust', (event) => {
+      console.log(event.payload);
+      if (event.payload === 'opened') {
+        console.log('opened');
+      }
+      if (event.payload === 'closed') {
+        console.log('closed');
+      }
+    });
+
     onMount(() => {
         console.log('command menu mount');
         getItems();
 
         searchInput = document.querySelector('[data-cmdk-input]') as HTMLInputElement; // bind:el not working?
-        searchInput?.focus();
         
+        const unlisten = listenForEvents();
+
         document.addEventListener("keydown", handleKeydown);
         document.addEventListener("keyup", handleKeyup);
         
         return () => {
             document.removeEventListener("keydown", handleKeydown);
             document.removeEventListener("keyup", handleKeyup);
+            unlisten.then(fn => fn());
         };
     });
 
@@ -101,17 +116,41 @@
         loading = true;
 
         const getData = async (url: string) => {
-            const response = await fetch(url);
+            const response = await fetch(url, { method: 'GET' });
             const result = await response.json();
             return result;
         }
+        // const savesData = await getData('https://www.stashlist.app/api/saves');
+        // const groupsData = await getData('https://www.stashlist.app/api/groups');
         const savesData = await getData('http://127.0.0.1:5173/api/saves');
         const groupsData = await getData('http://127.0.0.1:5173/api/groups');
+
+        console.log(savesData);
+        console.log(groupsData);
 
         saves = savesData.saves;
         groups = groupsData;
 
         loading = false;
+    }
+
+    async function listenForEvents() {
+        const unlisten = await listen<Payload>('toggle-window-rust', (event) => {
+            console.log(event.payload);
+            if (event.payload === 'opened') {
+                console.log('opened');
+                searchInput?.focus();
+            }
+            if (event.payload === 'closed') {
+                console.log('closed');
+            }
+        });
+        return unlisten;
+    }
+
+    function handleItemOpen(url: string) {
+        open(url);
+        emit('toggle-window-svelte', 'close');
     }
 
 </script>
@@ -121,15 +160,20 @@
     <Command.List>
         <Command.Empty>No results found.</Command.Empty>
         <Command.Group heading="Actions">
-			<Command.Item onSelect={() => open('https://stashlist.app')} value="Open Stashlist">
+			<Command.Item onSelect={() => handleItemOpen('https://stashlist.app')} value="Open Stashlist">
                 <Stash class="me-2 shrink-0" />
                 Open Stashlist
             </Command.Item>
+            <Command.Item onSelect={() => handleItemOpen('http://127.0.0.1:5173/api/saves')} value="Localhost">
+                <Stash class="me-2 shrink-0" />
+                Localhost Saves open
+            </Command.Item>
+            <!-- <a href="http://127.0.0.1:5173/api/saves">Localhost Saves href</a> -->
 		</Command.Group>
         {#if loading}
             <Command.Loading>Fetching stashes</Command.Loading>
 		{:else}
-            {#if groups.length > 0}
+            {#if groups?.length > 0}
                 <Command.Group heading="Groups">
                     {#each groups as { title }}
                         <Command.Item value={title}>
@@ -138,7 +182,7 @@
                     {/each}
                 </Command.Group>
             {/if}
-            {#if saves.length > 0}
+            {#if saves?.length > 0}
                 <Command.Group heading="Stashes">
                     {#each saves as { title, description, url }}
                         <Command.Item value={title + ' ' + description} onSelect={() => window.open(url, '_blank')?.focus()}>

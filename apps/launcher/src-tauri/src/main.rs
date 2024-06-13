@@ -22,6 +22,7 @@ fn hide_launchbar(app: &AppHandle, window: &WebviewWindow) {
 
 fn show_launchbar(app: &AppHandle, window: &WebviewWindow) {
     let _ = window.show();
+    let _ = window.set_focus();
     let _ = app.emit("toggle-window-rust", "opened");
 }
 
@@ -38,6 +39,7 @@ fn toggle_launchbar(app: &AppHandle) {
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
             #[cfg(desktop)]
