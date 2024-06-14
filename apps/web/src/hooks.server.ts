@@ -6,6 +6,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const allowedPaths = [
 		'/api/saves/new/website',
 		'/api/saves/new/image',
+		'/api/saves',
+		'/api/groups'
 	];
 
 	// https://github.com/sveltejs/kit/issues/6784
