@@ -12,9 +12,9 @@
 		"format": "prettier --write .",
 		"turso": "turso dev --db-file turso/dev.db",
 		"studio": "drizzle-kit studio --config drizzle.config.ts",
-		"generate": "drizzle-kit generate:sqlite --config drizzle.config.ts",
+		"generate": "drizzle-kit generate --config drizzle.config.ts",
 		"migrate": "tsx src/lib/server/db/migrate.ts",
-		"push": "drizzle-kit push:sqlite --config drizzle.config.ts"
+		"push": "drizzle-kit push --config=drizzle.config.ts"
 	},
 	"devDependencies": {
 		"@repo/eslint-config": "workspace:*",
