@@ -5,9 +5,10 @@
     import { Motion } from "svelte-motion";
 
     let canvas: HTMLCanvasElement;
-    let wrapper: HTMLDivElement;
+    let wrapper: HTMLElement;
     let replacerVisible = false;
     let width: number|string = 'auto';
+    let replacerScale = 1.15;
 
     let poof: any;
 
@@ -33,18 +34,23 @@
         poof.play();
         width = 28;
         replacerVisible = true;
+        replacerScale = 1;
     }
 
 </script>
 
-<Motion let:motion animate={{ width: width }}>
-    <span use:motion class="relative inline-flex items-center justify-center !m-0" bind:this={wrapper}>
-        <canvas bind:this={canvas} class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 hidden"></canvas>
-        <span class="inline" class:hidden={!replacerVisible}>
-            <Logo class="h-6 w-6 inline -mt-2" />
-        </span>
-        <button class="cursor-pointer inline" class:hidden={replacerVisible} on:click={handleClick}>
-            <slot />
-        </button>
+<Motion let:motion animate={{ width }}>
+    <span use:motion class="relative !inline-flex items-center justify-center !m-0" bind:this={wrapper}>
+        <canvas bind:this={canvas} class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 hidden z-50"></canvas>
+        <Motion let:motion animate={{ scale: replacerScale }}>
+            <span use:motion class="inline" class:hidden={!replacerVisible}>
+                <Logo class="h-6 w-6 inline -mt-2" />
+            </span>
+        </Motion>
+        <Motion let:motion whileHover={{ scale: 1.2 }}>
+            <button use:motion class="cursor-pointer inline" class:hidden={replacerVisible} on:click={handleClick}>
+                <slot />
+            </button>
+        </Motion>
     </span>
 </Motion>
