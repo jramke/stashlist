@@ -17,4 +17,6 @@ export const editGroupsDialogOpen = writable(false);
 
 export const newGroupDialogOpen = writable(false);
 
+export const generateKeyDialogOpen = writable(false);
+
 export { newStashStore, itemsStore };

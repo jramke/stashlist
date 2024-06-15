@@ -7,10 +7,11 @@
 	import * as Avatar from '@repo/ui/components/avatar';
 	import { onMount } from 'svelte';
 	import { cn } from '@repo/ui/utils';
-	import { commandMenuOpen } from '$lib/stores';
+	import { commandMenuOpen, generateKeyDialogOpen } from '$lib/stores';
 	import { Shortcut } from '@repo/ui/components/shortcut';
 	import { siteConfig } from '$lib/config/site';
 	import { goto } from '$app/navigation';
+	import { GenerateKeyDialog } from '../connect';
     
     let logoutForm: HTMLFormElement;
     
@@ -31,6 +32,8 @@
     })
 
 </script>
+
+<GenerateKeyDialog />
 
 <form class="hidden" method="post" bind:this={logoutForm} action="/logout" use:enhance></form>
 
@@ -56,6 +59,7 @@
         </DropdownMenu.Label>
         <DropdownMenu.Separator />
         <DropdownMenu.Group>
+            <DropdownMenu.Item on:click={() => generateKeyDialogOpen.set(true)}>Generate API key</DropdownMenu.Item> 
             <DropdownMenu.Item href={'/extension'}>Get the extension</DropdownMenu.Item> 
             <DropdownMenu.Item on:click={() => commandMenuOpen.set(true)}>
                 Command Menu

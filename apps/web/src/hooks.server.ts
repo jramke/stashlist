@@ -1,5 +1,6 @@
 import { siteConfig } from '$lib/config/site';
 import { lucia } from '$lib/server/auth';
+import { getUserByApiKey, getSessionByUserId } from '$lib/server/db/queries';
 import { redirect, error, json, text, type Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
@@ -39,13 +40,20 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	};
 
-	const sessionId = event.cookies.get(lucia.sessionCookieName);
+	let sessionId = event.cookies.get(lucia.sessionCookieName);
 
 	if (!sessionId) {
-		event.locals.user = null;
-		event.locals.session = null;
-		declineApiRequests();
-		return await resolve(event);
+		const fullUser = await getUserFromApiKeyHeader(event.request);
+		const session = await getSessionByUserId(fullUser?.id);
+		
+		if (session && session.id) {
+			sessionId = session.id;
+		} else {
+			event.locals.user = null;
+			event.locals.session = null;
+			declineApiRequests();
+			return await resolve(event);
+		}
 	}
 
 	const { session, user } = await lucia.validateSession(sessionId);
@@ -92,4 +100,17 @@ function isContentType(request: Request, ...types: string[]) {
 }
 function isFormContentType(request: Request) {
 	return isContentType(request, 'application/x-www-form-urlencoded', 'multipart/form-data');
+}
+async function getUserFromApiKeyHeader(request: Request) {
+	const apiKey = request.headers.get('x-api-key');
+	if (!apiKey) {
+		return null;
+	}
+
+	const user = await getUserByApiKey(apiKey);
+	if (!user) {
+		return null;
+	}
+
+	return user;
 }

@@ -9,12 +9,11 @@
     import { Textarea } from "@repo/ui/components/textarea";
     import Tags from "@repo/ui/components/tags";
 	import { Button } from "@repo/ui/components/button";
-	import * as Tooltip from "@repo/ui/components/tooltip";
 	import { invalidateAll } from "$app/navigation";
 	import { formatRelativeTime } from "$lib/utils";
-	import { Copy } from "@repo/ui/icons";
 	import { itemsStore } from "$lib/stores";
 	import ItemMedia from "$lib/components/app/saves/item/item-media.svelte";
+	import { CopyButton } from "$lib/components/app";
 
     export let data: {
         form: SuperValidated<Infer<FormSchema>>,
@@ -41,24 +40,9 @@
     let groups = data?.save.saveGroups.map(item => item.group) || [];
     $: groupIds = groups.map(item => item.id);
 
-    let copyUrlText = 'Copy URL to clipboard';
-    let copyUrlOpen = false;
-
     async function onLegacyCancel() {
         await invalidateAll();
         history.back();
-    }
-
-    function handleUrlCopy(url: string) {
-        copyUrlToClipboard(url, false);
-        copyUrlOpen = true;
-        copyUrlText = 'Copied!';
-    }
-
-    function handleUrlCopyOpenChange(open: boolean) {
-        if (!open) {
-            copyUrlText = 'Copy URL to clipboard';
-        }
     }
 
 </script>
@@ -106,16 +90,7 @@
                 <span class="text-sm font-medium leading-none">URL</span>
                 <div class="flex items-center gap-2 max-w-full">
                     <a href={data?.save.url} target="_blank" rel="noreferrer noopener" class="truncate max-w-[calc(100%-(1rem+0.5rem))] leading-tight text-sm text-muted-foreground underline underline-offset-4">{data?.save.url}</a>
-                    <Tooltip.Root disableHoverableContent={true} open={copyUrlOpen} closeOnPointerDown={false} onOpenChange={handleUrlCopyOpenChange}>
-                        <Tooltip.Trigger>
-                            <button type="button" class="focusable" on:click={() => handleUrlCopy(data?.save.url)}>
-                                <Copy class="size-4 -mb-1" />
-                            </button>
-                        </Tooltip.Trigger>
-                        <Tooltip.Content>
-                            {copyUrlText}
-                        </Tooltip.Content>
-                    </Tooltip.Root>
+                    <CopyButton copyString={data?.save.url} copyText={'Copy URL to clipboard'} />
                 </div>
             </div>
         {/if}
