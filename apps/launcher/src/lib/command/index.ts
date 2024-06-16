@@ -1,0 +1,1 @@
+export { default as Command } from "./main.svelte";

@@ -1,46 +1,42 @@
 <script lang="ts">
-    import { writable } from "svelte/store";
     import * as Command from "@repo/ui/components/command";
     import { Separator } from "@repo/ui/components/separator";
     import { Shortcut } from "@repo/ui/components/shortcut";
     import { Stash } from "@repo/ui/icons";
 	import { onMount } from "svelte";
-    import { open } from '@tauri-apps/plugin-shell';
-    import { listen, emit } from '@tauri-apps/api/event'
+    import { listen } from '@tauri-apps/api/event'
+    import { getCommandMenuContext, setCommandMenuContext } from "./context";
+    import Connect from "./connect.svelte";
+    import { getRecord } from "$lib/stronghold";
+    import { fetch } from '@tauri-apps/plugin-http';
 
     type Payload =  'opened' | 'closed';
 
-    const cmdPressed = writable(false);
-    const searchValue = writable('');
+    setCommandMenuContext();
+    const { cmdPressed, commandPages, handleItemSelect, changePage, searchValue, searchInput, apiInput, goPageBack, closeApp, focusableEls, parentEl, updateFocusableEls, resetPages } = getCommandMenuContext();
 
-    let searchInput: HTMLInputElement;
+    let currentPage = $commandPages.length > 0 ? $commandPages[0] : undefined;
+    $: currentPage = $commandPages[$commandPages.length - 1];
 
-    type CommandPage = {
-        name: string;
-        groupId?: string;
+    let removeTrapFocusListeners: (() => void) | undefined;
+    $: if ($focusableEls) {
+        removeTrapFocusListeners = trapFocus();
     }
-    const commandPages = writable<CommandPage[]>([]);
 
     let loading = true;
 	let saves: any[] = [];
     let groups: any[] = [];
 
-    const unlisten = listen<Payload>('toggle-window-rust', (event) => {
-      console.log(event.payload);
-      if (event.payload === 'opened') {
-        console.log('opened');
-      }
-      if (event.payload === 'closed') {
-        console.log('closed');
-      }
-    });
-
     onMount(() => {
         console.log('command menu mount');
         getItems();
-
-        searchInput = document.querySelector('[data-cmdk-input]') as HTMLInputElement; // bind:el not working?
         
+
+        parentEl.set(document.querySelector('[data-cmdk-root]') as HTMLElement);
+        searchInput.set(document.querySelector('[data-cmdk-input]') as HTMLInputElement); // bind:el not working?
+        updateFocusableEls();
+        
+        removeTrapFocusListeners = trapFocus();
         const unlisten = listenForEvents();
 
         document.addEventListener("keydown", handleKeydown);
@@ -50,6 +46,7 @@
             document.removeEventListener("keydown", handleKeydown);
             document.removeEventListener("keyup", handleKeyup);
             unlisten.then(fn => fn());
+            removeTrapFocusListeners?.();
         };
     });
 
@@ -59,21 +56,20 @@
     }
 
     function onKeydown(e: KeyboardEvent) {
-        console.log(e);
         // if ($commandMenuOpen) {
         //     // e.preventDefault();
         //     e.stopPropagation(); 
         // }
-        if (e.key === 'Escape' || (e.key === 'Backspace' && !$searchValue)) {
+        
+        if (e.key === 'Escape' || (e.key === 'Backspace' && !$searchValue && document.activeElement !== $apiInput)) {
 			e.preventDefault();
             // dont close command dialog if going back from a page with escape key
             if ($commandPages.length > 0) { 
                 e.stopPropagation();
+                goPageBack();
+            } else {
+                closeApp();
             }
-            commandPages.update(pages => {
-                const newPages = pages.slice(0, -1);
-                return newPages;
-            });
 		}
     }
 
@@ -116,14 +112,27 @@
         loading = true;
 
         const getData = async (url: string) => {
-            const response = await fetch(url, { method: 'GET' });
-            const result = await response.json();
-            return result;
+            const response = await fetch(url, 
+                { 
+                    method: 'GET',
+                    headers: {
+                        'X-Api-Key': await getRecord('api-key'),
+                    }
+                }
+            );
+            
+            // const result = await response.json();
+            // return result;
+            
+            const result = await response.text();            
+            return JSON.parse(result);
         }
+        const savesData = await getData('/saves.json');
+        const groupsData = await getData('/groups.json');
         // const savesData = await getData('https://www.stashlist.app/api/saves');
         // const groupsData = await getData('https://www.stashlist.app/api/groups');
-        const savesData = await getData('http://127.0.0.1:5173/api/saves');
-        const groupsData = await getData('http://127.0.0.1:5173/api/groups');
+        // const savesData = await getData('http://127.0.0.1:5173/api/saves');
+        // const groupsData = await getData('http://127.0.0.1:5173/api/groups');
 
         console.log(savesData);
         console.log(groupsData);
@@ -138,38 +147,75 @@
         const unlisten = await listen<Payload>('toggle-window-rust', (event) => {
             console.log(event.payload);
             if (event.payload === 'opened') {
-                console.log('opened');
-                searchInput?.focus();
+                $searchInput?.focus();
             }
             if (event.payload === 'closed') {
-                console.log('closed');
+                // Timeout so the page doesnt change while window closing animation
+                setTimeout(() => {
+                    resetPages();
+                }, 200);
             }
         });
         return unlisten;
     }
 
-    function handleItemOpen(url: string) {
-        open(url);
-        emit('toggle-window-svelte', 'close');
+    function trapFocus() {
+        if (removeTrapFocusListeners) {
+            removeTrapFocusListeners();
+        }
+
+        if (!$focusableEls || !$parentEl) return;
+
+        const firstFocusableEl = $focusableEls?.[0] as HTMLElement;
+        const lastFocusableEl = $focusableEls?.[$focusableEls.length - 1] as HTMLElement;
+
+        const handleTabKeyPress = (event: KeyboardEvent) => {
+            if (event.key !== 'Tab') return;
+            if (event.shiftKey) {
+                if (document.activeElement === firstFocusableEl) {
+                    event.preventDefault();
+                    lastFocusableEl.focus();
+                }
+            } else {
+                if (document.activeElement === lastFocusableEl) {
+                    event.preventDefault();
+                    firstFocusableEl.focus();
+                }
+            }
+        }
+        $parentEl?.addEventListener('keydown', handleTabKeyPress as EventListener);
+
+        return () => {
+            $parentEl?.removeEventListener('keydown', handleTabKeyPress as EventListener);
+        }
     }
+
+    
 
 </script>
    
 <Command.Root {filter} {onKeydown}>
-    <Command.Input bind:value={$searchValue} placeholder="Search your stashes..." />
+    <div class:hidden={currentPage?.name === 'connect'}>
+        <Command.Input class={currentPage?.name === 'connect' ? 'hidden' : ''} bind:value={$searchValue}  placeholder="Search your stashes..." />
+    </div>
     <Command.List>
-        <Command.Empty>No results found.</Command.Empty>
-        <Command.Group heading="Actions">
-			<Command.Item onSelect={() => handleItemOpen('https://stashlist.app')} value="Open Stashlist">
-                <Stash class="me-2 shrink-0" />
-                Open Stashlist
-            </Command.Item>
-            <Command.Item onSelect={() => handleItemOpen('http://127.0.0.1:5173/api/saves')} value="Localhost">
-                <Stash class="me-2 shrink-0" />
-                Localhost Saves open
-            </Command.Item>
-            <!-- <a href="http://127.0.0.1:5173/api/saves">Localhost Saves href</a> -->
-		</Command.Group>
+        {#if currentPage?.name !== 'connect'}
+            <Command.Empty>No results found.</Command.Empty>
+        {/if}
+        {#if currentPage?.name === 'connect'}
+            <Connect />
+        {:else}
+            <Command.Group heading="Actions">
+                <Command.Item onSelect={() => changePage({name: 'connect'})} value="Connect to Stashlist">
+                    <Stash class="me-2 shrink-0" />
+                    Connect to Stashlist
+                </Command.Item>
+                <Command.Item onSelect={() => handleItemSelect('https://stashlist.app')} value="Open Stashlist">
+                    <Stash class="me-2 shrink-0" />
+                    Open Stashlist
+                </Command.Item>
+            </Command.Group>
+        {/if}
         {#if loading}
             <Command.Loading>Fetching stashes</Command.Loading>
 		{:else}
@@ -185,7 +231,7 @@
             {#if saves?.length > 0}
                 <Command.Group heading="Stashes">
                     {#each saves as { title, description, url }}
-                        <Command.Item value={title + ' ' + description} onSelect={() => window.open(url, '_blank')?.focus()}>
+                        <Command.Item value={title + ' ' + description} onSelect={() => handleItemSelect(url)}>
                             {title}
                         </Command.Item>
                     {/each}

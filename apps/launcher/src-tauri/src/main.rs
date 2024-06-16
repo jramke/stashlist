@@ -5,6 +5,7 @@
 use serde_json::Value;
 use tauri::{AppHandle, Manager, WebviewWindow};
 use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
+use argon2::{hash_raw, Config, Variant, Version};
 
 const WINDOW: &str = "main";
 
@@ -15,9 +16,14 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
+#[tauri::command]
+fn get_env(name: &str) -> String {
+    std::env::var(String::from(name)).unwrap_or(String::from(""))
+}
+
 fn hide_launchbar(app: &AppHandle, window: &WebviewWindow) {
-    let _ = window.hide();
     let _ = app.emit("toggle-window-rust", "closed");
+    let _ = window.hide();
 }
 
 fn show_launchbar(app: &AppHandle, window: &WebviewWindow) {
@@ -39,6 +45,23 @@ fn toggle_launchbar(app: &AppHandle) {
 
 fn main() {
     tauri::Builder::default()
+        .plugin(
+            tauri_plugin_stronghold::Builder::new(|password| {
+                let config = Config {
+                    lanes: 4,
+                    mem_cost: 10_000,
+                    time_cost: 10,
+                    variant: Variant::Argon2id,
+                    version: Version::Version13,
+                    ..Default::default()
+                };
+                let salt = "my-random-string".as_bytes(); // TODO: generate random salt and use env
+                let key = hash_raw(password.as_ref(), &salt, &config).expect("failed to hash password");
+
+                key.to_vec()
+            })
+            .build(),
+        )
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
@@ -88,6 +111,7 @@ fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![get_env])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

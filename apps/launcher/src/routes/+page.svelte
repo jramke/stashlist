@@ -1,11 +1,11 @@
 <script lang="ts">
-  import '@repo/ui/globals.pcss';
-  import '../app.pcss';
+  import { Command } from '$lib/command';
+  import { onMount } from 'svelte';
 
-  import CommandMenu from './CommandMenu.svelte';
+  onMount(async () => {
+    console.log('page mount');
+  });
 
 </script>
 
-<main>
-  <CommandMenu />
-</main>
+<Command />

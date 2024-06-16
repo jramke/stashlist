@@ -24,11 +24,32 @@
     {
       "identifier": "http:default",
       "allow": [
-        { "url": "http://127.0.0.1:5173/api/saves" },
-        { "url": "http://127.0.0.1:5173/api/groups" },
-        { "url": "https://www.stashlist.app/api/saves" },
-        { "url": "https://www.stashlist.app/api/groups" }
+        {
+          "url": "http://127.0.0.1:5173/api/saves"
+        },
+        {
+          "url": "http://127.0.0.1:5173/api/groups"
+        },
+        {
+          "url": "https://www.stashlist.app/api/saves"
+        },
+        {
+          "url": "https://www.stashlist.app/api/groups"
+        },
+        {
+          "url": "http://localhost:1420/saves.json"
+        },
+        {
+          "url": "http://localhost:1420/groups.json"
+        }
       ]
-    }
+    },
+    "stronghold:allow-initialize",
+    "stronghold:allow-create-client",
+    "stronghold:allow-load-client",
+    "stronghold:allow-save",
+    "stronghold:allow-save-store-record",
+    "stronghold:allow-get-store-record",
+    "stronghold:allow-remove-store-record"
   ]
 }
