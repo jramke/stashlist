@@ -1,13 +1,14 @@
 import { Client, Stronghold, type Store } from '@tauri-apps/plugin-stronghold';
 import { appDataDir } from '@tauri-apps/api/path';
 import { get, writable, type Writable } from 'svelte/store';
+import { getEnv } from './env';
 
 export const stronghold = <Writable<any>>writable(null);
 export const strongholdClientStore = <Writable<Store|null>>writable(null);
 
 export async function initStronghold() {
   const vaultPath = `${await appDataDir()}/vault.hold`;
-  const vaultPassword = 'vault-password'; // TODO: use env
+  const vaultPassword = await getEnv('STRONGHOLD_PASSWORD');
   const strongholdObj = await Stronghold.load(vaultPath, vaultPassword);
 
 

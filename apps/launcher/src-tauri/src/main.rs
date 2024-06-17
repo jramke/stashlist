@@ -44,6 +44,8 @@ fn toggle_launchbar(app: &AppHandle) {
 }
 
 fn main() {
+    dotenv::dotenv().ok();
+
     tauri::Builder::default()
         .plugin(
             tauri_plugin_stronghold::Builder::new(|password| {
@@ -55,7 +57,8 @@ fn main() {
                     version: Version::Version13,
                     ..Default::default()
                 };
-                let salt = "my-random-string".as_bytes(); // TODO: generate random salt and use env
+                let salt_str = get_env("STRONGHOLD_SALT");
+                let salt = salt_str.as_bytes();
                 let key = hash_raw(password.as_ref(), &salt, &config).expect("failed to hash password");
 
                 key.to_vec()
