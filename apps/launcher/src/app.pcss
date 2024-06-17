@@ -2,10 +2,17 @@
 	@apply border-border;
 }
 #stashlist {
-	@apply bg-background;
+	@apply bg-background text-foreground;
 	min-height: 100%;
 }
 body, main {
 	height: 100vh;
 }
 
+[data-sonner-toaster] {
+	--mobile-offset: 0px !important;
+}
+[data-sonner-toast] {
+	width: fit-content !important;
+    margin-inline: auto;
+}

@@ -5,7 +5,6 @@ import { emit } from '@tauri-apps/api/event';
 
 const focusableElSelctor = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
-let parentEl = writable<HTMLElement|null>(null);
 let cmdPressed = writable(false);
 let searchValue = writable('');
 let searchInput = writable<HTMLInputElement|null>(null);
@@ -23,7 +22,10 @@ function changePage(newPage: CommandPage) {
         return [...pages, newPage];
     });
     searchValue.set('');
-    // updateFocusableEls();
+    setTimeout(() => {
+        updateFocusableEls();
+        get(searchInput)?.focus();
+    }, 100);
 }
 
 function resetPages() {
@@ -57,8 +59,9 @@ function closeApp() {
 }
 
 function updateFocusableEls() {
-    if (!get(parentEl)) {
-        console.error('parentEl needs to be set before calling updateFocusableEls');
+    const main = document.querySelector('main');
+    if (!main) {
+        console.error('main element not found');
         return;
     }
 
@@ -67,7 +70,7 @@ function updateFocusableEls() {
         return !el.hasAttribute('disabled') && !el.hasAttribute('aria-hidden') && !el.hasAttribute('hidden') && !el.classList.contains('hidden') && !el.classList.contains('disabled');
     };
 
-    let items = Array.from(get(parentEl)!.querySelectorAll(focusableElSelctor));
+    let items = Array.from(main.querySelectorAll(focusableElSelctor));
     items = items.filter((el) => isReallyFocusable(el) && isReallyFocusable(el.parentElement));    
     
     focusableEls.set(items as HTMLElement[]);
@@ -80,7 +83,6 @@ type CommandMenuContext = {
     handleItemSelect: typeof handleItemSelect;
     closeApp: typeof closeApp;
     updateFocusableEls: typeof updateFocusableEls;
-    parentEl: typeof parentEl;
     focusableEls: typeof focusableEls;
     cmdPressed: typeof cmdPressed;
     commandPages: typeof commandPages;
@@ -97,7 +99,6 @@ export function setCommandMenuContext() {
         handleItemSelect,
         closeApp,
         updateFocusableEls,
-        parentEl,
         focusableEls,
         cmdPressed,
         commandPages,
