@@ -40,10 +40,6 @@
     }
 
     function onKeydown(e: KeyboardEvent) {
-        // if ($commandMenuOpen) {
-        //     // e.preventDefault();
-        //     e.stopPropagation(); 
-        // }
         console.log(e);
         
         if (e.metaKey || e.ctrlKey) {

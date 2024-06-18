@@ -64,9 +64,7 @@
     function trapFocus() {
         if (removeTrapFocusListeners) {
             removeTrapFocusListeners();
-        }
-        console.log($focusableEls);
-        
+        } 
 
         if (!$focusableEls) return;
 
@@ -96,7 +94,6 @@
 
     async function listenForEvents() {
         const unlisten = await listen<Payload>('toggle-window-rust', (event) => {
-            console.log(event.payload);
             if (event.payload === 'opened') {
                 redirectToConnectPageIfNoApiKey();
                 $searchInput?.focus();
