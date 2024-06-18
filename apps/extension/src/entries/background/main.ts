@@ -9,11 +9,11 @@ function isValidUrl(url: string) {
   return regex.test(url);
 }
 
-// browser.action.onClicked.addListener((tab, info) => {
-//   browser.tabs.create({ 
-//     url: 'https://stashlist.app'
-//   })
-// })
+browser.action.onClicked.addListener((tab, info) => {
+  browser.tabs.create({
+    url: 'https://stashlist.app'
+  })
+})
 
 browser.contextMenus.create({
   id: 'stash-page',
@@ -54,6 +54,8 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 });
 
 browser.commands.onCommand.addListener(async (command, tab) => {
+  console.log('command', command);
+  console.log('tab', tab);
   if (tab && tab.url && !isValidUrl(tab.url)) {
     console.log('invalid url');
     return
@@ -61,20 +63,6 @@ browser.commands.onCommand.addListener(async (command, tab) => {
   
   if (command === 'stash-page') {
     await initStashPage(tab)
-  }
-  if (command === 'command-menu') {
-    await browser.tabs.sendMessage(tab?.id || 0, {
-      toggleCommandMenu: true
-    });
-    console.log('command-menu');
-    
-    const response = await fetch(baseUrl + "/api/saves");
-    console.log('response', response);
-    const result = await response.json();
-    console.log('result', result);
-    await browser.tabs.sendMessage(tab?.id || 0, {
-      saves: result
-    });
   }
 })
 

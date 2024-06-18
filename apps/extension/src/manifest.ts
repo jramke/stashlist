@@ -26,13 +26,6 @@ const sharedManifest: Partial<chrome.runtime.ManifestBase> = {
         mac: "Command+B",
       },
       description: "Stash the current page"
-    },
-    "_execute_action": {
-      suggested_key: {
-        default: "Ctrl+Shift+B",
-        windows: "Ctrl+Shift+B",
-        mac: "Command+Shift+B",
-      }
     }
   }
 };
@@ -44,7 +37,7 @@ const browserAction = {
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  default_popup: "src/entries/popup/index.html",
+  // default_popup: "src/entries/popup/index.html",
 };
 
 const ManifestV2 = {
