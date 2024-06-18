@@ -17,7 +17,7 @@
 {#if groups && groups.length > 0}    
     <Command.Group heading="Groups">
         {#each groups as group}
-            <Command.Item onSelect={() => handleItemSelect(siteConfig.appUrl + '/group/' + group.id, () => changePage({ name: group.title, groupId: group.id }))}>
+            <Command.Item value={'group-' + group.id} onSelect={() => handleItemSelect(siteConfig.appUrl + '/group/' + group.id, () => changePage({ name: group.title, groupId: group.id }))}>
                 <div class="rounded-full size-4 overflow-hidden relative me-2">
                     <Gradient gradientIndex={group.gradientIndex} />
                 </div>
