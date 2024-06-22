@@ -11,20 +11,25 @@
     import { goto } from "$app/navigation";
     import CommandListSaves from "./command-list-saves.svelte";
     import CommandListGroups from "./command-list-groups.svelte";
+    import { pageComponents } from "./pages";
+    import { currentPage } from "$lib/stores";
 
-    const { cmdPressed, commandPages, handleItemSelect, searchValue, searchInput, changePage } = getCommandMenuContext();
+    const { cmdPressed, commandPages, handleItemSelect, searchValue, searchInput, changePage, getCurrentPage } = getCommandMenuContext();
 
-    let currentPage = $commandPages.length > 0 ? $commandPages[0] : undefined;
-    $: currentPage = $commandPages[$commandPages.length - 1];
+    $: if ($commandPages) {
+        currentPage.set(getCurrentPage());
+    }
+    $: console.log('reactive log', $commandPages, $currentPage);
+    // $: currentPage = $commandPages[$commandPages.length - 1];
 
     // TODO: move this logic into a functuion because its also used in group/[slug]/page.ts
     $: currentGroup = groups?.filter((group: { id: string; }) => {
-		return group.id === currentPage?.groupId;
+		return group.id === $currentPage?.groupId;
 	})[0];
     $: savesByGroup = saves?.filter((save: { saveGroups: any; }) => {
         const groups = save.saveGroups;
         if (groups.length === 0) return;
-        return groups.find((item: { group: { id: string; }; }) => item.group.id === currentPage?.groupId)
+        return groups.find((item: { group: { id: string; }; }) => item.group.id === $currentPage?.groupId)
     });
 
     let loading = true;
@@ -33,7 +38,7 @@
 
     onMount(() => {
         console.log('command menu mount');
-        getItems(); // TODO: cache this or make it a store?
+        // getItems(); // TODO: cache this or make it a store?
 
         // parentEl.set(document.querySelector('[data-cmdk-root]') as HTMLElement);
         searchInput.set(document.querySelector('[data-cmdk-input]') as HTMLInputElement); // bind:el not working?
@@ -47,6 +52,7 @@
     });
 
     function filter(value: string, search: string) {
+        if ($currentPage?.preventFilter) return 1;
         search = search.toLowerCase();
         if (value.includes('item-')) {
             const id = value.split('item-')[1];
@@ -120,28 +126,37 @@
 </script>
    
 <Command.Root {filter} {onKeydown}>
-    <Command.Input  bind:value={$searchValue}  placeholder="Search your stashes..." />
+    <!-- {#if $commandPages.length > 1}
+        <Command.Breadcrumbs {pages} />
+    {/if} -->
+    <Command.Input bind:value={$searchValue} icon={$currentPage?.icon ?? null} placeholder={$currentPage?.placeholder ?? "Search your stashes..."} />
     <Command.List>
-        <Command.Empty>No results found.</Command.Empty>
-        <Command.Group heading="Actions">
-            <Command.Item onSelect={() => goto('/connect')} value="Connect your Stashlist">
-                <Unplug class="me-2 shrink-0" />
-                Connect your Stashlist
-            </Command.Item>
-            <Command.Item onSelect={() => handleItemSelect('https://stashlist.app')} value="Open Stashlist">
-                <Stash class="me-2 shrink-0" />
-                Open Stashlist
-            </Command.Item>
-        </Command.Group>
-        {#if $apiKey}
-            {#if loading}
-                <Command.Loading>Fetching stashes</Command.Loading>
-            {:else}
-                {#if savesByGroup?.length > 0}
-                    <CommandListSaves items={savesByGroup} title={currentGroup.title} />
+        {#if !$currentPage?.preventFilter}
+            <Command.Empty>No results found.</Command.Empty>
+        {/if}
+        {#if $currentPage}
+            <svelte:component this={pageComponents[$currentPage.name]} />
+        {:else}
+            <Command.Group heading="Actions">
+                <Command.Item onSelect={() => changePage({ name: 'connect', placeholder: 'Enter API key', preventFilter: true, height: 200, icon: Unplug })} value="Connect your Stashlist">
+                    <Unplug class="me-2 shrink-0" />
+                    Connect your Stashlist
+                </Command.Item>
+                <Command.Item onSelect={() => handleItemSelect('https://stashlist.app')} value="Open Stashlist">
+                    <Stash class="me-2 shrink-0" />
+                    Open Stashlist
+                </Command.Item>
+            </Command.Group>
+            {#if $apiKey}
+                {#if loading}
+                    <Command.Loading>Fetching stashes</Command.Loading>
                 {:else}
-                    <CommandListGroups {groups} />
-                    <CommandListSaves items={saves} />
+                    {#if savesByGroup?.length > 0}
+                        <CommandListSaves items={savesByGroup} title={currentGroup.title} />
+                    {:else}
+                        <CommandListGroups {groups} />
+                        <CommandListSaves items={saves} />
+                    {/if}
                 {/if}
             {/if}
         {/if}

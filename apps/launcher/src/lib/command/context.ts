@@ -1,7 +1,10 @@
 import { getContext, setContext } from 'svelte';
+import type { CommandPage } from '$lib/types';
 import { writable, get } from 'svelte/store';
 import { open } from '@tauri-apps/plugin-shell';
 import { emit } from '@tauri-apps/api/event';
+import { getCurrent, LogicalSize } from '@tauri-apps/api/window';
+import { currentPage } from '$lib/stores';
 
 const focusableElSelctor = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
@@ -11,41 +14,59 @@ let searchInput = writable<HTMLInputElement|null>(null);
 let apiInput = writable<HTMLInputElement|null>(null);
 let focusableEls = writable<HTMLElement[]>([]);
 
-type CommandPage = {
-    name: string;
-    groupId?: string;
-}
+const defaultSize = new LogicalSize(600, 444);
+
 let commandPages = writable<CommandPage[]>([]);
+
+function getCurrentPage(pages = get(commandPages)) {
+    if (pages.length > 0) {
+        return pages[pages.length - 1];
+    } else {
+        return undefined;
+    }
+}
 
 function changePage(newPage: CommandPage) {
     commandPages.update(pages => {
         return [...pages, newPage];
     });
     searchValue.set('');
-    setTimeout(() => {
+    setTimeout(async () => {
+        if (newPage.height) {
+            // 600 is default width, specified in tauri conf
+            await getCurrent().setSize(new LogicalSize(600, newPage.height));
+        }
         updateFocusableEls();
         get(searchInput)?.focus();
-    }, 100);
+    }, 10);
 }
 
 function resetPages() {
     commandPages.set([]);
     searchValue.set('');
-    setTimeout(() => {
+    setTimeout(async () => {
+        await getCurrent().setSize(defaultSize);
         updateFocusableEls();
         get(searchInput)?.focus();
-    }, 100);
+    }, 10);
 }
 
-function goPageBack() {
+async function goPageBack() {
+    const currentPageHeight = getCurrentPage(get(commandPages).slice(0, -1))?.height;
+    console.log('updated commandPages', get(commandPages), get(currentPage), getCurrentPage(get(commandPages).slice(0, -1)));
+    if (!currentPageHeight) {
+        await getCurrent().setSize(defaultSize);
+    } else {
+        await getCurrent().setSize(new LogicalSize(600, currentPageHeight));
+    }
     commandPages.update(pages => {
         const newPages = pages.slice(0, -1);
         return newPages;
     });
-    setTimeout(() => {
+    setTimeout(async () => {
         updateFocusableEls();
         get(searchInput)?.focus();
-    }, 100);
+    }, 10);
 }
 
 function handleItemSelect(mainAction: string|Function, secondAction?: string|Function, closeAfterAction = true) {
@@ -114,9 +135,11 @@ type CommandMenuContext = {
     handleItemSelect: typeof handleItemSelect;
     closeApp: typeof closeApp;
     updateFocusableEls: typeof updateFocusableEls;
+    getCurrentPage: typeof getCurrentPage;
     focusableEls: typeof focusableEls;
     cmdPressed: typeof cmdPressed;
     commandPages: typeof commandPages;
+    currentPage: typeof currentPage;
     searchValue: typeof searchValue;
     searchInput: typeof searchInput;
     apiInput: typeof apiInput;
@@ -130,9 +153,11 @@ export function setCommandMenuContext() {
         handleItemSelect,
         closeApp,
         updateFocusableEls,
+        getCurrentPage,
         focusableEls,
         cmdPressed,
         commandPages,
+        currentPage,
         searchValue,
         searchInput,
         apiInput,

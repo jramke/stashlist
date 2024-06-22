@@ -11,7 +11,7 @@
     "event:allow-unlisten",
     "event:allow-emit",
     "event:allow-emit-to",
-    "window:default",
+    "window:allow-set-size",
     "app:default",
     "resources:default",
     "menu:default",
