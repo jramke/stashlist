@@ -48,9 +48,40 @@ function goPageBack() {
     }, 100);
 }
 
-function handleItemSelect(url: string) {
-    open(url);
-    closeApp();
+function handleItemSelect(mainAction: string|Function, secondAction?: string|Function, closeAfterAction = true) {
+    console.log('handleItemSelect', mainAction, secondAction, closeAfterAction);
+    
+    if (get(cmdPressed) && typeof secondAction !== 'undefined') {
+        if (secondAction instanceof Function) {
+            secondAction();
+            return;
+        }
+
+        if (typeof secondAction === "string" && secondAction !== '') {
+            // openEditDialog(secondAction);
+            // editDialogCloseCallback.set(() => {
+            //     commandMenuOpen.set(true);
+            // });
+            // TODO: redirect to stashlist with edit dialog
+            if (closeAfterAction) {
+                closeApp();
+            }
+            return;
+        }
+    }
+
+    if (mainAction instanceof Function) {
+        mainAction();
+    }
+
+    if (typeof mainAction === "string" && mainAction !== '') {
+        let url = mainAction;
+        open(url);
+    }
+
+    if (closeAfterAction) {
+        closeApp();
+    }
 }
 
 function closeApp() {
