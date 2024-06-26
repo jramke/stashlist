@@ -11,12 +11,16 @@ const focusableElSelctor = 'button, [href], input, select, textarea, [tabindex]:
 let cmdPressed = writable(false);
 let searchValue = writable('');
 let searchInput = writable<HTMLInputElement|null>(null);
-let apiInput = writable<HTMLInputElement|null>(null);
 let focusableEls = writable<HTMLElement[]>([]);
 
-const defaultSize = new LogicalSize(600, 444);
+const defaultWidth = 620;
+const defaultSize = new LogicalSize(defaultWidth, 499);
 
 let commandPages = writable<CommandPage[]>([]);
+
+const availablePages: { [key: string]: CommandPage } = {
+    connect: { name: 'Connect', id: 'connect', placeholder: 'Enter API key', preventFilter: true, height: 180, hideFooter: true }
+};
 
 function getCurrentPage(pages = get(commandPages)) {
     if (pages.length > 0) {
@@ -34,7 +38,7 @@ function changePage(newPage: CommandPage) {
     setTimeout(async () => {
         if (newPage.height) {
             // 600 is default width, specified in tauri conf
-            await getCurrent().setSize(new LogicalSize(600, newPage.height));
+            await getCurrent().setSize(new LogicalSize(defaultWidth, newPage.height));
         }
         updateFocusableEls();
         get(searchInput)?.focus();
@@ -53,12 +57,12 @@ function resetPages() {
 
 async function goPageBack() {
     const currentPageHeight = getCurrentPage(get(commandPages).slice(0, -1))?.height;
-    console.log('updated commandPages', get(commandPages), get(currentPage), getCurrentPage(get(commandPages).slice(0, -1)));
     if (!currentPageHeight) {
         await getCurrent().setSize(defaultSize);
     } else {
-        await getCurrent().setSize(new LogicalSize(600, currentPageHeight));
+        await getCurrent().setSize(new LogicalSize(defaultWidth, currentPageHeight));
     }
+    searchValue.set('');
     commandPages.update(pages => {
         const newPages = pages.slice(0, -1);
         return newPages;
@@ -69,9 +73,7 @@ async function goPageBack() {
     }, 10);
 }
 
-function handleItemSelect(mainAction: string|Function, secondAction?: string|Function, closeAfterAction = true) {
-    console.log('handleItemSelect', mainAction, secondAction, closeAfterAction);
-    
+function handleItemSelect(mainAction: string|Function, secondAction?: string|Function, closeAfterAction = true) {   
     if (get(cmdPressed) && typeof secondAction !== 'undefined') {
         if (secondAction instanceof Function) {
             secondAction();
@@ -142,7 +144,7 @@ type CommandMenuContext = {
     currentPage: typeof currentPage;
     searchValue: typeof searchValue;
     searchInput: typeof searchInput;
-    apiInput: typeof apiInput;
+    availablePages: typeof availablePages;
 }
 
 export function setCommandMenuContext() {
@@ -160,7 +162,7 @@ export function setCommandMenuContext() {
         currentPage,
         searchValue,
         searchInput,
-        apiInput,
+        availablePages,
     });
 }
 

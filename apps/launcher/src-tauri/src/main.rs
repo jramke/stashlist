@@ -2,10 +2,10 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 // use tauri_plugin_global_shortcut::{Shortcut, Code, Modifiers, GlobalShortcutExt};
+use argon2::{hash_raw, Config, Variant, Version};
 use serde_json::Value;
 use tauri::{AppHandle, Manager, WebviewWindow};
 use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
-use argon2::{hash_raw, Config, Variant, Version};
 
 const WINDOW: &str = "main";
 
@@ -47,6 +47,7 @@ fn main() {
     dotenv::dotenv().ok();
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(
             tauri_plugin_stronghold::Builder::new(|password| {
                 let config = Config {
@@ -59,7 +60,8 @@ fn main() {
                 };
                 let salt_str = get_env("STRONGHOLD_SALT");
                 let salt = salt_str.as_bytes();
-                let key = hash_raw(password.as_ref(), &salt, &config).expect("failed to hash password");
+                let key =
+                    hash_raw(password.as_ref(), &salt, &config).expect("failed to hash password");
 
                 key.to_vec()
             })
@@ -78,7 +80,7 @@ fn main() {
                                 let ctrl_shift = Modifiers::CONTROL.union(Modifiers::SHIFT);
                                 // let meta_shift = Modifiers::META.union(Modifiers::SHIFT);
                                 if shortcut.matches(ctrl_shift, Code::KeyB) {
-                                    println!("Ctrl-b Detected!");
+                                    // println!("Ctrl-b Detected!");
                                     toggle_launchbar(app);
                                     // https://github.com/tauri-apps/tauri/issues/9296
                                 }

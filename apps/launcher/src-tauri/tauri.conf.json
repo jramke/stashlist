@@ -1,7 +1,7 @@
 {
-  "productName": "launcher",
+  "productName": "staschlist_launcher",
   "version": "0.0.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "stashlist.app.launcher",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -12,8 +12,8 @@
     "windows": [
       {
         "title": "main",
-        "width": 600,
-        "height": 444,
+        "width": 620,
+        "height": 499,
         "label": "main",
         "decorations": false,
         "transparent": true,
@@ -24,7 +24,9 @@
         "hiddenTitle": true,
         "minimizable": false,
         "resizable": false,
-        "maximizable": false
+        "maximizable": false,
+        "skipTaskbar": true,
+        "shadow": true
       }
     ],
     "security": {

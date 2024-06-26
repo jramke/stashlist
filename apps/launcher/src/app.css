@@ -9,10 +9,11 @@ body, main {
 	height: 100vh;
 }
 
-[data-sonner-toaster] {
+/* [data-sonner-toaster] {
 	--mobile-offset: 0px !important;
+	--offset: 12px;
 }
 [data-sonner-toast] {
 	width: fit-content !important;
-    margin-inline: auto;
-}
+    transform: translateX(50%);
+} */

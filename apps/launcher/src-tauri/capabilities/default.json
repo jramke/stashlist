@@ -50,6 +50,7 @@
     "stronghold:allow-save",
     "stronghold:allow-save-store-record",
     "stronghold:allow-get-store-record",
-    "stronghold:allow-remove-store-record"
+    "stronghold:allow-remove-store-record",
+    "clipboard-manager:allow-write-text"
   ]
 }

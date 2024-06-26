@@ -15,7 +15,7 @@
 	export let icon: ComponentType | null | undefined = Search;
 </script>
 
-<div class="flex items-center border-b px-2" data-cmdk-input-wrapper="">
+<div class="flex items-center border-b px-5 bg-card/50" data-cmdk-input-wrapper="">
 	<!-- <Search class="mr-2 h-4 w-4 shrink-0 opacity-50" /> -->
 	<svelte:component this={icon} class="mr-2 h-4 w-4 shrink-0 opacity-50" />
 	<CommandPrimitive.Input

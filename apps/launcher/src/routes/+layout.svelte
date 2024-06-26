@@ -1,20 +1,22 @@
 <script lang="ts">
     import '@repo/ui/globals.pcss';
-    import '../app.pcss';
+    import '../app.css';
 
     import { onMount } from 'svelte';
     import { getRecord, initStronghold } from '$lib/stronghold';
-    import { apiKey } from '$lib/stores';
+    import { apiKey, currentPage, groups, loading, saves } from '$lib/stores';
     import { listen } from '@tauri-apps/api/event';
     import { afterNavigate, goto } from '$app/navigation';
     import { setCommandMenuContext, getCommandMenuContext } from "$lib/command/context";
     import { page } from '$app/stores';
     import { Toaster } from '@repo/ui/components/sonner';
+    import { dev } from "$app/environment";
+    import { fetch } from '@tauri-apps/plugin-http';
     
     type Payload =  'opened' | 'closed';
 
     setCommandMenuContext();
-    const { focusableEls, searchInput, resetPages, searchValue, apiInput, commandPages, goPageBack, closeApp, updateFocusableEls } = getCommandMenuContext();
+    const { focusableEls, searchInput, resetPages, searchValue, commandPages, goPageBack, closeApp, updateFocusableEls, changePage, availablePages } = getCommandMenuContext();
 
     let removeTrapFocusListeners: (() => void) | undefined;
     $: if ($focusableEls) {
@@ -30,13 +32,15 @@
         const unlisten = listenForEvents();
         document.addEventListener('keydown', onKeydown);
 
+        getItems();
+
         (async () => {
             await initStronghold();
             const apiKeyFromStronghold = await getRecord('api-key');
             apiKey.set(apiKeyFromStronghold);
     
             if (!$apiKey) {
-                goto('/connect');
+                changePage(availablePages.connect);
             }
         })();
 
@@ -48,13 +52,10 @@
     });
 
     function onKeydown(e: KeyboardEvent) {
-        if (e.key === 'Escape' || (e.key === 'Backspace' && !$searchValue && document.activeElement !== $apiInput)) {
+        if (e.key === 'Escape' || (e.key === 'Backspace' && !$searchValue)) {
 			e.preventDefault();
             if ($commandPages.length > 0) {
-                // e.stopPropagation();
                 goPageBack();
-            } else if ($page.route.id === '/connect') {
-                goto('/');
             } else {
                 closeApp();
             }
@@ -109,14 +110,52 @@
     }
 
     async function redirectToConnectPageIfNoApiKey() {
-        if (!$apiKey && $page.route.id !== '/connect') {
-            goto('/connect');
+        if (!$apiKey && $currentPage !== availablePages.connect) {
+            changePage(availablePages.connect);
         }
+    }
+
+    async function getItems() {
+        loading.set(true);
+
+        const getData = async (url: string) => {
+            const response = await fetch(url, 
+                { 
+                    method: 'GET',
+                    headers: {
+                        'X-Api-Key': await getRecord('api-key'),
+                    }
+                }
+            );
+            
+            if (dev) {
+                const result = await response.text();            
+                return JSON.parse(result);
+            } else {
+                const result = await response.json();
+                return result;
+            }
+        }
+
+        let savesData: any;
+        let groupsData: any;
+        if (dev) {
+            savesData = await getData('/saves.json');
+            groupsData = await getData('/groups.json');
+        } else {
+            savesData = await getData('https://www.stashlist.app/api/saves');
+            groupsData = await getData('https://www.stashlist.app/api/groups');
+        }
+
+        saves.set(savesData.saves);
+        groups.set(groupsData);
+
+        loading.set(false);
     }
 
 </script>
 
-<Toaster offset="0px" duration={1300} position="bottom-center" />
+<Toaster offset={16} duration={1300} position="bottom-center" />
 <main>
     <slot />
 </main>

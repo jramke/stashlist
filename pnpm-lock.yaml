@@ -105,12 +105,18 @@ importers:
 
   apps/launcher:
     dependencies:
+      '@repo/constants':
+        specifier: workspace:*
+        version: link:../../packages/constants
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@tauri-apps/api':
         specifier: '>=2.0.0-beta.0'
         version: 2.0.0-beta.13
+      '@tauri-apps/plugin-clipboard-manager':
+        specifier: 2.1.0-beta.3
+        version: 2.1.0-beta.3
       '@tauri-apps/plugin-global-shortcut':
         specifier: 2.0.0-beta.5
         version: 2.0.0-beta.5
@@ -370,6 +376,8 @@ importers:
         specifier: ^2.37.0
         version: 2.39.3(eslint@8.57.0)(svelte@4.2.14)
 
+  packages/constants: {}
+
   packages/tsconfig:
     devDependencies:
       '@tsconfig/svelte':
@@ -381,6 +389,9 @@ importers:
       '@fontsource-variable/plus-jakarta-sans':
         specifier: ^5.0.20
         version: 5.0.21
+      '@repo/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@sveltejs/kit':
         specifier: ^2.0.0
         version: 2.5.10(@sveltejs/vite-plugin-svelte@3.1.1)(svelte@4.2.14)(vite@5.2.13)
@@ -2840,6 +2851,12 @@ packages:
       '@tauri-apps/cli-win32-ia32-msvc': 2.0.0-beta.20
       '@tauri-apps/cli-win32-x64-msvc': 2.0.0-beta.20
     dev: true
+
+  /@tauri-apps/plugin-clipboard-manager@2.1.0-beta.3:
+    resolution: {integrity: sha512-j48jTdZWeX5BylIGLYbXtg6ynZAcFKDKK6dguHAbG3zviqNE/XMf2vHOPJeFDZsDE5kVOZZS7nKOj7T2WiCpvw==}
+    dependencies:
+      '@tauri-apps/api': 2.0.0-beta.13
+    dev: false
 
   /@tauri-apps/plugin-global-shortcut@2.0.0-beta.5:
     resolution: {integrity: sha512-j4/2dcKu7dNmI3gNWeq0j7M9HYeQn325/pE9M/DBfhL4rdfYPtEpY/4eJwGQfJB4ijlrBnDOVOn7KeUO+YVpHw==}

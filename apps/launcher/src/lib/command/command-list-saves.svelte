@@ -1,29 +1,31 @@
 <script lang="ts">
     import * as Command from "@repo/ui/components/command";
 	import { getCommandMenuContext } from "./context";
-    // import { Gradient } from "$lib/components/app";
+    import { Gradient } from "@repo/ui/components/gradient";
 	import { onMount } from "svelte";
-	// import { itemsStore } from "$lib/stores";
+    import { writeText } from '@tauri-apps/plugin-clipboard-manager';
+    import { toast } from "@repo/ui/components/sonner";
 
     export let items: any;
     export let title = 'Stashes';
 
     const { handleItemSelect, closeApp } = getCommandMenuContext();
-    // const { copyUrlToClipboard } = itemsStore;
 
     const delimiter = '^$$^';
     let itemNodes: HTMLElement[] = [];
     
-    const handleKeydown = (event: KeyboardEvent) => {
+    const handleKeydown = async (event: KeyboardEvent) => {
         const itemNode = itemNodes.find(node => node.getAttribute('data-selected'));
         
 		if (!itemNode) return;
 		
 		if (event.key === 'c' && (event.metaKey || event.ctrlKey)) {
 			event.preventDefault();
-            // TODO: copy functionality
-			// copyUrlToClipboard(itemNode.id.split(delimiter)[1]);
-            closeApp();
+			await writeText(itemNode.id.split(delimiter)[1]);
+            toast.success('URL copied to clipboard');
+            // setTimeout(() => {
+            //     closeApp();
+            // }, 500);
 		}
 	};
 	
@@ -39,13 +41,13 @@
 
 {#if items && items.length > 0}
     <Command.Group heading={title}>
-        {#each items as { id, title, description, url, faviconUrl, gradientIndex, saveGroups}, index}
-            <Command.Item onSelect={() => handleItemSelect(url)} value={'item-' + id} id={'command-stash-item' + delimiter + url}>
+        {#each items as { id, title, url, faviconUrl, gradientIndex, saveGroups}, index}
+            <Command.Item onSelect={() => handleItemSelect(url, () => toast.error('Functionality in progress'))} value={'item-' + id} id={'command-stash-item' + delimiter + url}>
                 {#if faviconUrl}
                     <img loading="lazy" class="size-4 shrink-0 me-2" src={faviconUrl} alt={title} on:error={() => faviconUrl = ''} />
                 {:else}
                     <div class="rounded-full bg-secondary size-4 shrink-0 me-2 overflow-hidden relative">
-                        <!-- <Gradient {gradientIndex} /> -->
+                        <Gradient {gradientIndex} />
                     </div>
                 {/if}
                 <div class="flex items-baseline max-w-[95%] flex-grow">
