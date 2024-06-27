@@ -9,10 +9,10 @@
 </script>
 
 <CommandPrimitive.List
-	class={cn("", className)}
+	class={cn("flex-grow", className)}
 	{...$$restProps}
 >
-	<ScrollArea class="max-h-[349px] p-2 data-[scrollbar-visible=true]:pe-0">
+	<ScrollArea class="max-h-[349px] p-3 scroll-py-3 data-[scrollbar-visible=true]:pe-0">
 		<slot />
 	</ScrollArea>
 </CommandPrimitive.List>

@@ -1,0 +1,19 @@
+* {
+	@apply border-border;
+}
+#stashlist {
+	@apply bg-background text-foreground;
+	min-height: 100%;
+}
+body, main {
+	height: 100vh;
+}
+
+/* [data-sonner-toaster] {
+	--mobile-offset: 0px !important;
+	--offset: 12px;
+}
+[data-sonner-toast] {
+	width: fit-content !important;
+    transform: translateX(50%);
+} */

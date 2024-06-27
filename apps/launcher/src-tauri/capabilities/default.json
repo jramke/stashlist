@@ -1,0 +1,60 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability for the main window",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "path:default",
+    "event:allow-listen",
+    "event:allow-unlisten",
+    "event:allow-emit",
+    "event:allow-emit-to",
+    "window:allow-set-size",
+    "app:default",
+    "resources:default",
+    "menu:default",
+    "tray:default",
+    "window:allow-set-title",
+    "global-shortcut:allow-is-registered",
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-unregister",
+    "shell:allow-open",
+    {
+      "identifier": "http:default",
+      "allow": [
+        {
+          "url": "http://127.0.0.1:5173/api/saves"
+        },
+        {
+          "url": "http://127.0.0.1:5173/api/groups"
+        },
+        {
+          "url": "https://www.stashlist.app/api/saves"
+        },
+        {
+          "url": "https://www.stashlist.app/api/groups"
+        },
+        {
+          "url": "http://localhost:1420/saves.json"
+        },
+        {
+          "url": "http://localhost:1420/groups.json"
+        }
+      ]
+    },
+    "stronghold:allow-initialize",
+    "stronghold:allow-create-client",
+    "stronghold:allow-load-client",
+    "stronghold:allow-save",
+    "stronghold:allow-save-store-record",
+    "stronghold:allow-get-store-record",
+    "stronghold:allow-remove-store-record",
+    "clipboard-manager:allow-write-text",
+    "autostart:allow-enable",
+    "autostart:allow-disable",
+    "autostart:allow-is-enabled",
+    "autostart:default"
+  ]
+}

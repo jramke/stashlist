@@ -10,8 +10,8 @@ import List from "./command-list.svelte";
 import Separator from "./command-separator.svelte";
 import Shortcut from "./command-shortcut.svelte";
 import Footer from "./command-footer.svelte";
-
-const Loading = CommandPrimitive.Loading;
+import Loading from "./command-loading.svelte";
+import Breadcrumbs from "./command-breadcrumbs.svelte";
 
 export {
 	Root,
@@ -25,6 +25,7 @@ export {
 	Shortcut,
 	Loading,
 	Footer,
+	Breadcrumbs,
 	//
 	Root as Command,
 	Dialog as CommandDialog,
@@ -37,4 +38,5 @@ export {
 	Shortcut as CommandShortcut,
 	Loading as CommandLoading,
 	Footer as CommandFooter,
+	Breadcrumbs as CommandBreadcrumbs,
 };
