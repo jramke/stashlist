@@ -100,6 +100,21 @@
     })
 
     function filter(value: string, search: string) {
+        search = search.toLowerCase();
+        if (value.includes('item-')) {
+            const id = value.split('item-')[1];
+            const item = saves?.items.find((item: TODO) => item.id === id);
+            // TODO: maybe we can also check for the groups titles
+            const itemSearch = item?.title + ' ' + item?.description + ' ' + item?.url;
+            if (itemSearch.toLowerCase().includes(search)) return 1;
+            return 0;
+        }
+        if (value.includes('group-')) {
+            const id = value.split('group-')[1];
+            const group = groups.find((group: TODO) => group.id === id);
+            if (group.title.toLowerCase().includes(search)) return 1;
+            return 0;
+        }
         if (value.includes(search)) return 1;
         return 0;
     }

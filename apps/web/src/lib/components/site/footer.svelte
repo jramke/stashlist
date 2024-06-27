@@ -15,7 +15,7 @@
         <div class="grid md:grid-cols-2 gap-6">
             <div class="flex flex-col flex-wrap justify-end gap-2">
                 <a href={$page.data.user ? siteConfig.appUrl : '/'} class="flex items-center gap-2">
-                    <Logo class="h-5 w-5" />
+                    <Logo class="h-6 w-6" />
                     <span class="text-lg font-bold sm:inline-block">
                         {siteConfig.name}
                     </span>

@@ -1,11 +1,12 @@
 import { sql, relations } from 'drizzle-orm';
-import { text, sqliteTable, integer, real, primaryKey } from 'drizzle-orm/sqlite-core';
+import { text, sqliteTable, integer, primaryKey } from 'drizzle-orm/sqlite-core';
 
 export const user = sqliteTable('user', {
 	id: text('id').notNull().primaryKey().unique(),
 	username: text('username').default(''),
 	name: text('name').default(''),
 	avatarUrl: text('avatar_url').default(''),
+	apiKeyHash: text('api_key_hash').default(''),
 	createdAt: text('created_at')
 		.default(sql`CURRENT_TIMESTAMP`)
 		.notNull()

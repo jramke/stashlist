@@ -1,9 +1,6 @@
 import { google, lucia } from "$lib/server/auth";
 import { OAuth2RequestError } from "arctic";
 import { generateId } from "lucia";
-import { db } from "$lib/server/db";
-import { and, eq } from "drizzle-orm";
-import { user, oauth_account } from '$lib/server/db/schema';
 
 import { redirect, type RequestEvent } from "@sveltejs/kit";
 import { createUser, getUserByProvider } from "$lib/server/db/queries";

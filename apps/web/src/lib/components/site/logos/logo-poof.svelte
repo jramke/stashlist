@@ -1,22 +1,24 @@
 <script lang="ts">
-    import { Logo, Stash } from '@repo/ui/icons';
+    import { Logo } from '@repo/ui/icons';
     import { onMount } from 'svelte';
 	import * as rive from "@rive-app/canvas";
+    import { Motion } from "svelte-motion";
 
     let canvas: HTMLCanvasElement;
-    let replacer: HTMLElement;
-    let replaceWrapper: HTMLElement;
+    let wrapper: HTMLElement;
+    let replacerVisible = false;
+    let width: number|string = 'auto';
+    let replacerScale = 1.15;
+
+    let poof: any;
 
     onMount(() => {
+        
+        width = wrapper?.clientWidth;
 
-        const poof = new rive.Rive({
+        poof = new rive.Rive({
             src: "/poof.riv",
             canvas: canvas,
-            // autoplay: true,
-            // animations: 'idle',
-            // onLoad: () => {
-            // 	poof.resizeDrawingSurfaceToCanvas();
-            // },
             onPlay: () => {
                 canvas.classList.remove('hidden');
                 poof.resizeDrawingSurfaceToCanvas();
@@ -26,27 +28,29 @@
             }
         });
 
+	});
+    
+    function handleClick() {
+        poof.play();
+        width = 28;
+        replacerVisible = true;
+        replacerScale = 1;
+    }
 
-        replaceWrapper.addEventListener('click', () => {
-            // replaceWrapper.classList.remove('cursor-pointer');
-            // replaceWrapper.classList.add('hidden');
-            replaceWrapper.className = 'hidden';
-
-            replacer.classList.add('inline');
-            replacer.classList.remove('hidden');
-
-            poof.play();
-        })
-
-	})
 </script>
 
-<div class="relative inline">
-    <div bind:this={replaceWrapper} class="cursor-pointer inline">
-        <slot />
-    </div>
-    <div class="hidden relative" bind:this={replacer}>
-        <canvas bind:this={canvas} class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 hidden"></canvas>
-        <Logo class="h-6 w-6 inline -mt-1" /> 
-    </div>
-</div>
+<Motion let:motion animate={{ width }}>
+    <span use:motion class="relative !inline-flex items-center justify-center !m-0" bind:this={wrapper}>
+        <canvas bind:this={canvas} class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 hidden z-50"></canvas>
+        <Motion let:motion animate={{ scale: replacerScale }}>
+            <span use:motion class="inline" class:hidden={!replacerVisible}>
+                <Logo class="h-6 w-6 inline -mt-2" />
+            </span>
+        </Motion>
+        <Motion let:motion whileHover={{ scale: 1.2 }}>
+            <button use:motion class="cursor-pointer inline" class:hidden={replacerVisible} on:click={handleClick}>
+                <slot />
+            </button>
+        </Motion>
+    </span>
+</Motion>

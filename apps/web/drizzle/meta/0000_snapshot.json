@@ -1,8 +1,6 @@
 {
-  "version": "5",
+  "version": "6",
   "dialect": "sqlite",
-  "id": "f2c6ae1f-fe78-4a1b-bed8-1128edf7ec7f",
-  "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "group": {
       "name": "group",
@@ -67,15 +65,15 @@
         "group_user_id_user_id_fk": {
           "name": "group_user_id_user_id_fk",
           "tableFrom": "group",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -126,15 +124,15 @@
         "oauth_account_user_id_user_id_fk": {
           "name": "oauth_account_user_id_user_id_fk",
           "tableFrom": "oauth_account",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -242,15 +240,15 @@
         "save_user_id_user_id_fk": {
           "name": "save_user_id_user_id_fk",
           "tableFrom": "save",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -286,41 +284,41 @@
         "save_group_mm_user_id_user_id_fk": {
           "name": "save_group_mm_user_id_user_id_fk",
           "tableFrom": "save_group_mm",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "save_group_mm_save_id_save_id_fk": {
           "name": "save_group_mm_save_id_save_id_fk",
           "tableFrom": "save_group_mm",
-          "tableTo": "save",
           "columnsFrom": [
             "save_id"
           ],
+          "tableTo": "save",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "save_group_mm_group_id_group_id_fk": {
           "name": "save_group_mm_group_id_group_id_fk",
           "tableFrom": "save_group_mm",
-          "tableTo": "group",
           "columnsFrom": [
             "group_id"
           ],
+          "tableTo": "group",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -373,15 +371,15 @@
         "session_user_id_user_id_fk": {
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -446,8 +444,9 @@
   },
   "enums": {},
   "_meta": {
-    "schemas": {},
     "tables": {},
     "columns": {}
-  }
+  },
+  "id": "f2c6ae1f-fe78-4a1b-bed8-1128edf7ec7f",
+  "prevId": "00000000-0000-0000-0000-000000000000"
 }

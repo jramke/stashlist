@@ -1,6 +1,6 @@
 import type { Icon as LucideIcon } from "lucide-svelte";
 
-import { Inbox, Monitor, Plus, FolderPlus, Folder, Check, Bookmark, Compass, LogOut, Pencil, Trash2, X, Sun, Moon, MoreHorizontal, Trash, CircleDashed, Loader, LayoutGrid, StretchHorizontal, ChevronsUpDown, LayoutDashboard, Copy, GripVertical, Tv, Info, Space, Folders, ChevronLeft, Unplug, Search } from "lucide-svelte";
+import { Inbox, Monitor, Plus, FolderPlus, Folder, Check, Bookmark, Compass, LogOut, Pencil, Trash2, X, Sun, Moon, MoreHorizontal, Trash, CircleDashed, Loader, LayoutGrid, StretchHorizontal, ChevronsUpDown, LayoutDashboard, Copy, GripVertical, Tv, Info, Space, Folders, Eye, EyeOff, ChevronLeft, Unplug, Search } from "lucide-svelte";
 
 import GitHub from "./github.svelte";
 import Google from "./google.svelte";
@@ -45,4 +45,6 @@ export {
     ChevronLeft,
     Unplug,
     Search,
+    Eye,
+    EyeOff,
 }

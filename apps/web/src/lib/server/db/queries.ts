@@ -2,8 +2,9 @@ import { type InsertGroup, type InsertOAuthAccount, type InsertUser, type Select
 
 import { and, desc, eq } from 'drizzle-orm';
 import { db } from '$lib/server/db';
-import { group, oauth_account, save, save_group_mm, user } from './schema';
+import { group, oauth_account, save, save_group_mm, user, session } from './schema';
 import { generateId } from 'lucia';
+import { Argon2id } from "oslo/password";
 
 export async function getSavesWithGroups(userId: SelectUser['id']) {
     const savesWithGroups = await db.query.save.findMany({
@@ -125,7 +126,6 @@ export async function createUser(provider: InsertOAuthAccount['provider'], provi
         username: username ?? '',
         name: name ?? '',
         avatarUrl: avatarUrl ?? ''
-
     });
     await db.insert(oauth_account).values({
         provider: provider,
@@ -144,4 +144,37 @@ export async function getUserProvider(userId: SelectUser['id']) {
     const oauthAccount = await db.select({ provider: oauth_account.provider }).from(oauth_account).where(eq(oauth_account.userId, userId)).limit(1);
     if (oauthAccount.length === 0) return null;
     return oauthAccount[0].provider;
+}
+
+export async function getUserByApiKey(apiKey: string) {
+    let userToReturn = null;
+
+    const username = apiKey.split('-')[0];
+    const decodedUsername = decodeURIComponent(username);
+    const users = await db.select().from(user).where(eq(user.username, decodedUsername));
+
+    if (users.length === 0) return null;
+
+    const argon2id = new Argon2id();
+
+    for (const user of users) {
+        if (!user.apiKeyHash) continue;
+        if (await argon2id.verify(user.apiKeyHash, apiKey)) {
+            userToReturn = user
+            break;
+        }
+    }
+
+    return userToReturn;
+}
+
+export async function getSessionByUserId(userId: SelectUser['id'] | undefined) {
+    if (!userId) return null;
+    const sessionObj = await db.select().from(session).where(eq(session.userId, userId)).limit(1);
+    if (sessionObj.length === 0) return null;
+    return sessionObj[0];
+}
+
+export async function updateUser(id: InsertUser['id'], data: Partial<InsertUser>) {
+    await db.update(user).set(data).where(eq(user.id, id));
 }
