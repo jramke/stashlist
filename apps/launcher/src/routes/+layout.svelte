@@ -6,9 +6,8 @@
     import { getRecord, initStronghold } from '$lib/stronghold';
     import { apiKey, currentPage, groups, loading, saves } from '$lib/stores';
     import { listen } from '@tauri-apps/api/event';
-    import { afterNavigate, goto } from '$app/navigation';
+    import { afterNavigate } from '$app/navigation';
     import { setCommandMenuContext, getCommandMenuContext } from "$lib/command/context";
-    import { page } from '$app/stores';
     import { Toaster } from '@repo/ui/components/sonner';
     import { dev } from "$app/environment";
     import { fetch } from '@tauri-apps/plugin-http';
@@ -32,8 +31,6 @@
         const unlisten = listenForEvents();
         document.addEventListener('keydown', onKeydown);
 
-        getItems();
-
         (async () => {
             await initStronghold();
             const apiKeyFromStronghold = await getRecord('api-key');
@@ -42,6 +39,8 @@
             if (!$apiKey) {
                 changePage(availablePages.connect);
             }
+
+            getItems();
         })();
 
         return () => {
@@ -127,6 +126,7 @@
                     }
                 }
             );
+            console.log(dev);
             
             if (dev) {
                 const result = await response.text();            

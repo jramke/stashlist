@@ -1,6 +1,6 @@
 [package]
-name = "launcher"
-version = "0.0.0"
+name = "staschlist_launcher"
+version = "0.0.1"
 description = "A Tauri App"
 authors = ["you"]
 edition = "2021"

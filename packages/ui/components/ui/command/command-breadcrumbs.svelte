@@ -5,7 +5,7 @@
 	export let onPageClick: (page: string) => void = () => {};
 	let className: string | undefined | null = undefined;
 	export { className as class };
-	console.log('pages', pages);
+
 </script>
 
 <div class={cn("p-4 pb-1 text-[0.65rem] flex items-center gap-2 bg-card/50", className)} data-cmdk-breadcrumbs="">

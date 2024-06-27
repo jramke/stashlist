@@ -51,6 +51,10 @@
     "stronghold:allow-save-store-record",
     "stronghold:allow-get-store-record",
     "stronghold:allow-remove-store-record",
-    "clipboard-manager:allow-write-text"
+    "clipboard-manager:allow-write-text",
+    "autostart:allow-enable",
+    "autostart:allow-disable",
+    "autostart:allow-is-enabled",
+    "autostart:default"
   ]
 }

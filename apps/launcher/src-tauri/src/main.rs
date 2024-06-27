@@ -6,15 +6,9 @@ use argon2::{hash_raw, Config, Variant, Version};
 use serde_json::Value;
 use tauri::{AppHandle, Manager, WebviewWindow};
 use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
+use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 
 const WINDOW: &str = "main";
-
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    println!("hi from greet");
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
 
 #[tauri::command]
 fn get_env(name: &str) -> String {
@@ -47,6 +41,10 @@ fn main() {
     dotenv::dotenv().ok();
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            Some(vec!["--flag1", "--flag2"]),
+        ))
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(
             tauri_plugin_stronghold::Builder::new(|password| {
@@ -111,11 +109,13 @@ fn main() {
                         println!("Failed to parse payload: {:?}", payload);
                     }
                 });
+
+                let autostart_manager = app.autolaunch();
+                let _ = autostart_manager.enable();
             }
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![greet])
         .invoke_handler(tauri::generate_handler![get_env])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
