@@ -1,9 +1,10 @@
 name: 'publish_launcher'
 
 on:
-  push:
-    branches:
-      - launcher
+  # push:
+  #   branches:
+  #     - launcher
+  workflow_dispatch: # This line enables manual triggering
 
 jobs:
   publish-tauri:
