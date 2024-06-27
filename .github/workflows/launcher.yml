@@ -38,13 +38,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'pnpm' # Set this to npm, yarn or pnpm.
+          # cache: 'pnpm' # Set this to npm, yarn or pnpm.
 
       - name: install pnpm
         run: npm install -g pnpm
 
-      - name: Check pnpm installation and set PATH
-        run: echo "$(which pnpm)" >> $GITHUB_PATH
+      # - name: Check pnpm installation and set PATH
+      #   run: echo "$(which pnpm)" >> $GITHUB_PATH
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
