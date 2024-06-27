@@ -40,6 +40,9 @@ jobs:
           node-version: lts/*
           cache: 'pnpm' # Set this to npm, yarn or pnpm.
 
+      - name: install pnpm
+        run: npm install -g pnpm
+
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -65,4 +68,4 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
-          projectPath: 'apps/launcher'
+          projectPath: 'apps/launcher' # Specify the path to your Tauri project here.
