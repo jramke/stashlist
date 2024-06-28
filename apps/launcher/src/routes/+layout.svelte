@@ -6,7 +6,6 @@
     import { getRecord, initStronghold } from '$lib/stronghold';
     import { apiKey, currentPage, groups, loading, saves } from '$lib/stores';
     import { listen } from '@tauri-apps/api/event';
-    import { afterNavigate } from '$app/navigation';
     import { setCommandMenuContext, getCommandMenuContext } from "$lib/command/context";
     import { Toaster } from '@repo/ui/components/sonner';
     import { dev } from "$app/environment";
@@ -15,16 +14,12 @@
     type Payload =  'opened' | 'closed';
 
     setCommandMenuContext();
-    const { focusableEls, searchInput, resetPages, searchValue, commandPages, goPageBack, closeApp, updateFocusableEls, changePage, availablePages } = getCommandMenuContext();
+    const { focusableEls, searchInput, resetPages, searchValue, commandPages, goPageBack, closeApp, changePage, availablePages } = getCommandMenuContext();
 
     let removeTrapFocusListeners: (() => void) | undefined;
     $: if ($focusableEls) {
         removeTrapFocusListeners = trapFocus();
     }
-
-    afterNavigate(() => {
-        updateFocusableEls();
-    });
 
     onMount(() => {
         removeTrapFocusListeners = trapFocus();
@@ -52,6 +47,8 @@
 
     function onKeydown(e: KeyboardEvent) {
         if (e.key === 'Escape' || (e.key === 'Backspace' && !$searchValue)) {
+            console.log('back');
+            
 			e.preventDefault();
             if ($commandPages.length > 0) {
                 goPageBack();

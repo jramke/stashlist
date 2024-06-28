@@ -11,7 +11,7 @@
     import { pageComponents } from "./pages";
     import { currentPage } from "$lib/stores";
     import { siteConfig } from "@repo/constants";
-    
+    import { Badge } from "@repo/ui/components/badge";
 
     const { cmdPressed, commandPages, handleItemSelect, searchValue, searchInput, changePage, getCurrentPage, availablePages } = getCommandMenuContext();
 
@@ -99,6 +99,9 @@
                 <Command.Item onSelect={() => changePage(availablePages.connect)} value="Connect your stashes">
                     <Unplug class="me-2 shrink-0" />
                     Connect your stashes
+                    {#if $apiKey}
+                        <Badge class="ml-auto">Connected</Badge>
+                    {/if}
                 </Command.Item>
             </Command.Group>
             {#if $apiKey}

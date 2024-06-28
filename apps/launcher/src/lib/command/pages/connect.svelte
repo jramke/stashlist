@@ -11,7 +11,7 @@
     let apiKeyFormError = '';
 
     const connectText = 'Connect your Stashlist account.';
-    const connectedText = 'API key is already connected.';
+    const connectedText = 'API key is already connected. Connect a new account.';
     let infoText = $apiKey ? connectedText : connectText;
 
     const apiKeyPattern = /^([a-zA-Z0-9%]+)-[a-zA-Z0-9]{30}$/;
@@ -26,20 +26,18 @@
         };
         window.addEventListener('keydown', handleKeydown);
 
-        if ($apiKey) {
-            setTimeout(() => {
-                searchValue.set($apiKey);
-            }, 10);
-        }
-
         return () => {
             window.removeEventListener('keydown', handleKeydown);
+            apiKeyFormError = '';
         };
     });
 
-    async function handleSubmit() {
+    async function handleSubmit() {        
         if (!$searchValue) {
             infoText = connectText;
+            if ($apiKey) {
+                infoText = connectedText;
+            }
             return;
         }
 

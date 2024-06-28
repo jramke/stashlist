@@ -4,7 +4,6 @@ import { writable, get } from 'svelte/store';
 import { open } from '@tauri-apps/plugin-shell';
 import { emit } from '@tauri-apps/api/event';
 import { getCurrent, LogicalSize } from '@tauri-apps/api/window';
-import { currentPage } from '$lib/stores';
 
 const focusableElSelctor = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
@@ -37,7 +36,6 @@ function changePage(newPage: CommandPage) {
     searchValue.set('');
     setTimeout(async () => {
         if (newPage.height) {
-            // 600 is default width, specified in tauri conf
             await getCurrent().setSize(new LogicalSize(defaultWidth, newPage.height));
         }
         updateFocusableEls();
@@ -130,25 +128,9 @@ function updateFocusableEls() {
     focusableEls.set(items as HTMLElement[]);
 }
 
-type CommandMenuContext = {
-    resetPages: typeof resetPages;
-    goPageBack: typeof goPageBack;
-    changePage: typeof changePage;
-    handleItemSelect: typeof handleItemSelect;
-    closeApp: typeof closeApp;
-    updateFocusableEls: typeof updateFocusableEls;
-    getCurrentPage: typeof getCurrentPage;
-    focusableEls: typeof focusableEls;
-    cmdPressed: typeof cmdPressed;
-    commandPages: typeof commandPages;
-    currentPage: typeof currentPage;
-    searchValue: typeof searchValue;
-    searchInput: typeof searchInput;
-    availablePages: typeof availablePages;
-}
-
+const COMMAND_MENU_KEY = Symbol('commandMenu');
 export function setCommandMenuContext() {
-    setContext('commandMenu', {
+    return setContext(COMMAND_MENU_KEY, {
         resetPages,
         goPageBack,
         changePage,
@@ -159,7 +141,6 @@ export function setCommandMenuContext() {
         focusableEls,
         cmdPressed,
         commandPages,
-        currentPage,
         searchValue,
         searchInput,
         availablePages,
@@ -167,5 +148,5 @@ export function setCommandMenuContext() {
 }
 
 export function getCommandMenuContext() {
-    return getContext<CommandMenuContext>('commandMenu');
+    return getContext<ReturnType<typeof setCommandMenuContext>>(COMMAND_MENU_KEY);
 }
