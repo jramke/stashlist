@@ -70,7 +70,6 @@ fn main() -> Result<(), Box<dyn Error>> {
                     ..Default::default()
                 };
                 let salt_str = get_env("STRONGHOLD_SALT");
-                println!("is there a salt? {}", salt_str);
                 let salt = salt_str.as_bytes();
                 let key =
                     hash_raw(password.as_ref(), &salt, &config).expect("failed to hash password");
