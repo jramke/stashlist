@@ -12,6 +12,7 @@
     import { currentPage } from "$lib/stores";
     import { siteConfig } from "@repo/constants";
     import { Badge } from "@repo/ui/components/badge";
+    import { get, writable } from "svelte/store";
 
     const { cmdPressed, commandPages, handleItemSelect, searchValue, searchInput, changePage, getCurrentPage, availablePages } = getCommandMenuContext();
 
@@ -29,6 +30,26 @@
         return groups.find((item: { group: { id: string; }; }) => item.group.id === $currentPage?.groupId)
     });
 
+    const searchableItems = writable(new Map());
+    const searchableGroups = writable(new Map());
+
+    saves.subscribe(($saves) => {
+        const itemMap = new Map();
+        for (const item of $saves) {
+            const itemSearch = (item.title + ' ' + item.description + ' ' + item.url).toLowerCase();
+            itemMap.set(item.id, itemSearch);
+        }
+        searchableItems.set(itemMap);
+    });
+
+    groups.subscribe(($groups) => {
+        const groupMap = new Map();
+        for (const group of $groups) {
+            groupMap.set(group.id, group.title.toLowerCase());
+        }
+        searchableGroups.set(groupMap);
+    });
+
     onMount(() => {
         searchInput.set(document.querySelector('[data-cmdk-input]') as HTMLInputElement); // bind:el not working?
         $searchInput?.focus();
@@ -42,23 +63,24 @@
 
     function filter(value: string, search: string) {
         if ($currentPage?.preventFilter) return 1;
+
         search = search.toLowerCase();
-        if (value.includes('item-')) {
-            const id = value.split('item-')[1];
-            const item = $saves?.find((item: any) => item.id === id);
-            // TODO: maybe we can also check for the groups titles
-            const itemSearch = item?.title + ' ' + item?.description + ' ' + item?.url;
-            if (itemSearch.toLowerCase().includes(search)) return 1;
-            return 0;
+        const itemsMap = get(searchableItems);
+        const groupsMap = get(searchableGroups);
+
+        if (value.startsWith('item-')) {
+            const id = value.slice(5); // 'item-' has 5 characters
+            const itemSearch = itemsMap.get(id);
+            return itemSearch && itemSearch.includes(search) ? 1 : 0;
         }
-        if (value.includes('group-')) {
-            const id = value.split('group-')[1];
-            const group = $groups.find((group: any) => group.id === id);
-            if (group.title.toLowerCase().includes(search)) return 1;
-            return 0;
+
+        if (value.startsWith('group-')) {
+            const id = value.slice(6); // 'group-' has 6 characters
+            const groupSearch = groupsMap.get(id);
+            return groupSearch && groupSearch.includes(search) ? 1 : 0;
         }
-        if (value.includes(search)) return 1;
-        return 0;
+        
+        return value.toLowerCase().includes(search) ? 1 : 0;
     }
 
     function onKeydown(e: KeyboardEvent) {
