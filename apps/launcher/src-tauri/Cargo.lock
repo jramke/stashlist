@@ -3,6 +3,24 @@
 version = 3
 
 [[package]]
+name = "Stashlist_Launcher"
+version = "0.0.1"
+dependencies = [
+ "dotenvy",
+ "rust-argon2 2.1.0",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-autostart",
+ "tauri-plugin-clipboard-manager",
+ "tauri-plugin-global-shortcut",
+ "tauri-plugin-http",
+ "tauri-plugin-shell",
+ "tauri-plugin-stronghold",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3770,24 +3788,6 @@ name = "stable_deref_trait"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
-
-[[package]]
-name = "stashlist_launcher"
-version = "0.0.1"
-dependencies = [
- "dotenvy",
- "rust-argon2 2.1.0",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-autostart",
- "tauri-plugin-clipboard-manager",
- "tauri-plugin-global-shortcut",
- "tauri-plugin-http",
- "tauri-plugin-shell",
- "tauri-plugin-stronghold",
-]
 
 [[package]]
 name = "state"
