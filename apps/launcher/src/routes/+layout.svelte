@@ -116,7 +116,6 @@
 
     async function getItems() {
         loading.set(true);
-
         const getData = async (url: string) => {
             const response = await fetch(url, 
                 { 
@@ -126,15 +125,23 @@
                     }
                 }
             );
-            console.log(dev);
+
+            if (!response.ok) {
+                console.error(response.statusText, response);
+                loading.set(false);
+                return;
+            }
+            
+            let result;
             
             if (dev) {
-                const result = await response.text();            
-                return JSON.parse(result);
+                result = await response.text();            
+                result = JSON.parse(result);
             } else {
-                const result = await response.json();
-                return result;
+                result = await response.json();
             }
+            
+            return result;
         }
 
         let savesData: any;
@@ -145,9 +152,9 @@
         } else {
             savesData = await getData('https://www.stashlist.app/api/saves');
             groupsData = await getData('https://www.stashlist.app/api/groups');
-        }
+        } 
 
-        saves.set(savesData.saves);
+        saves.set(savesData?.saves);
         groups.set(groupsData);
 
         loading.set(false);
