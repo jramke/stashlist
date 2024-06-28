@@ -14,7 +14,7 @@
     import { Badge } from "@repo/ui/components/badge";
     import { get, writable } from "svelte/store";
 
-    const { cmdPressed, commandPages, handleItemSelect, searchValue, searchInput, changePage, getCurrentPage, availablePages } = getCommandMenuContext();
+    const { cmdPressed, commandPages, handleItemSelect, searchValue, searchInput, changePage, getCurrentPage, availablePages, resetPages } = getCommandMenuContext();
 
     $: if ($commandPages) {
         currentPage.set(getCurrentPage());
@@ -35,6 +35,7 @@
 
     saves.subscribe(($saves) => {
         const itemMap = new Map();
+        if (!$saves) return;
         for (const item of $saves) {
             const itemSearch = (item.title + ' ' + item.description + ' ' + item.url).toLowerCase();
             itemMap.set(item.id, itemSearch);
@@ -44,6 +45,7 @@
 
     groups.subscribe(($groups) => {
         const groupMap = new Map();
+        if (!$groups) return;
         for (const group of $groups) {
             groupMap.set(group.id, group.title.toLowerCase());
         }
@@ -95,10 +97,20 @@
         }
     }
 
+    function handleBreadcrumbsClick(page: string) {
+        if (page === 'Stashlist') {
+            resetPages();
+            return;
+        }
+        const newPage = availablePages[page.toLowerCase()];
+        if (newPage === $currentPage) return;
+        if (newPage) changePage(newPage);
+    }
+
 </script>
    
 <Command.Root {filter} {onKeydown}>
-    <Command.Breadcrumbs pages={['Stashlist', ...$commandPages.map(page => page.name)]} />
+    <Command.Breadcrumbs pages={['Stashlist', ...$commandPages.map(page => page.name)]} onPageClick={handleBreadcrumbsClick} />
     <Command.Input bind:value={$searchValue} icon={null} placeholder={$currentPage?.placeholder ?? "Search your stashes..."} />
     <Command.List>
         {#if !$currentPage?.preventFilter}

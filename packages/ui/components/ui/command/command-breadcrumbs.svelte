@@ -10,6 +10,17 @@
 
 <div class={cn("p-4 pb-1 text-[0.65rem] flex items-center gap-2 bg-card/50", className)} data-cmdk-breadcrumbs="">
 	{#each pages as page, i}
-		<button class="focusable text-primary-foreground py-[0.2rem] px-[0.4rem] bg-accent shadow-inner shadow-popover border border-accent rounded-sm" on:click={() => onPageClick(page)}>{page}</button>
+		<button 
+			class="focusable text-primary-foreground py-[0.2rem] px-[0.4rem] bg-accent shadow-inner shadow-popover border border-accent rounded-sm" 
+			on:click={() => onPageClick(page)}
+			on:keydown={(e) => {
+				if (e.key === 'Enter') {
+					e.preventDefault();
+					onPageClick(page);
+				}
+			}}
+		>
+			{page}
+		</button>
 	{/each}
 </div>
