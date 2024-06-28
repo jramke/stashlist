@@ -1,12 +1,12 @@
-// Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-// use tauri_plugin_global_shortcut::{Shortcut, Code, Modifiers, GlobalShortcutExt};
 use argon2::{hash_raw, Config, Variant, Version};
 use serde_json::Value;
 use tauri::{AppHandle, Manager, WebviewWindow};
 use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
+use std::env;
+use std::error::Error;
 
 const WINDOW: &str = "main";
 
@@ -37,8 +37,21 @@ fn toggle_launchbar(app: &AppHandle) {
     }
 }
 
-fn main() {
-    dotenv::dotenv().ok();
+fn init_env() -> Result<(), Box<dyn Error>> {
+    dotenvy::dotenv()?;
+    Ok(())
+}
+
+fn main() -> Result<(), Box<dyn Error>> {
+    init_env()?;
+    // dotenvy::dotenv()?;
+    // dotenv::dotenv().ok();
+    // dotenv::from_filename(".env").ok();
+    // if cfg!(debug_assertions) {
+    //     dotenv::from_filename(".env.development").unwrap().load();
+    // } else {
+    //     dotenv::from_filename(".env.production").unwrap().load();
+    // }
 
     tauri::Builder::default()
         .plugin(tauri_plugin_autostart::init(
@@ -57,6 +70,7 @@ fn main() {
                     ..Default::default()
                 };
                 let salt_str = get_env("STRONGHOLD_SALT");
+                println!("is there a salt? {}", salt_str);
                 let salt = salt_str.as_bytes();
                 let key =
                     hash_raw(password.as_ref(), &salt, &config).expect("failed to hash password");
@@ -117,6 +131,7 @@ fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![get_env])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .run(tauri::generate_context!())?;
+
+    Ok(())
 }
