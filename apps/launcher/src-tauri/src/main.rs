@@ -5,7 +5,6 @@ use serde_json::Value;
 use tauri::{AppHandle, Manager, WebviewWindow};
 use tauri_plugin_global_shortcut::{Code, Modifiers, ShortcutState};
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
-use std::env;
 use std::error::Error;
 
 const WINDOW: &str = "main";
@@ -37,21 +36,14 @@ fn toggle_launchbar(app: &AppHandle) {
     }
 }
 
-fn init_env() -> Result<(), Box<dyn Error>> {
-    dotenvy::dotenv()?;
-    Ok(())
-}
-
 fn main() -> Result<(), Box<dyn Error>> {
-    init_env()?;
-    // dotenvy::dotenv()?;
-    // dotenv::dotenv().ok();
-    // dotenv::from_filename(".env").ok();
-    // if cfg!(debug_assertions) {
-    //     dotenv::from_filename(".env.development").unwrap().load();
-    // } else {
-    //     dotenv::from_filename(".env.production").unwrap().load();
-    // }
+    if cfg!(debug_assertions) {
+        dotenv::from_filename(".env").unwrap().load();
+    }else{
+        let prod_env = include_str!("../../.env");
+        let result = dotenv::from_read(prod_env.as_bytes()).unwrap();
+        result.load();
+    }
 
     tauri::Builder::default()
         .plugin(tauri_plugin_autostart::init(
