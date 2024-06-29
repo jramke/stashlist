@@ -75,3 +75,4 @@ jobs:
           prerelease: false
           args: ${{ matrix.args }}
           projectPath: 'apps/launcher'
+          includeDebug: true
