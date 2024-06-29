@@ -4,12 +4,11 @@
 
     import { onMount } from 'svelte';
     import { getRecord, initStronghold } from '$lib/stronghold';
-    import { apiKey, currentPage, groups, loading, saves } from '$lib/stores';
+    import { apiKey, currentPage } from '$lib/stores';
     import { listen } from '@tauri-apps/api/event';
     import { setCommandMenuContext, getCommandMenuContext } from "$lib/command/context";
     import { Toaster } from '@repo/ui/components/sonner';
-    import { dev } from "$app/environment";
-    import { fetch } from '@tauri-apps/plugin-http';
+    import { getItems } from '$lib/queries';
     
     type Payload =  'opened' | 'closed';
 
@@ -25,7 +24,7 @@
         removeTrapFocusListeners = trapFocus();
         const unlisten = listenForEvents();
         document.addEventListener('keydown', onKeydown);
-
+        
         (async () => {
             await initStronghold();
             const apiKeyFromStronghold = await getRecord('api-key');
@@ -109,52 +108,6 @@
         if (!$apiKey && $currentPage !== availablePages.connect) {
             changePage(availablePages.connect);
         }
-    }
-
-    async function getItems() {
-        loading.set(true);
-        const getData = async (url: string) => {
-            const response = await fetch(url, 
-                { 
-                    method: 'GET',
-                    headers: {
-                        'X-Api-Key': await getRecord('api-key'),
-                    }
-                }
-            );
-
-            if (!response.ok) {
-                console.error(response.statusText, response);
-                loading.set(false);
-                return;
-            }
-            
-            let result;
-            
-            if (dev) {
-                result = await response.text();            
-                result = JSON.parse(result);
-            } else {
-                result = await response.json();
-            }
-            
-            return result;
-        }
-
-        let savesData: any;
-        let groupsData: any;
-        if (dev) {
-            savesData = await getData('/saves.json');
-            groupsData = await getData('/groups.json');
-        } else {
-            savesData = await getData('https://www.stashlist.app/api/saves');
-            groupsData = await getData('https://www.stashlist.app/api/groups');
-        } 
-
-        saves.set(savesData?.saves);
-        groups.set(groupsData);
-
-        loading.set(false);
     }
 
 </script>

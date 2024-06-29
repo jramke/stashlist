@@ -7,6 +7,8 @@
     import { get } from "svelte/store";
     import { apiKey } from "$lib/stores";
     import { toast } from "@repo/ui/components/sonner";
+    import { invalidateAll } from "$app/navigation";
+    import { getItems } from "$lib/queries";
 
     let apiKeyFormError = '';
 
@@ -53,6 +55,7 @@
             apiKey.set($searchValue);
             apiKeyFormError = '';
             toast.success('API key connected!');
+            getItems();
             setTimeout(() => {
                 goPageBack();
             }, 50);

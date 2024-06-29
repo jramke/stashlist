@@ -2,7 +2,7 @@
     import * as Command from "@repo/ui/components/command";
     import { Separator } from "@repo/ui/components/separator";
     import { Shortcut } from "@repo/ui/components/shortcut";
-    import { Stash, Unplug } from "@repo/ui/icons";
+    import { RotateCcw, Stash, Unplug } from "@repo/ui/icons";
 	import { onMount } from "svelte";
     import { getCommandMenuContext } from "./context";
     import { apiKey, groups, loading, saves } from "$lib/stores";
@@ -13,6 +13,7 @@
     import { siteConfig } from "@repo/constants";
     import { Badge } from "@repo/ui/components/badge";
     import { get, writable } from "svelte/store";
+    import { getItems } from "$lib/queries";
 
     const { cmdPressed, commandPages, handleItemSelect, searchValue, searchInput, changePage, getCurrentPage, availablePages, resetPages } = getCommandMenuContext();
 
@@ -130,9 +131,13 @@
                     <Stash class="me-2 shrink-0" />
                     Open Stashlist
                 </Command.Item>
-                <Command.Item onSelect={() => changePage(availablePages.connect)} value="Connect your stashes">
+                <Command.Item onSelect={() => getItems()} value="Reload items stashes">
+                    <RotateCcw class="me-2 shrink-0" />
+                    Reload stashes
+                </Command.Item>
+                <Command.Item onSelect={() => changePage(availablePages.connect)} value="Connect your account stashes">
                     <Unplug class="me-2 shrink-0" />
-                    Connect your stashes
+                    Connect your account
                     {#if $apiKey}
                         <Badge class="ml-auto">Connected</Badge>
                     {/if}
