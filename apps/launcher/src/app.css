@@ -2,11 +2,14 @@
 	@apply border-border;
 }
 #stashlist {
-	@apply bg-background text-foreground;
+	@apply  text-foreground;
 	min-height: 100%;
 }
 body, main {
 	height: 100vh;
+}
+main {
+	@apply bg-background rounded-[10px] overflow-hidden;
 }
 
 /* [data-sonner-toaster] {
