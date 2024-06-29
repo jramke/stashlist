@@ -62,11 +62,16 @@ jobs:
         # If you don't have `beforeBuildCommand` configured you may want to build your frontend here too.
         run: pnpm install --filter launcher # change this to npm or pnpm depending on which one you use.
 
+      - name: Set up environment variables
+        run: |
+          echo "STRONGHOLD_SALT=${{ secrets.STRONGHOLD_SALT }}" >> apps/launcher/.env
+          echo "STRONGHOLD_PASSWORD=${{ secrets.STRONGHOLD_PASSWORD }}" >> apps/launcher/.env
+          
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          STRONGHOLD_SALT: ${{ secrets.STRONGHOLD_SALT }}
-          STRONGHOLD_PASSWORD: ${{ secrets.STRONGHOLD_PASSWORD }}
+          # STRONGHOLD_SALT: ${{ secrets.STRONGHOLD_SALT }}
+          # STRONGHOLD_PASSWORD: ${{ secrets.STRONGHOLD_PASSWORD }}
         with:
           tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
           releaseName: 'Stashlist Launcher v__VERSION__'
