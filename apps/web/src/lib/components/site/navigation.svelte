@@ -4,8 +4,9 @@
 	import { Link } from '$lib/components/app/nav';
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
-	import { Logo } from '@repo/ui/icons';
-	
+	import { ChevronDown, Logo } from '@repo/ui/icons';
+	import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
+
 </script>
 
 <header
@@ -22,9 +23,24 @@
 		</div>
 		<div class="flex flex-1 items-center justify-between space-x-2 md:justify-end">
 			<nav class="flex items-center gap-6">
-				{#if $page.url.pathname !== '/extension'}
-					<Link path="/extension">Get the extension</Link>
-				{/if}
+				<DropdownMenu.Root >
+					<DropdownMenu.Trigger asChild let:builder>
+						<Button builders={[builder]} variant="nav">
+							Products
+							<ChevronDown class="size-4 ms-1 mt-0.5" />
+						</Button>
+					</DropdownMenu.Trigger>
+					<DropdownMenu.Content align="end" class="max-w-[250px]">
+						<DropdownMenu.Item class="flex flex-col items-start gap-1" href="https://github.com/jramke/stashlist/releases/latest">
+							Desktop launcher
+							<span class="text-muted-foreground text-xs">Acces Stashlist directly from your desktop</span>
+						</DropdownMenu.Item>
+						<DropdownMenu.Item class="flex flex-col items-start gap-1" href="/extension">
+							Browser extension
+							<span class="text-muted-foreground text-xs">Quickly save your resources to Stashlist</span>
+						</DropdownMenu.Item>
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
 				{#if $page.data.user}
 					<Link path={siteConfig.appUrl}>Go to app</Link>
 				{/if}

@@ -2,3 +2,4 @@
 **/node_modules
 .DS_Store
 dist.zip
+vite.config.ts.timestamp-*

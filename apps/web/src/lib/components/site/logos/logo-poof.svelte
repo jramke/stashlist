@@ -4,6 +4,10 @@
 	import * as rive from "@rive-app/canvas";
     import { Motion } from "svelte-motion";
 
+    export let delay = 0;
+    export let playPoof = false;
+    let thisPlayPoof = false;
+
     let canvas: HTMLCanvasElement;
     let wrapper: HTMLElement;
     let replacerVisible = false;
@@ -29,6 +33,18 @@
         });
 
 	});
+
+    $: if(playPoof || thisPlayPoof) {
+        setTimeout(() => {
+            if (replacerVisible) {
+                return;
+            }
+            poof.play();
+            width = 28;
+            replacerVisible = true;
+            replacerScale = 1;
+        }, delay);
+    }
     
     function handleClick() {
         poof.play();
@@ -48,7 +64,10 @@
             </span>
         </Motion>
         <Motion let:motion whileHover={{ scale: 1.2 }}>
-            <button use:motion class="cursor-pointer inline" class:hidden={replacerVisible} on:click={handleClick}>
+            <button use:motion class="cursor-pointer inline focusable" class:hidden={replacerVisible} on:click={() => {
+                delay = 0;
+                thisPlayPoof = true;
+            }}>
                 <slot />
             </button>
         </Motion>

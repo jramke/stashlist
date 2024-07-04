@@ -9,6 +9,6 @@
 	};
 </script>
 
-<section class={cn('w-full py-10', className)} {id}>
+<section class={cn('w-full py-16', className)} {id}>
 	<slot />
 </section>

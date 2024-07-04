@@ -8,11 +8,11 @@
 
 <CommandMenu />
 
-<Section class="container flex flex-col min-h-[100vh]">
+<Section class="py-10 container flex flex-col min-h-[100vh]">
 	<!-- <div class="sticky w-full top-0 bg-background/80 backdrop-blur z-50"> -->
 		<Topbar />
 	<!-- </div> -->
-	<Section class="flex-grow grid">
+	<Section class="py-10 flex-grow grid">
 		<!-- <ScrollArea class="max-h-[755px] pb-5"> -->
 			<slot />
 		<!-- </ScrollArea> -->
