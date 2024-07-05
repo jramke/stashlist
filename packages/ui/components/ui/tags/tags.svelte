@@ -2,6 +2,7 @@
 <script>
     import { cn } from '$ui/utils';
 	import { Badge } from '$ui/components/ui/badge';
+    import { ScrollArea } from '$ui/components/ui/scroll-area';
 
     let tag = "";
     let arrelementsmatch = [];
@@ -11,67 +12,72 @@
       return s.replace(/[-\\^$*+?.()|[\]{}]/g, "\\$&")
     }
     
-    export let tags;
-    export let addKeys;
-    export let maxTags;
-    export let onlyUnique;
-    export let removeKeys;
-    export let placeholder;
-    export let allowPaste;
-    export let allowDrop;
-    export let splitWith;
-    export let autoComplete;
-    export let autoCompleteFilter;
-    export let autoCompleteKey;
-    export let autoCompleteMarkupKey;
-    export let name;
-    export let id;
-    export let allowBlur;
-    export let disable;
-    export let minChars;
-    export let onlyAutocomplete;
-    export let labelText;
-    export let labelShow;
-    export let readonly;
-    export let onTagClick;
-    export let autoCompleteShowKey;
-    export let autoCompleteAddKey;
-    export let onTagAdded;
-    export let onTagRemoved;
-    export let cleanOnBlur;
-    export let customValidation;
-    
+    export let tags = [];
+    export let addKeys = [13];
+    export let removeKeys = [8];
+
+    export let autoComplete = false;
+    export let autoCompleteFilter = true;
+    /** @type {boolean|string} */
+    export let autoCompleteKey = false;
+    export let autoCompleteMarkupKey = false;
+    export let autoCompleteShowKey = autoCompleteKey;
+    export let autoCompleteAddKey = autoCompleteKey;
+
+    export let maxTags = false;
+    export let onlyUnique = false;
+    export let allowPaste = false;
+    export let allowDrop = false;
+    export let splitWith = ",";
+    export let name = "svelte-tags-input";
+    export let id = uniqueID();
+    export let allowBlur = false;
+    export let disable = false;
+    export let minChars = 1;
+    export let onlyAutocomplete = false;
+    export let labelText = name;
+    export let labelShow = false;
+    export let readonly = false;
+    export let cleanOnBlur = false;
+    export let customValidation = false;
+
+    export let onTagClick = () => {};
+    export let onTagAdded = () => {};
+    export let onTagRemoved = () => {};
+
+    export let placeholder = "";
+
     let layoutElement;
-    
-    $: tags = tags || [];
-    $: addKeys = addKeys || [13];
-    $: maxTags = maxTags || false;
-    $: onlyUnique = onlyUnique || false;
-    $: removeKeys = removeKeys || [8];
-    $: placeholder = placeholder || "";
-    $: allowPaste = allowPaste || false;
-    $: allowDrop = allowDrop || false;
-    $: splitWith = splitWith || ",";
-    $: autoComplete = autoComplete || false;
-    $: autoCompleteFilter = typeof autoCompleteFilter == "undefined" ? true : false;
-    $: autoCompleteKey = autoCompleteKey || false;
-    $: autoCompleteMarkupKey = autoCompleteMarkupKey || false;
-    $: name = name || "svelte-tags-input";
-    $: id = id || uniqueID();
-    $: allowBlur = allowBlur || false;
-    $: disable = disable || false;
-    $: minChars = minChars ?? 1;
-    $: onlyAutocomplete = onlyAutocomplete || false;
-    $: labelText = labelText || name;
-    $: labelShow = labelShow || false;
-    $: readonly = readonly || false;
-    $: onTagClick = onTagClick || function(){};
-    $: autoCompleteShowKey = autoCompleteShowKey || autoCompleteKey;
-    $: autoCompleteAddKey = autoCompleteAddKey || autoCompleteKey;
-    $: onTagAdded = onTagAdded || function(){};
-    $: onTagRemoved = onTagRemoved || function(){};
-    $: cleanOnBlur = cleanOnBlur || false;
-    $: customValidation = customValidation || false;
+
+    $: tags = tags;
+    $: addKeys = addKeys;
+    $: maxTags = maxTags;
+    $: onlyUnique = onlyUnique;
+    $: removeKeys = removeKeys;
+    $: placeholder = placeholder;
+    $: allowPaste = allowPaste;
+    $: allowDrop = allowDrop;
+    $: splitWith = splitWith;
+    $: autoComplete = autoComplete;
+    $: autoCompleteFilter = autoCompleteFilter;
+    $: autoCompleteKey = autoCompleteKey;
+    $: autoCompleteMarkupKey = autoCompleteMarkupKey;
+    $: name = name;
+    $: id = id;
+    $: allowBlur = allowBlur;
+    $: disable = disable;
+    $: minChars = minChars;
+    $: onlyAutocomplete = onlyAutocomplete;
+    $: labelText = labelText;
+    $: labelShow = labelShow;
+    $: readonly = readonly;
+    $: onTagClick = onTagClick;
+    $: autoCompleteShowKey = autoCompleteShowKey;
+    $: autoCompleteAddKey = autoCompleteAddKey;
+    $: onTagAdded = onTagAdded;
+    $: onTagRemoved = onTagRemoved;
+    $: cleanOnBlur = cleanOnBlur;
+    $: customValidation = customValidation;
     
     
     $: matchsID = id + "_matchs";
@@ -131,7 +137,7 @@
                     arrelementsmatch = [];
                     document.getElementById(id).readOnly = false;
                     placeholder = storePlaceholder;
-                    document.getElementById(id).focus();
+                    document.getElementById(id)?.focus();
                 }
             });
         }
@@ -151,8 +157,10 @@
         } else if (e.keyCode === 27) {
             // Escape
             arrelementsmatch = [];
-            document.getElementById(id).focus();
+            document.getElementById(id)?.focus();
         }
+
+        document?.querySelector(`li#${id}_match_item_${autoCompleteIndex}`)?.scrollIntoView({ block: "nearest" });
     
     }
     
@@ -234,7 +242,7 @@
         arrelementsmatch = [];
         document.getElementById(id).readOnly = false;
         placeholder = storePlaceholder;
-        document.getElementById(id).focus();
+        document.getElementById(id)?.focus();
     
     }
     
@@ -262,6 +270,7 @@
     
     function onBlur(e, currentTag) {
         layoutElement.classList.remove('focus');
+        console.log('onBlur', e, currentTag);
     
         if (allowBlur) {
             // A match is highlighted
@@ -391,28 +400,39 @@
     function uniqueID() {
         return 'sti_' + Math.random().toString(36).substring(2, 11);
     };
+
+    $: if (arrelementsmatch) {
+        arrelementsmatch = arrelementsmatch?.filter((element) => {
+            return tags?.map((tag) => tag.id)?.indexOf(element.label.id) === -1;
+        });
+    }
     
 </script>
 
 <div 
     class={cn(
-        "flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+        "flex flex-wrap min-h-10 h-auto gap-y-1 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
         disable || readonly ? 'cursor-not-allowed opacity-50 pointer-events-none' : ''
     )} 
     bind:this={layoutElement}>
 
     {#if tags.length > 0}
         {#each tags as tag, i}
-        <Badge type="button" class="whitespace-nowrap me-2" on:click={onTagClick(tag)}>
-            {#if typeof tag === 'string'}
-                {tag}
-            {:else}
-                {tag[autoCompleteShowKey]}
-            {/if}
-            {#if !disable && !readonly}
-                <button type="button" class="ms-1 mb-[3px]" on:pointerdown={() => removeTag(i)} on:keydown|preventDefault={() => removeTag(i)}>&#215;</button>
-            {/if}   
-        </Badge>
+            <Badge type="button" class="whitespace-nowrap me-2 items-center" on:click={onTagClick(tag)}>
+                {#if typeof tag === 'string'}
+                    {tag}
+                {:else}
+                    {tag[autoCompleteShowKey]}
+                {/if}
+                {#if !disable && !readonly}
+                    <button type="button" class="ms-1 leading-none text-[.5rem] focusable" on:pointerdown={() => removeTag(i)} on:keydown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            removeTag(i);
+                        };
+                    }}>✕</button>
+                {/if}   
+            </Badge>
         {/each}
     {/if}
     <input
@@ -427,7 +447,7 @@
         on:focus={onFocus}
         on:blur={(e) => onBlur(e, tag)}
         on:pointerdown={onClick}
-        class="bg-transparent w-full placeholder:text-muted-foreground focus-visible:outline-none"
+        class="bg-transparent w-auto flex-grow placeholder:text-muted-foreground focus-visible:outline-none"
         placeholder={placeholder}
         disabled={disable || readonly}
         autocomplete="off"
@@ -437,18 +457,21 @@
 {#if autoComplete && arrelementsmatch.length > 0}
     <div class="relative w-full">
         <ul id="{id}_matchs" class="absolute w-full p-1 z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md outline-none">
-            {#each arrelementsmatch as element, index}
-                <li
-                    class="border border-transparent 
-                        relative flex w-full cursor-pointer select-none rounded-sm text-sm outline-none 
-                        data-[disabled]:pointer-events-none data-[disabled]:opacity-50 
-                        hover:bg-secondary [&.focus]:bg-secondary hover:text-accent-foreground [&.focus]:text-accent-foreground hover:shadow-inner [&.focus]:shadow-inner hover:shadow-primary/20 [&.focus]:shadow-primary/20 hover:border-primary [&.focus]:border-primary"
-                    class:focus={index === autoCompleteIndex}>
-                    <button type="button" class="py-1.5 pl-8 pr-2 text-left w-full" on:pointerdown|preventDefault={() => addTag(element.label)} on:keydown|preventDefault={() => addTag(element.label)}>
-                        {@html element.search}
-                    </button>
-                </li>
-            {/each}
+            <ScrollArea class="max-h-64">
+                {#each arrelementsmatch as element, index}
+                    <li
+                        id={id + '_match_item_' + index}
+                        class="border border-transparent 
+                            relative flex w-full cursor-pointer select-none rounded-sm text-sm outline-none 
+                            data-[disabled]:pointer-events-none data-[disabled]:opacity-50 
+                            hover:bg-secondary [&.focus]:bg-secondary hover:text-accent-foreground [&.focus]:text-accent-foreground hover:shadow-inner [&.focus]:shadow-inner hover:shadow-primary/20 [&.focus]:shadow-primary/20 hover:border-primary [&.focus]:border-primary"
+                        class:focus={index === autoCompleteIndex}>
+                        <button tabindex="-1" type="button" class="py-1.5 pl-8 pr-2 text-left w-full" on:pointerdown={() => addTag(element.label)} on:keydown|preventDefault={() => addTag(element.label)}>
+                            {@html element.search}
+                        </button>
+                    </li>
+                {/each}
+            </ScrollArea>
         </ul>
     </div>
 {/if}
