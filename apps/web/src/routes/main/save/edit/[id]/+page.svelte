@@ -11,9 +11,10 @@
 	import { Button } from "@repo/ui/components/button";
 	import { invalidateAll } from "$app/navigation";
 	import { formatRelativeTime } from "$lib/utils";
-	import { itemsStore } from "$lib/stores";
 	import ItemMedia from "$lib/components/app/saves/item/item-media.svelte";
 	import { CopyButton } from "$lib/components/app";
+	import { onMount } from "svelte";
+	import { Loader } from "@repo/ui/icons";
 
     export let data: {
         form: SuperValidated<Infer<FormSchema>>,
@@ -21,24 +22,43 @@
         groups: TODO,
         isDialog: boolean,
     };
-    // export let data: PageData;
 
-    const { copyUrlToClipboard } = itemsStore;
+    export let busy = false;
 
     const form = superForm(data?.form, {
         validators: zodClient(formSchema),
+        delayMs: 350,
     });
 
-    const { form: formData, enhance } = form;
+    const { form: formData, enhance, delayed } = form;
 
     const aviableGroups = data?.groups;
 
     const creationDate = new Date(data?.save.createdAt);
-    const readableDate = new Intl.DateTimeFormat('de-DE', { dateStyle: 'full' }).format(creationDate)
+    const readableDate = new Intl.DateTimeFormat('de-DE', { dateStyle: 'full' }).format(creationDate);
+
+    let formRef: HTMLFormElement;
+
+    $: if ($delayed === true) {
+        busy = true;
+    } else {
+        busy = false;
+    }
     
     // // //TODO: types
     let groups = data?.save.saveGroups.map(item => item.group) || [];
     $: groupIds = groups.map(item => item.id);
+
+    onMount(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+                event.preventDefault();
+                formRef?.requestSubmit();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    })
 
     async function onLegacyCancel() {
         await invalidateAll();
@@ -46,7 +66,7 @@
     }
 
 </script>
-<form method="POST" id="edit-stash-form" class="flex-grow flex flex-col gap-4 justify-between" use:enhance>
+<form method="POST" id="edit-stash-form" class="flex-grow flex flex-col gap-4 justify-between" bind:this={formRef} use:enhance>
     <div class="flex flex-col gap-4">
         <Form.Field {form} name="title">
             <Form.Control let:attrs>
@@ -103,8 +123,15 @@
         <slot />
         {#if data?.isDialog === false} 
             <div class="space-x-2">
-                <Button on:click={onLegacyCancel} variant="outline">Cancel</Button>
-                <Button type="submit">Update</Button>
+                <Button on:click={onLegacyCancel} variant="outline" disabled={busy}>Cancel</Button>
+                <Button type="submit" disabled={busy}>
+                    {#if busy}
+                        <Loader class="animate-spin size-4" />
+                        <span class="ml-2">Updating...</span>
+                    {:else}
+                        Update
+                    {/if}
+                </Button>
             </div>
         {/if}
     </div>

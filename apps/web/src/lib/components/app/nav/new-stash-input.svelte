@@ -16,6 +16,7 @@
 	import { cn } from "@repo/ui/utils";
 	import { get } from "svelte/store";
 	import { newStashStore } from "$lib/stores";
+	import { ScrollArea } from "@repo/ui/components/scroll-area";
 
     let busy = false;
 	let newStashFormError = '';
@@ -117,18 +118,20 @@
                             {/if}
                         </div>
                     </Select.Trigger>
-                    <Select.Content class="!w-auto">
-                        <Select.Item value={''} label={"No group"}>
-                            No group
-                        </Select.Item>
-                        {#each groups as item}
-                            <Select.Item value={item.id} label={item.title}>
-                                <!-- <div class="relative overflow-hidden rounded-full size-4 me-2">
-                                    <Gradient gradientIndex={item.gradientIndex} />
-                                </div> -->
-                                {item.title}
+                    <Select.Content class="!w-auto px-0" align="start">
+                        <ScrollArea class="max-h-[30vh] px-1 data-[scrollbar-visible=true]:pe-0">
+                            <Select.Item value={''} label={"No group"}>
+                                No group
                             </Select.Item>
-                        {/each}
+                            {#each groups as item}
+                                <Select.Item value={item.id} label={item.title}>
+                                    <!-- <div class="relative overflow-hidden rounded-full size-4 me-2">
+                                        <Gradient gradientIndex={item.gradientIndex} />
+                                    </div> -->
+                                    {item.title}
+                                </Select.Item>
+                            {/each}
+                        </ScrollArea>
                     </Select.Content>
                     <Select.Input name="group" />
                 </Select.Root>
