@@ -4,8 +4,7 @@
     import { page } from '$app/stores';
     import { Gradient } from '$lib/components/app';
 	import { findMiddleNumberInRange, getRandomIndex, minDelay } from '$lib/utils';
-	import { gradients } from '$lib/constants'; 
-    import { siteConfig } from '$lib/config/site';
+    import { siteConfig, gradients } from '@repo/constants';
     import { ChevronsUpDown, Folders, GripVertical, Inbox, Loader, Pencil, Plus, Trash } from '@repo/ui/icons';
     import * as DropdownMenu from '@repo/ui/components/dropdown-menu';
     import { Button, buttonVariants } from '@repo/ui/components/button';

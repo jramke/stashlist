@@ -4,7 +4,7 @@ import { superValidate, message } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from './schema';
 import { redirect } from '@sveltejs/kit';
-import { siteConfig } from '$lib/config/site';
+import { siteConfig } from '@repo/constants';
 import { deleteGroup } from '$lib/server/db/queries';
 
 export const actions: Actions = {

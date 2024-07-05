@@ -1,6 +1,6 @@
 <script lang="ts">
     import * as Command from "@repo/ui/components/command";
-    import { siteConfig } from "$lib/config/site";
+    import { siteConfig } from '@repo/constants';
 	import { getCommandMenuContext } from "./context";
     import { newGroupDialogOpen, editGroupsDialogOpen, liveView, newStashStore } from "$lib/stores";
 	import { Folders, Inbox, Masonry, Pencil, Plus, Stash, Tv } from "@repo/ui/icons";

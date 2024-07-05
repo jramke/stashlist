@@ -13,7 +13,7 @@
     import CommandListLayouts from "./command-list-layouts.svelte";
     import { Shortcut } from "@repo/ui/components/shortcut";
 	import { goto } from "$app/navigation";
-	import { siteConfig } from "$lib/config/site";
+	import { siteConfig } from '@repo/constants';
 
     let groups: TODO;
     $: if (typeof $page.data.groups?.then === "function") {

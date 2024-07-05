@@ -1,7 +1,7 @@
 import type { Save } from '$lib/types';
 
 import { goto, invalidateAll, preloadData, pushState } from '$app/navigation';
-import { siteConfig } from '$lib/config/site';
+import { siteConfig } from '@repo/constants';
 import { toast } from '@repo/ui/components/sonner';
 import { get, writable, type Writable } from 'svelte/store';
 

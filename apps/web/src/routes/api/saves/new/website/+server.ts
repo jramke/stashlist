@@ -7,7 +7,7 @@ import { error, json, redirect } from '@sveltejs/kit';
 import urlMetadata from 'url-metadata';
 import { getDomainFromUrl, isImageUrl, isAbsoluteUrl, makeAbsoluteUrl, getRandomIndex } from '$lib/utils';
 import { eq } from 'drizzle-orm';
-import { gradients } from '$lib/constants';
+import { gradients } from '@repo/constants';
 
 
 

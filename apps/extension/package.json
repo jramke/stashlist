@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@repo/ui": "workspace:*",
+    "@repo/constants": "workspace:*",
     "webextension-polyfill": "^0.10.0",
     "zod": "^3.22.4"
   }

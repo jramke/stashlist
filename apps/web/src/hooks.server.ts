@@ -1,4 +1,4 @@
-import { siteConfig } from '$lib/config/site';
+import { siteConfig } from '@repo/constants';
 import { lucia } from '$lib/server/auth';
 import { getUserByApiKey, getSessionByUserId } from '$lib/server/db/queries';
 import { redirect, error, json, text, type Handle } from '@sveltejs/kit';

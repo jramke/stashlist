@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { invalidateAll } from '$app/navigation';
-	import { siteConfig } from '$lib/config/site';
+	import { siteConfig } from '@repo/constants';
 	import { listLayout, listColumns, itemsStore } from '$lib/stores';
 	import { EmptyState } from '$lib/components/app';
     import { Item } from '$lib/components/app/saves';

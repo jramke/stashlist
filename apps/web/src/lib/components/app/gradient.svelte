@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { gradients } from "$lib/constants";
+    import { gradients } from "@repo/constants";
 	import { cn } from "@repo/ui/utils";
 
     export let gradientIndex: number | null;

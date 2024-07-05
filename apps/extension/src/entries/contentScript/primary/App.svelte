@@ -3,6 +3,7 @@
 	import '../../../app.pcss';
 
 	import browser from 'webextension-polyfill';
+	import { siteConfig } from '@repo/constants';
 	import * as Dialog from '@repo/ui/components/dialog';
 	import { Input } from '@repo/ui/components/input';
 	import { Label } from '@repo/ui/components/label';
@@ -104,8 +105,7 @@
 				toast.success('Successfully created stash', {
 					action: {
 						label: 'View',
-						onClick: () => window.open('https://stashlist.app', '_blank')?.focus(),
-						// onClick: () => browser.tabs.create({ url: 'https://stashlist.app' }),
+						onClick: () => window.open(siteConfig.url, '_blank')?.focus(),
 					}
 				});
 				

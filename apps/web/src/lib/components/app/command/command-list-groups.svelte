@@ -2,7 +2,7 @@
 	import type { TODO } from "$lib/types";
 
     import * as Command from "@repo/ui/components/command";
-    import { siteConfig } from "$lib/config/site";
+    import { siteConfig } from '@repo/constants';
 	import { getCommandMenuContext } from "./context";
     import { Gradient } from "$lib/components/app";
 

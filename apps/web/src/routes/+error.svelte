@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { siteConfig } from '$lib/config/site';
+	import { siteConfig } from '@repo/constants';
 	import Section from '@repo/ui/components/section';
 	import Heading from '@repo/ui/components/heading';
 	import { Button } from '@repo/ui/components/button';

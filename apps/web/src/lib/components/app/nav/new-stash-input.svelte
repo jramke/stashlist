@@ -6,7 +6,7 @@
 	import { applyAction, enhance } from "$app/forms";
 	import { afterNavigate, invalidateAll } from "$app/navigation";
 	import { page } from "$app/stores";
-	import { siteConfig } from "$lib/config/site";
+	import { siteConfig } from '@repo/constants';
 	import { minDelay } from "$lib/utils";
 	import { Loader } from "@repo/ui/icons";
 	import { Input } from "@repo/ui/components/input";

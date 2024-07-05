@@ -9,7 +9,7 @@
 	import { cn } from '@repo/ui/utils';
 	import { commandMenuOpen, generateKeyDialogOpen } from '$lib/stores';
 	import { Shortcut } from '@repo/ui/components/shortcut';
-	import { siteConfig } from '$lib/config/site';
+	import { siteConfig } from '@repo/constants';
 	import { goto } from '$app/navigation';
 	import { GenerateKeyDialog } from '../connect';
     
@@ -70,7 +70,7 @@
                 </DropdownMenu.SubTrigger>
                 <DropdownMenu.SubContent side="left">
                     <DropdownMenu.Item href={'/extension'}>Browser extension</DropdownMenu.Item> 
-                    <DropdownMenu.Item href={'https://github.com/jramke/stashlist/releases/latest'}>Desktop launcher</DropdownMenu.Item> 
+                    <DropdownMenu.Item href={siteConfig.releaseUrl}>Desktop launcher</DropdownMenu.Item> 
                 </DropdownMenu.SubContent>
             </DropdownMenu.Sub>
             <DropdownMenu.Item on:click={() => commandMenuOpen.set(true)}>

@@ -1,4 +1,4 @@
-import { siteConfig } from '$lib/config/site';
+import { siteConfig } from '@repo/constants';
 import { getLatestReleaseByOS, getLatestReleases, getOS } from '$lib/helper/releases';
 import type { LayoutServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';

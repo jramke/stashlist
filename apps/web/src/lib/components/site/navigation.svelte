@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '@repo/ui/components/button';
-	import { siteConfig } from '$lib/config/site';
-	import { Link } from '$lib/components/app/nav';
+	import { siteConfig } from '@repo/constants';
+ 	import { Link } from '$lib/components/app/nav';
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
 	import { ChevronDown, Logo } from '@repo/ui/icons';
@@ -31,7 +31,7 @@
 						</Button>
 					</DropdownMenu.Trigger>
 					<DropdownMenu.Content align="end" class="max-w-[250px]">
-						<DropdownMenu.Item class="flex flex-col items-start gap-1" href="https://github.com/jramke/stashlist/releases/latest">
+						<DropdownMenu.Item class="flex flex-col items-start gap-1" href={siteConfig.releaseUrl}>
 							Desktop launcher
 							<span class="text-muted-foreground text-xs">Acces Stashlist directly from your desktop</span>
 						</DropdownMenu.Item>

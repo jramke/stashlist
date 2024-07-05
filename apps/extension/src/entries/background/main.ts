@@ -1,7 +1,8 @@
 import browser, { type Tabs } from "webextension-polyfill";
+import { siteConfig } from "@repo/constants";
 
 // const baseUrl = 'https://stashlist.app';
-const baseUrl = import.meta.env.MODE === 'development' ?'http://127.0.0.1:5173' : 'https://stashlist.app';
+const baseUrl = import.meta.env.MODE === 'development' ?'http://127.0.0.1:5173' : siteConfig.url;
 
 function isValidUrl(url: string) {
   // Regular expression to match the pattern *://*/*
@@ -11,7 +12,7 @@ function isValidUrl(url: string) {
 
 browser.action.onClicked.addListener((tab, info) => {
   browser.tabs.create({
-    url: 'https://stashlist.app'
+    url: siteConfig.url
   })
 })
 

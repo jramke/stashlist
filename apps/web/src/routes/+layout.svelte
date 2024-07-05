@@ -6,7 +6,7 @@
 	import { Toaster } from '@repo/ui/components/sonner';
 	import {Navigation, Footer, Metadata } from '$lib/components/site';
 	import { page } from '$app/stores';
-	import { siteConfig } from '$lib/config/site';
+	import { siteConfig } from '@repo/constants';
 </script>
 
 <Metadata />

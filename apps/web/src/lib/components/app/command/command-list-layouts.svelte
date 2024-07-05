@@ -1,6 +1,6 @@
 <script lang="ts">
     import * as Command from "@repo/ui/components/command";
-    import { siteConfig } from "$lib/config/site";
+    import { siteConfig } from '@repo/constants';
 	import { getCommandMenuContext } from "./context";
     import { listLayout } from "$lib/stores";
 	import { LayoutGrid, StretchHorizontal, Masonry } from "@repo/ui/icons";

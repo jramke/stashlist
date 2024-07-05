@@ -6,7 +6,7 @@
     import { setMode, resetMode } from 'mode-watcher';
     import { page } from '$app/stores';
     import { Logo } from '@repo/ui/icons';
-    import { siteConfig } from '$lib/config/site';
+    import { siteConfig } from '@repo/constants';
 
 </script>
 

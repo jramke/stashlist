@@ -5,7 +5,7 @@
 	import { Gradient } from "$lib/components/app";
 	import { cn } from "@repo/ui/utils";
 	import { ItemImage } from "$lib/components/app/saves/item";
-	import { siteConfig } from "$lib/config/site";
+	import { siteConfig } from '@repo/constants';
 
     export let title: SelectGroup['title'];
     export let gradientIndex: SelectGroup['gradientIndex'];

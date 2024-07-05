@@ -1,5 +1,5 @@
 <script>
-	import { siteConfig } from '$lib/config/site';
+	import { siteConfig } from '@repo/constants';
 	import Heading from '@repo/ui/components/heading';
     import Section from '@repo/ui/components/section';
 	import { Shortcut } from '@repo/ui/components/shortcut';

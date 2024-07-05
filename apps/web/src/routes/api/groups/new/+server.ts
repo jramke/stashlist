@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 
 import { json, redirect, error } from '@sveltejs/kit';
 import { getRandomIndex } from '$lib/utils';
-import { gradients } from '$lib/constants';
+import { gradients } from '@repo/constants';
 import { createNewGroup } from '$lib/server/db/queries';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
