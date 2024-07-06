@@ -8,10 +8,19 @@
 
     const excludedNodeNames = ['INPUT', 'TEXTAREA'];
 
+    const colToWidth = {
+        1: 550,
+        2: 750,
+    };
+
     onMount(() => {
-        
-		document.addEventListener('keydown', setListColumns);
-        return () => document.removeEventListener('keydown', setListColumns);
+        setDefaultColForWidth();
+		document.addEventListener('keydown', setListColumns); 
+        window.addEventListener('resize',setDefaultColForWidth);
+        return () => {
+            document.removeEventListener('keydown', setListColumns);
+            window.removeEventListener('resize',setDefaultColForWidth);
+        };
     });
 
     function sliderValueChange(value: number[]) {
@@ -25,6 +34,21 @@
                 listColumns.set(i);
             }
         }
+    }
+
+    function setDefaultColForWidth() {
+        if (!window) return;  
+        
+        let col = $listColumns;
+
+        for (const [key, value] of Object.entries(colToWidth)) {
+            if (window.innerWidth < value) {
+                col = parseInt(key);
+                break;
+            }
+        }
+
+        listColumns.set(col);
     }
 
 </script>
