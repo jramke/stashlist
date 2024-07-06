@@ -23,7 +23,7 @@
 		</div>
 		<div class="flex flex-1 items-center justify-between space-x-2 md:justify-end">
 			<nav class="flex items-center gap-6">
-				<DropdownMenu.Root >
+				<DropdownMenu.Root preventScroll={false}>
 					<DropdownMenu.Trigger asChild let:builder>
 						<Button builders={[builder]} variant="nav">
 							Products
