@@ -10,6 +10,7 @@ const editDialogOpen = writable<boolean>(false);
 const focusedItem = writable<HTMLElement | null>(null);
 const editDialogCloseCallback = writable<Function | null>(null);
 const deletedItems = writable<Set<string>>(new Set());
+const fetchingMetadataItems = writable<Set<Save['id']>>(new Set());
 
 function createContextMenuOpenState(state: boolean) {
     const open = writable<boolean>(state);
@@ -105,6 +106,40 @@ function deleteItem(id: Save['id']) {
     });
 }
 
+async function refetchMetadata(id: Save['id']) {
+    if (!id || get(fetchingMetadataItems).has(id)) return;
+    
+    fetchingMetadataItems.update((items) => items.add(id));
+    
+    try {
+        const res = await fetch('/api/saves/metadata/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id }),
+        });
+
+        if (!res.ok) {
+            throw new Error('Failed to fetch metadata');
+        }
+
+        await invalidateAll();
+        fetchingMetadataItems.update(set => {
+            set.delete(id);
+            return set;
+        });
+
+    } catch (error) {
+        console.error('Error refetching metadata', error);
+        toast.error('Failed to refetch metadata');
+        fetchingMetadataItems.update(set => {
+            set.delete(id);
+            return set;
+        });
+    }
+}
+
 export const itemsStore = {
     openContextMenus,
     editDialogOpen,
@@ -115,4 +150,6 @@ export const itemsStore = {
     openEditDialog,
     deleteItem,
     editDialogCloseCallback,
+    refetchMetadata,
+    fetchingMetadataItems,
 };

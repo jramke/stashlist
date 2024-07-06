@@ -22,7 +22,7 @@
 
 	$: copyUrl = type === 'image' ? imageUrl : url;
 
-	const { copyUrlToClipboard, openEditDialog, deletedItems, focusedItem, deleteItem } = itemsStore;
+	const { copyUrlToClipboard, openEditDialog, deletedItems, focusedItem, deleteItem, refetchMetadata } = itemsStore;
 
 	let itemNode: HTMLAnchorElement;
 
@@ -43,6 +43,11 @@
 		if (event.key === 'd' && (event.metaKey || event.ctrlKey)) {
 			event.preventDefault();
 			deleteItem(id);
+		}
+
+		if (event.key === 'r' && (event.metaKey || event.ctrlKey)) {
+			event.preventDefault();
+			refetchMetadata(id);
 		}
 	};
 	

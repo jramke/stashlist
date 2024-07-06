@@ -1,6 +1,5 @@
 import type { RequestHandler } from './$types';
 
-import { db } from '$lib/server/db';
 import { error, json, redirect } from '@sveltejs/kit';
 import { getSaveWithGroups } from '$lib/server/db/queries';
 

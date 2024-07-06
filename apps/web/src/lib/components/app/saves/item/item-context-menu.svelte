@@ -3,7 +3,7 @@
 	
 	import * as ContextMenu from '@repo/ui/components/context-menu';
 	import { Shortcut } from '@repo/ui/components/shortcut';
-    import { Trash, Pencil, Copy } from '@repo/ui/icons';
+    import { Trash, Pencil, Copy, RotateCcw, Loader } from '@repo/ui/icons';
 	import { itemsStore } from '$lib/stores';
 
     export let id: Save['id'];
@@ -11,7 +11,7 @@
 
 	let triggerNode: HTMLDivElement;
 
-	const { openContextMenus, createContextMenuOpenState, copyUrlToClipboard, openEditDialog, deleteItem } = itemsStore; 
+	const { openContextMenus, createContextMenuOpenState, copyUrlToClipboard, openEditDialog, deleteItem, refetchMetadata, fetchingMetadataItems } = itemsStore; 
 	const openState = createContextMenuOpenState(false);
 
 	const handleContextMenuOpen = (open: boolean) => {
@@ -25,6 +25,8 @@
 		}
 	};
 
+	$: isFetching = $fetchingMetadataItems.has(id);
+
 </script>
 
 <ContextMenu.Root onOpenChange={handleContextMenuOpen} bind:open={$openState} disableFocusFirstItem={true}>
@@ -32,7 +34,6 @@
 		<slot />
 	</ContextMenu.Trigger>
 	<ContextMenu.Content>
-		<!-- <ContextMenu.Label>Actions</ContextMenu.Label> -->
 		<ContextMenu.Item on:click={() => openEditDialog(id)}>
 			<Pencil class="size-4 me-2" />
 			View details
@@ -47,6 +48,23 @@
 				<Shortcut keys={['command', 'C']} />
 			</ContextMenu.Shortcut>
 		</ContextMenu.Item>
+		{#if isFetching}
+			<ContextMenu.Item disabled={true}>
+				<Loader class="size-4 me-2 animate-spin" />
+				Fetching...
+				<ContextMenu.Shortcut>
+					<Shortcut keys={['command', 'R']} />
+				</ContextMenu.Shortcut>
+			</ContextMenu.Item>
+		{:else}
+			<ContextMenu.Item on:click={() => refetchMetadata(id)}>
+				<RotateCcw class="size-4 me-2" />
+				Refetch metadata
+				<ContextMenu.Shortcut>
+					<Shortcut keys={['command', 'R']} />
+				</ContextMenu.Shortcut>
+			</ContextMenu.Item>
+		{/if}
 		<ContextMenu.Item on:click={() => deleteItem(id)} class="data-[highlighted]:bg-destructive/10 data-[highlighted]:shadow-destructive/10 data-[highlighted]:border-destructive/30">
 			<Trash class="size-4 me-2" />
 			Delete

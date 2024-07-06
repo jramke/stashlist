@@ -10,6 +10,10 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
         const data = await request.json();
         const saveUrl = data['url'] as string;
 
+        if (!saveUrl) {
+            return error(400, 'Invalid URL');
+        }
+
         if (saveUrl.includes('x.com') || saveUrl.includes('twitter.com')) {
             return await handleTweetUrl(saveUrl, fetch);
         } else {
