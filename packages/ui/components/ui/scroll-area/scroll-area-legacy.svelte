@@ -13,7 +13,7 @@
     const observer = new ResizeObserver(() => {
       scrollbarVisible = scrollArea.scrollHeight > scrollArea.clientHeight;
     });
-    observer.observe(scrollArea);
+    observer.observe(scrollArea.firstChild as HTMLElement);
     return () => observer.disconnect();
   });
 </script>
