@@ -11,7 +11,7 @@ import { gradients } from '@repo/constants';
 
 
 
-export const POST: RequestHandler = async ({ request, locals, params, url }) => {
+export const POST: RequestHandler = async ({ request, locals, params, url, fetch }) => {
 	if (!locals.user) redirect(302, '/login');
 	
 	try {
@@ -48,23 +48,14 @@ export const POST: RequestHandler = async ({ request, locals, params, url }) => 
 			return json({ success: true });
 		}
 
-		let metaData;
-		const saveUrlResponse = await fetch(saveUrl);
-		if (saveUrlResponse.ok) {
-			metaData = await urlMetadata(null, { parseResponseObject: saveUrlResponse });
-		}
-
-		// console.log('metadata', metaData);
-
-		let faviconUrl = (metaData?.favicons[0]?.href || '') as string;
-
-		if (isImageUrl(faviconUrl) && !isAbsoluteUrl(faviconUrl)) {
-			faviconUrl = makeAbsoluteUrl(faviconUrl, getDomainFromUrl(saveUrl));
-		}
-
-		const imageUrl = metaData?.['og:image'] || '';
-		const description = metaData?.description || '';
-		const title = metaData?.title || metaData?.name || saveUrl;
+		const metaDataResponse = await fetch('/api/saves/metadata', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ url: saveUrl })
+		});
+		const { title, description, imageUrl, faviconUrl } = await metaDataResponse.json();
 
 		if (edit) {
 			const groups = await db.select().from(group).where(eq(group.userId, locals.user.id)).all();
