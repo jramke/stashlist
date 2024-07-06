@@ -13,7 +13,7 @@ let searchInput = writable<HTMLInputElement|null>(null);
 let focusableEls = writable<HTMLElement[]>([]);
 
 const defaultWidth = 620;
-const defaultSize = new LogicalSize(defaultWidth, 499);
+const defaultSize = new LogicalSize(defaultWidth, 490);
 
 let commandPages = writable<CommandPage[]>([]);
 
