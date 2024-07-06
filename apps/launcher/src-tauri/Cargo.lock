@@ -4,7 +4,7 @@ version = 3
 
 [[package]]
 name = "Stashlist_Launcher"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "dotenvs",
  "rust-argon2 2.1.0",

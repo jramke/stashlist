@@ -1,6 +1,6 @@
 {
   "productName": "Stashlist Launcher",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "identifier": "stashlist.app.launcher",
   "build": {
     "beforeDevCommand": "pnpm dev",
