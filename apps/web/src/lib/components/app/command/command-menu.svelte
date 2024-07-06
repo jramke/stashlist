@@ -14,6 +14,8 @@
     import { Shortcut } from "@repo/ui/components/shortcut";
 	import { goto } from "$app/navigation";
 	import { siteConfig } from '@repo/constants';
+	import { memoize } from "$lib/utils";
+	import { get, writable } from "svelte/store";
 
     let groups: TODO;
     $: if (typeof $page.data.groups?.then === "function") {
@@ -46,6 +48,29 @@
         const groups = save.saveGroups;
         if (groups.length === 0) return;
         return groups.find((item: { group: { id: string; }; }) => item.group.id === currentPage?.groupId)
+    });
+
+    const searchableItems = writable(new Map());
+    const searchableGroups = writable(new Map());
+
+    saves.subscribe(($saves: any) => {
+        const itemMap = new Map();
+        if (!$saves) return;
+        for (const item of $saves) {
+            const itemSearch = (item.title + ' ' + item.description + ' ' + item.url).toLowerCase();
+            itemMap.set(item.id, new Set(itemSearch.split(/\s+/)));
+        }
+        searchableItems.set(itemMap);
+    });
+
+    groups.subscribe(($groups: any) => {
+        const groupMap = new Map();
+        if (!$groups) return;
+        for (const group of $groups) {
+            const groupSearch = group.title.toLowerCase(); // Split by whitespace
+            groupMap.set(group.id, new Set(groupSearch.split(/\s+/)));
+        }
+        searchableGroups.set(groupMap);
     });
 
     onMount(() => {
@@ -99,25 +124,31 @@
         };
     })
 
-    function filter(value: string, search: string) {
-        search = search.toLowerCase();
-        if (value.includes('item-')) {
-            const id = value.split('item-')[1];
-            const item = saves?.items.find((item: TODO) => item.id === id);
-            // TODO: maybe we can also check for the groups titles
-            const itemSearch = item?.title + ' ' + item?.description + ' ' + item?.url;
-            if (itemSearch.toLowerCase().includes(search)) return 1;
-            return 0;
+    const containsAllParts = (searchableSet: Set<string> | undefined, searchParts: string[]): boolean => {
+        if (!searchableSet) return false;
+        return searchParts.every(part => [...searchableSet].some(word => word.includes(part)));
+    };
+
+    const filter = memoize((value: string, search: string) => {
+        const searchParts = search.toLowerCase().split(/\s+/); // Split by whitespace
+        const itemsMap = get(searchableItems);
+        const groupsMap = get(searchableGroups);
+
+        if (value.startsWith('item-')) {
+            const id = value.slice(5); // 'item-' has 5 characters
+            const itemSearch = itemsMap.get(id);
+            return itemSearch && containsAllParts(itemSearch, searchParts) ? 1 : 0;
         }
-        if (value.includes('group-')) {
-            const id = value.split('group-')[1];
-            const group = groups.find((group: TODO) => group.id === id);
-            if (group.title.toLowerCase().includes(search)) return 1;
-            return 0;
+
+        if (value.startsWith('group-')) {
+            const id = value.slice(6); // 'group-' has 6 characters
+            const groupSearch = groupsMap.get(id);
+            return groupSearch && containsAllParts(groupSearch, searchParts) ? 1 : 0;
         }
-        if (value.includes(search)) return 1;
-        return 0;
-    }
+        
+        const valueSearch = new Set(value.toLowerCase().split(/\s+/));
+        return containsAllParts(valueSearch, searchParts) ? 1 : 0;
+    });
 
     function onKeydown(e: KeyboardEvent) {
         if (e.key === 'Escape' || (e.key === 'Backspace' && !$searchValue)) {

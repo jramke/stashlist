@@ -14,6 +14,7 @@
     import { Badge } from "@repo/ui/components/badge";
     import { get, writable } from "svelte/store";
     import { getItems } from "$lib/queries";
+    import { memoize } from "$lib/utils";
 
     const { cmdPressed, commandPages, handleItemSelect, searchValue, searchInput, changePage, getCurrentPage, availablePages, resetPages } = getCommandMenuContext();
 
@@ -39,7 +40,7 @@
         if (!$saves) return;
         for (const item of $saves) {
             const itemSearch = (item.title + ' ' + item.description + ' ' + item.url).toLowerCase();
-            itemMap.set(item.id, itemSearch);
+            itemMap.set(item.id, new Set(itemSearch.split(/\s+/)));
         }
         searchableItems.set(itemMap);
     });
@@ -48,7 +49,8 @@
         const groupMap = new Map();
         if (!$groups) return;
         for (const group of $groups) {
-            groupMap.set(group.id, group.title.toLowerCase());
+            const groupSearch = group.title.toLowerCase(); // Split by whitespace
+            groupMap.set(group.id, new Set(groupSearch.split(/\s+/)));
         }
         searchableGroups.set(groupMap);
     });
@@ -64,27 +66,33 @@
         };
     });
 
-    function filter(value: string, search: string) {
+    const containsAllParts = (searchableSet: Set<string> | undefined, searchParts: string[]): boolean => {
+        if (!searchableSet) return false;
+        return searchParts.every(part => [...searchableSet].some(word => word.includes(part)));
+    };
+
+    const filter = memoize((value: string, search: string) => {
         if ($currentPage?.preventFilter) return 1;
 
-        search = search.toLowerCase();
+        const searchParts = search.toLowerCase().split(/\s+/); // Split by whitespace
         const itemsMap = get(searchableItems);
         const groupsMap = get(searchableGroups);
 
         if (value.startsWith('item-')) {
             const id = value.slice(5); // 'item-' has 5 characters
             const itemSearch = itemsMap.get(id);
-            return itemSearch && itemSearch.includes(search) ? 1 : 0;
+            return itemSearch && containsAllParts(itemSearch, searchParts) ? 1 : 0;
         }
 
         if (value.startsWith('group-')) {
             const id = value.slice(6); // 'group-' has 6 characters
             const groupSearch = groupsMap.get(id);
-            return groupSearch && groupSearch.includes(search) ? 1 : 0;
+            return groupSearch && containsAllParts(groupSearch, searchParts) ? 1 : 0;
         }
         
-        return value.toLowerCase().includes(search) ? 1 : 0;
-    }
+        const valueSearch = new Set(value.toLowerCase().split(/\s+/));
+        return containsAllParts(valueSearch, searchParts) ? 1 : 0;
+    });
 
     function onKeydown(e: KeyboardEvent) {
         if (e.metaKey || e.ctrlKey) {
