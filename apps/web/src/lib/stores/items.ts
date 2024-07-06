@@ -46,9 +46,10 @@ async function openEditDialog(id: string | undefined) {
 
 }
 
-function softDelete(id: string, deleteFunction: () => Promise<boolean|Error>) {
+async function softDelete(id: string, deleteFunction: () => Promise<boolean|Error>) {
     try {
         deletedItems.update((items) => items.add(id));
+        await invalidateAll();
         
         const toastDismiss = async () => {
             if (!get(deletedItems).has(id)) return;
@@ -67,11 +68,12 @@ function softDelete(id: string, deleteFunction: () => Promise<boolean|Error>) {
         toast('Successfully deleted stash', {
             action: {
                 label: 'Undo',
-                onClick: () => {
+                onClick: async () => {
                     deletedItems.update(set => {
                         set.delete(id);
                         return set;
                     });
+                    await invalidateAll();
                 }
             },
             onDismiss: toastDismiss,
