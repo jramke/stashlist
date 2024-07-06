@@ -122,7 +122,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
                 // Hide icon in macos dock
                 #[cfg(target_os = "macos")]
-                app_handle.set_activation_policy(tauri::ActivationPolicy::Accessory);
+                app.set_activation_policy(tauri::ActivationPolicy::Accessory);
             }
 
             Ok(())
