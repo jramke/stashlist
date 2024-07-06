@@ -4,6 +4,7 @@ import { writable, get } from 'svelte/store';
 import { open } from '@tauri-apps/plugin-shell';
 import { emit } from '@tauri-apps/api/event';
 import { getCurrent, LogicalSize } from '@tauri-apps/api/window';
+import { siteConfig } from '@repo/constants';
 
 const focusableElSelctor = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
@@ -79,11 +80,7 @@ function handleItemSelect(mainAction: string|Function, secondAction?: string|Fun
         }
 
         if (typeof secondAction === "string" && secondAction !== '') {
-            // openEditDialog(secondAction);
-            // editDialogCloseCallback.set(() => {
-            //     commandMenuOpen.set(true);
-            // });
-            // TODO: redirect to stashlist with edit dialog
+            open(siteConfig.url + siteConfig.appUrl + '?edit-stash=' + secondAction);
             if (closeAfterAction) {
                 closeApp();
             }
