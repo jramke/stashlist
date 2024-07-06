@@ -17,18 +17,20 @@
 	import { memoize } from "$lib/utils";
 	import { get, writable } from "svelte/store";
 
-    let groups: TODO;
+    let groups = writable<TODO>(null);
+    let saves = writable<TODO>(null);
+    // let groups: TODO;
     $: if (typeof $page.data.groups?.then === "function") {
-        $page.data.groups.then(data => groups = data);
+        $page.data.groups.then(data => groups.set(data));
     } else {
-        groups = $page.data.groups;
+        groups.set($page.data.groups);
     }
 
-    let saves: TODO;
+    // let saves: TODO;
     $: if (typeof $page.data.saves?.then === "function") {
-        $page.data.saves.then(data => saves = data);
+        $page.data.saves.then(data => saves.set(data));
     } else {
-        saves = $page.data.saves;
+        saves.set($page.data.saves);
     }
 
     setCommandMenuContext();
@@ -41,10 +43,10 @@
     $: currentPage = $commandPages[$commandPages.length - 1];
 
     // TODO: move this logic into a functuion because its also used in group/[slug]/page.ts
-    $: currentGroup = groups?.filter((group: { id: string; }) => {
+    $: currentGroup = $groups?.filter((group: { id: string; }) => {
 		return group.id === currentPage?.groupId;
 	})[0];
-    $: savesByGroup = saves?.items?.filter((save: { saveGroups: any; }) => {
+    $: savesByGroup = $saves?.items?.filter((save: { saveGroups: any; }) => {
         const groups = save.saveGroups;
         if (groups.length === 0) return;
         return groups.find((item: { group: { id: string; }; }) => item.group.id === currentPage?.groupId)
@@ -55,8 +57,8 @@
 
     saves.subscribe(($saves: any) => {
         const itemMap = new Map();
-        if (!$saves) return;
-        for (const item of $saves) {
+        if (!$saves?.items) return;
+        for (const item of $saves?.items) {
             const itemSearch = (item.title + ' ' + item.description + ' ' + item.url).toLowerCase();
             itemMap.set(item.id, new Set(itemSearch.split(/\s+/)));
         }
@@ -176,8 +178,8 @@
             <CommandListLayouts />
         {:else}
             <CommandListActions />
-            <CommandListGroups {groups} />
-            <CommandListSaves items={saves?.items} />
+            <CommandListGroups groups={$groups} />
+            <CommandListSaves items={$saves?.items} />
         {/if}
     </Command.List>
     <Command.Footer class="flex items-center justify-end">
