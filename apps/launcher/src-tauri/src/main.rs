@@ -116,7 +116,9 @@ fn main() -> Result<(), Box<dyn Error>> {
                 });
 
                 let autostart_manager = app.autolaunch();
-                let _ = autostart_manager.enable();
+                if !autostart_manager.is_enabled().unwrap() {
+                    let _ = autostart_manager.enable();
+                }
             }
 
             Ok(())
