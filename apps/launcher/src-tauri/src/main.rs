@@ -119,6 +119,10 @@ fn main() -> Result<(), Box<dyn Error>> {
                 if !autostart_manager.is_enabled().unwrap() {
                     let _ = autostart_manager.enable();
                 }
+
+                // Hide icon in macos dock
+                #[cfg(target_os = "macos")]
+                app_handle.set_activation_policy(tauri::ActivationPolicy::Accessory);
             }
 
             Ok(())
