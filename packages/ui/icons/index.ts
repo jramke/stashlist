@@ -37,7 +37,8 @@ import {
   RotateCcw,
   ChevronDown,
   Command,
-  Blocks
+  Blocks,
+  CornerDownLeft,
 } from 'lucide-svelte';
 
 import GitHub from './github.svelte';
@@ -88,4 +89,5 @@ export {
   ChevronDown,
   Command,
   Blocks,
+  CornerDownLeft,
 };

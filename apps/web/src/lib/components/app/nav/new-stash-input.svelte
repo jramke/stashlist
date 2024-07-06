@@ -8,7 +8,7 @@
 	import { page } from "$app/stores";
 	import { siteConfig } from '@repo/constants';
 	import { minDelay } from "$lib/utils";
-	import { Loader } from "@repo/ui/icons";
+	import { CornerDownLeft, Loader } from "@repo/ui/icons";
 	import { Input } from "@repo/ui/components/input";
 	import { toast } from "@repo/ui/components/sonner";
     import * as Select from "@repo/ui/components/select";
@@ -17,6 +17,7 @@
 	import { get } from "svelte/store";
 	import { newStashStore } from "$lib/stores";
 	import { ScrollArea } from "@repo/ui/components/scroll-area";
+	import { Shortcut } from "@repo/ui/components/shortcut";
 
     let busy = false;
 	let newStashFormError = '';
@@ -104,6 +105,11 @@
 
 <form action={siteConfig.appUrl + '/save/new'} method="POST" bind:this={newStashForm} use:enhance={enhanceNewStashForm}>
     <div class="relative">
+        {#if newStashValue}
+            <span class="text-muted-foreground text-xs absolute bottom-full right-0 mb-2 text-nowrap flex items-center gap-1 opacity-70">
+                press <span class="font-semibold text-foreground/90">Enter</span> <CornerDownLeft class="size-4 text-foreground/90" /> to submit
+            </span>
+        {/if}
         <Input autocomplete="off" id="new-stash-input" placeholder="Create new stash" class={cn('min-w-0 w-full max-w-full pe-14')} disabled={busy} name="url" bind:value={newStashValue} on:keydown={handleNewStashInputKeydown} />
         <div class={cn('absolute right-2 top-2 bottom-2 text-muted-foreground')}>
             <Loader class={cn("animate-spin size-6 hidden", busy && 'block')} />
