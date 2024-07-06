@@ -8,6 +8,7 @@
 	import ItemContextMenu from './item-context-menu.svelte';
 	import { onMount } from 'svelte';
 	import { itemsStore } from '$lib/stores';
+	import { toast } from '@repo/ui/components/sonner';
 
 	// TODO: use let { a,b } = $props();
 	export let title: Save['title'];
@@ -32,22 +33,30 @@
 		if (event.key === 'c' && (event.metaKey || event.ctrlKey)) {
 			event.preventDefault();
 			copyUrlToClipboard(copyUrl);
+			return;
 		}
 		
 		if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
 			event.preventDefault();
 			focusedItem.set(document.activeElement as HTMLElement)
 			openEditDialog(id);
+			return;
 		}
 
 		if (event.key === 'd' && (event.metaKey || event.ctrlKey)) {
 			event.preventDefault();
 			deleteItem(id);
+			return;
 		}
 
 		if (event.key === 'r' && (event.metaKey || event.ctrlKey)) {
+			if (type !== 'website') {
+				toast.info('This action is only available for links');
+				return;
+			}
 			event.preventDefault();
 			refetchMetadata(id);
+			return;
 		}
 	};
 	
@@ -62,7 +71,7 @@
 
 {#if !$deletedItems.has(id)}
 	<div>
-		<ItemContextMenu {id} {copyUrl}>
+		<ItemContextMenu {id} {copyUrl} {type}>
 			<a 
 				href={copyUrl}
 				{title}

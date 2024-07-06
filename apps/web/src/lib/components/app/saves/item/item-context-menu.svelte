@@ -8,6 +8,7 @@
 
     export let id: Save['id'];
 	export let copyUrl: string;
+	export let type: Save['type'];
 
 	let triggerNode: HTMLDivElement;
 
@@ -48,22 +49,24 @@
 				<Shortcut keys={['command', 'C']} />
 			</ContextMenu.Shortcut>
 		</ContextMenu.Item>
-		{#if isFetching}
-			<ContextMenu.Item disabled={true}>
-				<Loader class="size-4 me-2 animate-spin" />
-				Fetching...
-				<ContextMenu.Shortcut>
-					<Shortcut keys={['command', 'R']} />
-				</ContextMenu.Shortcut>
-			</ContextMenu.Item>
-		{:else}
-			<ContextMenu.Item on:click={() => refetchMetadata(id)}>
-				<RotateCcw class="size-4 me-2" />
-				Refetch metadata
-				<ContextMenu.Shortcut>
-					<Shortcut keys={['command', 'R']} />
-				</ContextMenu.Shortcut>
-			</ContextMenu.Item>
+		{#if type === 'website'}
+			{#if isFetching}
+				<ContextMenu.Item disabled={true}>
+					<Loader class="size-4 me-2 animate-spin" />
+					Fetching...
+					<ContextMenu.Shortcut>
+						<Shortcut keys={['command', 'R']} />
+					</ContextMenu.Shortcut>
+				</ContextMenu.Item>
+			{:else}
+				<ContextMenu.Item on:click={() => refetchMetadata(id)}>
+					<RotateCcw class="size-4 me-2" />
+					Refetch metadata
+					<ContextMenu.Shortcut>
+						<Shortcut keys={['command', 'R']} />
+					</ContextMenu.Shortcut>
+				</ContextMenu.Item>
+			{/if}
 		{/if}
 		<ContextMenu.Item on:click={() => deleteItem(id)} class="data-[highlighted]:bg-destructive/10 data-[highlighted]:shadow-destructive/10 data-[highlighted]:border-destructive/30">
 			<Trash class="size-4 me-2" />
