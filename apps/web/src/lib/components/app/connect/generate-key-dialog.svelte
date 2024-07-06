@@ -4,7 +4,8 @@
     import { generateKeyDialogOpen } from '$lib/stores';
 	import { Input } from '@repo/ui/components/input';
 	import { CopyButton } from '..';
-	import { Eye, EyeOff } from '@repo/ui/icons';
+	import { Eye, EyeOff, Info } from '@repo/ui/icons';
+	import { siteConfig } from '@repo/constants';
 
     let apiKey: string;
     let showApiKey = false;
@@ -43,16 +44,14 @@
         <Dialog.Header>
             <Dialog.Title>Generate new API key</Dialog.Title>
             <Dialog.Description>
-                The key is only shown once and will be deleted if you generate a new one.
+                The API key is used to connect your account to the desktop app.
             </Dialog.Description>
         </Dialog.Header>
-        <div class="text-sm space-y-2">
-            <p>Desktop app coming soon...</p>
-            <!-- <p class="font-bold">How it works</p>
-            <p>The API key is used to connect your account to the desktop app.</p>
-            <p>1. <span>Generate a new API key.</span></p>
-            <p>3. <span>Paste the key into the desktop app.</span></p>
-            <p>2. <span>Copy the key and go to the desktop app.</span></p> -->
+        <div class="text-sm space-y-2 mb-3">
+            <p>1. Install the desktop launcher <a href={siteConfig.releaseUrl} class="underline underline-offset-2">here</a></p>
+            <p>2. Generate a new API key.</p>
+            <p>3. Paste the key into the desktop app.</p>
+            <p>4. Copy the key and go to the desktop app.</p>
         </div>
         {#if apiKey}
             <div class="relative">
@@ -68,6 +67,10 @@
             </div>
         {:else}
             <Dialog.Footer>
+                <div class="flex gap-2 text-xs text-muted-foreground">
+                    <Info class="size-4 flex-shrink-0" />
+                    <span>The key is only shown once and will be deleted if you generate a new one.</span>
+                </div>
                 <Button on:click={generateApiKey}>
                     Generate API Key
                 </Button>
