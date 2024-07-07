@@ -7,8 +7,8 @@
 
 	//TODO: type
 	let classByTag: any = {
-		h1: 'text-6xl leading-none',
-		h2: 'text-4xl leading-none'
+		h1: 'text-4xl sm:text-6xl leading-none',
+		h2: 'text-3xl sm:text-4xl leading-none'
 	};
 </script>
 

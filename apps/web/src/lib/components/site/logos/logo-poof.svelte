@@ -3,7 +3,11 @@
     import { onMount } from 'svelte';
 	import * as rive from "@rive-app/canvas";
     import { Motion } from "svelte-motion";
+	import { cn } from '@repo/ui/utils';
 
+    export let replacerLogoClass = '';
+    export let poofClass = '';
+    export let poofCallback = () => {};
     export let delay = 0;
     export let playPoof = false;
     let thisPlayPoof = false;
@@ -43,6 +47,9 @@
             width = 28;
             replacerVisible = true;
             replacerScale = 1;
+            setTimeout(() => {
+                poofCallback();
+            }, 1050); // delay until poof is optically played
         }, delay);
     }
     
@@ -57,10 +64,10 @@
 
 <Motion let:motion animate={{ width }}>
     <span use:motion class="relative !inline-flex items-center justify-center !m-0" bind:this={wrapper}>
-        <canvas bind:this={canvas} class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 hidden z-50"></canvas>
+        <canvas bind:this={canvas} class={cn("absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 hidden z-50", poofClass)}></canvas>
         <Motion let:motion animate={{ scale: replacerScale }}>
             <span use:motion class="inline" class:hidden={!replacerVisible}>
-                <Logo class="h-6 w-6 inline -mt-2" />
+                <Logo class={cn("inline size-6", replacerLogoClass)} />
             </span>
         </Motion>
         <Motion let:motion whileHover={{ scale: 1.2 }}>

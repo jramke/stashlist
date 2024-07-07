@@ -12,16 +12,16 @@
 <header
 	class="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
 >
-	<div class="container flex items-center py-4">
+	<div class="container flex items-center justify-between py-4">
 		<div class="mr-4 flex">
 			<a href={$page.data.user ? siteConfig.appUrl : '/'} class="mr-6 flex items-center space-x-2">
 				<Logo class="h-6 w-6" />
-				<span class="text-lg font-bold sm:inline-block">
+				<span class="text-lg font-bold hidden sm:inline-block">
 					{siteConfig.name}
 				</span>
 			</a>
 		</div>
-		<div class="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+		<div class="flex flex-1 items-center space-x-2 justify-end">
 			<nav class="flex items-center gap-6">
 				<DropdownMenu.Root preventScroll={false}>
 					<DropdownMenu.Trigger asChild let:builder>
