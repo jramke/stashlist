@@ -116,9 +116,10 @@ fn main() -> Result<(), Box<dyn Error>> {
                 });
 
                 let autostart_manager = app.autolaunch();
-                if !autostart_manager.is_enabled().unwrap() {
-                    let _ = autostart_manager.enable();
-                }
+                // if !autostart_manager.is_enabled().unwrap() {
+                //     println!("we need to enable it");
+                // }
+                let _ = autostart_manager.enable();
 
                 // Hide icon in macos dock
                 #[cfg(target_os = "macos")]
