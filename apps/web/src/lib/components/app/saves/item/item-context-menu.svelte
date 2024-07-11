@@ -31,7 +31,7 @@
 </script>
 
 <ContextMenu.Root onOpenChange={handleContextMenuOpen} bind:open={$openState} disableFocusFirstItem={true}>
-	<ContextMenu.Trigger bind:el={triggerNode}>
+	<ContextMenu.Trigger bind:el={triggerNode} class="stash-item-context-trigger">
 		<slot />
 	</ContextMenu.Trigger>
 	<ContextMenu.Content>
@@ -78,6 +78,10 @@
 	</ContextMenu.Content>
 </ContextMenu.Root>
 
-
+<style>
+	:global(.stash-item-context-trigger a) {
+		-webkit-touch-callout: none;
+	}
+</style>
 
 
