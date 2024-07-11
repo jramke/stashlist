@@ -42,12 +42,7 @@
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>
 				{#if $page.data.user}
-					<Link path={siteConfig.appUrl}>Go to app</Link>
-				{/if}
-				{#if $page.data.user}
-					<form method="post" action="/logout" use:enhance>
-						<Button type="submit" variant="outline">Logout</Button>
-					</form>
+					<Button variant="outline" href={siteConfig.appUrl}>Go to app</Button>
 				{:else if $page.url.pathname !== '/login'}
 					<Button href="/login" variant="outline">Login</Button>
 				{/if}

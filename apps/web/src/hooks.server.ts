@@ -70,8 +70,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 			});
 		}
 		
-		// redirect to app when logged in and on home page
-		if (event.url.pathname === '/') {
+		// redirect to app when logged in and on home page	
+		if (event.url.pathname === '/' && !event.url.searchParams.has('homepage')) {
 			redirect(302, siteConfig.appUrl);
 		}
 	}
