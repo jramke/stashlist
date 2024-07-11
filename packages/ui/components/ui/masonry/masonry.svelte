@@ -62,19 +62,24 @@
 					mod: 0
 				};
 			});
-			refreshLayout(); /* initial load */
+			refreshLayout();
 		}
 	};
 
-	let _window: Window & typeof globalThis;
 	onMount(() => {
-		_window = window;
-		_window.addEventListener('resize', refreshLayout, false); /* on resize */
-	});
-	onDestroy(() => {
-		if (_window) {
-			_window.removeEventListener('resize', refreshLayout, false); /* on resize */
-		}
+		window.addEventListener('resize', refreshLayout, false);
+
+		const masonryImages = masonryElement.querySelectorAll('img');
+		masonryImages?.forEach((img) => {
+			img.addEventListener('load', refreshLayout, false);
+		});
+
+		return () => {
+			window.removeEventListener('resize', refreshLayout, false);
+			masonryImages?.forEach((img) => {
+				img.removeEventListener('load', refreshLayout, false);
+			});
+		};
 	});
 
 	$: if (masonryElement) {
