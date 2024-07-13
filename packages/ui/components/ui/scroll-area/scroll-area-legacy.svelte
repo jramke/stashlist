@@ -59,23 +59,12 @@
 
     &[data-scrollbar-visible='true'][data-scrollbar-indicator='true'] {
       --mask-size: 48px;
-      /* padding: 0; */
-      background: transparent;
-      mask:
-        linear-gradient(white, transparent) 50% 0 / 100% 0 no-repeat,
-        linear-gradient(white, white) 50% 50% / 100% 100% no-repeat,
-        linear-gradient(transparent, white) 50% 100% / 100% 100px no-repeat;
-      mask-composite: exclude;
-      mask-size:
-        100% calc((var(--scroll-progress-top) / 100) * 100px),
-        100% 100%,
-        100% calc((100 - (100 * (var(--scroll-progress-bottom) / 100))) * 1px);
 
       @supports (animation-timeline: scroll()) {
         mask:
-          linear-gradient(white, transparent) 50% 0 / 100% 0 no-repeat,
+          linear-gradient(var(--smooth-gradient-stops-white-transparent)) 50% 0 / 100% 0 no-repeat,
           linear-gradient(white, white) 50% 50% / 100% 100% no-repeat,
-          linear-gradient(transparent, white) 50% 100% / 100% 100px no-repeat;
+          linear-gradient(var(--smooth-gradient-stops-transparent-white)) 50% 100% / 100% 100px no-repeat;
         mask-composite: exclude;
         animation:
           mask-up both linear,

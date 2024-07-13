@@ -27,6 +27,7 @@ export const load: PageLoad = async ({ params, fetch, parent }) => {
 	const formSchemaWithDefaults = formSchema.extend({
 		title: formSchema.shape.title.default(save.title),
 		description: formSchema.shape.description.default(save.description),
+		text: formSchema.shape.text.default(save.text),
 		groups: formSchema.shape.groups.default(groupIdsString),
 		id: formSchema.shape.id.default(save.id),
 	})

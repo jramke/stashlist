@@ -58,7 +58,7 @@
 		{#if !isGroupsPage}
 			<div>
 				<p class="text-xs text-muted-foreground mb-1">Live view</p>
-				<Switch checked={$liveView} onCheckedChange={(checked) => liveView.set(checked)} />
+				<Switch checked={$liveView} disabled={$listLayout === 'list' ? true : false} onCheckedChange={(checked) => liveView.set(checked)} />
 			</div>
 			<div>
 				<p class="text-xs text-muted-foreground mb-1">Layout</p>

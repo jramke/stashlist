@@ -1,4 +1,4 @@
-import type { Save } from '$lib/types';
+import type { SelectSave } from '$lib/server/db/schema';
 
 import { goto, invalidateAll, preloadData, pushState } from '$app/navigation';
 import { siteConfig } from '@repo/constants';
@@ -10,19 +10,47 @@ const editDialogOpen = writable<boolean>(false);
 const focusedItem = writable<HTMLElement | null>(null);
 const editDialogCloseCallback = writable<Function | null>(null);
 const deletedItems = writable<Set<string>>(new Set());
-const fetchingMetadataItems = writable<Set<Save['id']>>(new Set());
+const fetchingMetadataItems = writable<Set<SelectSave['id']>>(new Set());
 
 function createContextMenuOpenState(state: boolean) {
     const open = writable<boolean>(state);
     return open;
 }
 
-function copyUrlToClipboard(url: string, showToast = true) {
-    navigator.clipboard.writeText(url);
+function getCopyData(item: SelectSave) {
+    const copyUrlByType = {
+        website: item.url,
+        image: item.imageUrl,
+        text: item.text,
+        color: item.title,
+    };
+    const copyUrl = copyUrlByType[item.type] || item.url;
+    return copyUrl;
+}
+
+function copyToClipboard(itemOrString: SelectSave | string, showToast = true) {
+    let copyData;
+    if (typeof itemOrString === 'string') {
+        copyData = itemOrString;
+    } else {
+        copyData = getCopyData(itemOrString);  
+    }
+    navigator.clipboard.writeText(copyData);
     if (showToast) {
-        toast.success('URL copied to clipboard');
+        toast.success('Copied to clipboard!');
     }
 }
+
+function getCopyText(type: SelectSave['type']) {
+    const texts = {
+        website: 'URL',
+        image: 'image URL',
+        text: 'text',
+        color: 'color',
+        default: 'URL',
+    };
+    return 'Copy ' + texts[type] || texts.default;
+};
 
 async function openEditDialog(id: string | undefined) {
     if (!id) return;
@@ -91,7 +119,7 @@ async function softDelete(id: string, deleteFunction: () => Promise<boolean|Erro
     }
 }
 
-function deleteItem(id: Save['id']) {
+function deleteItem(id: SelectSave['id']) {
     if (!id) return;
     softDelete(id, async () => {
         const response = await fetch('/api/saves/delete/' + id, {
@@ -106,7 +134,7 @@ function deleteItem(id: Save['id']) {
     });
 }
 
-async function refetchMetadata(id: Save['id']) {
+async function refetchMetadata(id: SelectSave['id']) {
     if (!id || get(fetchingMetadataItems).has(id)) return;
     
     fetchingMetadataItems.update((items) => items.add(id));
@@ -146,7 +174,9 @@ export const itemsStore = {
     deletedItems,
     focusedItem,
     createContextMenuOpenState,
-    copyUrlToClipboard,
+    copyToClipboard,
+    getCopyText,
+    getCopyData,
     openEditDialog,
     deleteItem,
     editDialogCloseCallback,

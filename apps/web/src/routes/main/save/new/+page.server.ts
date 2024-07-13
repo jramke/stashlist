@@ -13,7 +13,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			const response = await event.fetch('/api/saves/new/website', {
+			const response = await event.fetch('/api/saves/new', {
 				method: 'POST',
 				body: JSON.stringify(form.data)
 			});

@@ -3,10 +3,10 @@ import { text, sqliteTable, integer, primaryKey } from 'drizzle-orm/sqlite-core'
 
 export const user = sqliteTable('user', {
 	id: text('id').notNull().primaryKey().unique(),
-	username: text('username').default(''),
-	name: text('name').default(''),
-	avatarUrl: text('avatar_url').default(''),
-	apiKeyHash: text('api_key_hash').default(''),
+	username: text('username').notNull().default(''),
+	name: text('name').notNull().default(''),
+	avatarUrl: text('avatar_url').notNull().default(''),
+	apiKeyHash: text('api_key_hash').notNull().default(''),
 	createdAt: text('created_at')
 		.default(sql`CURRENT_TIMESTAMP`)
 		.notNull()
@@ -40,14 +40,14 @@ export const save = sqliteTable('save', {
 	userId: text('user_id')
 		.notNull()
 		.references(() => user.id),
-	type: text('type',{ enum: ['code', 'website', 'image'] }).notNull(),
-	url: text('url').default(''),
-	title: text('title').default(''),
-	description: text('description').default(''),
-	faviconUrl: text('favicon_url').default(''),
-	gradientIndex: integer('gradient_index').default(0),
-	imageUrl: text('image_url').default(''),
-	codeText: text('code_text').default(''),
+	type: text('type',{ enum: ['text', 'website', 'image', 'color'] }).notNull(),
+	url: text('url').notNull().default(''),
+	title: text('title').notNull().default(''),
+	description: text('description').notNull().default(''),
+	faviconUrl: text('favicon_url').notNull().default(''),
+	gradientIndex: integer('gradient_index').notNull().default(0),
+	imageUrl: text('image_url').notNull().default(''),
+	text: text('text').notNull().default(''),
 	createdAt: text('created_at')
 		.default(sql`CURRENT_TIMESTAMP`)
 		.notNull()
@@ -60,9 +60,9 @@ export const group = sqliteTable('group', {
 	userId: text('user_id')
 		.notNull()
 		.references(() => user.id),
-	title: text('title').default(''),
-	gradientIndex: integer('gradient_index').default(0),
-	parentId: text('parent_id').default(''),
+	title: text('title').notNull().default(''),
+	gradientIndex: integer('gradient_index').notNull().default(0),
+	parentId: text('parent_id').notNull().default(''),
 	sortIndex: integer('sort_index').notNull().default(100),
 	createdAt: text('created_at')
 		.default(sql`CURRENT_TIMESTAMP`)

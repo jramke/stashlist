@@ -1,6 +1,6 @@
 import { z } from 'zod';
 export const formSchema = z.object({
-	url: z.string().url(),
+	input: z.string().min(1),
 	groups: z.string().optional()
 });
 export type FormSchema = typeof formSchema;

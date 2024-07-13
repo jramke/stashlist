@@ -39,6 +39,8 @@ import {
   Command,
   Blocks,
   CornerDownLeft,
+  Text,
+  Type,
 } from 'lucide-svelte';
 
 import GitHub from './github.svelte';
@@ -90,4 +92,6 @@ export {
   Command,
   Blocks,
   CornerDownLeft,
+  Text,
+  Type,
 };

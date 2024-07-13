@@ -4,6 +4,12 @@
 @tailwind utilities;
 
 @layer base {
+	:root {
+		/* gradients generated using the scrim method https://larsenwork.com/easing-gradients/ */
+		--smooth-gradient-stops-white-transparent: rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.738) 19%, rgba(255, 255, 255, 0.541) 34%, rgba(255, 255, 255, 0.382) 47%, rgba(255, 255, 255, 0.278) 56.5%, rgba(255, 255, 255, 0.194) 65%, rgba(255, 255, 255, 0.126) 73%, rgba(255, 255, 255, 0.075) 80.2%, rgba(255, 255, 255, 0.042) 86.1%, rgba(255, 255, 255, 0.021) 91%, rgba(255, 255, 255, 0.008) 95.2%, rgba(255, 255, 255, 0.002) 98.2%, rgba(255, 255, 255, 0) 100%;
+		--smooth-gradient-stops-transparent-white: rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.002) 1.8%, rgba(255, 255, 255, 0.008) 4.8%, rgba(255, 255, 255, 0.021) 9%, rgba(255, 255, 255, 0.042) 13.9%, rgba(255, 255, 255, 0.075) 19.8%, rgba(255, 255, 255, 0.126) 27%, rgba(255, 255, 255, 0.194) 35%, rgba(255, 255, 255, 0.278) 43.5%, rgba(255, 255, 255, 0.382) 53%, rgba(255, 255, 255, 0.541) 66%, rgba(255, 255, 255, 0.738) 81%, rgba(255, 255, 255, 1) 100%;
+	}
+
 	#stashlist, #stashlist-root {
 		--background: 0 0% 100%;
 		--foreground: 20 14.3% 4.1%;

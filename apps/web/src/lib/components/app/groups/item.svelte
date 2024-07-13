@@ -31,9 +31,13 @@
             </span>
         {:else}
             <div class={cn("relative aspect-og", saveItems.length === 1 ? 'w-full h-full' : 'w-full h-full')}>
-                {#each saveItems as {title, imageUrl, gradientIndex}, i}
-                    <div class={cn(`group-list__item__image-${i} absolute aspect-og w-full rounded-md shadow-md shadow-[0_0_6px_-1px_rgba(0,0,0,0.6)] overflow-hidden`)}>
-                        <ItemImage {imageUrl} {title} {gradientIndex} />
+                {#each saveItems as {title, imageUrl, gradientIndex, type}, i}
+                    <div class={cn(`group-list__item__image-${i} absolute aspect-og w-full rounded-md shadow-[0_0_6px_-1px_rgba(0,0,0,0.6)] overflow-hidden`)}>
+                        {#if type === 'color'}
+                            <div class="relative flex aspect-og overflow-hidden" style={`background-color: ${title}`}></div>
+                        {:else}
+                            <ItemImage {imageUrl} {title} {gradientIndex} />
+                        {/if}
                     </div>
                 {/each}
             </div>

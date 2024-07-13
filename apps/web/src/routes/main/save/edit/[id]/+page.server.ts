@@ -23,6 +23,7 @@ export const actions: Actions = {
 				.set({
 					title: form.data.title,
 					description: form.data.description,
+					text: form.data.text,
 				}).where(eq(save.id, form.data.id));
 
 			await db.delete(save_group_mm).where(eq(save_group_mm.saveId, form.data.id));

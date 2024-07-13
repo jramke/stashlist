@@ -10,18 +10,56 @@ body {
 	.body-inner {
 		display: flex;
 		flex-direction: column;
-		&[style*="transform:"] {
+		&[style*='transform:'] {
 			height: 100vh;
 		}
-		&:not([style*="transform:"]) {
+		&:not([style*='transform:']) {
 			animation: transformStylesHack 400ms;
 		}
 		min-height: 100vh;
 		min-height: 100dvh;
 	}
+	@supports (animation-timeline: scroll()) {
+		&:after {
+			@apply fixed inset-0 pointer-events-none bg-background;
+			--mask-size: 48px;
+			content: '';
+			/* under the navigation zIndex */
+			z-index: 49;
+			mask:
+				linear-gradient(var(--smooth-gradient-stops-white-transparent)) 50% 0 / 100% 0 no-repeat,
+				linear-gradient(transparent, transparent) 50% 50% / 100% 100% no-repeat,
+				linear-gradient(var(--smooth-gradient-stops-transparent-white)) 50% 100% / 100% 100px no-repeat;
+			mask-composite: exclude;
+			animation:
+				mask-up both linear,
+				mask-down both linear;
+			animation-timeline: scroll(root);
+			animation-range:
+				0 2rem,
+				calc(100% - 2rem) 100%;
+			@keyframes mask-up {
+				100% {
+					mask-size:
+						100% 100px,
+						100% 100%,
+						100% 100px;
+				}
+			}
+			@keyframes mask-down {
+				100% {
+					mask-size:
+						100% 100px,
+						100% 100%,
+						100% 0;
+				}
+			}
+		}
+	}
 }
 @keyframes transformStylesHack {
-	0%, 100% {
+	0%,
+	100% {
 		height: 100vh;
 	}
 }
@@ -32,11 +70,10 @@ main {
 
 [data-scale-main-wrapper] {
 	--scale: 1;
-	transition: transform 200ms cubic-bezier(.4,0,0,1);
+	transition: transform 200ms cubic-bezier(0.4, 0, 0, 1);
 	transform: scale(var(--scale));
 	height: 100vh;
 	&.scale {
 		--scale: 0.98;
 	}
 }
-

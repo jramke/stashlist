@@ -1,4 +1,4 @@
-import { type InsertGroup, type InsertOAuthAccount, type InsertUser, type SelectGroupOAuthAccount, type SelectSave, type SelectUser } from './schema';
+import { type InsertGroup, type InsertOAuthAccount, type InsertSave, type InsertUser, type SelectGroupOAuthAccount, type SelectSave, type SelectUser } from './schema';
 
 import { and, desc, eq } from 'drizzle-orm';
 import { db } from '$lib/server/db';
@@ -117,15 +117,15 @@ export async function deleteGroup(id: InsertGroup['id']) {
     await db.delete(group).where(eq(group.id, id));
 }
 
-export async function createUser(provider: InsertOAuthAccount['provider'], providerId: InsertOAuthAccount['providerId'], userId: InsertUser['id'] | null = null, username: InsertUser['username'] = null, name: InsertUser['name'] = null, avatarUrl: InsertUser['avatarUrl'] = null) {
-    if (userId === null) {
+export async function createUser(provider: InsertOAuthAccount['provider'], providerId: InsertOAuthAccount['providerId'], userId: InsertUser['id'], username: InsertUser['username'], name: InsertUser['name'], avatarUrl: InsertUser['avatarUrl']) {
+    if (!userId) {
         userId = generateId(15);
     }
     await db.insert(user).values({
         id: userId,
-        username: username ?? '',
-        name: name ?? '',
-        avatarUrl: avatarUrl ?? ''
+        username: username || '',
+        name: name || '',
+        avatarUrl: avatarUrl || ''
     });
     await db.insert(oauth_account).values({
         provider: provider,
@@ -177,4 +177,18 @@ export async function getSessionByUserId(userId: SelectUser['id'] | undefined) {
 
 export async function updateUser(id: InsertUser['id'], data: Partial<InsertUser>) {
     await db.update(user).set(data).where(eq(user.id, id));
+}
+
+export async function createSaveGroupsRelations(groupIds: InsertGroup['id'][], saveId: InsertSave['id'], userId: InsertUser['id']) {
+    if (groupIds.length === 0) return;
+
+    for (let groupId of groupIds) {
+        groupId = groupId.trim();
+        if (groupId.length === 0) continue;
+        await db.insert(save_group_mm).values({
+            userId: userId,
+            saveId: saveId,
+            groupId: groupId
+        })
+    }
 }

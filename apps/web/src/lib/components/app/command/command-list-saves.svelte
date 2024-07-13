@@ -6,12 +6,15 @@
     import { Gradient } from "$lib/components/app";
 	import { onMount } from "svelte";
 	import { itemsStore } from "$lib/stores";
+	import { ItemImage } from "$lib/components/app/saves";
+	import { Type } from "@repo/ui/icons";
+	import { cn } from "@repo/ui/utils";
 
     export let items: TODO;
     export let title = 'Stashes';
 
     const { handleItemSelect, closeMenu } = getCommandMenuContext();
-    const { copyUrlToClipboard } = itemsStore;
+    const { copyToClipboard, getCopyData } = itemsStore;
 
     const delimiter = '^$$^';
     let itemNodes: HTMLElement[] = [];
@@ -23,7 +26,7 @@
 		
 		if (event.key === 'c' && (event.metaKey || event.ctrlKey)) {
 			event.preventDefault();
-			copyUrlToClipboard(itemNode.id.split(delimiter)[1]);
+			copyToClipboard(itemNode.id.split(delimiter)[1]);
             closeMenu();
 		}
 	};
@@ -40,23 +43,38 @@
 
 {#if items && items.length > 0}
     <Command.Group heading={title}>
-        {#each items as { id, title, description, url, faviconUrl, gradientIndex, saveGroups}, index}
-            <Command.Item onSelect={() => handleItemSelect(() => window.open(url, '_blank'), id)} value={'item-' + id} id={'command-stash-item' + delimiter + url}>
-                {#if faviconUrl}
-                    <img loading="lazy" class="size-4 shrink-0 me-2" src={faviconUrl} alt={title} on:error={() => faviconUrl = ''} />
+        {#each items as item}
+            <Command.Item onSelect={() => handleItemSelect(() => window.open(item.url, '_blank'), item.id)} value={'item-' + item.id} id={'command-stash-item' + delimiter + getCopyData(item)}>
+                {#if item.faviconUrl}
+                    <img loading="lazy" class="size-4 shrink-0 me-2 rounded-[4px]" src={item.faviconUrl} alt={title} on:error={() => item.faviconUrl = ''} />
+                {:else if item.type === 'color'}
+                    <div class="size-4 shrink-0 me-2 rounded-[4px]" style={`background-color: ${item.title}`}></div>
+                {:else if item.type === 'image'}
+                    <div class="size-4 shrink-0 me-2 rounded-[4px] overflow-hidden relative">
+                        <ItemImage imageUrl={item.imageUrl} title={item.title} gradientIndex={item.gradientIndex} absolute={true} />
+                    </div>
+                {:else if item.type === 'text'}
+                    <div class={cn("size-4 shrink-0 me-2 rounded-[4px]", "flex items-center justify-center bg-white")}>
+                        <Type class="!size-3.5 text-background" />
+                    </div>
                 {:else}
-                    <div class="rounded-full size-4 shrink-0 me-2 overflow-hidden relative">
-                        <Gradient {gradientIndex} />
+                    <div class="size-4 shrink-0 me-2 rounded-[4px] overflow-hidden relative">
+                        <Gradient gradientIndex={item.gradientIndex} />
                     </div>
                 {/if}
                 <div class="flex items-baseline max-w-[95%] flex-grow">
-                    <span class="truncate max-w-[80%]">
-                        {title}
+                    <span class="truncate max-w-[80%] flex-shrink-0">
+                        {item.title || item.text}
                     </span>
-                    {#if saveGroups.length !== 0}
+                    <!-- {#if item.description || item.text}
+                        <span class="line-clamp-1 text-xs text-muted-foreground">
+                            {item.description || item.text}
+                        </span>
+                    {/if} -->
+                    {#if item.saveGroups.length !== 0}
                         <div class="ms-3 truncate text-xs text-muted-foreground">
-                            {#each saveGroups as group, index}
-                                {#if index < saveGroups.length - 1}
+                            {#each item.saveGroups as group, index}
+                                {#if index < item.saveGroups.length - 1}
                                     {group.group.title + ', '}
                                 {:else}
                                     {group.group.title}

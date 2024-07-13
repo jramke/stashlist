@@ -1,38 +1,44 @@
 <script lang="ts">
-	import type { Save, TODO } from '$lib/types';
+	import type { SelectSave } from '$lib/server/db/schema';
 	
-	import { cleanUrl } from '$lib/utils';
-	import ItemMedia from './item-media.svelte';
-	import { Gradient } from '$lib/components/app';
 	import { cn } from '@repo/ui/utils';
 	import ItemContextMenu from './item-context-menu.svelte';
 	import { onMount } from 'svelte';
-	import { itemsStore } from '$lib/stores';
+	import { itemsStore, listLayout } from '$lib/stores';
 	import { toast } from '@repo/ui/components/sonner';
+	import ItemWebsite from './types/item-website.svelte';
+	import ItemText from './types/item-text.svelte';
+	import ItemColor from './types/item-color.svelte';
+	import ItemImage from './types/item-image.svelte';
 
-	// TODO: use let { a,b } = $props();
-	export let title: Save['title'];
-	export let url: Save['url'];
-	export let imageUrl: Save['imageUrl'];
-	export let faviconUrl: Save['faviconUrl'];
-	export let createdAt: Save['createdAt'];
-	export let saveGroups: TODO[] = [];
-	export let id: string;
-	export let gradientIndex: number;
-	export let type: Save['type'];
+	export let save: SelectSave;
 
-	$: copyUrl = type === 'image' ? imageUrl : url;
+	$: ({ title, url, imageUrl, faviconUrl, id, gradientIndex, type, text, description } = save);
 
-	const { copyUrlToClipboard, openEditDialog, deletedItems, focusedItem, deleteItem, refetchMetadata } = itemsStore;
+	$: copyUrlByType = {
+		website: url,
+		image: imageUrl,
+		text: text,
+		color: title,
+	};
+	$: copyUrl = copyUrlByType[type] || url;
 
-	let itemNode: HTMLAnchorElement;
+	$: linkUrl = type === 'text' || type === 'color' ? '' : copyUrl;
+
+	const { copyToClipboard, openEditDialog, deletedItems, focusedItem, deleteItem, refetchMetadata } = itemsStore;
+
+	let itemNode: HTMLAnchorElement | HTMLDivElement;
+
+	const handleCopyUrl = (event: any) => {
+		event.preventDefault();
+		copyToClipboard(save);
+	}
 
 	const handleContextMenu = (event: KeyboardEvent) => {
 		if (document.activeElement !== itemNode) return;
 		
 		if (event.key === 'c' && (event.metaKey || event.ctrlKey)) {
-			event.preventDefault();
-			copyUrlToClipboard(copyUrl);
+			handleCopyUrl(event);
 			return;
 		}
 		
@@ -62,55 +68,47 @@
 	
 	onMount(() => {
 		document.addEventListener('keydown', handleContextMenu);
+		if (!linkUrl) {
+			itemNode.addEventListener('click', handleCopyUrl);
+		}
 		return () => {
 			document.removeEventListener('keydown', handleContextMenu);
+			itemNode?.removeEventListener('click', handleCopyUrl);
 		}
 	});
 
 </script>
 
 {#if !$deletedItems.has(id)}
-	<div>
-		<ItemContextMenu {id} {copyUrl} {type}>
-			<a 
-				href={copyUrl}
+	<div class={$listLayout === 'list' ? 'flex flex-col' : ''}>
+		<ItemContextMenu {save}>
+			<svelte:element this={linkUrl ? 'a' : 'div'} 
+				href={linkUrl}
 				{title}
 				rel="norefferrer noopener"
 				target="_blank" 
 				class={cn(
-					`relative group overflow-hidden h-full rounded-lg bg-card/50 text-card-foreground flex flex-col justify-between border
+					`relative group overflow-hidden h-full rounded-lg bg-card/50 text-card-foreground flex flex-col justify-between border p-3 cursor-pointer
 					hover:shadow-black hover:bg-card 
 					focus-within:shadow-black focus-within:bg-card ring-offset-background
 					focus-visible:shadow-black focus-visible:bg-card outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2`	
 				)}
 				bind:this={itemNode}
 				data-grid-item="true"
+				tabindex="0"
 			>
 				<div>
-					<ItemMedia {type} {imageUrl} {title} {url} {gradientIndex} />
-					<div class="flex gap-4 p-4">
-						<div class="flex flex-col gap-2 min-w-0">
-							<div class="flex items-baseline gap-2">
-								<h3 class="line-clamp-1 text-lg font-bold break-words">{title}</h3>
-							</div>
-							{#if type !== 'image'}
-								<div class="flex items-center gap-2">
-									{#if faviconUrl}
-										<img loading="lazy" class="size-4 shrink-0 -mb-[1.5px]" src={faviconUrl} alt={title} on:error={() => faviconUrl = ''} />
-									{:else}
-										<div class="rounded-full size-4 shrink-0 -mb-[1.5px] overflow-hidden relative">
-											<Gradient {gradientIndex} />
-										</div>
-									{/if}
-									<span class="line-clamp-1 text-sm text-muted-foreground break-words">
-										{cleanUrl(url)}
-									</span>
-								</div>
-							{/if}
-						</div>
-					</div>
+					{#if type === 'website'}
+						<ItemWebsite {url} {imageUrl} {title} {faviconUrl} {gradientIndex} />
+					{:else if type === 'text'}
+						<ItemText {text} {title} />
+					{:else if type === 'color'}
+						<ItemColor {title} {description} />
+					{:else if type === 'image'}
+						<ItemImage {imageUrl} {title} {description} {gradientIndex} />
+					{/if}
 				</div>
-			</a>
+			</svelte:element>
 		</ItemContextMenu>
 	</div>
 {/if}

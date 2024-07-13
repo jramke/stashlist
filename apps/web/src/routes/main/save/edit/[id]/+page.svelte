@@ -15,6 +15,7 @@
 	import { CopyButton } from "$lib/components/app";
 	import { onMount } from "svelte";
 	import { Loader } from "@repo/ui/icons";
+	import ItemImage from "$lib/components/app/saves/item/item-image.svelte";
 
     export let data: {
         form: SuperValidated<Infer<FormSchema>>,
@@ -75,13 +76,23 @@
             </Form.Control>
             <Form.FieldErrors />
         </Form.Field>
-        <Form.Field {form} name="description">
-            <Form.Control let:attrs>
-                <Form.Label>Description</Form.Label>
-                <Textarea {...attrs} bind:value={$formData.description} />
-            </Form.Control>
-            <Form.FieldErrors />
-        </Form.Field>
+        {#if data?.save.type === 'text'}
+            <Form.Field {form} name="text">
+                <Form.Control let:attrs>
+                    <Form.Label>Text</Form.Label>
+                    <Textarea spellcheck="false" {...attrs} bind:value={$formData.text} />
+                </Form.Control>
+                <Form.FieldErrors />
+            </Form.Field>
+        {:else}
+            <Form.Field {form} name="description">
+                <Form.Control let:attrs>
+                    <Form.Label>Description</Form.Label>
+                    <Textarea {...attrs} bind:value={$formData.description} />
+                </Form.Control>
+                <Form.FieldErrors />
+            </Form.Field>
+        {/if}
         <Form.Field {form} name="groups">
             <Form.Control let:attrs>
                 <Form.Label>Groups</Form.Label>
@@ -101,10 +112,22 @@
             <Form.FieldErrors />
         </Form.Field>
         <input type="hidden" name="id" bind:value={$formData.id}>
-        <div class="space-y-2">
-            <span class="text-sm font-medium leading-none">Image</span>
-            <ItemMedia class="m-0" type={data?.save.type} title={data?.save.title} imageUrl={data?.save.imageUrl} url={data?.save.url} gradientIndex={data?.save.gradientIndex} />
-        </div>
+        {#if data?.save.type === 'image' || data?.save.type === 'website'}
+            <div class="space-y-2">
+                <span class="text-sm font-medium leading-none">{data?.save.type === 'website' ? 'OG ' : ''}Image</span>
+                <div class="rounded-sm overflow-hidden">
+                    <ItemImage title={data?.save.title} imageUrl={data?.save.imageUrl} gradientIndex={data?.save.gradientIndex} />
+                </div>
+            </div>
+        {/if}
+        {#if data?.save.type === 'color'}
+            <div class="space-y-2">
+                <span class="text-sm font-medium leading-none">Color</span>
+                <div class="rounded-sm overflow-hidden">
+                    <div class="relative flex aspect-og overflow-hidden" style={`background-color: ${data?.save.title}`}></div>
+                </div>
+            </div>
+        {/if}
         {#if data?.save.url}
             <div class="space-y-2">
                 <span class="text-sm font-medium leading-none">URL</span>

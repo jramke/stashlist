@@ -1,15 +1,13 @@
 import type { RequestHandler } from './$types';
 
 import { db } from '$lib/server/db';
-import { save, save_group_mm, group } from '$lib/server/db/schema';
+import { save, group } from '$lib/server/db/schema';
 import { generateId } from 'lucia';
 import { error, json, redirect } from '@sveltejs/kit';
-import urlMetadata from 'url-metadata';
-import { getDomainFromUrl, isImageUrl, isAbsoluteUrl, makeAbsoluteUrl, getRandomIndex } from '$lib/utils';
+import { getRandomIndex } from '$lib/utils';
 import { eq } from 'drizzle-orm';
 import { gradients } from '@repo/constants';
-
-
+import { createSaveGroupsRelations } from '$lib/server/db/queries';
 
 export const POST: RequestHandler = async ({ request, locals, params, url, fetch }) => {
 	if (!locals.user) redirect(302, '/login');
@@ -43,7 +41,9 @@ export const POST: RequestHandler = async ({ request, locals, params, url, fetch
 				createdAt: currentTime
 			});
 
-			await addGroups(groups, id);
+			if (groups) {
+				await createSaveGroupsRelations(groups.split(','), id, locals.user.id);
+			}
 	
 			return json({ success: true });
 		}
@@ -89,7 +89,9 @@ export const POST: RequestHandler = async ({ request, locals, params, url, fetch
 			createdAt: currentTime
 		});
 
-		await addGroups(groups, id);
+		if (groups) {
+            await createSaveGroupsRelations(groups.split(','), id, locals.user.id);
+        }
 
 		return json({ success: true });
 
@@ -98,20 +100,6 @@ export const POST: RequestHandler = async ({ request, locals, params, url, fetch
 		return error(400, {
 			message: 'Failed to create save'
 		});
-	}
-
-	async function addGroups(groups: string, id: string) {
-		let groupsArr = groups.split(',');
-		if (groups.length > 0) {
-			for (const groupId of groupsArr) {
-				if (groupId.length === 0) continue;
-				await db.insert(save_group_mm).values({
-					userId: locals.user?.id as string,
-					saveId: id,
-					groupId: groupId
-				})
-			}
-		}
 	}
 	
 };

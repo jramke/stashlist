@@ -11,8 +11,6 @@
     type SaveListOptions = 'all' | 'savesByGroup' | 'unsorted';
     export let saves: SaveListOptions = 'all';
 
-	const { editDialogOpen, focusedItem, editDialogCloseCallback } = itemsStore;
-
     $: saveOption = {
         'all': getAll(),
         'savesByGroup': $page.data.savesByGroup,
@@ -42,16 +40,16 @@
 	<div class="self-start">
 		{#if $listLayout === 'masonry'}
 			<div use:gridArrowKeys={{ selector: '[data-grid-item]' }}>
-				<Masonry gapSize={6} columns={$listColumns} items={saveOption[saves]}>
-					{#each saveOption[saves] as {title, url, imageUrl, faviconUrl, createdAt, saveGroups, id, type, gradientIndex}}
-						<Item {title} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} {type} {gradientIndex} />
+				<Masonry gapSize={4} columns={$listColumns} items={saveOption[saves]}>
+					{#each saveOption[saves] as save}
+						<Item {save} />
 					{/each}
 				</Masonry>
 			</div>
 		{:else}
-			<div class="grid grid-cols-{$listColumns} gap-6" use:gridArrowKeys={{ selector: '[data-grid-item]' }}>
-				{#each saveOption[saves] as {title, url, imageUrl, faviconUrl, createdAt, saveGroups, id, type, gradientIndex}}
-					<Item {title} {url} {imageUrl} {faviconUrl} {createdAt} {saveGroups} {id} {type} {gradientIndex} />
+			<div class="grid grid-cols-{$listColumns} gap-4" use:gridArrowKeys={{ selector: '[data-grid-item]' }}>
+				{#each saveOption[saves] as save}
+					<Item {save} />
 				{/each}
 			</div>
 		{/if}

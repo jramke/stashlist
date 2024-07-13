@@ -25,9 +25,19 @@ export function formatRelativeTime(date: Date): string {
 	return 'just now';
 }
 
-export function isImageUrl(url: string): boolean {
-	// Include query parameter support by adding \?.* after the file extension
-	return /\.(jpg|jpeg|png|webp|avif|gif|svg|ico)(\?.*)?$/i.test(url);
+export async function isImageUrl(url: string) {
+	try {
+		const res = await fetch(url, {method: 'HEAD'});
+		const contentType = res.headers.get('Content-Type');
+		
+		if (!contentType) return false;
+		
+		return contentType.startsWith('image');
+		
+	} catch (error) {
+		console.error(`Error while checking if URL is an image, falling back to regex: ${error}`);
+		return /\.(jpg|jpeg|png|webp|avif|gif|svg|ico)(\?.*)?$/i.test(url);
+	}
 }
 
 export function isAbsoluteUrl(url: string): boolean {
@@ -128,4 +138,39 @@ export function memoize(func: (...args: any[]) => any) {
         }
         return cache.get(key);
     };
+}
+
+export function isValidCssColor(color: string): boolean {
+	const hexColorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+	const rgbColorRegex = /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/;
+	const rgbaColorRegex = /^rgba\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(0(\.\d+)?|1(\.0+)?)\s*\)$/;
+	const hslColorRegex = /^hsl\(\s*(\d{1,3})\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*\)$/;
+	const hslaColorRegex = /^hsla\(\s*(\d{1,3})\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*,\s*(0(\.\d+)?|1(\.0+)?)\s*\)$/;
+	const oklchColorRegex = /^oklch\(\s*((0|1)(\.\d+)?|0|1)\s*,\s*(\d+(\.\d+)?)%\s*,\s*(\d+(\.\d+)?)\s*\)$/;
+
+	const namedColors = new Set([
+		"aliceblue", "antiquewhite", "aqua", "aquamarine", "azure", "beige", "bisque", "black", "blanchedalmond", "blue", "blueviolet", "brown", "burlywood", 
+		"cadetblue", "chartreuse", "chocolate", "coral", "cornflowerblue", "cornsilk", "crimson", "cyan", "darkblue", "darkcyan", "darkgoldenrod", "darkgray", 
+		"darkgreen", "darkgrey", "darkkhaki", "darkmagenta", "darkolivegreen", "darkorange", "darkorchid", "darkred", "darksalmon", "darkseagreen", "darkslateblue", 
+		"darkslategray", "darkslategrey", "darkturquoise", "darkviolet", "deeppink", "deepskyblue", "dimgray", "dimgrey", "dodgerblue", "firebrick", "floralwhite", 
+		"forestgreen", "fuchsia", "gainsboro", "ghostwhite", "gold", "goldenrod", "gray", "green", "greenyellow", "grey", "honeydew", "hotpink", "indianred", 
+		"indigo", "ivory", "khaki", "lavender", "lavenderblush", "lawngreen", "lemonchiffon", "lightblue", "lightcoral", "lightcyan", "lightgoldenrodyellow", 
+		"lightgray", "lightgreen", "lightgrey", "lightpink", "lightsalmon", "lightseagreen", "lightskyblue", "lightslategray", "lightslategrey", "lightsteelblue", 
+		"lightyellow", "lime", "limegreen", "linen", "magenta", "maroon", "mediumaquamarine", "mediumblue", "mediumorchid", "mediumpurple", "mediumseagreen", 
+		"mediumslateblue", "mediumspringgreen", "mediumturquoise", "mediumvioletred", "midnightblue", "mintcream", "mistyrose", "moccasin", "navajowhite", "navy", 
+		"oldlace", "olive", "olivedrab", "orange", "orangered", "orchid", "palegoldenrod", "palegreen", "paleturquoise", "palevioletred", "papayawhip", "peachpuff", 
+		"peru", "pink", "plum", "powderblue", "purple", "rebeccapurple", "red", "rosybrown", "royalblue", "saddlebrown", "salmon", "sandybrown", "seagreen", "seashell", 
+		"sienna", "silver", "skyblue", "slateblue", "slategray", "slategrey", "snow", "springgreen", "steelblue", "tan", "teal", "thistle", "tomato", "turquoise", 
+		"violet", "wheat", "white", "whitesmoke", "yellow", "yellowgreen"
+	]);
+
+	return (
+		hexColorRegex.test(color) ||
+		rgbColorRegex.test(color) ||
+		rgbaColorRegex.test(color) ||
+		hslColorRegex.test(color) ||
+		hslaColorRegex.test(color) ||
+		oklchColorRegex.test(color) ||
+		namedColors.has(color.toLowerCase())
+	);
 }

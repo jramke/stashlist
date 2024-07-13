@@ -14,7 +14,7 @@
 	class={cn(
 		`peer inline-flex h-[20px] w-[40px] shrink-0 cursor-pointer items-center rounded-full border-2 border-primary transition-colors 
 		focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background 
-		disabled:cursor-not-allowed disabled:opacity-50 
+		disabled:cursor-not-allowed disabled:opacity-35 
 		data-[state=checked]:bg-accent-foreground data-[state=checked]:border-accent-foreground
 		data-[state=unchecked]:bg-input data-[state=unchecked]:shadow-inner data-[state=unchecked]:shadow-secondary`,
 		className

@@ -89,13 +89,13 @@
 		return async ({ result }) => {
 			await minDelay(start);
 			if (result.type !== 'success' || result?.data?.form.message.type === 'error') {
-				newStashFormError = 'Something went wrong stashing the website';
+				newStashFormError = 'Something went wrong creating the stash. Please try again.';
 			} else {
 				invalidateAll();
 				await applyAction(result);
 				newStashFormError = '';
 				newStashValue = '';
-				toast.success('Successfully stashed new website');
+				toast.success('New stash created');
 			}
 			busy = false;
 		};
@@ -110,7 +110,7 @@
                 press <span class="font-semibold text-foreground/90">Enter</span> <CornerDownLeft class="size-4 text-foreground/90" /> to submit
             </span>
         {/if}
-        <Input autocomplete="off" id="new-stash-input" placeholder="Create new stash" class={cn('min-w-0 w-full max-w-full pe-14')} disabled={busy} name="url" bind:value={newStashValue} on:keydown={handleNewStashInputKeydown} />
+        <Input autocomplete="off" id="new-stash-input" placeholder="Create new stash" class={cn('min-w-0 w-full max-w-full pe-14')} disabled={busy} name="input" bind:value={newStashValue} on:keydown={handleNewStashInputKeydown} />
         <div class={cn('absolute right-2 top-2 bottom-2 text-muted-foreground')}>
             <Loader class={cn("animate-spin size-6 hidden", busy && 'block')} />
             {#if groups && groups.length > 0 && !busy}

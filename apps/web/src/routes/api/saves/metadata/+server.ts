@@ -64,7 +64,7 @@ async function handleGenericUrl(saveUrl: string, fetch: typeof globalThis.fetch)
     const metaData = await urlMetadata(null, { parseResponseObject: saveUrlResponse });
     let faviconUrl = metaData?.favicons?.[0]?.href || '';
 
-    if (isImageUrl(faviconUrl) && !isAbsoluteUrl(faviconUrl)) {
+    if (await isImageUrl(faviconUrl) && !isAbsoluteUrl(faviconUrl)) {
         faviconUrl = makeAbsoluteUrl(faviconUrl, getDomainFromUrl(saveUrl));
     }
 
