@@ -1,1 +1,0 @@
-ALTER TABLE `user` ADD `api_key_hash` text DEFAULT '';

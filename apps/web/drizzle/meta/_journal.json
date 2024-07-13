@@ -1,40 +1,12 @@
 {
-  "version": "5",
+  "version": "6",
   "dialect": "sqlite",
   "entries": [
     {
       "idx": 0,
-      "version": "5",
-      "when": 1710617119264,
-      "tag": "0000_abnormal_mephisto",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1711296133365,
-      "tag": "0001_awesome_retro_girl",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1711987617809,
-      "tag": "0002_sparkling_norman_osborn",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1712413665578,
-      "tag": "0003_cute_hawkeye",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
       "version": "6",
-      "when": 1718478487919,
-      "tag": "0004_tense_captain_cross",
+      "when": 1720889812656,
+      "tag": "0000_spooky_marvel_zombies",
       "breakpoints": true
     }
   ]

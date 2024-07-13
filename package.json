@@ -11,7 +11,8 @@
     "studio": "pnpm --filter web studio",
     "generate": "pnpm --filter web generate",
     "migrate": "pnpm --filter web migrate",
-    "push": "pnpm --filter web push"
+    "push": "pnpm --filter web push",
+    "introspect": "pnpm --filter web introspect"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

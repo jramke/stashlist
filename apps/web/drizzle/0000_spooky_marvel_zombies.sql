@@ -1,9 +1,10 @@
 CREATE TABLE `group` (
 	`id` text PRIMARY KEY NOT NULL,
 	`user_id` text NOT NULL,
-	`title` text DEFAULT '',
-	`parent_id` text DEFAULT '',
-	`index` real DEFAULT 1,
+	`title` text DEFAULT '' NOT NULL,
+	`gradient_index` integer DEFAULT 0 NOT NULL,
+	`parent_id` text DEFAULT '' NOT NULL,
+	`sort_index` integer DEFAULT 100 NOT NULL,
 	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -20,12 +21,13 @@ CREATE TABLE `save` (
 	`id` text PRIMARY KEY NOT NULL,
 	`user_id` text NOT NULL,
 	`type` text NOT NULL,
-	`url` text DEFAULT '',
-	`title` text DEFAULT '',
-	`description` text DEFAULT '',
-	`favicon_url` text DEFAULT '',
-	`image_url` text DEFAULT '',
-	`code_text` text DEFAULT '',
+	`url` text DEFAULT '' NOT NULL,
+	`title` text DEFAULT '' NOT NULL,
+	`description` text DEFAULT '' NOT NULL,
+	`favicon_url` text DEFAULT '' NOT NULL,
+	`gradient_index` integer DEFAULT 0 NOT NULL,
+	`image_url` text DEFAULT '' NOT NULL,
+	`text` text DEFAULT '' NOT NULL,
 	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -49,9 +51,10 @@ CREATE TABLE `session` (
 --> statement-breakpoint
 CREATE TABLE `user` (
 	`id` text PRIMARY KEY NOT NULL,
-	`username` text DEFAULT '',
-	`name` text DEFAULT '',
-	`avatar_url` text DEFAULT '',
+	`username` text DEFAULT '' NOT NULL,
+	`name` text DEFAULT '' NOT NULL,
+	`avatar_url` text DEFAULT '' NOT NULL,
+	`api_key_hash` text DEFAULT '' NOT NULL,
 	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 --> statement-breakpoint

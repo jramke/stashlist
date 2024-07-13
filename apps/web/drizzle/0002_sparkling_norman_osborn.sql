@@ -1,1 +1,0 @@
-ALTER TABLE `group` ADD `gradient_index` integer DEFAULT 0;
