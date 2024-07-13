@@ -9,6 +9,7 @@
 	import { ItemImage } from "$lib/components/app/saves";
 	import { Type } from "@repo/ui/icons";
 	import { cn } from "@repo/ui/utils";
+	import type { SelectSave } from "$lib/server/db/schema";
 
     export let items: TODO;
     export let title = 'Stashes';
@@ -39,12 +40,28 @@
 		}
 	});
 
+    function mainActionByItemType(item: SelectSave) {
+        if (item.type === 'website') {
+            return () => window.open(item.url, '_blank');
+        }
+        if (item.type === 'image') {
+            return () => window.open(item.imageUrl, '_blank');
+        }
+        if (item.type === 'text') {
+            return () => copyToClipboard(item.text);
+        }
+        if (item.type === 'color') {
+            return () => copyToClipboard(item.title);
+        }
+        return () => {};
+    }
+
 </script>
 
 {#if items && items.length > 0}
     <Command.Group heading={title}>
         {#each items as item}
-            <Command.Item onSelect={() => handleItemSelect(() => window.open(item.url, '_blank'), item.id)} value={'item-' + item.id} id={'command-stash-item' + delimiter + getCopyData(item)}>
+            <Command.Item onSelect={() => handleItemSelect(mainActionByItemType(item), item.id)} value={'item-' + item.id} id={'command-stash-item' + delimiter + getCopyData(item)}>
                 {#if item.faviconUrl}
                     <img loading="lazy" class="size-4 shrink-0 me-2 rounded-[4px]" src={item.faviconUrl} alt={title} on:error={() => item.faviconUrl = ''} />
                 {:else if item.type === 'color'}
