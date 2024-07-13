@@ -7,6 +7,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const allowedPaths = [
 		'/api/saves/new/website',
 		'/api/saves/new/image',
+		'/api/saves/new/text',
+		'/api/saves/new/color',
+		'/api/saves/new',
 		'/api/saves',
 		'/api/groups'
 	];
