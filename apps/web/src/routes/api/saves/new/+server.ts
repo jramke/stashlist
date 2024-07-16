@@ -52,6 +52,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 
         response = await fetch(condition.endpoint, {
             method: 'POST',
+            headers: request.headers,
             body: JSON.stringify(condition.body),
         }); 
 

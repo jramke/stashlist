@@ -47,9 +47,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	if (!sessionId) {
 		const fullUser = await getUserFromApiKeyHeader(event.request);
-		console.log('user id from api key', fullUser?.id);
+		// console.log('user id from api key', fullUser?.id);
 		const session = await getSessionByUserId(fullUser?.id);
-		console.log('session from user id', session);
+		// console.log('session from user id', session);
 		
 		if (session && session.id) {
 			sessionId = session.id;
@@ -107,7 +107,7 @@ function isFormContentType(request: Request) {
 	return isContentType(request, 'application/x-www-form-urlencoded', 'multipart/form-data');
 }
 async function getUserFromApiKeyHeader(request: Request) {
-	console.log(request.headers);
+	// console.log(request.headers);
 	const apiKey = request.headers.get('x-api-key');
 	if (!apiKey) {
 		return null;
