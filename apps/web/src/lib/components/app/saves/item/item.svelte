@@ -69,7 +69,7 @@
 	onMount(() => {
 		document.addEventListener('keydown', handleContextMenu);
 		if (!linkUrl) {
-			itemNode.addEventListener('click', handleCopyUrl);
+			itemNode?.addEventListener('click', handleCopyUrl);
 		}
 		return () => {
 			document.removeEventListener('keydown', handleContextMenu);
