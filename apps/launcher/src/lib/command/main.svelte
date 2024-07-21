@@ -2,7 +2,7 @@
     import * as Command from "@repo/ui/components/command";
     import { Separator } from "@repo/ui/components/separator";
     import { Shortcut } from "@repo/ui/components/shortcut";
-    import { RotateCcw, Stash, Unplug } from "@repo/ui/icons";
+    import { Plus, RotateCcw, Stash, Unplug } from "@repo/ui/icons";
 	import { onMount } from "svelte";
     import { getCommandMenuContext } from "./context";
     import { apiKey, groups, loading, saves } from "$lib/stores";
@@ -15,6 +15,7 @@
     import { get, writable } from "svelte/store";
     import { getItems } from "$lib/queries";
     import { memoize } from "$lib/utils";
+    import { footerComponents } from "./footers";
 
     const { cmdPressed, commandPages, handleItemSelect, searchValue, searchInput, changePage, getCurrentPage, availablePages, resetPages } = getCommandMenuContext();
 
@@ -111,8 +112,9 @@
             resetPages();
             return;
         }
-        const newPage = availablePages[page.toLowerCase()];
-        if (newPage === $currentPage) return;
+
+        const newPage = availablePages[page.toLowerCase() as keyof typeof availablePages] || null;
+        if (newPage === $currentPage || newPage === null) return;
         if (newPage) changePage(newPage);
     }
 
@@ -127,7 +129,7 @@
         {/if}
         {#if $currentPage}
             {#if pageComponents[$currentPage.id]}
-                <div class="text-sm">
+                <div class="text-sm h-full">
                     <svelte:component this={pageComponents[$currentPage.id]} />
                 </div>
             {:else if savesByGroup?.length > 0}
@@ -135,6 +137,10 @@
             {/if}
         {:else}
             <Command.Group heading="Actions">
+                <Command.Item onSelect={() => changePage(availablePages.newStash)} value="Create a new stash">
+                    <Plus class="me-2 shrink-0" />
+                    Create new stash
+                </Command.Item>
                 <Command.Item onSelect={() => handleItemSelect(siteConfig.url)} value="Open Stashlist">
                     <Stash class="me-2 shrink-0" />
                     Open Stashlist
@@ -162,21 +168,25 @@
         {/if}
     </Command.List>
     {#if !$currentPage?.hideFooter}
-        <Command.Footer class="flex items-center justify-end mt-auto">
-            <div class="flex items-center gap-2">
-                Copy url
-                <Shortcut keys={['command', 'C']} />
-            </div>
-            <Separator orientation="vertical" />
-            <div class="flex items-center gap-2">
-                Search in group / detail view
-                <Shortcut keys={['command', 'enter']} />
-            </div>
-            <Separator orientation="vertical" />
-            <div class="flex items-center gap-2">
-                Open item
-                <Shortcut keys={['enter']} />
-            </div>
-        </Command.Footer>
+        {#if $currentPage?.footer}
+            <svelte:component this={footerComponents[$currentPage.footer]} />
+        {:else}
+            <Command.Footer class="flex items-center justify-end mt-auto">
+                <div class="flex items-center gap-2">
+                    Copy url
+                    <Shortcut keys={['command', 'C']} />
+                </div>
+                <Separator orientation="vertical" />
+                <div class="flex items-center gap-2">
+                    Search in group / detail view
+                    <Shortcut keys={['command', 'enter']} />
+                </div>
+                <Separator orientation="vertical" />
+                <div class="flex items-center gap-2">
+                    Open item
+                    <Shortcut keys={['enter']} />
+                </div>
+            </Command.Footer>
+        {/if}
     {/if}
 </Command.Root>

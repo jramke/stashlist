@@ -3,6 +3,7 @@ export const siteConfig = /** @type {const} */ ({
 	"slogan": "Your Creative Vault",
 	"appUrl": "/main",
 	"url": "https://stashlist.app",
+	"wwwUrl": "https://www.stashlist.app",
 	"fullAppUrl": "https://stashlist.app/main",
 	"ogImage": "https://stashlist.app/og.png",
 	"description": "The creative vault for developers and designers.",

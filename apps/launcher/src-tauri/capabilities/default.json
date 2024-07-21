@@ -25,16 +25,7 @@
       "identifier": "http:default",
       "allow": [
         {
-          "url": "http://127.0.0.1:5173/api/saves"
-        },
-        {
-          "url": "http://127.0.0.1:5173/api/groups"
-        },
-        {
-          "url": "https://www.stashlist.app/api/saves"
-        },
-        {
-          "url": "https://www.stashlist.app/api/groups"
+          "url": "https://www.stashlist.app"
         },
         {
           "url": "http://localhost:1420/saves.json"

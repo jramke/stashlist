@@ -12,6 +12,9 @@ body, main {
 main {
 	@apply bg-background rounded-[10px] overflow-hidden;
 }
+[data-cmdk-list-sizer], .scroll-area {
+	height: 100%;
+}
 
 /* [data-sonner-toaster] {
 	--mobile-offset: 0px !important;

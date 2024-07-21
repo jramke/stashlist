@@ -2,6 +2,7 @@ import { groups, loading, saves } from "./stores";
 import { getRecord } from "./stronghold";
 import { dev } from "$app/environment";
 import { fetch } from '@tauri-apps/plugin-http';
+import { siteConfig } from "@repo/constants";
 
 export async function getItems() {
     loading.set(true);
@@ -39,8 +40,8 @@ export async function getItems() {
         savesData = await getData('/saves.json');
         groupsData = await getData('/groups.json');
     } else {
-        savesData = await getData('https://www.stashlist.app/api/saves');
-        groupsData = await getData('https://www.stashlist.app/api/groups');
+        savesData = await getData(siteConfig.wwwUrl + '/api/saves');
+        groupsData = await getData(siteConfig.wwwUrl + '/api/groups');
     } 
 
     saves.set(savesData?.saves);

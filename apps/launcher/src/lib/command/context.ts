@@ -5,6 +5,8 @@ import { open } from '@tauri-apps/plugin-shell';
 import { emit } from '@tauri-apps/api/event';
 import { getCurrent, LogicalSize } from '@tauri-apps/api/window';
 import { siteConfig } from '@repo/constants';
+import { footerComponents } from './footers';
+import { newStashInputValue } from '$lib/stores';
 
 const focusableElSelctor = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
@@ -18,9 +20,11 @@ const defaultSize = new LogicalSize(defaultWidth, 490);
 
 let commandPages = writable<CommandPage[]>([]);
 
-const availablePages: { [key: string]: CommandPage } = {
-    connect: { name: 'Connect', id: 'connect', placeholder: 'Enter API key', preventFilter: true, height: 180, hideFooter: true }
-};
+const availablePages = {
+    connect: { name: 'Connect', id: 'connect', placeholder: 'Enter API key', preventFilter: true, height: 180, hideFooter: true },
+    newStash: { name: 'Create', id: 'new-stash', placeholder: 'Create a new stash', preventFilter: true, height: 180, hideFooter: true },
+    newStashGroups: { name: 'Groups', id: 'new-stash-groups', placeholder: 'Add some groups', footer: 'newStashGroups' }
+} as const satisfies { [key: string]: CommandPage };
 
 function getCurrentPage(pages = get(commandPages)) {
     if (pages.length > 0) {
@@ -36,8 +40,10 @@ function changePage(newPage: CommandPage) {
     });
     searchValue.set('');
     setTimeout(async () => {
-        if (newPage.height) {
+        if (newPage?.height) {
             await getCurrent().setSize(new LogicalSize(defaultWidth, newPage.height));
+        } else {
+            await getCurrent().setSize(defaultSize);
         }
         updateFocusableEls();
         get(searchInput)?.focus();

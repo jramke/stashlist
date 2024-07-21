@@ -9,16 +9,24 @@
   let scrollArea: HTMLDivElement;
   let scrollbarVisible = false;
 
+  const updateScrollbar = () => {
+    scrollbarVisible = scrollArea?.scrollHeight > scrollArea?.clientHeight;
+  };
+
   onMount(() => {
-    const observer = new ResizeObserver(() => {
-      scrollbarVisible = scrollArea.scrollHeight > scrollArea.clientHeight;
+    const resizeObserver = new ResizeObserver(() => {
+      updateScrollbar();
     });
+    const mutationObserver = new MutationObserver(() => {
+      updateScrollbar();
+    });
+    mutationObserver.observe(scrollArea, { childList: true });
     if (scrollArea.children?.[0]) {
-      observer.observe(scrollArea.children[0] as HTMLElement);
+      resizeObserver.observe(scrollArea.children[0] as HTMLElement);
     } else {
-      observer.observe(scrollArea);
+      resizeObserver.observe(scrollArea);
     }
-    return () => observer.disconnect();
+    return () => resizeObserver.disconnect();
   });
 </script>
 
