@@ -15,9 +15,11 @@ function setNewStashInput(input: HTMLInputElement) {
 
 function focusNewStashInput() {
     const focusIt = () => {
-        newStashInput.update($input => {
-            $input?.focus();
-            return $input;
+        setTimeout(() => {
+            newStashInput.update($input => {
+                $input?.focus();
+                return $input;
+            });
         });
     }
     if (get(commandMenuOpen) === true) {

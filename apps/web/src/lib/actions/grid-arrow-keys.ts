@@ -147,8 +147,8 @@ class GridArrowKeyHandler {
         });
     }
     getCurrentRowAndColumn(target: HTMLElement): { row: number, col: number } {
-        const row = parseInt(target.dataset.row || '0');
-        const col = parseInt(target.dataset.col || '0');
+        const row = parseInt(target?.dataset?.row || '0');
+        const col = parseInt(target?.dataset?.col || '0');
         return { row, col };
     }
     focusGridItem(row: number, col: number, recursive = true) {

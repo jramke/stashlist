@@ -40,13 +40,15 @@
     onMount(() => {
         inputNode = document.getElementById('new-stash-input') as HTMLInputElement;
         setNewStashInput(inputNode);
+        focusNewStashInput();
 
-        document.addEventListener('keydown', handleNewStashShortcut);
-        return () => document.removeEventListener('keydown', handleNewStashShortcut);
+        document.addEventListener('keydown', handleNewStashKeydown);
+        return () => document.removeEventListener('keydown', handleNewStashKeydown);
     });
 
     afterNavigate(() => {
 		newStashSelectedGroup = getNewStashSelectedGroup();
+        focusNewStashInput();
 	});
 
     const getGradientIndexByGroupId = (groupId: string) => {
@@ -69,7 +71,7 @@
 		}
 	}
 
-    const handleNewStashShortcut = (e: KeyboardEvent) => {       
+    const handleNewStashKeydown = (e: KeyboardEvent) => {       
         if (e.key === 'm' && (e.metaKey || e.ctrlKey)) {
             e.preventDefault();
             focusNewStashInput();
@@ -78,6 +80,14 @@
         if (e.code === 'Escape' && document.activeElement === $newStashInput) {
             e.preventDefault();
             $newStashInput?.blur();
+            return;
+        }
+
+        // used to trigger the grid-arrow-keys action 
+        if (e.key === 'ArrowDown' && document.activeElement === $newStashInput) {
+            e.preventDefault();
+            $newStashInput?.blur();
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', code: 'ArrowDown' }));
             return;
         }
     }
@@ -98,6 +108,7 @@
 				toast.success('New stash created');
 			}
 			busy = false;
+            focusNewStashInput();
 		};
 	}
 
