@@ -44,6 +44,9 @@ jobs:
       - name: install pnpm
         run: npm install -g pnpm@9.2.0
 
+      - name: Clear pnpm cache
+        run: pnpm cache clean
+
       # - name: Check pnpm installation and set PATH
       #   run: echo "$(which pnpm)" >> $GITHUB_PATH
 
