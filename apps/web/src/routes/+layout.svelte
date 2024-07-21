@@ -7,7 +7,14 @@
 	import {Navigation, Footer, Metadata } from '$lib/components/site';
 	import { page } from '$app/stores';
 	import { siteConfig } from '@repo/constants';
+	import { UmamiAnalytics } from '@lukulent/svelte-umami';
+
 </script>
+
+<UmamiAnalytics
+	websiteID="0a85e0e8-2328-453f-a062-00a7d5fa71dd"
+	srcURL="https://umami.joostramke.com/script.js"
+/>
 
 <Metadata />
 <ModeWatcher defaultMode="dark" />

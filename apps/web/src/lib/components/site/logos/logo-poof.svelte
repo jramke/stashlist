@@ -4,6 +4,7 @@
 	import * as rive from "@rive-app/canvas";
     import { Motion } from "svelte-motion";
 	import { cn } from '@repo/ui/utils';
+    import { trackEvent } from '@lukulent/svelte-umami';
 
     export let replacerLogoClass = '';
     export let poofClass = '';
@@ -47,17 +48,11 @@
             width = 28;
             replacerVisible = true;
             replacerScale = 1;
+            trackEvent('logo-poof');
             setTimeout(() => {
                 poofCallback();
             }, 1050); // delay until poof is optically played
         }, delay);
-    }
-    
-    function handleClick() {
-        poof.play();
-        width = 28;
-        replacerVisible = true;
-        replacerScale = 1;
     }
 
 </script>
