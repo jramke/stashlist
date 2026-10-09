@@ -1,0 +1,27 @@
+php-version = "8.4"
+
+[source]
+paths = ["app", "bootstrap/app.php", "config", "database", "routes", "tests"]
+includes = ["vendor"]
+
+[formatter]
+preset = "laravel"
+space-after-cast-unary-prefix-operators = false
+line-before-binary-operator = false
+indent-heredoc = false
+
+[linter]
+integrations = ["laravel", "pest"]
+excludes = ["config", "database/migrations"]
+
+[linter.rules]
+no-shorthand-ternary = { enabled = false }
+readable-literal = { enabled = false }
+tagged-todo = { enabled = false }
+excessive-parameter-list = { constructor-threshold = 10 }
+no-literal-password = { exclude = ["tests"] }
+
+[analyzer]
+excludes = ["config", "database/migrations", "tests"]
+ignore = ["invalid-type-cast"]
+

@@ -1,0 +1,15 @@
+/vendor
+/node_modules
+/public
+/bootstrap/ssr
+/storage
+/resources/js/actions
+/resources/js/routes
+/resources/js/wayfinder
+/resources/views
+composer.lock
+package-lock.json
+*.php
+/.ddev
+/.claude
+/.agents
