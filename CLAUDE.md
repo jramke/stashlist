@@ -4,6 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Laravel 13 + Inertia 3 + React 19 (TypeScript, React Compiler) + Tailwind 4 + shadcn/ui on **Base UI** (not Radix). PHP 8.4, Pest, SQLite. Local dev runs in DDEV (`.ddev/`).
 
+## Plan and progress
+
+The product plan is `docs/PLAN.md` (local, gitignored). `docs/PROGRESS.md` is the resume point: read it before continuing the work, commit one logical step at a time with `ddev composer test` green, and tick the checklist (and the **Now** line) in the same commit.
+
 ## Commands
 
 **Run everything inside the DDEV container whenever possible: prefix every command with `ddev`.** `vendor/` and `node_modules/` are installed for the container's platform (Linux), so host-side tools can fail or behave differently (host `vite build` cannot find rolldown's native binary, mago downloads a different binary per platform). Shortcuts exist for `ddev composer`, `ddev artisan`, `ddev npm`, `ddev npx`, `ddev php` and `ddev vite`; for anything else use `ddev exec <command>`. Only `git`, `gh` and file edits stay on the host.
