@@ -4,62 +4,10 @@ declare(strict_types=1);
 
 use App\Images\ImageProcessor;
 use App\Images\InvalidImage;
-
-/**
- * An image of one color, or split in two halves, in the given format.
- */
-function make_image(string $format, int $width, int $height, string $left = 'red', ?string $right = null): string
-{
-    $image = new Imagick;
-    $image->newImage($width, $height, new ImagickPixel($left));
-
-    if ($right !== null) {
-        $middle = $width >> 1;
-        $top = 0;
-        $half = new Imagick;
-        $half->newImage($middle, $height, new ImagickPixel($right));
-        $image->compositeImage($half, Imagick::COMPOSITE_OVER, $middle, $top);
-    }
-
-    $image->setImageFormat($format);
-
-    return $image->getImageBlob();
-}
-
-/**
- * A JPEG with a minimal EXIF block that carries a GPS latitude.
- */
-function jpeg_with_gps(): string
-{
-    $rational = static fn (int $numerator): string => pack('VV', $numerator, 1);
-
-    $tiff =
-        'II'.
-        pack('vV', 0x2A, 8)
-        // IFD0: one entry, the pointer to the GPS IFD at offset 26.
-        .pack('v', 1).
-        pack('vvVV', 0x8825, 4, 1, 26).
-        pack('V', 0)
-        // GPS IFD: latitude reference "N" and latitude 52 31 0, the rationals follow at offset 56.
-        .pack('v', 2).
-        pack('vvV', 0x0001, 2, 2).
-        "N\0\0\0".
-        pack('vvVV', 0x0002, 5, 3, 56).
-        pack('V', 0).
-        $rational(52).
-        $rational(31).
-        $rational(0);
-
-    $image = new Imagick;
-    $image->newImage(200, 100, new ImagickPixel('green'));
-    $image->setImageFormat('jpeg');
-    $image->profileImage('exif', "Exif\0\0".$tiff);
-
-    return $image->getImageBlob();
-}
+use Tests\Support\Images;
 
 test('common formats are accepted and turned into webp derivatives', function (string $format, string $mime) {
-    $processed = new ImageProcessor()->process(make_image($format, width: 2000, height: 1000));
+    $processed = new ImageProcessor()->process(Images::make($format, width: 2000, height: 1000));
 
     expect($processed->mime)
         ->toBe($mime)
@@ -89,7 +37,7 @@ test('common formats are accepted and turned into webp derivatives', function (s
 ]);
 
 test('small images are not enlarged', function () {
-    $processed = new ImageProcessor()->process(make_image('png', width: 100, height: 50));
+    $processed = new ImageProcessor()->process(Images::make('png', width: 100, height: 50));
 
     expect($processed->thumb->width)
         ->toBe(100)
@@ -100,7 +48,7 @@ test('small images are not enlarged', function () {
 });
 
 test('very tall images are capped in height', function () {
-    $processed = new ImageProcessor()->process(make_image('png', width: 400, height: 12000));
+    $processed = new ImageProcessor()->process(Images::make('png', width: 400, height: 12000));
 
     expect($processed->thumb->height)
         ->toBeLessThanOrEqual(640 * 4)
@@ -109,7 +57,13 @@ test('very tall images are capped in height', function () {
 });
 
 test('dominant colors come with their share', function () {
-    $processed = new ImageProcessor()->process(make_image('png', width: 400, height: 200, left: 'red', right: 'blue'));
+    $processed = new ImageProcessor()->process(Images::make(
+        'png',
+        width: 400,
+        height: 200,
+        left: 'red',
+        right: 'blue',
+    ));
 
     $hexes = array_column($processed->colors, 'hex');
 
@@ -127,7 +81,7 @@ test('dominant colors come with their share', function () {
 });
 
 test('exif gps data does not survive in the derivatives', function () {
-    $original = jpeg_with_gps();
+    $original = Images::jpegWithGps();
 
     expect($original)->toContain('Exif');
 
@@ -165,7 +119,7 @@ test('an oversized file is refused before it is looked at', function () {
 });
 
 test('an image with too many pixels is refused without decoding it', function () {
-    $png = make_image('png', width: 1, height: 1);
+    $png = Images::make('png', width: 1, height: 1);
     // The IHDR chunk starts at byte 16 with width and height as 32-bit big-endian numbers.
     $bomb = substr($png, offset: 0, length: 16).pack('NN', 10_000, 10_000).substr($png, offset: 24);
 

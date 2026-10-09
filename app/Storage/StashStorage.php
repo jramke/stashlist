@@ -90,6 +90,16 @@ final readonly class StashStorage
     }
 
     /**
+     * The bytes of a stored object.
+     *
+     * @throws RuntimeException when the object is missing
+     */
+    public function contents(StashFile $file): string
+    {
+        return $this->disk()->get($file->path) ?? throw new RuntimeException("Could not read {$file->path}.");
+    }
+
+    /**
      * Deletes one object and its row.
      */
     public function forget(StashFile $file): void
