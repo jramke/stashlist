@@ -12,7 +12,7 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 ## Now
 
-M0, step 4: install the packages (Scout, Meilisearch client, Horizon, Flysystem S3, Intervention Image, readability).
+M0, step 4b: Horizon with supervisors, Redis for queue, cache and sessions.
 
 ## Blocked on you
 
@@ -31,8 +31,9 @@ Nothing blocks the code. These need your accounts or your OK, and are tracked he
 - [x] Light and dark mode, tooling cleanup, Claude format hook, PHP to TypeScript type generation, strict TypeScript (before this file existed)
 - [x] MariaDB for dev, tests and CI (`stashlist_test` database, DDEV hook, CI service); `php ^8.4` in `composer.json` [1.1]
 - [x] Redis 7 and Meilisearch 1.54 in DDEV [M0]
-- [ ] Packages: `laravel/scout`, `meilisearch/meilisearch-php`, `http-interop/http-factory-guzzle`, `laravel/horizon`, `league/flysystem-aws-s3-v3`, `intervention/image`, `fivefilters/readability.php` [M0]
-- [ ] Config: Scout (prefix, queue, `after_commit`), Horizon supervisors [2.2, 4.3], S3 disk [7.2]
+- [x] `laravel/scout` and `meilisearch/meilisearch-php` with `config/scout.php` (prefix, queue `index`, `after_commit`, Stash index settings) [2.2]
+- [ ] `laravel/horizon` with supervisors per queue, Redis for queue, cache and sessions, admin gate [4.3, 7.5]
+- [ ] `league/flysystem-aws-s3-v3`, `intervention/image`, `fivefilters/readability.php`; `ext-*` requirements; S3 env [7.2]
 - [ ] `license` fields set to `AGPL-3.0-or-later` in `composer.json` and `package.json` [M0]
 - [ ] Migrations: users columns, `oauth_accounts`, `stashes`, `stash_files`, `tags`, `stash_tag`, `collections`, `collection_stash`, `usage_monthly` [1.3]
 - [ ] Enums, models, `UserScope`, `BelongsToUser` [3, 3.1]
@@ -108,4 +109,5 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 
 ## Decisions and deviations
 
+- 2026-10-10: `http-interop/http-factory-guzzle` is not installed. It caps `guzzlehttp/psr7` at ^2 and the app has 3.1; psr7 3 ships its own PSR-17 factory and `php-http/discovery` finds it. Checked with a live health call from the Meilisearch client.
 - 2026-10-10: this file is tracked on purpose so the progress can be followed in git. Delete it whenever you do not need it.

@@ -14,8 +14,10 @@
         "laravel/chisel": "^0.1.0",
         "laravel/fortify": "^1.37.2",
         "laravel/framework": "^13.17",
+        "laravel/scout": "^11.9",
         "laravel/tinker": "^3.0",
         "laravel/wayfinder": "^0.1.14",
+        "meilisearch/meilisearch-php": "^1.17",
         "spatie/laravel-typescript-transformer": "^3.3"
     },
     "require-dev": {
