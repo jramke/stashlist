@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Laravel 13 + Inertia 3 + React 19 (TypeScript, React Compiler) + Tailwind 4 + shadcn/ui on **Base UI** (not Radix). PHP 8.4, Pest, SQLite. Local dev runs in DDEV (`.ddev/`).
+Laravel 13 + Inertia 3 + React 19 (TypeScript, React Compiler) + Tailwind 4 + shadcn/ui on **Base UI** (not Radix). PHP 8.4, Pest, MariaDB 11.8 (dev, tests and CI; tests use their own `stashlist_test` database, which a DDEV `post-start` hook creates). Local dev runs in DDEV (`.ddev/`).
 
 ## Plan and progress
 

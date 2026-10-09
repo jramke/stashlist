@@ -13,6 +13,28 @@ jobs:
     ci:
         runs-on: ubuntu-latest
 
+        services:
+            mariadb:
+                image: mariadb:11.8
+                env:
+                    MARIADB_ROOT_PASSWORD: root
+                    MARIADB_DATABASE: stashlist_test
+                ports:
+                    - 3306:3306
+                options: >-
+                    --health-cmd="healthcheck.sh --connect --innodb_initialized"
+                    --health-interval=5s
+                    --health-timeout=5s
+                    --health-retries=10
+
+        # Process variables win over .env, so `composer setup` and the tests both use the service.
+        env:
+            DB_HOST: 127.0.0.1
+            DB_PORT: 3306
+            DB_DATABASE: stashlist_test
+            DB_USERNAME: root
+            DB_PASSWORD: root
+
         steps:
             - name: Checkout code
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
