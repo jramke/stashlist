@@ -1,0 +1,16 @@
+#ddev-generated
+additional_hostnames:
+  - vite.stashlist
+web_environment:
+  - VITE_SERVER_URI=https://vite.stashlist.ddev.site
+  - VITE_PACKAGE_MANAGER=npm
+
+# Enable these lines if you want to expose the vite port to the host system
+# Note that this means that only one ddev project with vite can be run at a time
+# as the different processes might interfere with each other
+#
+# web_extra_exposed_ports:
+#   - name: vite
+#     container_port: 5173
+#     http_port: 5172
+#     https_port: 5173

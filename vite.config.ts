@@ -26,5 +26,10 @@ export default defineConfig({
         watch: {
             ignored: ['**/.claude/**', '**/vendor/**'],
         },
+        host: '0.0.0.0',
+        origin: `https://vite.${process?.env?.DDEV_PRIMARY_URL?.replace('https://', '')}`,
+        cors: {
+            origin: /^https?:\/\/(?:.*\.ddev\.site|.*\.dev)(?::\d+)?$/,
+        },
     },
 });

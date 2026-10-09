@@ -1,0 +1,13 @@
+name: ddev-vite-sidecar
+repository: s2b/ddev-vite-sidecar
+version: 1.1.1
+install_date: "2026-10-09T21:10:15+02:00"
+project_files:
+    - commands/web/vite
+    - apache/vite.conf
+    - nginx_full/vite.conf
+    - vite/vite-server-not-running.html
+    - config.vite.yaml
+    - web-build/Dockerfile.vite
+global_files: []
+removal_actions: []
