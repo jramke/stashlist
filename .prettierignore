@@ -13,3 +13,4 @@ package-lock.json
 /.ddev
 /.claude
 /.agents
+/tests/fixtures
