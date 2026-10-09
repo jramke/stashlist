@@ -12,7 +12,7 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 ## Now
 
-M0, step 4b: Horizon with supervisors, Redis for queue, cache and sessions.
+M0, step 4c: Flysystem S3, Intervention Image, readability and the `ext-*` requirements.
 
 ## Blocked on you
 
@@ -32,7 +32,7 @@ Nothing blocks the code. These need your accounts or your OK, and are tracked he
 - [x] MariaDB for dev, tests and CI (`stashlist_test` database, DDEV hook, CI service); `php ^8.4` in `composer.json` [1.1]
 - [x] Redis 7 and Meilisearch 1.54 in DDEV [M0]
 - [x] `laravel/scout` and `meilisearch/meilisearch-php` with `config/scout.php` (prefix, queue `index`, `after_commit`, Stash index settings) [2.2]
-- [ ] `laravel/horizon` with supervisors per queue, Redis for queue, cache and sessions, admin gate [4.3, 7.5]
+- [x] `laravel/horizon` with supervisors per queue, Redis for queue, cache and sessions, `STASHLIST_ADMINS` gate (Pulse joins the gate in M1) [4.3, 7.5]
 - [ ] `league/flysystem-aws-s3-v3`, `intervention/image`, `fivefilters/readability.php`; `ext-*` requirements; S3 env [7.2]
 - [ ] `license` fields set to `AGPL-3.0-or-later` in `composer.json` and `package.json` [M0]
 - [ ] Migrations: users columns, `oauth_accounts`, `stashes`, `stash_files`, `tags`, `stash_tag`, `collections`, `collection_stash`, `usage_monthly` [1.3]
@@ -110,4 +110,6 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 ## Decisions and deviations
 
 - 2026-10-10: `http-interop/http-factory-guzzle` is not installed. It caps `guzzlehttp/psr7` at ^2 and the app has 3.1; psr7 3 ships its own PSR-17 factory and `php-http/discovery` finds it. Checked with a live health call from the Meilisearch client.
+- 2026-10-10: `retry_after` for the Redis queue is 3700 s, not the plan's 360 s. The plan's own rule says it must exceed the longest job timeout, and the maintenance supervisor runs jobs for up to 3600 s.
+- 2026-10-10: Horizon 5.50 serves its assets itself (`horizon:publish` is a no-op), so nothing under `public/vendor` is committed.
 - 2026-10-10: this file is tracked on purpose so the progress can be followed in git. Delete it whenever you do not need it.
