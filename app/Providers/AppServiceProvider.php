@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Extraction\DnsHostResolver;
+use App\Extraction\HostResolver;
 use Carbon\CarbonImmutable;
+use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +20,11 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
-    public function register(): void {}
+    public function register(): void
+    {
+        $this->app->bind(HostResolver::class, DnsHostResolver::class);
+        $this->app->bind(ClientInterface::class, Client::class);
+    }
 
     /**
      * Bootstrap any application services.

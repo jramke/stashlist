@@ -14,7 +14,7 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 M0 is done in code (`composer test` green on MariaDB, user A cannot read user B's rows). Left for M0: the `LICENSE` file and the buckets, both waiting on you (see above).
 
-M1 in progress. Next: `UrlGuard` and `SafeHttp` with the SSRF test list, then `StashStorage`, `stash_enrichments` and `ExtractContent`, then `CapturePayload` and `CaptureStash`.
+M1 in progress. Next: `StashStorage`, then `stash_enrichments` and `ExtractContent`, then `CapturePayload` and `CaptureStash`.
 
 ## Blocked on you
 
@@ -47,7 +47,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 
 - [x] `InputClassifier` and `UrlNormalizer` (rules and cases in `tests/fixtures/url-normalization.json`, reused by the extension in M1.6) [4.2, 5.3]
 - [ ] `CapturePayload`, `CaptureStash` [4.2, 6.1]
-- [ ] `UrlGuard`, `SafeHttp` and the SSRF test list [5.6, 10.3]
+- [x] `UrlGuard`, `SafeHttp` and the SSRF test list (checked live against the network too) [5.6, 10.3]
 - [ ] `stash_enrichments` migration, `ExtractContent` v0 (title, description, OG image, favicon, readability text) [5.1 to 5.3]
 - [ ] `ImageProcessor` (thumb, preview, colors), `StashStorage` (paths, signed URLs) [5.4]
 - [ ] `TagSync`, `TagNormalizer` (manual tags) [1.4]
@@ -118,4 +118,6 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - 2026-10-10: `intervention/image` resolved to v4 (the plan assumed v3) and `fivefilters/readability.php` to v4.1 (`(new Readability())->parse($html)` returns an `Article`). Both load and work in DDEV with the Imagick driver. Read their READMEs when writing `ImageProcessor` and `ExtractContent`.
 - 2026-10-10: the migrations are new files that alter and create, not edits of the starter kit's `create_users_table`, so a database that already ran the old ones just migrates forward.
 - 2026-10-10: `Searchable` (Scout) is not on `Stash` yet. The searchable document needs enrichments, highlights and embeddings, which arrive with the search step of M1 and later milestones.
+- 2026-10-10: `SafeHttp` downloads through a size-capped Guzzle sink instead of `stream => true`. Guzzle picks PHP's stream handler for `stream`, which ignores `CURLOPT_RESOLVE`, so the address pinning would silently not happen. Found by a live request; the tests assert the pinned entry.
+- 2026-10-10: `PublicAddress` blocks multicast and NAT64 (`64:ff9b::/96`) on top of PHP's `FILTER_FLAG_GLOBAL_RANGE`, which lets both through.
 - 2026-10-10: this file is tracked on purpose so the progress can be followed in git. Delete it whenever you do not need it.

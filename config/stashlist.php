@@ -14,4 +14,17 @@ return [
      */
 
     'admins' => array_values(array_filter(array_map(trim(...), explode(',', (string)env('STASHLIST_ADMINS', ''))))),
+
+    /*
+     |--------------------------------------------------------------------------
+     | Bot
+     |--------------------------------------------------------------------------
+     |
+     | How the server identifies itself when it fetches a page for a user.
+     |
+     */
+
+    'bot' => [
+        'user_agent' => env('STASHLIST_BOT_USER_AGENT', 'StashlistBot/1.0 (+https://stashlist.app/bot)'),
+    ],
 ];
