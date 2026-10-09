@@ -1,0 +1,27 @@
+services:
+  meilisearch:
+    container_name: ddev-${DDEV_SITENAME}-meilisearch
+    image: getmeili/meilisearch:v1.54
+    hostname: meilisearch
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: ${DDEV_APPROOT}
+    restart: "no"
+    expose:
+      - 7700
+    environment:
+      # Dev only: this key is not a secret. Production uses its own master key and a restricted API key.
+      MEILI_ENV: development
+      MEILI_MASTER_KEY: ddev-meilisearch-master-key
+      MEILI_NO_ANALYTICS: "true"
+      VIRTUAL_HOST: ${DDEV_HOSTNAME}
+      HTTP_EXPOSE: 7700:7700
+      HTTPS_EXPOSE: 7701:7700
+    volumes:
+      - meilisearch:/meili_data
+      - ".:/mnt/ddev_config"
+    x-ddev:
+      describe-url-port: "7701 (dashboard at https://${DDEV_SITENAME}.ddev.site:7701)"
+
+volumes:
+  meilisearch:

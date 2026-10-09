@@ -12,7 +12,7 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 ## Now
 
-M0, step 3: Redis and Meilisearch in DDEV.
+M0, step 4: install the packages (Scout, Meilisearch client, Horizon, Flysystem S3, Intervention Image, readability).
 
 ## Blocked on you
 
@@ -30,7 +30,7 @@ Nothing blocks the code. These need your accounts or your OK, and are tracked he
 
 - [x] Light and dark mode, tooling cleanup, Claude format hook, PHP to TypeScript type generation, strict TypeScript (before this file existed)
 - [x] MariaDB for dev, tests and CI (`stashlist_test` database, DDEV hook, CI service); `php ^8.4` in `composer.json` [1.1]
-- [ ] Redis and Meilisearch in DDEV [M0]
+- [x] Redis 7 and Meilisearch 1.54 in DDEV [M0]
 - [ ] Packages: `laravel/scout`, `meilisearch/meilisearch-php`, `http-interop/http-factory-guzzle`, `laravel/horizon`, `league/flysystem-aws-s3-v3`, `intervention/image`, `fivefilters/readability.php` [M0]
 - [ ] Config: Scout (prefix, queue, `after_commit`), Horizon supervisors [2.2, 4.3], S3 disk [7.2]
 - [ ] `license` fields set to `AGPL-3.0-or-later` in `composer.json` and `package.json` [M0]
