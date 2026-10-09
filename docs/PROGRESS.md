@@ -14,7 +14,7 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 M0 is done in code (`composer test` green on MariaDB, user A cannot read user B's rows). Left for M0: the `LICENSE` file and the buckets, both waiting on you (see above).
 
-M1 in progress. Next: `TagSync` and `TagNormalizer`, then `CapturePayload`, `CaptureStash` and `StartPipeline` (starts with `ExtractContent` only; `IndexStash` joins with search).
+M1 in progress. Next: `CapturePayload`, `CaptureStash` and `StartPipeline` (starts with `ExtractContent` only; `IndexStash` joins with search), then `DeleteStash` and `PurgeStashFiles`.
 
 ## Blocked on you
 
@@ -51,7 +51,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [x] `stash_enrichments` migration, page parsing (`PageParser`), `ExtractContent` job v0: title, description, OG image copied to thumbnail and preview, favicon URL, readable text, colors, subtype guess; links that serve an image become image stashes; hash-based skip, retry matrix, `force` [5.1 to 5.3]
 - [x] `StashStorage` (paths, writes, purge, signed URLs) [5.4]
 - [x] `ImageProcessor` (WebP thumb 640 and preview 1280 without metadata, five dominant colors, limits) [5.4]
-- [ ] `TagSync`, `TagNormalizer` (manual tags) [1.4]
+- [x] `TagSync` (user side: add, remove, dismissed tombstones, counter cache) and `TagNormalizer`; `applyAi` joins in M2 [1.4]
 - [ ] Inertia pages: feed (masonry, keyset pagination), capture box, detail drawer, collections, tags [6.2]
 - [ ] Keyboard and speed contract: command menu, grid navigation, quick-add, undo delete, shortcut sheet [11.2]
 - [ ] Scout keyword search through `StashSearch`, as-you-type contract, `scout:sync-index-settings` [2.2, 2.5]

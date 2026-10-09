@@ -32,6 +32,11 @@ final class Tag extends Model
      */
     public function stashes(): BelongsToMany
     {
-        return $this->belongsToMany(Stash::class, 'stash_tag')->withPivot(['source', 'dismissed_at', 'user_id']);
+        return $this->belongsToMany(Stash::class, 'stash_tag')->withPivot([
+            'source',
+            'dismissed_at',
+            'user_id',
+            'created_at',
+        ]);
     }
 }
