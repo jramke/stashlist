@@ -6,21 +6,24 @@ Laravel 13 + Inertia 3 + React 19 (TypeScript, React Compiler) + Tailwind 4 + sh
 
 ## Commands
 
+**Run everything inside the DDEV container whenever possible: prefix every command with `ddev`.** `vendor/` and `node_modules/` are installed for the container's platform (Linux), so host-side tools can fail or behave differently (host `vite build` cannot find rolldown's native binary, mago downloads a different binary per platform). Shortcuts exist for `ddev composer`, `ddev artisan`, `ddev npm`, `ddev npx`, `ddev php` and `ddev vite`; for anything else use `ddev exec <command>`. Only `git`, `gh` and file edits stay on the host.
+
 ```bash
-composer setup            # install, .env, key, migrate, npm install, build
-composer dev              # php artisan dev: serve + queue + pail logs + vite (npm run dev)
-npm run build             # vite build (build:ssr also builds the SSR bundle)
+ddev composer setup       # install, .env, key, migrate, npm install, build
+ddev composer dev         # php artisan dev: serve + queue + pail logs + vite (npm run dev)
+ddev vite                 # only the Vite dev server, proxied at https://vite.stashlist.ddev.site
+ddev npm run build        # vite build (build:ssr also builds the SSR bundle)
 
-composer test             # config:clear, lint:check, types:check, then php artisan test
-php artisan test --filter=ProfileUpdateTest   # single test / file (Pest)
-composer lint             # mago lint+analyze with --fix --unsafe --potentially-unsafe, then mago format (rewrites code)
-composer lint:check       # mago format --check + mago lint (read-only, used by CI)
-composer types:check      # mago analyze (PHP static analysis)
+ddev composer test        # config:clear, lint:check, types:check, then php artisan test
+ddev artisan test --filter=ProfileUpdateTest   # single test / file (Pest)
+ddev composer lint        # mago lint+analyze with --fix --unsafe --potentially-unsafe, then mago format (rewrites code)
+ddev composer lint:check  # mago format --check + mago lint (read-only, used by CI)
+ddev composer types:check # mago analyze (PHP static analysis)
 
-npm run types:check       # tsc --noEmit
-npm run format            # prettier --write . (non-PHP files only)
-npm run format:check
-composer ci:check         # what CI runs: format:check, types:check (tsc), then composer test
+ddev npm run types:check  # tsc --noEmit
+ddev npm run format       # prettier --write . (non-PHP files only)
+ddev npm run format:check
+ddev composer ci:check    # what CI runs: format:check, types:check (tsc), then composer test
 ```
 
 ## Tooling decisions
