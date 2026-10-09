@@ -7,6 +7,7 @@ namespace App\Tags;
 use App\Enums\TagSource;
 use App\Models\Stash;
 use App\Models\Tag;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use InvalidArgumentException;
 
 /**
@@ -29,17 +30,7 @@ final class TagSync
         $display = TagNormalizer::name($name) ?? throw new InvalidArgumentException('A tag needs a name.');
         $tag = $this->findOrCreate($stash->user_id, $display);
 
-        $row = $stash->tags()->where('tags.id', $tag->id)->first()?->pivot;
-
-        if ($row === null) {
-            $stash->tags()->attach($tag->id, [
-                'user_id' => $stash->user_id,
-                'source' => TagSource::User->value,
-                'created_at' => now(),
-            ]);
-        } elseif ($row->getAttribute('source') !== TagSource::User->value) {
-            $stash->tags()->updateExistingPivot($tag->id, ['source' => TagSource::User->value, 'dismissed_at' => null]);
-        }
+        $this->linkAsUser($stash, $tag, $stash->tags()->where('tags.id', $tag->id)->first()?->pivot);
 
         $this->recount($tag);
 
@@ -60,11 +51,33 @@ final class TagSync
 
         if ($row->getAttribute('source') === TagSource::User->value) {
             $stash->tags()->detach($tag->id);
-        } else {
-            $stash->tags()->updateExistingPivot($tag->id, ['dismissed_at' => now()]);
+            $this->recount($tag);
+
+            return;
         }
 
+        $stash->tags()->updateExistingPivot($tag->id, ['dismissed_at' => now()]);
         $this->recount($tag);
+    }
+
+    /**
+     * Links the tag as a user tag: new link, or an AI link (visible or dismissed) taken over by the user.
+     */
+    private function linkAsUser(Stash $stash, Tag $tag, ?Pivot $row): void
+    {
+        if ($row === null) {
+            $stash->tags()->attach($tag->id, [
+                'user_id' => $stash->user_id,
+                'source' => TagSource::User->value,
+                'created_at' => now(),
+            ]);
+
+            return;
+        }
+
+        if ($row->getAttribute('source') !== TagSource::User->value) {
+            $stash->tags()->updateExistingPivot($tag->id, ['source' => TagSource::User->value, 'dismissed_at' => null]);
+        }
     }
 
     private function findOrCreate(int $userId, string $name): Tag

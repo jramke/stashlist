@@ -14,7 +14,7 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 M0 is done in code (`composer test` green on MariaDB, user A cannot read user B's rows). Left for M0: the `LICENSE` file and the buckets, both waiting on you (see above).
 
-M1 in progress. Next: `CapturePayload`, `CaptureStash` and `StartPipeline` (starts with `ExtractContent` only; `IndexStash` joins with search), then `DeleteStash` and `PurgeStashFiles`.
+M1 in progress. Next: `DeleteStash` and `PurgeStashFiles`, then the web layer: routes, controllers, form requests, Inertia DTOs and the feed page; Scout search joins after that.
 
 ## Blocked on you
 
@@ -46,7 +46,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 ### M1. Save, browse, keyword search, deploy [9]
 
 - [x] `InputClassifier` and `UrlNormalizer` (rules and cases in `tests/fixtures/url-normalization.json`, reused by the extension in M1.6) [4.2, 5.3]
-- [ ] `CapturePayload`, `CaptureStash` [4.2, 6.1]
+- [x] `CapturePayload`, `CaptureStash` (single entry point: classify, dedupe links per user, tags, collections, uploaded original, pipeline start), `StartPipeline` (extraction only for now), `CollectionSync` [4.2, 6.1]
 - [x] `UrlGuard`, `SafeHttp` and the SSRF test list (checked live against the network too) [5.6, 10.3]
 - [x] `stash_enrichments` migration, page parsing (`PageParser`), `ExtractContent` job v0: title, description, OG image copied to thumbnail and preview, favicon URL, readable text, colors, subtype guess; links that serve an image become image stashes; hash-based skip, retry matrix, `force` [5.1 to 5.3]
 - [x] `StashStorage` (paths, writes, purge, signed URLs) [5.4]

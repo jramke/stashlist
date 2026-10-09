@@ -53,7 +53,7 @@ final class ImageProcessor
      */
     public function process(string $bytes): ProcessedImage
     {
-        $mime = $this->assertAcceptable($bytes);
+        $mime = $this->mime($bytes);
 
         try {
             $image = $this->manager->decodeBinary($bytes)->orient();
@@ -79,9 +79,11 @@ final class ImageProcessor
     /**
      * Checks size, type and pixel count before anything is decoded, so a decompression bomb is refused cheaply.
      *
+     * @return string the media type of the image
+     *
      * @throws InvalidImage
      */
-    private function assertAcceptable(string $bytes): string
+    public function mime(string $bytes): string
     {
         if (strlen($bytes) > self::MAX_BYTES) {
             throw InvalidImage::tooLarge(self::MAX_BYTES);
