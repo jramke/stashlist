@@ -1,3 +1,4 @@
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Toaster } from '@/components/ui/sonner';
 import AuthLayout from '@/layouts/auth-layout';
 import { createInertiaApp } from '@inertiajs/react';
@@ -12,6 +13,7 @@ void createInertiaApp({
         return (
             <>
                 {app}
+                <ThemeToggle className="fixed bottom-4 left-4 z-50" />
                 <Toaster />
             </>
         );
