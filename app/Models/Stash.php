@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\AiStage;
 use App\Enums\AiStatus;
+use App\Enums\FileRole;
 use App\Enums\StashType;
 use App\Models\Concerns\BelongsToUser;
 use Carbon\CarbonImmutable;
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Something the user saved. The user owns title, body, url and is_private; the pipeline owns subtype,
@@ -40,6 +42,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property CarbonImmutable|null $indexed_at
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
+ * @property StashEnrichment|null $enrichment
+ * @property StashFile|null $thumbnail
  */
 #[Fillable(['type', 'subtype', 'title', 'body', 'url', 'url_hash', 'domain', 'meta', 'is_private', 'content_hash'])]
 #[Hidden(['url_hash'])]
@@ -63,6 +67,30 @@ final class Stash extends Model
             'processed_at' => 'datetime',
             'indexed_at' => 'datetime',
         ];
+    }
+
+    /**
+     * @return HasOne<StashEnrichment, $this>
+     */
+    public function enrichment(): HasOne
+    {
+        return $this->hasOne(StashEnrichment::class);
+    }
+
+    /**
+     * @return HasOne<StashFile, $this>
+     */
+    public function thumbnail(): HasOne
+    {
+        return $this->hasOne(StashFile::class)->where('role', FileRole::Thumb->value);
+    }
+
+    /**
+     * What to call the stash: the user's title, else the scraped one, else the domain. Load `enrichment` first.
+     */
+    public function displayTitle(): string
+    {
+        return $this->title ?? $this->enrichment->title ?? $this->domain ?? 'Untitled';
     }
 
     /**
