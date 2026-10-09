@@ -10,7 +10,12 @@
     "license": "MIT",
     "require": {
         "php": "^8.4",
+        "ext-imagick": "*",
+        "ext-intl": "*",
+        "ext-redis": "*",
+        "fivefilters/readability.php": "^4.1",
         "inertiajs/inertia-laravel": "^3.0",
+        "intervention/image": "^4.3",
         "laravel/chisel": "^0.1.0",
         "laravel/fortify": "^1.37.2",
         "laravel/framework": "^13.17",
@@ -18,6 +23,7 @@
         "laravel/scout": "^11.9",
         "laravel/tinker": "^3.0",
         "laravel/wayfinder": "^0.1.14",
+        "league/flysystem-aws-s3-v3": "^3.35",
         "meilisearch/meilisearch-php": "^1.17",
         "spatie/laravel-typescript-transformer": "^3.3"
     },
