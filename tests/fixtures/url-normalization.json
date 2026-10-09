@@ -1,0 +1,69 @@
+{
+    "_comment": "Shared by the PHP tests and, from M1.6, the extension tests. input -> expected, null means 'not a valid web URL'. Rules: http/https only, no credentials, scheme and host lowercase, IDN host as punycode, trailing dot and default port removed, fragment removed, tracking parameters (utm_*, fbclid, gclid, mc_*) removed, empty path becomes /, non-ASCII bytes in path and query percent-encoded with uppercase hex.",
+    "cases": [
+        {
+            "input": "https://Example.com/Path?x=1#frag",
+            "expected": "https://example.com/Path?x=1"
+        },
+        { "input": "HTTP://EXAMPLE.COM", "expected": "http://example.com/" },
+        {
+            "input": "  https://example.com/a  ",
+            "expected": "https://example.com/a"
+        },
+        { "input": "//example.com/a", "expected": "https://example.com/a" },
+        {
+            "input": "https://example.com:443/a",
+            "expected": "https://example.com/a"
+        },
+        {
+            "input": "http://example.com:80/a",
+            "expected": "http://example.com/a"
+        },
+        {
+            "input": "https://example.com:8443/a",
+            "expected": "https://example.com:8443/a"
+        },
+        { "input": "http://[::1]:8080/x", "expected": "http://[::1]:8080/x" },
+        {
+            "input": "https://example.com./a",
+            "expected": "https://example.com/a"
+        },
+        {
+            "input": "https://bücher.example/straße",
+            "expected": "https://xn--bcher-kva.example/stra%C3%9Fe"
+        },
+        {
+            "input": "https://example.com/a?q=ü",
+            "expected": "https://example.com/a?q=%C3%BC"
+        },
+        {
+            "input": "https://example.com/a?utm_source=x&b=2&fbclid=abc&gclid=1&mc_cid=2&mc_eid=3",
+            "expected": "https://example.com/a?b=2"
+        },
+        {
+            "input": "https://example.com/a?UTM_Medium=x",
+            "expected": "https://example.com/a"
+        },
+        {
+            "input": "https://example.com/a?utm_source",
+            "expected": "https://example.com/a"
+        },
+        {
+            "input": "https://example.com/a?b=2&&c=3",
+            "expected": "https://example.com/a?b=2&c=3"
+        },
+        {
+            "input": "https://example.com/a?",
+            "expected": "https://example.com/a"
+        },
+        {
+            "input": "https://example.com/a?b=2&a=1",
+            "expected": "https://example.com/a?b=2&a=1"
+        },
+        { "input": "https://user:pw@example.com/", "expected": null },
+        { "input": "ftp://example.com/", "expected": null },
+        { "input": "javascript:alert(1)", "expected": null },
+        { "input": "not a url", "expected": null },
+        { "input": "", "expected": null }
+    ]
+}

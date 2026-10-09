@@ -12,7 +12,9 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 ## Now
 
-M0 is done in code (`composer test` green on MariaDB, user A cannot read user B's rows). Left for M0: the `LICENSE` file and the buckets, both waiting on you (see above). Next: M1, starting with `InputClassifier`, `CapturePayload` and `CaptureStash`.
+M0 is done in code (`composer test` green on MariaDB, user A cannot read user B's rows). Left for M0: the `LICENSE` file and the buckets, both waiting on you (see above).
+
+M1 in progress. Next: `UrlGuard` and `SafeHttp` with the SSRF test list, then `StashStorage`, `stash_enrichments` and `ExtractContent`, then `CapturePayload` and `CaptureStash`.
 
 ## Blocked on you
 
@@ -43,7 +45,8 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 
 ### M1. Save, browse, keyword search, deploy [9]
 
-- [ ] `InputClassifier`, `CapturePayload`, `CaptureStash` [4.2, 6.1]
+- [x] `InputClassifier` and `UrlNormalizer` (rules and cases in `tests/fixtures/url-normalization.json`, reused by the extension in M1.6) [4.2, 5.3]
+- [ ] `CapturePayload`, `CaptureStash` [4.2, 6.1]
 - [ ] `UrlGuard`, `SafeHttp` and the SSRF test list [5.6, 10.3]
 - [ ] `stash_enrichments` migration, `ExtractContent` v0 (title, description, OG image, favicon, readability text) [5.1 to 5.3]
 - [ ] `ImageProcessor` (thumb, preview, colors), `StashStorage` (paths, signed URLs) [5.4]
