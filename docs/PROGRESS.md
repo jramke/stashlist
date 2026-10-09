@@ -12,7 +12,7 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 ## Now
 
-M0, step 6b: enums, models, `UserScope`/`BelongsToUser`, factories, and the isolation and architecture tests.
+M0 is done in code (`composer test` green on MariaDB, user A cannot read user B's rows). Left for M0: the `LICENSE` file and the buckets, both waiting on you (see above). Next: M1, starting with `InputClassifier`, `CapturePayload` and `CaptureStash`.
 
 ## Blocked on you
 
@@ -36,8 +36,8 @@ Nothing blocks the code. These need your accounts or your OK, and are tracked he
 - [x] `league/flysystem-aws-s3-v3`, `intervention/image`, `fivefilters/readability.php`; `ext-imagick`, `ext-intl`, `ext-redis`; S3 env [7.2]
 - [x] `license` fields set to `AGPL-3.0-or-later` in `composer.json` and `package.json` (the `LICENSE` file waits for your OK, see above) [M0]
 - [x] Migrations: users columns, `oauth_accounts`, `stashes`, `stash_files`, `tags`, `stash_tag`, `collections`, `collection_stash`, `usage_monthly` [1.3]
-- [ ] Enums, models, `UserScope`, `BelongsToUser`, factories [3, 3.1]
-- [ ] Pest arch tests, scope tests and composite-key tests (the HTTP isolation matrix grows with the routes) [10.1]
+- [x] Enums, models, `UserScope`, `BelongsToUser`, factories [3, 3.1]
+- [x] Pest arch tests, scope tests and composite-key tests (the HTTP isolation matrix grows with the routes) [10.1]
 
 Ships when `composer test` is green on MariaDB and an isolation test proves user A cannot read user B's stash.
 
@@ -114,4 +114,5 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - 2026-10-10: Horizon 5.50 serves its assets itself (`horizon:publish` is a no-op), so nothing under `public/vendor` is committed.
 - 2026-10-10: `intervention/image` resolved to v4 (the plan assumed v3) and `fivefilters/readability.php` to v4.1 (`(new Readability())->parse($html)` returns an `Article`). Both load and work in DDEV with the Imagick driver. Read their READMEs when writing `ImageProcessor` and `ExtractContent`.
 - 2026-10-10: the migrations are new files that alter and create, not edits of the starter kit's `create_users_table`, so a database that already ran the old ones just migrates forward.
+- 2026-10-10: `Searchable` (Scout) is not on `Stash` yet. The searchable document needs enrichments, highlights and embeddings, which arrive with the search step of M1 and later milestones.
 - 2026-10-10: this file is tracked on purpose so the progress can be followed in git. Delete it whenever you do not need it.
