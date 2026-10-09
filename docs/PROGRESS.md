@@ -14,7 +14,7 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 M0 is done in code (`composer test` green on MariaDB, user A cannot read user B's rows). Left for M0: the `LICENSE` file and the buckets, both waiting on you (see above).
 
-M1 in progress. Next: `StashStorage`, then `stash_enrichments` and `ExtractContent`, then `CapturePayload` and `CaptureStash`.
+M1 in progress. Next: `ImageProcessor`, then `stash_enrichments` and `ExtractContent`, then `CapturePayload` and `CaptureStash`.
 
 ## Blocked on you
 
@@ -49,7 +49,8 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [ ] `CapturePayload`, `CaptureStash` [4.2, 6.1]
 - [x] `UrlGuard`, `SafeHttp` and the SSRF test list (checked live against the network too) [5.6, 10.3]
 - [ ] `stash_enrichments` migration, `ExtractContent` v0 (title, description, OG image, favicon, readability text) [5.1 to 5.3]
-- [ ] `ImageProcessor` (thumb, preview, colors), `StashStorage` (paths, signed URLs) [5.4]
+- [x] `StashStorage` (paths, writes, purge, signed URLs) [5.4]
+- [ ] `ImageProcessor` (thumb, preview, colors; Intervention Image v4 has `colors()->dominant()`) [5.4]
 - [ ] `TagSync`, `TagNormalizer` (manual tags) [1.4]
 - [ ] Inertia pages: feed (masonry, keyset pagination), capture box, detail drawer, collections, tags [6.2]
 - [ ] Keyboard and speed contract: command menu, grid navigation, quick-add, undo delete, shortcut sheet [11.2]
