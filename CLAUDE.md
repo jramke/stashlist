@@ -12,18 +12,14 @@ Laravel 13 + Inertia 3 + React 19 (TypeScript, React Compiler) + Tailwind 4 + sh
 ddev composer setup       # install, .env, key, migrate, npm install, build
 ddev composer dev         # php artisan dev: serve + queue + pail logs + vite (npm run dev)
 ddev vite                 # only the Vite dev server, proxied at https://vite.stashlist.ddev.site
-ddev npm run build        # vite build (build:ssr also builds the SSR bundle)
+ddev npm run build        # vite build + SSR bundle (bootstrap/ssr)
 
-ddev composer test        # config:clear, lint:check, types:check, then php artisan test
+ddev composer test        # everything CI runs: mago format --check, lint, analyze; prettier --check + tsc; php artisan test
 ddev artisan test --filter=ProfileUpdateTest   # single test / file (Pest)
 ddev composer lint        # mago lint+analyze with --fix --unsafe --potentially-unsafe, then mago format (rewrites code)
-ddev composer lint:check  # mago format --check + mago lint (read-only, used by CI)
-ddev composer types:check # mago analyze (PHP static analysis)
-
-ddev npm run types:check  # tsc --noEmit
-ddev npm run format       # prettier --write . (non-PHP files only)
-ddev npm run format:check
-ddev composer ci:check    # what CI runs: format:check, types:check (tsc), then composer test
+ddev composer format      # mago format (PHP only)
+ddev npm run format       # prettier --write . (non-PHP files only); pass files with `-- <file>...`
+ddev npm run check        # prettier --check + tsc --noEmit
 ```
 
 ## Tooling decisions

@@ -54,28 +54,19 @@
             "Composer\\Config::disableProcessTimeout",
             "@php artisan dev"
         ],
+        "format": "mago format",
         "lint": [
             "mago lint --fix --unsafe --potentially-unsafe --format-after-fix",
             "mago analyze --fix --unsafe --potentially-unsafe --format-after-fix",
-            "mago format"
-        ],
-        "lint:check": [
-            "mago format --check",
-            "mago lint"
-        ],
-        "ci:check": [
-            "Composer\\Config::disableProcessTimeout",
-            "npm run format:check",
-            "npm run types:check",
-            "@test"
-        ],
-        "types:check": [
-            "mago analyze"
+            "@format"
         ],
         "test": [
+            "Composer\\Config::disableProcessTimeout",
             "@php artisan config:clear --ansi",
-            "@lint:check",
-            "@types:check",
+            "mago format --check",
+            "mago lint",
+            "mago analyze",
+            "npm run check",
             "@php artisan test"
         ],
         "post-autoload-dump": [
