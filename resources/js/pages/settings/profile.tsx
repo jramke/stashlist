@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { Form, Head, usePage } from '@inertiajs/react';
+import { useAuthUser } from '@/hooks/use-auth-user';
+import { Form, Head } from '@inertiajs/react';
 
 export default function Profile() {
-    const { auth } = usePage().props;
+    const user = useAuthUser();
 
     return (
         <>
@@ -25,7 +26,7 @@ export default function Profile() {
                             <Input
                                 id="name"
                                 name="name"
-                                defaultValue={auth.user.name}
+                                defaultValue={user.name}
                                 required
                                 autoComplete="name"
                                 placeholder="Full name"
@@ -39,7 +40,7 @@ export default function Profile() {
                                 id="email"
                                 type="email"
                                 name="email"
-                                defaultValue={auth.user.email}
+                                defaultValue={user.email}
                                 required
                                 autoComplete="username"
                                 placeholder="email@example.com"

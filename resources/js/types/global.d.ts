@@ -1,4 +1,5 @@
-import type { Auth } from '@/types/auth';
+// Keeps this file a module, so the `declare module` blocks below augment instead of replace.
+export {};
 
 declare module 'react' {
     interface InputHTMLAttributes<T> {
@@ -6,12 +7,10 @@ declare module 'react' {
     }
 }
 
+// `App.*` types are generated from PHP by `php artisan typescript:transform` (resources/js/generated).
 declare module '@inertiajs/core' {
     export interface InertiaConfig {
-        sharedPageProps: {
-            name: string;
-            auth: Auth;
-            [key: string]: unknown;
-        };
+        sharedPageProps: App.Data.SharedData;
+        flashDataType: { toast?: App.Data.ToastData };
     }
 }

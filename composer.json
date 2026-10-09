@@ -15,7 +15,8 @@
         "laravel/fortify": "^1.37.2",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
-        "laravel/wayfinder": "^0.1.14"
+        "laravel/wayfinder": "^0.1.14",
+        "spatie/laravel-typescript-transformer": "^3.3"
     },
     "require-dev": {
         "carthage-software/mago": "^1.54",
@@ -47,6 +48,7 @@
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
             "@php artisan migrate --force",
+            "@php artisan typescript:transform",
             "npm install",
             "npm run build"
         ],
@@ -66,6 +68,7 @@
             "mago format --check",
             "mago lint",
             "mago analyze",
+            "@php artisan typescript:transform",
             "npm run check",
             "@php artisan test"
         ],

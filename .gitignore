@@ -9,6 +9,7 @@
 /storage/*.key
 /storage/pail
 /resources/js/actions
+/resources/js/generated
 /resources/js/routes
 /resources/js/wayfinder
 /vendor
