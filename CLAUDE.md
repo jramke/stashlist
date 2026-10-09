@@ -22,6 +22,8 @@ ddev npm run format       # prettier --write . (non-PHP files only); pass files 
 ddev npm run check        # prettier --check + tsc --noEmit
 ```
 
+A `PostToolUse` hook (`.claude/hooks/format.sh`) formats every file you write or edit (PHP via mago, everything else via Prettier, Blade skipped). Do not run the formatters by hand after edits.
+
 ## Tooling decisions
 
 - **PHP: Mago only** (`mago.toml`) for format, lint and analyze. No Pint or PHPStan. Config and `database/migrations` are excluded from lint/analyze but still formatted; `tests` is excluded from analyze. There is no baseline: fix issues in code, or use an inline `// @mago-expect lint:<rule>` / `// @mago-expect analysis:<code>` for framework-magic false positives (see `routes/console.php`, `app/Models/User.php`). Mago cannot see Facade macros, so prefer real methods over macros (e.g. `Route::get(..., Inertia::render())` instead of `Route::inertia`).
