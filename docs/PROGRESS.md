@@ -14,7 +14,7 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 M0 is done in code (`composer test` green on MariaDB, user A cannot read user B's rows). Left for M0: the `LICENSE` file and the buckets, both waiting on you (see above).
 
-M1 in progress. Next: `ImageProcessor`, then `stash_enrichments` and `ExtractContent`, then `CapturePayload` and `CaptureStash`.
+M1 in progress. Next: `stash_enrichments` and `ExtractContent`, then `CapturePayload` and `CaptureStash`.
 
 ## Blocked on you
 
@@ -50,7 +50,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [x] `UrlGuard`, `SafeHttp` and the SSRF test list (checked live against the network too) [5.6, 10.3]
 - [ ] `stash_enrichments` migration, `ExtractContent` v0 (title, description, OG image, favicon, readability text) [5.1 to 5.3]
 - [x] `StashStorage` (paths, writes, purge, signed URLs) [5.4]
-- [ ] `ImageProcessor` (thumb, preview, colors; Intervention Image v4 has `colors()->dominant()`) [5.4]
+- [x] `ImageProcessor` (WebP thumb 640 and preview 1280 without metadata, five dominant colors, limits) [5.4]
 - [ ] `TagSync`, `TagNormalizer` (manual tags) [1.4]
 - [ ] Inertia pages: feed (masonry, keyset pagination), capture box, detail drawer, collections, tags [6.2]
 - [ ] Keyboard and speed contract: command menu, grid navigation, quick-add, undo delete, shortcut sheet [11.2]
@@ -121,4 +121,5 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - 2026-10-10: `Searchable` (Scout) is not on `Stash` yet. The searchable document needs enrichments, highlights and embeddings, which arrive with the search step of M1 and later milestones.
 - 2026-10-10: `SafeHttp` downloads through a size-capped Guzzle sink instead of `stream => true`. Guzzle picks PHP's stream handler for `stream`, which ignores `CURLOPT_RESOLVE`, so the address pinning would silently not happen. Found by a live request; the tests assert the pinned entry.
 - 2026-10-10: `PublicAddress` blocks multicast and NAT64 (`64:ff9b::/96`) on top of PHP's `FILTER_FLAG_GLOBAL_RANGE`, which lets both through.
+- 2026-10-10: HEIC and the 12 named color buckets for the Meilisearch `colors` filter are left to M4; `ImageProcessor` accepts JPEG, PNG, GIF, WebP and AVIF and returns hex colors with their share. Animated GIFs get static derivatives of the first frame.
 - 2026-10-10: this file is tracked on purpose so the progress can be followed in git. Delete it whenever you do not need it.
