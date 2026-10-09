@@ -14,7 +14,7 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 M0 is done in code (`composer test` green on MariaDB, user A cannot read user B's rows). Left for M0: the `LICENSE` file and the buckets, both waiting on you (see above).
 
-M1 in progress. Next: `DeleteStash` and `PurgeStashFiles`, then the web layer: routes, controllers, form requests, Inertia DTOs and the feed page; Scout search joins after that.
+M1 in progress. Next: the web layer: routes, controllers, form requests, Inertia DTOs and the feed page; Scout search joins after that.
 
 ## Blocked on you
 
@@ -58,7 +58,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [ ] Socialite login for GitHub and Google with the linking rules [6.4]
 - [ ] Horizon dashboard and Pulse behind the admin gate [7.5]
 - [ ] `stashlist:import-old` [M1 list]
-- [ ] `DeleteStash`, `PurgeStashFiles` [4.9]
+- [x] `DeleteStash` (real delete in a transaction, tag counters recounted) and `PurgeStashFiles` (queued after commit, 5 tries); the Meilisearch side follows with `Searchable` [4.9]
 - [ ] Playwright keyboard flows and the bundle-size check in CI [10.6]
 - [ ] You: Coolify resources, backups, restore drill; spikes for Hetzner S3 and the all-in-one container [7.1, M1 spikes]
 

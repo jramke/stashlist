@@ -98,6 +98,18 @@ final class TagSync
     }
 
     /**
+     * Recomputes the counters of tags whose links changed without TagSync, for example when a stash was deleted.
+     *
+     * @param  array<int, int>  $tagIds
+     */
+    public function recountTags(int $userId, array $tagIds): void
+    {
+        foreach (Tag::query()->where('user_id', $userId)->whereIn('id', $tagIds)->get() as $tag) {
+            $this->recount($tag);
+        }
+    }
+
+    /**
      * stashes_count is the number of stashes where the tag is visible (not dismissed). It is recomputed from
      * the rows, so it cannot drift.
      */
