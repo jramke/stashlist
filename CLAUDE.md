@@ -27,6 +27,8 @@ ddev npm run check        # prettier --check + tsc --noEmit
 ddev artisan typescript:transform   # regenerate the PHP -> TypeScript types
 ```
 
+To run Artisan against the test database use `ddev exec 'DB_DATABASE=stashlist_test php artisan ...'`. `--env=testing` does **not** switch databases: `migrate:fresh --env=testing` wiped the dev database once. Never run `migrate:fresh`, `db:wipe` or `migrate:rollback` without pinning `DB_DATABASE` first.
+
 A `PostToolUse` hook (`.claude/hooks/format.sh`) formats every file you write or edit (PHP via mago, everything else via Prettier, Blade skipped) and regenerates the TypeScript types when `app/Data` or `app/Enums` changed. Do not run the formatters by hand after edits.
 
 ## Tooling decisions
