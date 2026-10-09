@@ -12,7 +12,7 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 ## Now
 
-M0, step 5: `license` fields, then migrations, models and the user scope.
+M0, step 6: migrations, enums, models, `UserScope`/`BelongsToUser`, factories.
 
 ## Blocked on you
 
@@ -34,7 +34,7 @@ Nothing blocks the code. These need your accounts or your OK, and are tracked he
 - [x] `laravel/scout` and `meilisearch/meilisearch-php` with `config/scout.php` (prefix, queue `index`, `after_commit`, Stash index settings) [2.2]
 - [x] `laravel/horizon` with supervisors per queue, Redis for queue, cache and sessions, `STASHLIST_ADMINS` gate (Pulse joins the gate in M1) [4.3, 7.5]
 - [x] `league/flysystem-aws-s3-v3`, `intervention/image`, `fivefilters/readability.php`; `ext-imagick`, `ext-intl`, `ext-redis`; S3 env [7.2]
-- [ ] `license` fields set to `AGPL-3.0-or-later` in `composer.json` and `package.json` [M0]
+- [x] `license` fields set to `AGPL-3.0-or-later` in `composer.json` and `package.json` (the `LICENSE` file waits for your OK, see above) [M0]
 - [ ] Migrations: users columns, `oauth_accounts`, `stashes`, `stash_files`, `tags`, `stash_tag`, `collections`, `collection_stash`, `usage_monthly` [1.3]
 - [ ] Enums, models, `UserScope`, `BelongsToUser` [3, 3.1]
 - [ ] Pest arch tests and the cross-user isolation tests [10.1]
