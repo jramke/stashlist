@@ -18,11 +18,13 @@ final class CappedStream implements StreamInterface
 
     public bool $exceeded = false;
 
+    /** Set once the response headers are known; nothing may be written before that. */
+    public int $maxBytes = 0;
+
     private int $written = 0;
 
     public function __construct(
         private readonly StreamInterface $stream,
-        private readonly int $maxBytes,
     ) {}
 
     #[\Override]

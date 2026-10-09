@@ -8,38 +8,21 @@ use Psr\Http\Message\ResponseInterface;
 
 /**
  * Turns a final (non-redirect) response into a FetchedResponse, or into the FetchFailed that says why not.
+ * Type and size were already enforced when the headers arrived (ContentLimits).
  */
 final class ResponseChecker
 {
     /**
-     * @param  list<string>  $accept
-     *
      * @throws FetchFailed
      */
-    public static function accept(
-        string $url,
-        ResponseInterface $response,
-        int $maxBytes,
-        array $accept,
-    ): FetchedResponse {
+    public static function accept(string $url, ResponseInterface $response): FetchedResponse
+    {
         self::assertSuccessful($response->getStatusCode());
-
-        $contentType = strtolower(trim(explode(';', $response->getHeaderLine('Content-Type'))[0]));
-
-        if (! self::matches($contentType, $accept)) {
-            throw FetchFailed::unsupportedType($contentType === '' ? 'unknown' : $contentType);
-        }
-
-        $declared = $response->getHeaderLine('Content-Length');
-
-        if ($declared !== '' && (int)$declared > $maxBytes) {
-            throw FetchFailed::tooLarge();
-        }
 
         return new FetchedResponse(
             url: $url,
             status: $response->getStatusCode(),
-            contentType: $contentType,
+            contentType: ContentLimits::mediaType($response),
             charset: self::charset($response->getHeaderLine('Content-Type')),
             body: $response->getBody()->getContents(),
         );
@@ -47,31 +30,24 @@ final class ResponseChecker
 
     private static function assertSuccessful(int $status): void
     {
-        if ($status >= 200 && $status < 300) {
-            return;
+        if ($status < 200 || $status >= 300) {
+            throw self::failureFor($status);
         }
-
-        if (in_array($status, [401, 403, 404, 410], strict: true)) {
-            throw FetchFailed::gone($status);
-        }
-
-        throw FetchFailed::failed(
-            "The server answered {$status}.",
-            retryable: $status === 408 || $status === 429 || $status >= 500,
-        );
     }
 
     /**
-     * @param  list<string>  $accept
+     * The failure for a response that is not a success: pages that are gone or closed to us are permanent,
+     * timeouts, rate limits and server errors may pass.
      */
-    private static function matches(string $contentType, array $accept): bool
+    public static function failureFor(int $status): FetchFailed
     {
-        return array_any(
-            $accept,
-            static fn (string $allowed): bool => (
-                $allowed === $contentType ||
-                str_ends_with($allowed, '/*') && str_starts_with($contentType, substr($allowed, offset: 0, length: -1))
-            ),
+        if (in_array($status, [401, 403, 404, 410], strict: true)) {
+            return FetchFailed::gone($status);
+        }
+
+        return FetchFailed::failed(
+            "The server answered {$status}.",
+            retryable: $status === 408 || $status === 429 || $status >= 500,
         );
     }
 

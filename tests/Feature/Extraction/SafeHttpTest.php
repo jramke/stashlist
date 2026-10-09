@@ -45,7 +45,7 @@ function redirect_to(string $location, int $status = 302): Response
 
 test('a page is fetched with the bot identity and the pinned address', function () {
     $history = [];
-    $response = safe_http([html()], history: $history)->get('https://example.com/post', 1024, ['text/html']);
+    $response = safe_http([html()], history: $history)->get('https://example.com/post', ['text/html' => 1024]);
 
     expect($response->body)
         ->toBe('<html>ok</html>')
@@ -74,7 +74,7 @@ test('redirects are followed by hand and every hop is pinned', function () {
     $response = safe_http(
         [redirect_to('https://other.example.net/next'), redirect_to('/final', status: 301), html('done')],
         history: $history,
-    )->get('https://example.com/start', 1024, ['text/html']);
+    )->get('https://example.com/start', ['text/html' => 1024]);
 
     expect($response->url)
         ->toBe('https://other.example.net/final')
@@ -91,11 +91,9 @@ test('redirects are followed by hand and every hop is pinned', function () {
 test('a redirect from a public host to a private one is blocked', function () {
     $history = [];
     $fetch = function () use (&$history) {
-        safe_http([redirect_to('http://internal.example.com/admin')], history: $history)->get(
-            'https://example.com/',
-            1024,
-            ['text/html'],
-        );
+        safe_http([redirect_to('http://internal.example.com/admin')], history: $history)->get('https://example.com/', [
+            'text/html' => 1024,
+        ]);
     };
 
     expect($fetch)->toThrow(BlockedUrl::class);
@@ -103,20 +101,20 @@ test('a redirect from a public host to a private one is blocked', function () {
 });
 
 test('a redirect to a non-http scheme is blocked', function () {
-    expect(fn () => safe_http([redirect_to('file:///etc/passwd')])->get('https://example.com/', 1024, ['text/html']))
+    expect(fn () => safe_http([redirect_to('file:///etc/passwd')])->get('https://example.com/', ['text/html' => 1024]))
         ->toThrow(BlockedUrl::class);
 });
 
 test('five redirects are followed, six are too many', function () {
     $five = array_map(static fn (): Response => redirect_to('/again'), range(start: 1, end: 5));
 
-    expect(safe_http([...$five, html('arrived')])->get('https://example.com/', 1024, ['text/html'])->body)
+    expect(safe_http([...$five, html('arrived')])->get('https://example.com/', ['text/html' => 1024])->body)
         ->toBe('arrived');
 
     $six = array_map(static fn (): Response => redirect_to('/again'), range(start: 1, end: 6));
 
     try {
-        safe_http([...$six, html()])->get('https://example.com/', 1024, ['text/html']);
+        safe_http([...$six, html()])->get('https://example.com/', ['text/html' => 1024]);
         $this->fail('Expected FetchFailed.');
     } catch (FetchFailed $exception) {
         expect($exception->reason)->toBe('fetch_failed')->and($exception->retryable)->toBeFalse();
@@ -129,11 +127,10 @@ test('dns rebinding cannot change the address after the check', function () {
     $stack = HandlerStack::create(new MockHandler([html()]));
     $stack->push(Middleware::history($history));
 
-    $response = new SafeHttp(new UrlGuard($resolver), new Client(['handler' => $stack]))->get(
-        'http://rebind.example.com/',
-        1024,
-        ['text/html'],
-    );
+    $response = new SafeHttp(
+        new UrlGuard($resolver),
+        new Client(['handler' => $stack]),
+    )->get('http://rebind.example.com/', ['text/html' => 1024]);
 
     expect($response->body)
         ->toBe('<html>ok</html>')
@@ -145,7 +142,7 @@ test('dns rebinding cannot change the address after the check', function () {
 
 test('ipv6 addresses are pinned in brackets', function () {
     $history = [];
-    safe_http([html()], history: $history)->get('https://v6.example.com/', 1024, ['text/html']);
+    safe_http([html()], history: $history)->get('https://v6.example.com/', ['text/html' => 1024]);
 
     expect($history[0]['options']['curl'][CURLOPT_RESOLVE])->toBe(['v6.example.com:443:[2606:4700:4700::1111]']);
 });
@@ -153,7 +150,7 @@ test('ipv6 addresses are pinned in brackets', function () {
 test('a body over the cap is refused, whatever the headers say', function () {
     $body = str_repeat('a', times: 20_000);
 
-    expect(fn () => safe_http([html($body)])->get('https://example.com/', 10_000, ['text/html']))
+    expect(fn () => safe_http([html($body)])->get('https://example.com/', ['text/html' => 10_000]))
         ->toThrow(FetchFailed::class, 'larger than the limit');
 });
 
@@ -161,7 +158,7 @@ test('a declared length over the cap is refused before reading', function () {
     $response = new Response(200, ['Content-Type' => 'text/html', 'Content-Length' => '5000000'], 'tiny');
 
     try {
-        safe_http([$response])->get('https://example.com/', 1_000_000, ['text/html']);
+        safe_http([$response])->get('https://example.com/', ['text/html' => 1_000_000]);
         $this->fail('Expected FetchFailed.');
     } catch (FetchFailed $exception) {
         expect($exception->reason)->toBe('fetch_too_large');
@@ -171,13 +168,16 @@ test('a declared length over the cap is refused before reading', function () {
 test('a body exactly at the cap is accepted', function () {
     $body = str_repeat('a', times: 10_000);
 
-    expect(safe_http([html($body)])->get('https://example.com/', 10_000, ['text/html'])->body)->toBe($body);
+    expect(safe_http([html($body)])->get('https://example.com/', ['text/html' => 10_000])->body)->toBe($body);
 });
 
 test('content types on the allow-list are accepted', function (string $type, array $accept) {
     $response = new Response(200, ['Content-Type' => $type], 'data');
 
-    expect(safe_http([$response])->get('https://example.com/', 1024, $accept)->contentType)
+    expect(safe_http([$response])->get('https://example.com/', array_fill_keys(
+        keys: $accept,
+        value: 1024,
+    ))->contentType)
         ->toBe(strtolower(explode(';', $type)[0]));
 })->with([
     'html for a page' => ['text/html; charset=utf-8', ['text/html']],
@@ -188,7 +188,7 @@ test('content types on the allow-list are accepted', function (string $type, arr
 test('content types outside the allow-list are refused', function (string $type, array $accept) {
     $response = new Response(200, ['Content-Type' => $type], 'data');
 
-    expect(fn () => safe_http([$response])->get('https://example.com/', 1024, $accept))
+    expect(fn () => safe_http([$response])->get('https://example.com/', array_fill_keys(keys: $accept, value: 1024)))
         ->toThrow(FetchFailed::class, 'Unsupported content type');
 })->with([
     'pdf for a page' => ['application/pdf', ['text/html']],
@@ -198,11 +198,9 @@ test('content types outside the allow-list are refused', function (string $type,
 
 test('failures carry the reason code and whether to retry', function (int $status, string $reason, bool $retryable) {
     try {
-        safe_http([new Response($status, ['Content-Type' => 'text/html'], 'nope')])->get(
-            'https://example.com/',
-            1024,
-            ['text/html'],
-        );
+        safe_http([new Response($status, ['Content-Type' => 'text/html'], 'nope')])->get('https://example.com/', [
+            'text/html' => 1024,
+        ]);
         $this->fail('Expected FetchFailed.');
     } catch (FetchFailed $exception) {
         expect($exception->reason)->toBe($reason)->and($exception->retryable)->toBe($retryable);
@@ -224,7 +222,7 @@ test('a connection error is a retryable failure', function () {
     $http = new SafeHttp(new UrlGuard(new FakeHostResolver(PUBLIC_DNS)), new Client(['handler' => $stack]));
 
     try {
-        $http->get('https://example.com/', 1024, ['text/html']);
+        $http->get('https://example.com/', ['text/html' => 1024]);
         $this->fail('Expected FetchFailed.');
     } catch (FetchFailed $exception) {
         expect($exception->reason)->toBe('fetch_failed')->and($exception->retryable)->toBeTrue();
@@ -234,9 +232,33 @@ test('a connection error is a retryable failure', function () {
 test('a blocked url never reaches the network', function () {
     $history = [];
     $fetch = function () use (&$history) {
-        safe_http([html()], history: $history)->get('http://internal.example.com/', 1024, ['text/html']);
+        safe_http([html()], history: $history)->get('http://internal.example.com/', ['text/html' => 1024]);
     };
 
     expect($fetch)->toThrow(BlockedUrl::class);
     expect($history)->toBeEmpty();
+});
+
+test('each content type has its own byte cap', function () {
+    $limits = ['text/html' => 1_000, 'image/*' => 50_000];
+    $image = new Response(200, ['Content-Type' => 'image/png'], str_repeat('x', times: 20_000));
+
+    expect(safe_http([$image])->get('https://example.com/cat.png', $limits)->body)->toHaveLength(20_000);
+
+    expect(fn () => safe_http([html(str_repeat('x', times: 20_000))])->get('https://example.com/', $limits))
+        ->toThrow(
+            FetchFailed::class,
+            'larger than the limit',
+        );
+});
+
+test('a huge error page still reports the status, not its size', function () {
+    $notFound = new Response(404, ['Content-Type' => 'text/html'], str_repeat('x', times: 200_000));
+
+    try {
+        safe_http([$notFound])->get('https://example.com/', ['text/html' => 5_000_000]);
+        $this->fail('Expected FetchFailed.');
+    } catch (FetchFailed $exception) {
+        expect($exception->reason)->toBe('fetch_gone');
+    }
 });

@@ -6,6 +6,7 @@ namespace App\Extraction;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\ResponseException;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\Psr7\UriResolver;
 use GuzzleHttp\Psr7\Utils;
@@ -31,19 +32,20 @@ final readonly class SafeHttp
     ) {}
 
     /**
-     * @param  list<string>  $accept  allowed media types; "image/*" matches a whole family
+     * @param  array<string, int>  $limits  the media types to accept and the most bytes of each; "image/*"
+     *                                      matches a whole family
      *
      * @throws BlockedUrl
      * @throws FetchFailed
      */
-    public function get(string $url, int $maxBytes, array $accept): FetchedResponse
+    public function get(string $url, array $limits): FetchedResponse
     {
         for ($hop = 0; $hop <= self::MAX_REDIRECTS; $hop++) {
-            $response = $this->request($url, $maxBytes, $accept);
+            $response = $this->request($url, $limits);
             $next = $this->redirectTarget($url, $response);
 
             if ($next === null) {
-                return ResponseChecker::accept($url, $response, $maxBytes, $accept);
+                return ResponseChecker::accept($url, $response);
             }
 
             $url = $next;
@@ -53,33 +55,37 @@ final readonly class SafeHttp
     }
 
     /**
-     * @param  list<string>  $accept
+     * @param  array<string, int>  $limits
      */
-    private function request(string $url, int $maxBytes, array $accept): ResponseInterface
+    private function request(string $url, array $limits): ResponseInterface
     {
         $target = $this->guard->check($url);
-        $sink = new CappedStream(Utils::streamFor(''), $maxBytes);
+        $sink = new CappedStream(Utils::streamFor(''));
 
         try {
             $response = $this->client->request('GET', $url, [
                 RequestOptions::ALLOW_REDIRECTS => false,
                 // The cURL handler is required for CURLOPT_RESOLVE; "stream" would select PHP's stream handler.
                 RequestOptions::SINK => $sink,
+                RequestOptions::ON_HEADERS => static function (ResponseInterface $response) use ($sink, $limits): void {
+                    $sink->maxBytes = ContentLimits::maxBytes($response, $limits);
+                },
                 RequestOptions::DECODE_CONTENT => true,
                 RequestOptions::HTTP_ERRORS => false,
                 RequestOptions::CONNECT_TIMEOUT => 5,
                 RequestOptions::TIMEOUT => 15,
                 RequestOptions::HEADERS => [
                     'User-Agent' => config()->string('stashlist.bot.user_agent'),
-                    'Accept' => implode(', ', $accept),
+                    'Accept' => implode(', ', array_keys($limits)),
                 ],
                 'curl' => [CURLOPT_RESOLVE => [$target->curlResolveEntry()]],
             ]);
         } catch (GuzzleException $exception) {
-            throw $sink->exceeded ? FetchFailed::tooLarge() : FetchFailed::failed($exception->getMessage());
+            throw $this->failure($exception, $sink);
         }
 
-        if ($sink->exceeded) {
+        // Only a success can be "too large": for any other status the status itself is the answer.
+        if ($sink->exceeded && $response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
             throw FetchFailed::tooLarge();
         }
 
@@ -87,6 +93,24 @@ final readonly class SafeHttp
         $sink->rewind();
 
         return $response->withBody($sink);
+    }
+
+    /**
+     * A refusal thrown while the headers arrived comes back wrapped by Guzzle; unwrap it. An abort because the
+     * body outgrew the cap shows up as a write error.
+     */
+    private function failure(GuzzleException $exception, CappedStream $sink): FetchFailed
+    {
+        $previous = $exception->getPrevious();
+        $response = $exception instanceof ResponseException ? $exception->getResponse() : null;
+
+        return match (true) {
+            $previous instanceof FetchFailed => $previous,
+            $response !== null && ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300)
+                => ResponseChecker::failureFor($response->getStatusCode()),
+            $sink->exceeded => FetchFailed::tooLarge(),
+            default => FetchFailed::failed($exception->getMessage()),
+        };
     }
 
     /**
