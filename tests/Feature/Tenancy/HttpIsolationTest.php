@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\Collection;
 use App\Models\Stash;
 use App\Models\User;
 use App\Tags\TagSync;
@@ -20,6 +21,7 @@ beforeEach(function () {
     $this->stash = Stash::factory()->for($this->alice)->create();
     $this->tag = app(TagSync::class)->addByUser($this->stash, 'design');
     $this->bobStash = Stash::factory()->for($this->bob)->create();
+    $this->collection = Collection::factory()->for($this->alice)->create();
 });
 
 test("bob cannot reach alice's stash", function (string $method, Closure $uri, array $data) {
@@ -70,3 +72,25 @@ test("bob cannot file his stash under alice's tag by name", function () {
         ->and($this->tag->fresh()->stashes_count)
         ->toBe(1);
 });
+
+test("bob cannot reach alice's collections and tags", function (string $method, Closure $uri, array $data) {
+    $this->actingAs($this->bob)->call($method, $uri($this), $data)->assertNotFound();
+
+    expect(Collection::query()->withoutGlobalScopes()->find($this->collection->id)?->name)
+        ->toBe($this->collection->name);
+})->with([
+    'rename a collection' => ['PATCH', fn ($t) => "/collections/{$t->collection->id}", ['name' => 'hijacked']],
+    'delete a collection' => ['DELETE', fn ($t) => "/collections/{$t->collection->id}", []],
+    'set the stashes of a collection' => [
+        'PUT',
+        fn ($t) => "/collections/{$t->collection->id}/stashes",
+        ['stash_ids' => []],
+    ],
+    'rename a tag' => ['PATCH', fn ($t) => "/tags/{$t->tag->id}", ['name' => 'hijacked']],
+    'delete a tag' => ['DELETE', fn ($t) => "/tags/{$t->tag->id}", []],
+    'set the collections of a stash' => [
+        'PUT',
+        fn ($t) => "/stashes/{$t->stash->id}/collections",
+        ['collection_ids' => []],
+    ],
+]);

@@ -2,11 +2,16 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\CollectionController;
+use App\Http\Controllers\CollectionOrderController;
+use App\Http\Controllers\CollectionStashController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\StashCollectionController;
 use App\Http\Controllers\StashController;
 use App\Http\Controllers\StashDeletionController;
 use App\Http\Controllers\StashReprocessController;
 use App\Http\Controllers\StashTagController;
+use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -23,6 +28,19 @@ Route::middleware('auth')->group(function () {
         ->name('stashes.reprocess');
     Route::post('stashes/{stash}/tags', [StashTagController::class, 'store'])->name('stashes.tags.store');
     Route::delete('stashes/{stash}/tags/{tag}', [StashTagController::class, 'destroy'])->name('stashes.tags.destroy');
+    Route::put('stashes/{stash}/collections', [StashCollectionController::class, 'update'])->name(
+        'stashes.collections.update',
+    );
+
+    Route::put('collections/order', [CollectionOrderController::class, 'update'])->name('collections.order');
+    Route::resource('collections', CollectionController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::put('collections/{collection}/stashes', [CollectionStashController::class, 'update'])->name(
+        'collections.stashes.update',
+    );
+
+    Route::get('tags', [TagController::class, 'index'])->name('tags.index');
+    Route::patch('tags/{tag}', [TagController::class, 'update'])->name('tags.update');
+    Route::delete('tags/{tag}', [TagController::class, 'destroy'])->name('tags.destroy');
 });
 
 require __DIR__.'/settings.php';

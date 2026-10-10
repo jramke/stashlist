@@ -133,6 +133,6 @@ final class Stash extends Model
      */
     public function collections(): BelongsToMany
     {
-        return $this->belongsToMany(Collection::class, 'collection_stash')->withPivot('position');
+        return $this->belongsToMany(Collection::class, 'collection_stash')->withPivot(['position', 'created_at']);
     }
 }

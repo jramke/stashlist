@@ -38,6 +38,36 @@ final class TagSync
     }
 
     /**
+     * Renames a tag everywhere it is used. The new name must not belong to another tag of the same user.
+     *
+     * @throws InvalidArgumentException when the name is empty after normalization
+     * @throws TagNameTaken
+     */
+    public function rename(Tag $tag, string $name): Tag
+    {
+        $display = TagNormalizer::name($name) ?? throw new InvalidArgumentException('A tag needs a name.');
+        $slug = TagNormalizer::slug($display);
+
+        $taken = Tag::query()->where('user_id', $tag->user_id)->where('slug', $slug)->whereKeyNot($tag->id)->exists();
+
+        if ($taken) {
+            throw TagNameTaken::for($display);
+        }
+
+        $tag->forceFill(['name' => $display, 'slug' => $slug])->save();
+
+        return $tag;
+    }
+
+    /**
+     * Deletes a tag with all its links, including the tombstones of dismissed AI tags.
+     */
+    public function delete(Tag $tag): void
+    {
+        $tag->delete();
+    }
+
+    /**
      * Removes a tag the user does not want on this stash. A user tag is deleted; an AI tag is kept as a
      * dismissed tombstone.
      */

@@ -35,6 +35,7 @@ final readonly class SharedData
             collections: $user instanceof User
                 ? array_values(
                     Collection::query()
+                        ->withCount('stashes')
                         ->orderBy('position')
                         ->orderBy('name')
                         ->get()

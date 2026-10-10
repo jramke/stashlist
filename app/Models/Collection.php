@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property int $position order in the sidebar
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
+ * @property int $stashes_count only when loaded with withCount('stashes')
  */
 #[Fillable(['name', 'description', 'position'])]
 final class Collection extends Model
@@ -34,6 +35,6 @@ final class Collection extends Model
      */
     public function stashes(): BelongsToMany
     {
-        return $this->belongsToMany(Stash::class, 'collection_stash')->withPivot('position');
+        return $this->belongsToMany(Stash::class, 'collection_stash')->withPivot(['position', 'created_at']);
     }
 }
