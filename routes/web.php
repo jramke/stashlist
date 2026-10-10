@@ -6,6 +6,7 @@ use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\CollectionOrderController;
 use App\Http\Controllers\CollectionStashController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\SocialLoginController;
 use App\Http\Controllers\StashCollectionController;
 use App\Http\Controllers\StashController;
 use App\Http\Controllers\StashDeletionController;
@@ -15,6 +16,14 @@ use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+
+// Sign in with GitHub or Google. The paths are the ones the old app's OAuth apps already allow.
+Route::middleware('guest')->group(function () {
+    Route::get('login/{provider}', [SocialLoginController::class, 'redirect'])->name('login.provider');
+    Route::get('login/{provider}/callback', [SocialLoginController::class, 'callback'])->name(
+        'login.provider.callback',
+    );
+});
 
 Route::middleware('auth')->group(function () {
     Route::post('stashes', [StashController::class, 'store'])->middleware('throttle:capture')->name('stashes.store');

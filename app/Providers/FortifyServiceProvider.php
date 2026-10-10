@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
+use App\Enums\SocialProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -44,10 +45,13 @@ class FortifyServiceProvider extends ServiceProvider
      */
     private function configureViews(): void
     {
-        Fortify::loginView(static fn () => Inertia::render('auth/login'));
+        Fortify::loginView(static fn () => Inertia::render('auth/login', [
+            'providers' => SocialProvider::configured(),
+        ]));
 
         Fortify::registerView(static fn () => Inertia::render('auth/register', [
             'passwordRules' => Password::defaults()->toPasswordRulesString(),
+            'providers' => SocialProvider::configured(),
         ]));
     }
 

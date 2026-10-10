@@ -21,6 +21,7 @@
         "laravel/framework": "^13.17",
         "laravel/horizon": "^5.50",
         "laravel/scout": "^11.9",
+        "laravel/socialite": "^5.31",
         "laravel/tinker": "^3.0",
         "laravel/wayfinder": "^0.1.14",
         "league/flysystem-aws-s3-v3": "^3.35",

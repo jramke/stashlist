@@ -21,6 +21,8 @@ tagged-todo = { enabled = false }
 # Data classes (app/Data) carry a card's worth of fields in their constructor.
 excessive-parameter-list = { constructor-threshold = 16 }
 no-literal-password = { exclude = ["tests"] }
+# Test helpers take literals all day (`social_user('903', 'grace@example.com')`); naming each one hides the point of the test.
+literal-named-argument = { exclude = ["tests"] }
 
 [analyzer]
 excludes = ["config", "database/migrations", "tests"]

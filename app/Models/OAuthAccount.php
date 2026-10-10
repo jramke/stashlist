@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $provider_id GitHub numeric id or Google "sub", as a string
  * @property string|null $email last seen from the provider
  * @property string|null $avatar_url
+ * @property User $user
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  */
