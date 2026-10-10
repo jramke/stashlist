@@ -78,3 +78,18 @@ test('the command reports and repairs, and a dry run only reports', function () 
 
     $this->artisan('stashlist:reconcile-index')->assertSuccessful();
 });
+
+test('one user\'s part of the index can be removed as a whole, and counted to prove it', function () {
+    $mine = [Stash::factory()->for($this->user)->create(), Stash::factory()->for($this->user)->create()];
+    $other = User::factory()->create();
+    Stash::factory()->for($other)->create();
+    $this->meili->settle();
+    $index = resolve(App\Search\MeilisearchUserIndex::class);
+
+    expect($index->count($this->user->id))->toBe(2)->and($index->count($other->id))->toBe(1);
+
+    $index->purge($this->user->id);
+
+    expect($index->count($this->user->id))->toBe(0)->and($index->count($other->id))->toBe(1);
+    expect(array_map(static fn (Stash $stash): int => $stash->id, $mine))->each->not->toBeIn(indexed_ids());
+});

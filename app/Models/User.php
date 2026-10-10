@@ -48,6 +48,7 @@ class User extends Authenticatable
         'locale' => 'en',
         'ai_enabled' => true,
         'plan' => 'free',
+        'deleting_at' => null,
     ];
 
     /**

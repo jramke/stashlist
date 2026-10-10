@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Settings\AccountController;
 use App\Http\Controllers\Settings\ExportController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SmartFeaturesController;
@@ -15,6 +16,8 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('settings/smart-features', [SmartFeaturesController::class, 'update'])->name(
         'smart-features.update',
     );
+
+    Route::delete('settings/account', [AccountController::class, 'destroy'])->name('account.destroy');
 
     Route::get('settings/usage', [UsageController::class, 'show'])->name('usage.show');
 

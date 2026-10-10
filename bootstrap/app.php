@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Data\ToastData;
+use App\Http\Middleware\BlockClosingAccounts;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\Idempotent;
 use App\Http\Middleware\LimitJsonBody;
@@ -27,9 +28,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
             'idempotent' => Idempotent::class,
+            'not.closing' => BlockClosingAccounts::class,
             'json.limit' => LimitJsonBody::class,
         ]);
         $middleware->web(append: [
+            BlockClosingAccounts::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);

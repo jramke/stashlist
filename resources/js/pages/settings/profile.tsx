@@ -1,3 +1,4 @@
+import AccountController from '@/actions/App/Http/Controllers/Settings/AccountController';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import SmartFeaturesController from '@/actions/App/Http/Controllers/Settings/SmartFeaturesController';
 import InputError from '@/components/input-error';
@@ -90,6 +91,61 @@ export default function Profile() {
                             </span>
                         </Label>
                     </div>
+                </section>
+
+                <section className="grid gap-3 border-t pt-6">
+                    <h2 className="text-sm font-medium">Delete account</h2>
+
+                    <p className="text-sm text-muted-foreground">
+                        This removes your account and everything in it: your
+                        stashes, tags, collections, highlights and files. It
+                        cannot be undone. Export your data first if you want a
+                        copy. Backups are kept for up to 14 days.
+                    </p>
+
+                    <Form
+                        {...AccountController.destroy.form()}
+                        onBefore={() =>
+                            confirm(
+                                'Delete your account and everything in it? This cannot be undone.',
+                            )
+                        }
+                        className="grid gap-3"
+                    >
+                        {({ processing, errors }) => (
+                            <>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="confirmation">
+                                        {user.has_password
+                                            ? 'Your password'
+                                            : 'Type your email address'}
+                                    </Label>
+                                    <Input
+                                        id="confirmation"
+                                        name="confirmation"
+                                        type={
+                                            user.has_password
+                                                ? 'password'
+                                                : 'email'
+                                        }
+                                        autoComplete="off"
+                                        required
+                                    />
+                                    <InputError message={errors.confirmation} />
+                                </div>
+
+                                <Button
+                                    type="submit"
+                                    variant="destructive"
+                                    className="w-fit"
+                                    disabled={processing}
+                                >
+                                    {processing && <Spinner />}
+                                    Delete my account
+                                </Button>
+                            </>
+                        )}
+                    </Form>
                 </section>
             </SettingsFrame>
         </>

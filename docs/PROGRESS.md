@@ -116,7 +116,8 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [x] Plans and `Support\Limits`: caps on stashes, storage, summaries per month and searches per minute, a usage page, `STASHLIST_PLAN=unlimited` for self-hosters
 - [x] Tag merge (`TagMerge`: the user's choice wins, visible wins over dismissed; a select on the tags page)
 - [x] Export: a zip with `stashlist.json` and the files, built in the background, a week to download, an hourly cleanup (`Settings > Export`)
-- [ ] Account deletion, tenant tokens, privacy page, self-host `docker-compose.yml` and README
+- [x] Account deletion (`Settings > Profile`): locked at once (web and API), `DeleteAccount` removes the search documents, the files, the rows in chunks and the user, checks the index is empty, and is tried for three days; a browser flow and a test against the real index
+- [ ] Tenant tokens, privacy page, self-host `docker-compose.yml` and README
 
 ### M5.5 and M5.6. Marketing site and hero [11]
 
@@ -180,3 +181,4 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - 2026-10-12: registration is closed unless `STASHLIST_REGISTRATION` says otherwise, but an empty installation always lets its first account in. `.env.example`, `phpunit.xml` and the DDEV `.env` say `open`.
 - 2026-10-12: merging a tag deletes the old one. A later automatic run that proposes the old name makes it again, because there is no alias table; the matcher only catches plurals and near spellings. If that bothers you, an alias is a small column on `tags`.
 - 2026-10-12: the export builds the zip with PHP's `ZipArchive` instead of `zipstream-php` (no new dependency). The JSON is written to disk stash by stash, so memory stays flat, but the zip reads its sources when it is closed, so the files are copied to a temporary folder first and the export needs about twice the size of the files in free disk space while it runs. Thumbnails and previews are not exported (they are made from the originals), and neither are the vectors.
+- 2026-10-12: deleting an account asks for the password, or for the email address when the account has none (it signs in with GitHub or Google). The account is locked by `deleting_at` the moment it is asked for (`BlockClosingAccounts` on the web group and the API), before the job runs; the job is idempotent, deletes stashes with plain queries (no model events, so no queue storm) and fails, to be retried, if the search index still holds documents afterwards. The shadcn `Button` is not a submit button by default; a form needs `type="submit"`.

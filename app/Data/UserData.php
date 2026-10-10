@@ -19,6 +19,7 @@ final readonly class UserData
         public string $email,
         public ?string $email_verified_at,
         public bool $ai_enabled,
+        public bool $has_password,
     ) {}
 
     public static function fromModel(User $user): self
@@ -29,6 +30,7 @@ final readonly class UserData
             email: $user->email,
             email_verified_at: $user->email_verified_at?->toIso8601String(),
             ai_enabled: $user->ai_enabled,
+            has_password: $user->password !== null,
         );
     }
 }

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 // The capture API of the browser extension and other clients (plan 6.3). Bearer tokens only; every route
 // asks for an ability the token was made with, and every limit is per token.
 Route::prefix('v1')
-    ->middleware('auth:sanctum')
+    ->middleware(['auth:sanctum', 'not.closing'])
     ->group(function () {
         Route::get('me', MeController::class)->middleware('throttle:api-lookup')->name('api.me');
 

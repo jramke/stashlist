@@ -11,6 +11,8 @@ use App\Models\Stash;
 use App\Models\User;
 use App\Pipeline\PipelineJob;
 use App\Search\MakeSearchableUniquely;
+use App\Search\MeilisearchUserIndex;
+use App\Search\UserIndex;
 use App\Support\Limits;
 use Carbon\CarbonImmutable;
 use GuzzleHttp\Client;
@@ -38,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(HostResolver::class, DnsHostResolver::class);
         $this->app->bind(ClientInterface::class, Client::class);
+        $this->app->bind(UserIndex::class, MeilisearchUserIndex::class);
         $this->app->singleton(Embedders::class, Embedders::fromConfig(...));
     }
 
