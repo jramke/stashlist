@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 
 use App\Actions\Stashes\CaptureStash;
 use App\Actions\Stashes\UpdateStash;
-use App\Data\StashData;
 use App\Data\StashDetailData;
 use App\Data\TagData;
 use App\Data\ToastData;
@@ -17,8 +16,7 @@ use App\Images\InvalidImage;
 use App\Models\Stash;
 use App\Models\Tag;
 use App\Models\User;
-use App\Search\StashSearch;
-use App\Stashes\FeedQuery;
+use App\Stashes\Feed;
 use App\Stashes\PendingDeletion;
 use App\Storage\StashStorage;
 use Illuminate\Container\Attributes\CurrentUser;
@@ -38,21 +36,16 @@ final class StashController extends Controller
      */
     public function index(
         IndexStashRequest $request,
-        FeedQuery $feed,
-        StashSearch $search,
-        StashStorage $storage,
+        Feed $feed,
         #[CurrentUser]
         User $user,
     ): Response {
         $filters = $request->filters();
 
         return Inertia::render('stashes/index', [
-            'stashes' => Inertia::scroll(
-                static fn () => ($filters->q === null
-                    ? $feed->build($filters)->cursorPaginate(self::PER_PAGE)
-                    : $search->search($user, $filters->q, $filters, self::PER_PAGE))->through(
-                    static fn (Stash $stash): StashData => StashData::fromModel($stash, $storage),
-                ),
+            // A reload of the list (polling) replaces cards by id instead of appending a second copy of each.
+            'stashes' => Inertia::scroll(static fn () => $feed->page($user, $filters, self::PER_PAGE))->matchOn(
+                'data.id',
             ),
             'filters' => $filters,
             'tags' => array_values(
@@ -67,9 +60,10 @@ final class StashController extends Controller
         ]);
     }
 
-    public function show(Stash $stash, StashStorage $storage): Response
+    public function show(Stash $stash, StashStorage $storage, PendingDeletion $deletion): Response
     {
         Gate::authorize('view', $stash);
+        abort_if($deletion->isPending($stash->id), code: 404);
 
         $stash->load(['enrichment', 'thumbnail', 'visibleTags', 'collections', 'files']);
 

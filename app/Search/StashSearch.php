@@ -14,6 +14,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Laravel\Scout\Builder;
 use LogicException;
 use Meilisearch\Endpoints\Indexes;
+use Meilisearch\Exceptions\ExceptionInterface;
 
 /**
  * Text search over one user's stashes, the only caller of the search engine (an arch test keeps it that way).
@@ -29,14 +30,22 @@ final class StashSearch
      * One page of the stashes that match the text, best match first.
      *
      * @return LengthAwarePaginator<int, Stash>
+     *
+     * @throws SearchUnavailable when the engine cannot be reached or is not set up
      */
     public function search(User $user, string $text, FeedFiltersData $filters, int $perPage): LengthAwarePaginator
     {
-        /** @var LengthAwarePaginator<int, Stash> */
-        return $this
-            ->builder($user, $text, $filters)
-            ->query(static fn (EloquentBuilder $stashes): EloquentBuilder => $stashes->with(FeedQuery::EAGER))
-            ->paginate($perPage);
+        try {
+            /** @var LengthAwarePaginator<int, Stash> */
+            return $this
+                ->builder($user, $text, $filters)
+                ->query(static fn (EloquentBuilder $stashes): EloquentBuilder => $stashes->with(FeedQuery::EAGER))
+                ->paginate($perPage);
+        } catch (ExceptionInterface $failure) {
+            report($failure);
+
+            throw SearchUnavailable::because($failure);
+        }
     }
 
     /**

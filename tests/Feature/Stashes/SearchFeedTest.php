@@ -93,3 +93,36 @@ test('only a search is rate limited, 90 a minute per user', function () {
         ->and($limiter($plain)->maxAttempts)
         ->toBeGreaterThan(90_000);
 });
+
+test('a stash in its undo window is not in the search results', function () {
+    $staying = Stash::factory()->for($this->user)->create(['title' => 'Stays']);
+    $going = Stash::factory()->for($this->user)->create(['title' => 'Going']);
+    $this->engine->hits = [$going->id, $staying->id];
+
+    $this->actingAs($this->user)->delete("/stashes/{$going->id}");
+
+    expect(search_titles($this->actingAs($this->user)->get('/stashes?q=bread')))->toBe(['Stays']);
+});
+
+test('when the search engine fails the feed answers with a message instead of an error page', function () {
+    Illuminate\Support\Facades\Exceptions::fake();
+    $this->engine->failure = new Meilisearch\Exceptions\CommunicationException('connection refused');
+    Stash::factory()->for($this->user)->create();
+
+    $this
+        ->actingAs($this->user)
+        ->get('/stashes?q=bread')
+        ->assertOk()
+        ->assertInertia(
+            fn (AssertableInertia $page) => $page
+                ->component('stashes/index')
+                ->has('stashes.data', 0)
+                ->hasFlash('toast', [
+                    'type' => 'error',
+                    'message' => 'Search is not available right now. Try again in a moment.',
+                    'undo_url' => null,
+                ]),
+        );
+
+    Illuminate\Support\Facades\Exceptions::assertReported(Meilisearch\Exceptions\CommunicationException::class);
+});

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Laravel\Scout\Builder;
 use Laravel\Scout\EngineManager;
 use Laravel\Scout\Engines\NullEngine;
+use Throwable;
 
 /**
  * A search engine for tests: it keeps the documents it is given, remembers every search and answers with the
@@ -26,6 +27,9 @@ final class FakeSearchEngine extends NullEngine
 
     /** @var list<int> what every search answers with, best match first */
     public array $hits = [];
+
+    /** When set, every search fails with this. */
+    public ?Throwable $failure = null;
 
     /**
      * Makes this the engine of the app; call it before the models that should be indexed are created.
@@ -62,6 +66,10 @@ final class FakeSearchEngine extends NullEngine
     {
         $this->searches[] = $builder;
 
+        if ($this->failure !== null) {
+            throw $this->failure;
+        }
+
         return ['hits' => $this->hitsOf($this->hits), 'totalHits' => count($this->hits)];
     }
 
@@ -69,6 +77,10 @@ final class FakeSearchEngine extends NullEngine
     public function paginate(Builder $builder, $perPage, $page)
     {
         $this->searches[] = $builder;
+
+        if ($this->failure !== null) {
+            throw $this->failure;
+        }
 
         return [
             'hits' => $this->hitsOf(array_slice($this->hits, ($page - 1) * $perPage, $perPage)),

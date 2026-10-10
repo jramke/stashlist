@@ -49,6 +49,26 @@ test('deleting starts an undo window and the stash is still there', function () 
         ->toBeTrue();
 });
 
+test('a stash in its undo window is gone from the feed and its page, and comes back with the undo', function () {
+    $other = Stash::factory()->for($this->user)->create(['title' => 'Stays']);
+    $titles = fn () => array_column(
+        $this->actingAs($this->user)->get('/stashes')->viewData('page')['props']['stashes']['data'],
+        'id',
+    );
+
+    expect($titles())->toEqualCanonicalizing([$this->stash->id, $other->id]);
+
+    $this->actingAs($this->user)->delete("/stashes/{$this->stash->id}");
+
+    expect($titles())->toBe([$other->id]);
+    $this->actingAs($this->user)->get("/stashes/{$this->stash->id}")->assertNotFound();
+
+    $this->actingAs($this->user)->delete("/stashes/{$this->stash->id}/deletion");
+
+    expect($titles())->toEqualCanonicalizing([$this->stash->id, $other->id]);
+    $this->actingAs($this->user)->get("/stashes/{$this->stash->id}")->assertOk();
+});
+
 test('after the window the stash is deleted for real and its files are purged', function () {
     $this->actingAs($this->user)->delete("/stashes/{$this->stash->id}");
 

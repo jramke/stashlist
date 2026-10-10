@@ -41,6 +41,8 @@ export function SearchBox({ filters }: { filters: App.Data.FeedFiltersData }) {
             {},
             {
                 only: ['stashes', 'filters'],
+                // The list is a merge prop (infinite scroll appends pages); a new query starts it over.
+                reset: ['stashes'],
                 preserveState: true,
                 preserveScroll: true,
                 replace: true,

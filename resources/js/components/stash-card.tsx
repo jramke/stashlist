@@ -68,6 +68,7 @@ export function StashCard({ stash }: { stash: App.Data.StashData }) {
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Icon
                         className="size-3.5 shrink-0"
+                        role="img"
                         aria-label={stash.type}
                     />
                     <span className="truncate">{stash.domain}</span>

@@ -6,6 +6,7 @@ namespace App\Stashes;
 
 use App\Jobs\FinishStashDeletion;
 use App\Models\Stash;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -32,6 +33,20 @@ final class PendingDeletion
     public function isPending(int $stashId): bool
     {
         return Cache::has($this->key($stashId));
+    }
+
+    /**
+     * The stashes without those whose deletion is waiting out its undo window: to the user they are gone
+     * already. One cache round trip for the whole list.
+     *
+     * @param  Collection<int, Stash>  $stashes
+     * @return Collection<int, Stash>
+     */
+    public function without(Collection $stashes): Collection
+    {
+        $marks = Cache::many($stashes->map(fn (Stash $stash): string => $this->key($stash->id))->all());
+
+        return $stashes->reject(fn (Stash $stash): bool => $marks[$this->key($stash->id)] !== null)->values();
     }
 
     public function forget(int $stashId): void
