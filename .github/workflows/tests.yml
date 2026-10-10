@@ -77,3 +77,91 @@ jobs:
 
             - name: Run Checks
               run: composer test
+
+            - name: Check the JavaScript budget of the feed
+              run: npm run check:bundle
+
+    e2e:
+        runs-on: ubuntu-latest
+
+        services:
+            mariadb:
+                image: mariadb:11.8
+                env:
+                    MARIADB_ROOT_PASSWORD: root
+                    MARIADB_DATABASE: stashlist_e2e
+                ports:
+                    - 3306:3306
+                options: >-
+                    --health-cmd="healthcheck.sh --connect --innodb_initialized"
+                    --health-interval=5s
+                    --health-timeout=5s
+                    --health-retries=10
+
+            meilisearch:
+                image: getmeili/meilisearch:v1.54
+                env:
+                    MEILI_ENV: development
+                    MEILI_MASTER_KEY: ci-meilisearch-master-key
+                    MEILI_NO_ANALYTICS: 'true'
+                ports:
+                    - 7700:7700
+                options: >-
+                    --health-cmd="curl -fs http://localhost:7700/health"
+                    --health-interval=5s
+                    --health-timeout=5s
+                    --health-retries=10
+
+        # A real server, a real database and a real search engine; the queue runs inside the request, so a
+        # saved stash is indexed before the page answers.
+        env:
+            APP_ENV: local
+            APP_URL: http://127.0.0.1:8000
+            E2E_BASE_URL: http://127.0.0.1:8000
+            E2E_QUEUE: sync
+            DB_HOST: 127.0.0.1
+            DB_PORT: 3306
+            DB_DATABASE: stashlist_e2e
+            DB_USERNAME: root
+            DB_PASSWORD: root
+            QUEUE_CONNECTION: sync
+            SESSION_DRIVER: file
+            CACHE_STORE: file
+            MEILISEARCH_HOST: http://127.0.0.1:7700
+            MEILISEARCH_KEY: ci-meilisearch-master-key
+            INERTIA_SSR_ENABLED: 'false'
+            PULSE_ENABLED: 'false'
+            PHP_CLI_SERVER_WORKERS: 4
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+              with:
+                  php-version: '8.4'
+                  tools: composer:v2
+                  extensions: imagick, intl, redis
+                  coverage: none
+
+            - name: Setup Node
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: '22'
+
+            - name: Setup Application
+              run: composer setup
+
+            - name: Install the browser
+              run: npx playwright install --with-deps chromium
+
+            - name: Start the application
+              run: |
+                  php artisan serve --host=127.0.0.1 --port=8000 > serve.log 2>&1 &
+                  curl --retry 20 --retry-delay 1 --retry-connrefused --silent --output /dev/null http://127.0.0.1:8000/login
+
+            - name: Run the browser flows
+              run: npm run e2e

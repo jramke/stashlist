@@ -14,7 +14,7 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 M0 is done in code (`composer test` green on MariaDB, user A cannot read user B's rows). Left for M0: the `LICENSE` file and the buckets, both waiting on you (see above).
 
-M1 in progress. Search works end to end: `GET /stashes?q=...&mode=keyword|hybrid` (hybrid is keyword until M3), checked against a real Meilisearch, with a plain search box in the feed (not yet seen in a browser: no Playwright yet). Sign-in with GitHub and Google works in code (tests fake the providers; it needs OAuth apps from you to try for real). Horizon and Pulse sit behind the admin gate and `stashlist:import-old` is written. Left in M1: the Playwright flows with the bundle-size check and your Coolify/Hetzner spikes.
+M1 in progress. Search works end to end: `GET /stashes?q=...&mode=keyword|hybrid` (hybrid is keyword until M3), checked against a real Meilisearch, with a plain search box in the feed (not yet seen in a browser: no Playwright yet). Sign-in with GitHub and Google works in code (tests fake the providers; it needs OAuth apps from you to try for real). Horizon and Pulse sit behind the admin gate, `stashlist:import-old` is written, and seven browser flows (Playwright) run green against DDEV; the feed's JavaScript is 147.7 of 150 KiB. Left in M1: the keyboard layer (yours) and the Coolify/Hetzner spikes (yours).
 
 ## Blocked on you
 
@@ -65,7 +65,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [x] Horizon dashboard and Pulse behind the admin gate (`User::isAdmin()`: verified email on `STASHLIST_ADMINS`; no Gravatar in Pulse) [7.5]
 - [x] `stashlist:import-old {dump.sql} --user=ID [--old-user=ID] [--dry-run]`: reads the `save` table of the old SQL dump through in-memory SQLite, maps website/text/image/color, idempotent, then runs each new link and image through the normal pipeline (`app/Import`) [M1 list]
 - [x] `DeleteStash` (real delete in a transaction, tag counters recounted) and `PurgeStashFiles` (queued after commit, 5 tries); the Meilisearch side follows with `Searchable` [4.9]
-- [ ] Playwright keyboard flows and the bundle-size check in CI [10.6]
+- [x] Bundle-size check in CI (`npm run check:bundle`, feed route 147.7 of 150 KiB) and Playwright browser flows (`e2e/`: sign up and out, capture, search, edit and tag, delete with undo, collections, a failing link) locally and as CI job `e2e`; the keyboard flows join them when the keyboard layer exists [10.6]
 - [ ] You: Coolify resources, backups, restore drill; spikes for Hetzner S3 and the all-in-one container [7.1, M1 spikes]
 
 ### M1.5. Browser extension v1 [6.3, 6.5]
@@ -119,6 +119,8 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 
 ## Decisions and deviations
 
+- 2026-10-10: the first browser run found three bugs the PHP tests could not: a deleted stash stayed in the feed during its undo window (now hidden in the feed, in search results and on its own page), a search or a polling reload appended a second copy of every card (the list is a merge prop: the search box now resets it and the list matches cards by id), and a search returned a 500 when the index settings were never synced (`scout:sync-index-settings` is part of `composer setup` now, and a failing engine shows a toast and an empty list instead of an error page).
+- 2026-10-10: the budget "150 KB gzipped" is counted as 150 x 1024 bytes. Counted in thousands the feed is at 151.3 KB, 1.3 KB over; in KiB it is 147.7 with 2.3 KiB to spare. The next component in the feed route will need an offsetting cut or a decision to raise the budget.
 - 2026-10-10: `stashlist:import-old` fetches nothing itself. The plan had it download `image_url` and `favicon_url`; instead every imported link and image goes through `ExtractContent`, which fetches the page again, so thumbnails and text are fresh. What the old app scraped (title, description, favicon) stays until then and for pages that no longer exist. A dead page leaves the stash as a bare link with `ai_error = fetch_gone`, as planned.
 - 2026-10-10: the importer takes `--old-user`, which the plan did not have. The old database could hold several users and all of their saves would otherwise land in one account; with one user in the dump nothing needs to be passed. Groups are skipped as planned (the old app's `save_group_mm` and `group` tables are not read); mapping them to collections is a small step if you want it.
 - 2026-10-10: in the old app a color's value is in the `title` column (`text` is empty) and an image's source is `image_url` (`url` is empty); the mapper follows what the old code wrote, not the column names. Imported stashes keep `created_at`; `updated_at` is the import time because the pipeline saves them again.

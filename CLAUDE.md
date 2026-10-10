@@ -27,10 +27,14 @@ ddev npm run check        # prettier --check + tsc --noEmit
 ddev artisan typescript:transform   # regenerate the PHP -> TypeScript types
 ddev artisan scout:sync-index-settings   # push the index settings of config/scout.php to Meilisearch (run on every deploy)
 ddev artisan scout:import 'App\Models\Stash'   # index every stash again from the database
+ddev npm run build && ddev npm run check:bundle   # the JavaScript of a first visit to the feed must stay under 150 KiB gzipped (CI runs it too)
+npm run e2e               # browser flows (Playwright) against the DDEV site, run on the HOST so it can use the Chrome installed there; see below
 ddev artisan stashlist:import-old dump.sql --user=ID [--old-user=ID] [--dry-run]   # one-time import of the old app's saves (app/Import)
 ```
 
 To run Artisan against the test database use `ddev exec 'DB_DATABASE=stashlist_test php artisan ...'`. `--env=testing` does **not** switch databases: `migrate:fresh --env=testing` wiped the dev database once. Never run `migrate:fresh`, `db:wipe` or `migrate:rollback` without pinning `DB_DATABASE` first.
+
+**Browser flows** (`e2e/`, Playwright) are the one thing that runs on the host: they drive the Chrome installed on the Mac (`channel: 'chrome'`, no browser download) against https://stashlist.ddev.site and call `ddev exec` to drain the queue (`E2E_QUEUE=sync` skips that, which CI sets). They need the production build (`ddev npm run build`), sign up their own people (`e2e-*@example.test`) and remove them again in the teardown. CI runs the same flows against `php artisan serve` with a synchronous queue (job `e2e`). Fix a failing flow by fixing the app: three real bugs (delete not hiding the card, duplicated cards after a search, a 500 without index settings) came out of the first run.
 
 A `PostToolUse` hook (`.claude/hooks/format.sh`) formats every file you write or edit (PHP via mago, everything else via Prettier, Blade skipped) and regenerates the TypeScript types when `app/Data` or `app/Enums` changed. Do not run the formatters by hand after edits.
 

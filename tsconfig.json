@@ -115,7 +115,9 @@
     "include": [
         "resources/js/**/*.ts",
         "resources/js/**/*.d.ts",
-        "resources/js/**/*.tsx"
+        "resources/js/**/*.tsx",
+        "e2e/**/*.ts",
+        "playwright.config.ts"
     ],
     "exclude": ["resources/js/actions"]
 }

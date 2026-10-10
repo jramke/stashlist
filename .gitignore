@@ -20,3 +20,5 @@
 .phpunit.result.cache
 npm-debug.log
 /auth.json
+/test-results
+/playwright-report
