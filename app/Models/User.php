@@ -39,6 +39,18 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
+     * The defaults of the database, so a user that was just made has them in memory too (strict models throw on
+     * an attribute that was never loaded).
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'locale' => 'en',
+        'ai_enabled' => true,
+        'plan' => 'free',
+    ];
+
+    /**
      * Whether this account may open Horizon and Pulse: its email is on the STASHLIST_ADMINS list and verified.
      * Registering with a password proves nothing about the address, so an unverified one never counts (an
      * admin signs in with GitHub or Google, whose emails are verified).

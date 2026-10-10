@@ -26,6 +26,7 @@ test('authenticated users share only the fields declared in UserData', function 
             'name' => $user->name,
             'email' => $user->email,
             'email_verified_at' => $user->email_verified_at?->toIso8601String(),
+            'ai_enabled' => true,
         ]));
 });
 

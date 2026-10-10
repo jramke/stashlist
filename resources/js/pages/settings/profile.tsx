@@ -1,12 +1,14 @@
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
+import SmartFeaturesController from '@/actions/App/Http/Controllers/Settings/SmartFeaturesController';
 import InputError from '@/components/input-error';
 import { SettingsFrame } from '@/components/settings-frame';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { useAuthUser } from '@/hooks/use-auth-user';
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, router } from '@inertiajs/react';
 
 export default function Profile() {
     const user = useAuthUser();
@@ -63,6 +65,32 @@ export default function Profile() {
                         </>
                     )}
                 </Form>
+
+                <section className="grid gap-3 border-t pt-6">
+                    <h2 className="text-sm font-medium">Smart features</h2>
+
+                    <div className="flex items-start gap-2">
+                        <Checkbox
+                            id="ai-enabled"
+                            checked={user.ai_enabled}
+                            onCheckedChange={(checked) =>
+                                router.patch(
+                                    SmartFeaturesController.update.url(),
+                                    { ai_enabled: checked },
+                                    { preserveScroll: true },
+                                )
+                            }
+                        />
+                        <Label htmlFor="ai-enabled" className="grid gap-1">
+                            Use AI to tag and summarize what I save
+                            <span className="text-xs font-normal text-muted-foreground">
+                                Turn it off and nothing you save is sent to an
+                                AI provider. Tags and summaries made before
+                                stay.
+                            </span>
+                        </Label>
+                    </div>
+                </section>
             </SettingsFrame>
         </>
     );
