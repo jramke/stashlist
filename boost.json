@@ -1,0 +1,22 @@
+{
+    "cloud": true,
+    "guidelines": true,
+    "mcp": true,
+    "nightwatch": false,
+    "sail": false,
+    "skills": [
+        "infer-conventions",
+        "deploying-to-cloud",
+        "ai-sdk-development",
+        "fortify-development",
+        "laravel-best-practices",
+        "testing-best-practices",
+        "configuring-horizon",
+        "pulse-development",
+        "scout-development",
+        "socialite-development",
+        "wayfinder-development",
+        "inertia-react-development",
+        "tailwindcss-development"
+    ]
+}
