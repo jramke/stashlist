@@ -15,7 +15,8 @@ return [
      */
 
     'ssr' => [
-        'enabled' => true,
+        // Off for installations that do not run the SSR server (the compose file): pages then render in the browser.
+        'enabled' => (bool)env('INERTIA_SSR_ENABLED', true),
         'url' => 'http://127.0.0.1:13714',
         // 'bundle' => base_path('bootstrap/ssr/ssr.mjs'),
     ],

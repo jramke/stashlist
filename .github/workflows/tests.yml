@@ -203,3 +203,22 @@ jobs:
 
             - name: Check the permissions in the manifests
               run: npm run check:manifest
+
+    image:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
+
+            # The image that self-hosters run: it has to build, and compose has to accept its own file.
+            - name: Build the image
+              run: docker build --tag stashlist:ci .
+
+            - name: Check the compose file
+              run: |
+                  cp .env.docker.example .env
+                  printf 'DB_PASSWORD=x\nDB_ROOT_PASSWORD=x\nMEILISEARCH_MASTER_KEY=x\nAPP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\n' >> .env
+                  docker compose config --quiet

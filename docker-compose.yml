@@ -1,0 +1,140 @@
+# Stashlist for people who host it themselves: the app, its queue worker and scheduler, MariaDB, Redis and
+# Meilisearch. See README.md for the five-minute start.
+#
+#   cp .env.docker.example .env      # then fill in the secrets it lists
+#   docker compose up -d --build
+#
+# Everything lives in named volumes. Nothing but the app is reachable from outside.
+
+x-app: &app
+    build: .
+    image: stashlist:latest
+    restart: unless-stopped
+    env_file: .env
+    environment: &app-environment
+        APP_ENV: production
+        DB_CONNECTION: mariadb
+        DB_HOST: mariadb
+        DB_PORT: 3306
+        DB_DATABASE: stashlist
+        DB_USERNAME: stashlist
+        DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+        REDIS_CLIENT: phpredis
+        REDIS_HOST: redis
+        CACHE_STORE: redis
+        SESSION_DRIVER: redis
+        QUEUE_CONNECTION: redis
+        SCOUT_DRIVER: meilisearch
+        MEILISEARCH_HOST: http://meilisearch:7700
+        MEILISEARCH_KEY: ${MEILISEARCH_MASTER_KEY:?Set MEILISEARCH_MASTER_KEY in .env}
+        FILESYSTEM_DISK: local
+        INERTIA_SSR_ENABLED: 'false'
+    volumes:
+        - files:/app/storage/app/private
+    depends_on:
+        mariadb:
+            condition: service_healthy
+        redis:
+            condition: service_healthy
+        meilisearch:
+            condition: service_healthy
+
+services:
+    app:
+        <<: *app
+        ports:
+            - '${APP_PORT:-8080}:80'
+        environment:
+            <<: *app-environment
+            RUN_MIGRATIONS: 'true'
+        healthcheck:
+            test:
+                [
+                    'CMD-SHELL',
+                    'curl -fsS http://127.0.0.1/up >/dev/null || exit 1',
+                ]
+            interval: 30s
+            timeout: 5s
+            retries: 5
+            start_period: 30s
+
+    # Runs the queue: reading pages, summaries, search documents, exports. Horizon needs the app to have migrated.
+    horizon:
+        <<: *app
+        command: ['php', 'artisan', 'horizon']
+        stop_grace_period: 180s
+        depends_on:
+            app:
+                condition: service_healthy
+
+    # Runs the schedule: sweeping stuck work, retries, cleaning up.
+    scheduler:
+        <<: *app
+        command: ['php', 'artisan', 'schedule:work']
+        depends_on:
+            app:
+                condition: service_healthy
+
+    mariadb:
+        image: mariadb:11.8
+        restart: unless-stopped
+        environment:
+            MARIADB_DATABASE: stashlist
+            MARIADB_USER: stashlist
+            MARIADB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+            MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Set DB_ROOT_PASSWORD in .env}
+        volumes:
+            - mariadb:/var/lib/mysql
+        healthcheck:
+            test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+            interval: 10s
+            timeout: 5s
+            retries: 10
+
+    # noeviction: the queue lives here, and evicting a key would delete a job.
+    redis:
+        image: redis:7-alpine
+        restart: unless-stopped
+        command:
+            [
+                'redis-server',
+                '--appendonly',
+                'yes',
+                '--maxmemory',
+                '512mb',
+                '--maxmemory-policy',
+                'noeviction',
+            ]
+        volumes:
+            - redis:/data
+        healthcheck:
+            test: ['CMD', 'redis-cli', 'ping']
+            interval: 10s
+            timeout: 5s
+            retries: 10
+
+    meilisearch:
+        image: getmeili/meilisearch:v1.54
+        restart: unless-stopped
+        environment:
+            MEILI_ENV: production
+            MEILI_MASTER_KEY: ${MEILISEARCH_MASTER_KEY:?Set MEILISEARCH_MASTER_KEY in .env}
+            MEILI_NO_ANALYTICS: 'true'
+            MEILI_MAX_INDEXING_MEMORY: 1Gb
+        volumes:
+            - meilisearch:/meili_data
+        healthcheck:
+            test:
+                [
+                    'CMD-SHELL',
+                    'wget -qO- http://127.0.0.1:7700/health | grep -q available',
+                ]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+
+volumes:
+    files:
+    mariadb:
+    redis:
+    meilisearch:
