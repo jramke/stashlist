@@ -14,7 +14,7 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 M0 is done in code (`composer test` green on MariaDB, user A cannot read user B's rows). Left for M0: the `LICENSE` file and the buckets, both waiting on you (see above).
 
-M1 in progress. Next: the web layer: routes, controllers, form requests, Inertia DTOs and the feed page; Scout search joins after that.
+M1 in progress. Next: the web write path (store, update, destroy, reprocess, stash tags), then collections and tags controllers, then the React pages; Scout search joins after that.
 
 ## Blocked on you
 
@@ -52,7 +52,10 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [x] `StashStorage` (paths, writes, purge, signed URLs) [5.4]
 - [x] `ImageProcessor` (WebP thumb 640 and preview 1280 without metadata, five dominant colors, limits) [5.4]
 - [x] `TagSync` (user side: add, remove, dismissed tombstones, counter cache) and `TagNormalizer`; `applyAi` joins in M2 [1.4]
-- [ ] Inertia pages: feed (masonry, keyset pagination), capture box, detail drawer, collections, tags [6.2]
+- [x] Web read path: `GET /stashes` (feed: cursor pagination of 60, filters type, tags, collection, status) and `GET /stashes/{stash}` with typed DTOs (`StashData`, `StashDetailData`, ...), the ownership policy, `/` redirecting signed-in users, collections in the shared props. The React pages are placeholders for now [6.2]
+- [ ] Web write path: store, update, destroy, reprocess, tags (form requests, rate limits, isolation matrix) [6.2, 10.1]
+- [ ] Collections and tags controllers [6.2]
+- [ ] React pages and layout: app layout, feed grid, capture box, detail view, collections, tags [6.2]
 - [ ] Keyboard and speed contract: command menu, grid navigation, quick-add, undo delete, shortcut sheet [11.2]
 - [ ] Scout keyword search through `StashSearch`, as-you-type contract, `scout:sync-index-settings` [2.2, 2.5]
 - [ ] Socialite login for GitHub and Google with the linking rules [6.4]
@@ -124,4 +127,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - 2026-10-10: HEIC and the 12 named color buckets for the Meilisearch `colors` filter are left to M4; `ImageProcessor` accepts JPEG, PNG, GIF, WebP and AVIF and returns hex colors with their share. Animated GIFs get static derivatives of the first frame.
 - 2026-10-10: while AI does not exist, the pipeline's `ai_status` stays at what `StartPipeline` sets (`skipped`); `ExtractContent` only writes `failed` with `ai_stage = extract` and an `ai_error` code. The `pending`/`processing`/`done` states and `stash_runs` arrive with M2.
 - 2026-10-10: JSON-LD (price, author, date) and the YouTube/X resolvers are not in `ExtractContent` v0; they belong to the later "rich links" work (M6) and the product polish.
+- 2026-10-10: tests render pages without the Vite manifest (`withoutVite()` in `Tests\TestCase`), so they do not depend on the last build.
+- 2026-10-10: `mago.toml` allows 16 constructor parameters (it was 10) because the data classes in `app/Data` carry a whole card.
+- 2026-10-10: the keyboard layer of 11.2 (command menu, grid navigation, shortcuts) is the part the plan leaves to you; the pages get plain mouse-driven versions first.
 - 2026-10-10: this file is tracked on purpose so the progress can be followed in git. Delete it whenever you do not need it.

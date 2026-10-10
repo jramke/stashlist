@@ -9,6 +9,16 @@ use Laravel\Fortify\Features;
 
 abstract class TestCase extends BaseTestCase
 {
+    /**
+     * Pages are rendered without the Vite manifest, so tests do not depend on the state of the last build.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutVite();
+    }
+
     protected function skipUnlessFortifyHas(string $feature, ?string $message = null): void
     {
         if (! Features::enabled($feature)) {

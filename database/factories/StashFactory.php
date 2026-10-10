@@ -36,7 +36,7 @@ class StashFactory extends Factory
 
     public function note(): static
     {
-        return $this->state(static fn (array $attributes): array => [
+        return $this->state([
             'type' => StashType::Note,
             'url' => null,
             'url_hash' => null,
@@ -47,6 +47,6 @@ class StashFactory extends Factory
 
     public function private(): static
     {
-        return $this->state(static fn (array $attributes): array => ['is_private' => true]);
+        return $this->state(['is_private' => true]);
     }
 }

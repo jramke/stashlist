@@ -18,7 +18,8 @@ excludes = ["config", "database/migrations"]
 no-shorthand-ternary = { enabled = false }
 readable-literal = { enabled = false }
 tagged-todo = { enabled = false }
-excessive-parameter-list = { constructor-threshold = 10 }
+# Data classes (app/Data) carry a card's worth of fields in their constructor.
+excessive-parameter-list = { constructor-threshold = 16 }
 no-literal-password = { exclude = ["tests"] }
 
 [analyzer]

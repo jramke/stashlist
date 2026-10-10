@@ -44,6 +44,10 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property CarbonImmutable|null $updated_at
  * @property StashEnrichment|null $enrichment
  * @property StashFile|null $thumbnail
+ * @property \Illuminate\Database\Eloquent\Collection<int, StashFile> $files
+ * @property \Illuminate\Database\Eloquent\Collection<int, Tag> $tags
+ * @property \Illuminate\Database\Eloquent\Collection<int, Tag> $visibleTags
+ * @property \Illuminate\Database\Eloquent\Collection<int, Collection> $collections
  */
 #[Fillable(['type', 'subtype', 'title', 'body', 'url', 'url_hash', 'domain', 'meta', 'is_private', 'content_hash'])]
 #[Hidden(['url_hash'])]

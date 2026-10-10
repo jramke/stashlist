@@ -179,7 +179,7 @@ test('tags and collections are applied, and only the owner collections', functio
         ->toBeTrue()
         ->and($stash->tags()->orderBy('name')->pluck('name')->all())
         ->toBe(['Design', 'inspiration'])
-        ->and(Tag::where('slug', 'design')->firstOrFail()->stashes_count)
+        ->and(Tag::query()->where('slug', 'design')->firstOrFail()->stashes_count)
         ->toBe(1)
         ->and($stash->collections()->pluck('collections.id')->all())
         ->toBe([$mine->id]);
