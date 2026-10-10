@@ -23,7 +23,7 @@ M1.6 is done in code: persistent highlights on the server and the stash page, an
 Nothing blocks the code. These need your accounts or your OK, and are tracked here so they are not forgotten:
 
 - [ ] Hetzner Object Storage: buckets `stashlist-media` (NBG1) and `stashlist-backups` (FSN1 or HEL1), plus an access key [7.6]. Until then dev and tests use the local disk and `Storage::fake`.
-- [ ] OpenAI project with Europe data residency and its API key [7.6]. Needed from M2; tests use fakes.
+- [ ] OpenAI project with Europe data residency and its API key [7.6]. Put it in `.env` as `OPENAI_API_KEY` (and `OPENAI_URL` for the regional endpoint): until then the AI stage is skipped everywhere. Then run `ddev artisan stashlist:bakeoff --user=ID` on your imported library and pick the model for `STASHLIST_LLM`; tests use fakes.
 - [ ] `LICENSE` file with the AGPL-3.0 text [M0]. The official text is not in the repo or `vendor/`, and I did not want to download it without asking. Say "ok, fetch it from gnu.org" (about 34 KB) or drop the file in yourself.
 - [ ] GitHub and Google OAuth credentials for local dev: a second GitHub OAuth app and an extra Google redirect URI [6.4]. Needed to try the login live; tests fake Socialite.
 - [ ] Business status, Polar account, store developer accounts, Coolify resources [12.3, M8, 7.1].
@@ -93,7 +93,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [x] Pipeline: `StartPipeline`, `PipelineJob`, `GenerateEnrichment`, `stash_runs`, `UsageRecorder`, rate limiters, circuit breaker, `SweepStuckStashes`, `RetryFailedStashes`, nightly prune
 - [x] `ai_enabled` end to end (the only switch; no per-stash flag): `AiGuard` stops every AI call when the user has it off (or the instance, `STASHLIST_AI=false`)
 - [x] UI: tag chips with source (outlined = automatic), dismiss, a "Tagging" badge on cards and a status line with a retry button on the detail page, the summary on both, `usePoll` on the feed and the detail page
-- [ ] `stashlist:bakeoff` (needs the OpenAI key)
+- [x] `stashlist:bakeoff` written and tested with fakes; running it needs the OpenAI key (yours: `ddev artisan stashlist:bakeoff --user=ID`, then pick the default in `STASHLIST_LLM`)
 
 ### M3. Embeddings and hybrid search [2, 9]
 
