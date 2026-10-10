@@ -17,6 +17,7 @@ use App\Images\InvalidImage;
 use App\Models\Stash;
 use App\Models\Tag;
 use App\Models\User;
+use App\Search\StashSearch;
 use App\Stashes\FeedQuery;
 use App\Stashes\PendingDeletion;
 use App\Storage\StashStorage;
@@ -33,18 +34,25 @@ final class StashController extends Controller
     private const PER_PAGE = 60;
 
     /**
-     * The feed: the user's stashes, newest first, with keyset pagination (infinite scroll on the client).
+     * The feed: the user's stashes, newest first, with keyset pagination (infinite scroll on the client). With a text query it lists the matches of the search engine, best first.
      */
-    public function index(IndexStashRequest $request, FeedQuery $feed, StashStorage $storage): Response
-    {
+    public function index(
+        IndexStashRequest $request,
+        FeedQuery $feed,
+        StashSearch $search,
+        StashStorage $storage,
+        #[CurrentUser]
+        User $user,
+    ): Response {
         $filters = $request->filters();
 
         return Inertia::render('stashes/index', [
             'stashes' => Inertia::scroll(
-                static fn () => $feed
-                    ->build($filters)
-                    ->cursorPaginate(self::PER_PAGE)
-                    ->through(static fn (Stash $stash): StashData => StashData::fromModel($stash, $storage)),
+                static fn () => ($filters->q === null
+                    ? $feed->build($filters)->cursorPaginate(self::PER_PAGE)
+                    : $search->search($user, $filters->q, $filters, self::PER_PAGE))->through(
+                    static fn (Stash $stash): StashData => StashData::fromModel($stash, $storage),
+                ),
             ),
             'filters' => $filters,
             'tags' => array_values(

@@ -23,18 +23,24 @@ final class IndexStashRequest extends FormRequest
             'tag' => ['nullable', 'array', 'max:10'],
             'tag.*' => ['integer', 'min:1'],
             'collection' => ['nullable', 'string', 'regex:/^(none|\d+)$/'],
+            'q' => ['nullable', 'string', 'max:200'],
+            // The as-you-type pair: "keyword" answers fast, "hybrid" follows once the user paused. Until
+            // embeddings exist both are a keyword search.
+            'mode' => ['nullable', Rule::in(['keyword', 'hybrid'])],
         ];
     }
 
     public function filters(): FeedFiltersData
     {
         $collection = $this->string('collection')->toString();
+        $text = trim($this->string('q')->toString());
 
         return new FeedFiltersData(
             type: StashType::tryFrom($this->string('type')->toString()),
             tags: array_values(array_map(intval(...), $this->array('tag'))),
             collection: $collection === '' ? null : $collection,
             status: AiStatus::tryFrom($this->string('status')->toString()),
+            q: $text === '' ? null : $text,
         );
     }
 }

@@ -27,6 +27,20 @@ jobs:
                     --health-timeout=5s
                     --health-retries=10
 
+            meilisearch:
+                image: getmeili/meilisearch:v1.54
+                env:
+                    MEILI_ENV: development
+                    MEILI_MASTER_KEY: ci-meilisearch-master-key
+                    MEILI_NO_ANALYTICS: 'true'
+                ports:
+                    - 7700:7700
+                options: >-
+                    --health-cmd="curl -fs http://localhost:7700/health"
+                    --health-interval=5s
+                    --health-timeout=5s
+                    --health-retries=10
+
         # Process variables win over .env, so `composer setup` and the tests both use the service.
         env:
             DB_HOST: 127.0.0.1
@@ -34,6 +48,10 @@ jobs:
             DB_DATABASE: stashlist_test
             DB_USERNAME: root
             DB_PASSWORD: root
+            MEILISEARCH_HOST: http://127.0.0.1:7700
+            MEILISEARCH_KEY: ci-meilisearch-master-key
+            # The search tests skip without a server; in CI a missing server has to fail the run.
+            MEILISEARCH_REQUIRED: '1'
 
         steps:
             - name: Checkout code

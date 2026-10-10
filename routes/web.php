@@ -18,7 +18,8 @@ Route::get('/', HomeController::class)->name('home');
 
 Route::middleware('auth')->group(function () {
     Route::post('stashes', [StashController::class, 'store'])->middleware('throttle:capture')->name('stashes.store');
-    Route::resource('stashes', StashController::class)->only(['index', 'show', 'update', 'destroy']);
+    Route::get('stashes', [StashController::class, 'index'])->middleware('throttle:search')->name('stashes.index');
+    Route::resource('stashes', StashController::class)->only(['show', 'update', 'destroy']);
 
     Route::delete('stashes/{stash}/deletion', [StashDeletionController::class, 'destroy'])->name(
         'stashes.deletion.destroy',

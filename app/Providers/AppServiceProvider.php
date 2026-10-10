@@ -53,6 +53,10 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('capture', static fn (Request $request): Limit => Limit::perMinute(60)->by($perUser(
             $request,
         )));
+        // Only a search is limited, the plain feed is not. Typing sends a request per pause.
+        RateLimiter::for('search', static fn (Request $request): Limit => $request->filled('q')
+            ? Limit::perMinute(90)->by($perUser($request))
+            : Limit::none());
         RateLimiter::for('reprocess', static fn (Request $request): Limit => Limit::perMinute(10)->by($perUser(
             $request,
         )));

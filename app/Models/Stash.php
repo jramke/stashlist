@@ -52,6 +52,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  *
  * @method void searchable() queues an index write, Scout's Searchable trait
  * @method \Laravel\Scout\Engines\Engine searchableUsing()
+ * @method static \Laravel\Scout\Builder<Stash> search(string $query = '', \Closure|null $callback = null)
  */
 #[Fillable(['type', 'subtype', 'title', 'body', 'url', 'url_hash', 'domain', 'meta', 'is_private', 'content_hash'])]
 #[Hidden(['url_hash'])]
