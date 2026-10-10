@@ -132,6 +132,8 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 ### M5.7. Installable app and share sheet
 
 - [x] Web manifest, icons and theme colors so the app installs on desktop and phones; the share target (`/share`) fills the capture box from the phone's share sheet (Chrome on Android; iOS has none). No service worker on purpose
+- [x] iPhone share sheet: iOS has no share targets, so the token page explains the Shortcut (five steps), and `scripts/build-ios-shortcut.py` builds the same one as a file that asks for the address and the token when added. Signing needs a Mac signed in to iCloud, which this one is not: the file is unsigned (`storage/app/stashlist-unsigned.shortcut`, opens in Shortcuts on a Mac only) and its import is untested
+- [ ] Sign the Shortcut (`python3 scripts/build-ios-shortcut.py` on a Mac with iCloud writes `public/stashlist.shortcut`), then link it from the token page; or open the unsigned file on a Mac, copy its iCloud link and use that
 - [ ] Try it on a real phone: install from Chrome, share a link to Stashlist (yours: needs a device and the live domain; icons are made from the placeholder logo)
 
 ### M6 to M8

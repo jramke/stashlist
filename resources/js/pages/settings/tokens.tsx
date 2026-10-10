@@ -14,7 +14,9 @@ type Props = {
 };
 
 export default function Tokens({ tokens }: Props) {
-    const newToken = usePage().flash.new_token;
+    const { flash, props } = usePage();
+    const newToken = flash.new_token;
+    const url = props.url;
 
     return (
         <>
@@ -108,6 +110,51 @@ export default function Tokens({ tokens }: Props) {
                         ))}
                     </ul>
                 )}
+
+                <section className="grid gap-2 border-t pt-6">
+                    <h2 className="text-sm font-medium">
+                        Save from the iPhone share sheet
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                        Safari on iOS cannot install a share target, so make a
+                        Shortcut that sends the link here. Make a token for it
+                        first.
+                    </p>
+                    <ol className="grid list-decimal gap-1.5 pl-5 text-sm text-muted-foreground">
+                        <li>
+                            In Shortcuts, make a new shortcut and call it
+                            Stashlist. In its settings turn on Show in Share
+                            Sheet, and let it receive URLs.
+                        </li>
+                        <li>
+                            Add Get Contents of URL. Set the URL to{' '}
+                            <code className="rounded bg-muted px-1">
+                                {url}/api/v1/stashes
+                            </code>{' '}
+                            and the method to POST.
+                        </li>
+                        <li>
+                            Add the headers Authorization with the value{' '}
+                            <code className="rounded bg-muted px-1">
+                                Bearer your-token
+                            </code>{' '}
+                            and Accept with{' '}
+                            <code className="rounded bg-muted px-1">
+                                application/json
+                            </code>
+                            .
+                        </li>
+                        <li>
+                            Set the request body to JSON and add a Text field
+                            named{' '}
+                            <code className="rounded bg-muted px-1">url</code>{' '}
+                            with Shortcut Input as its value.
+                        </li>
+                        <li>
+                            Add Show Notification, so you see that it worked.
+                        </li>
+                    </ol>
+                </section>
             </SettingsFrame>
         </>
     );
