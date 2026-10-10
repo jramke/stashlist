@@ -294,3 +294,48 @@ test('cancelling at the provider, a stale callback and a rejected code end at th
 
     $this->assertGuest();
 });
+
+test('a new person cannot sign up through a provider while registration is closed', function () {
+    config(['stashlist.registration' => 'closed']);
+    User::factory()->create();
+    provider_answers(SocialProvider::GitHub, social_user(77, 'new@example.com'));
+
+    $response = callback(SocialProvider::GitHub);
+
+    login_toast($response, 'Registration is closed.');
+    expect(User::query()->where('email', 'new@example.com')->exists())->toBeFalse();
+});
+
+test('a person who already has an account still signs in when registration is closed', function () {
+    config(['stashlist.registration' => 'closed']);
+    $user = User::factory()->create(['email' => 'ada@example.com']);
+    provider_answers(SocialProvider::GitHub, social_user(77, 'ada@example.com'));
+
+    callback(SocialProvider::GitHub);
+
+    $this->assertAuthenticatedAs($user);
+});
+
+test('an invitation from the registration page is used by a sign-up through a provider', function () {
+    config(['stashlist.registration' => 'invite']);
+    User::factory()->create();
+    $invitation = app(App\Auth\Invitations::class)->create();
+
+    $this->get(route('register', ['invite' => $invitation->code]));
+    provider_answers(SocialProvider::GitHub, social_user(77, 'new@example.com'));
+    callback(SocialProvider::GitHub);
+
+    $new = User::query()->where('email', 'new@example.com')->firstOrFail();
+
+    $this->assertAuthenticatedAs($new);
+    expect($invitation->fresh()->used_by)->toBe($new->id);
+});
+
+test('without an invitation a sign-up through a provider is refused in invite mode', function () {
+    config(['stashlist.registration' => 'invite']);
+    User::factory()->create();
+    provider_answers(SocialProvider::GitHub, social_user(77, 'new@example.com'));
+
+    login_toast(callback(SocialProvider::GitHub), 'You need an invitation to register.');
+    $this->assertGuest();
+});

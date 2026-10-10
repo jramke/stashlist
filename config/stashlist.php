@@ -21,6 +21,20 @@ return [
 
     /*
      |--------------------------------------------------------------------------
+     | Registration
+     |--------------------------------------------------------------------------
+     |
+     | Who may create an account: "open" (anyone), "invite" (a code from
+     | `stashlist:invite`) or "closed" (nobody new; the first account of an empty
+     | installation is always allowed). Closed unless told otherwise, so a
+     | forgotten setting never opens a server to the world.
+     |
+     */
+
+    'registration' => (string)env('STASHLIST_REGISTRATION', 'closed'),
+
+    /*
+     |--------------------------------------------------------------------------
      | API
      |--------------------------------------------------------------------------
      |

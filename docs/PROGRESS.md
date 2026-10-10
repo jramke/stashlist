@@ -16,7 +16,9 @@ M0 and M1 are done in code and green: `composer test` (490+ tests, mago clean, r
 
 M1.5 is done in code: the capture API (tokens, `/api/v1`, the `capture` block, idempotency) and the browser extension in `extension/`, with four flows in a real Chrome. What is left is yours: privacy page, screenshots, the Chrome public key and the Defuddle spike (see the checklist).
 
-M1.6 is done in code: persistent highlights on the server and the stash page, and in the extension (`Alt+Shift+H` or the menu, painting with the CSS Custom Highlight API, a local copy kept in step by sync, an opt-in "Show my highlights on pages"), with five more flows in a real Chrome. What is left is yours: try the anchoring on real pages (see the checklist). **Next: M2, auto-tagging.**
+M1.6 is done in code: persistent highlights on the server and the stash page, and in the extension (`Alt+Shift+H` or the menu, painting with the CSS Custom Highlight API, a local copy kept in step by sync, an opt-in "Show my highlights on pages"), with five more flows in a real Chrome. What is left is yours: try the anchoring on real pages (see the checklist).
+
+M2 (auto-tagging), M3 (embeddings and hybrid search) and M4 (pictures) are done in code, with fakes and against a real Meilisearch. They need your OpenAI key to do anything for real: until `OPENAI_API_KEY` is in `.env` the AI stages are skipped everywhere. Yours after that: the model bake-off, the search eval set and the 1M spike (see the checklists). **Next: M5, launch readiness.**
 
 ## Blocked on you
 

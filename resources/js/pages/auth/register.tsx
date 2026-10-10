@@ -13,9 +13,31 @@ import { Form, Head } from '@inertiajs/react';
 type Props = {
     passwordRules: string;
     providers: App.Enums.SocialProvider[];
+    registration: App.Enums.RegistrationMode;
+    invite: string | null;
 };
 
-export default function Register({ passwordRules, providers }: Props) {
+export default function Register({
+    passwordRules,
+    providers,
+    registration,
+    invite,
+}: Props) {
+    if (registration === 'closed') {
+        return (
+            <>
+                <Head title="Register" />
+                <p className="text-center text-sm text-muted-foreground">
+                    Registration is closed.
+                </p>
+                <div className="text-center text-sm text-muted-foreground">
+                    Already have an account?{' '}
+                    <TextLink href={login()}>Log in</TextLink>
+                </div>
+            </>
+        );
+    }
+
     return (
         <>
             <Head title="Register" />
@@ -32,6 +54,14 @@ export default function Register({ passwordRules, providers }: Props) {
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-6">
+                                {registration === 'invite' && (
+                                    <input
+                                        type="hidden"
+                                        name="invite"
+                                        value={invite ?? ''}
+                                    />
+                                )}
+
                                 <div className="grid gap-2">
                                     <Label htmlFor="name">Name</Label>
                                     <Input

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
+use App\Auth\Registration;
+use App\Enums\RegistrationMode;
 use App\Enums\SocialProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -49,10 +51,19 @@ class FortifyServiceProvider extends ServiceProvider
             'providers' => SocialProvider::configured(),
         ]));
 
-        Fortify::registerView(static fn () => Inertia::render('auth/register', [
-            'passwordRules' => Password::defaults()->toPasswordRulesString(),
-            'providers' => SocialProvider::configured(),
-        ]));
+        Fortify::registerView(static function (Request $request) {
+            // Fortify calls a view with the request only, so the service is asked for here.
+            $registration = resolve(Registration::class);
+
+            $registration->remember($request->query('invite') === null ? null : $request->string('invite')->toString());
+
+            return Inertia::render('auth/register', [
+                'passwordRules' => Password::defaults()->toPasswordRulesString(),
+                'providers' => SocialProvider::configured(),
+                'registration' => $registration->isAccepting() ? $registration->mode() : RegistrationMode::Closed,
+                'invite' => $registration->remembered(),
+            ]);
+        });
     }
 
     /**

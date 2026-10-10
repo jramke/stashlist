@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\Concerns\BelongsToUser;
+use App\Models\Invitation;
 use App\Models\OAuthAccount;
 use App\Models\UsageMonthly;
 use App\Models\User;
@@ -54,7 +55,14 @@ arch('every model with an owner uses the ownership scope')
     ->expect('App\Models')
     ->classes()
     ->toUseTrait(BelongsToUser::class)
-    ->ignoring([User::class, OAuthAccount::class, UsageMonthly::class, 'App\Models\Concerns', 'App\Models\Scopes']);
+    ->ignoring([
+        User::class,
+        OAuthAccount::class,
+        UsageMonthly::class,
+        Invitation::class,
+        'App\Models\Concerns',
+        'App\Models\Scopes',
+    ]);
 
 test('tenant tables are only reached through Eloquent, not the query builder', function () {
     $tables = 'stashes|stash_[a-z_]+|tags|collections|collection_stash|exports|usage_monthly';

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Auth;
 
+use App\Auth\RegistrationRefused;
 use App\Enums\SocialProvider;
 use Illuminate\Support\Facades\Lang;
 use RuntimeException;
@@ -22,6 +23,14 @@ final class SocialLoginRefused extends RuntimeException
         return new self(Lang::string('We need a verified email address from :provider to sign you in.', [
             'provider' => $provider->label(),
         ]));
+    }
+
+    /**
+     * A new person while registration is closed or by invitation only.
+     */
+    public static function registrationRefused(RegistrationRefused $refused): self
+    {
+        return new self($refused->getMessage());
     }
 
     public static function closing(): self

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions\Auth;
 
+use App\Auth\Registration;
+use App\Auth\RegistrationRefused;
 use App\Enums\SocialProvider;
 use App\Models\OAuthAccount;
 use App\Models\User;
@@ -25,6 +27,10 @@ use Laravel\Socialite\Contracts\User as SocialUser;
  */
 final class ResolveSocialUser
 {
+    public function __construct(
+        private readonly Registration $registration,
+    ) {}
+
     /**
      * @throws SocialLoginRefused
      */
@@ -62,7 +68,7 @@ final class ResolveSocialUser
         try {
             /** @var User */
             return DB::transaction(function () use ($provider, $social, $email): User {
-                $user = User::query()->where('email', $email)->first() ?? $this->create($social, $email);
+                $user = User::query()->where('email', $email)->first() ?? $this->register($social, $email);
 
                 $user->oauthAccounts()->create([
                     'provider' => $provider->value,
@@ -76,6 +82,21 @@ final class ResolveSocialUser
         } catch (UniqueConstraintViolationException) {
             // The same person finished two sign-ins at once; the second one finds the account the first made.
             throw SocialLoginRefused::tryAgain($provider);
+        }
+    }
+
+    /**
+     * A person new to the site: registration has to allow it, with the invitation they came with.
+     */
+    private function register(SocialUser $social, string $email): User
+    {
+        try {
+            return $this->registration->register($email, code: null, create: fn (): User => $this->create(
+                $social,
+                $email,
+            ));
+        } catch (RegistrationRefused $refused) {
+            throw SocialLoginRefused::registrationRefused($refused);
         }
     }
 
