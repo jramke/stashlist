@@ -25,8 +25,8 @@ trait StashSearchable
     public const SEARCH_RELATIONS = ['enrichment', 'visibleTags', 'collections'];
 
     /**
-     * Private stashes are indexed too; the search is always limited to the owner. Build the document from a
-     * stash with SEARCH_RELATIONS loaded.
+     * Every stash is indexed; the search is always limited to the owner. Build the document from a stash with
+     * SEARCH_RELATIONS loaded.
      *
      * @return array<string, mixed>
      */
@@ -40,7 +40,6 @@ trait StashSearchable
             'user_id' => $this->user_id,
             'type' => $this->type->value,
             'subtype' => $this->subtype,
-            'is_private' => $this->is_private,
             'title' => $this->title ?? $enrichment->title ?? $this->domain,
             'url' => $this->url,
             'domain' => $this->domain,
@@ -98,7 +97,7 @@ trait StashSearchable
         return (
             $this->wasRecentlyCreated &&
             $this->getChanges() === [] ||
-            $this->wasChanged(['type', 'subtype', 'title', 'body', 'url', 'domain', 'is_private'])
+            $this->wasChanged(['type', 'subtype', 'title', 'body', 'url', 'domain'])
         );
     }
 }

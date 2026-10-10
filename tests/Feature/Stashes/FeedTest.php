@@ -84,7 +84,6 @@ test('a card carries what the grid needs', function () {
                 ->where('stashes.data.0.description', 'Scraped description')
                 ->where('stashes.data.0.url', 'https://example.com/post')
                 ->where('stashes.data.0.domain', 'example.com')
-                ->where('stashes.data.0.is_private', false)
                 ->where('stashes.data.0.ai_status', 'pending')
                 ->where('stashes.data.0.fetching', false)
                 ->where('stashes.data.0.colors', [['hex' => '#ff0000', 'pct' => 0.6]])

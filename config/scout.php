@@ -100,7 +100,6 @@ return [
                     'collection_ids',
                     'domain',
                     'colors',
-                    'is_private',
                     'language',
                     'created_at',
                 ],

@@ -23,15 +23,13 @@ function patch_stash(Stash $stash, array $data): Illuminate\Testing\TestResponse
         ->patch("/stashes/{$stash->id}", $data);
 }
 
-test('title and privacy can be changed without restarting the pipeline', function () {
+test('a title can be changed without restarting the pipeline', function () {
     $stash = Stash::factory()->for($this->user)->create(['title' => 'Old']);
     $before = $stash->content_hash;
 
-    patch_stash($stash, ['title' => 'New', 'is_private' => true])->assertOk();
+    patch_stash($stash, ['title' => 'New'])->assertOk();
 
-    $fresh = $stash->fresh();
-
-    expect($fresh->title)->toBe('New')->and($fresh->is_private)->toBeTrue();
+    expect($stash->fresh()->title)->toBe('New');
 
     Queue::assertNotPushed(ExtractContent::class);
 });
@@ -47,9 +45,9 @@ test('an empty title clears the override', function () {
 test('only what was sent changes', function () {
     $stash = Stash::factory()->for($this->user)->create(['title' => 'Keep', 'body' => 'comment']);
 
-    patch_stash($stash, ['is_private' => true])->assertOk();
+    patch_stash($stash, ['body' => 'a new comment'])->assertOk();
 
-    expect($stash->fresh()->title)->toBe('Keep')->and($stash->fresh()->body)->toBe('comment');
+    expect($stash->fresh()->title)->toBe('Keep')->and($stash->fresh()->body)->toBe('a new comment');
 });
 
 test('a changed body restarts the pipeline, an unchanged one does not', function () {
@@ -84,7 +82,6 @@ test('validation protects the fields', function (array $data, string $field, str
         ->assertSessionHasErrors($field);
 })->with([
     'title too long' => [['title' => str_repeat('a', times: 501)], 'title', 'note'],
-    'privacy is not a flag' => [['is_private' => 'maybe'], 'is_private', 'note'],
     'a color needs a color' => [['body' => 'not a color'], 'body', 'color'],
     'a note needs text' => [['body' => ''], 'body', 'note'],
 ]);

@@ -56,9 +56,4 @@ class StashFactory extends Factory
             'body' => fake()->paragraph(),
         ]);
     }
-
-    public function private(): static
-    {
-        return $this->state(['is_private' => true]);
-    }
 }

@@ -89,21 +89,18 @@ test('an image can be dropped on the capture box', function () {
     Queue::assertPushed(ExtractContent::class);
 });
 
-test('tags, privacy and my collections are applied', function () {
+test('tags and my collections are applied', function () {
     $collection = Collection::factory()->for($this->user)->create();
 
     post_stash([
         'input' => 'https://example.com/post',
-        'private' => true,
         'tags' => ['Design', 'inspiration'],
         'collection_ids' => [$collection->id],
     ])->assertOk();
 
     $stash = Stash::query()->firstOrFail();
 
-    expect($stash->is_private)
-        ->toBeTrue()
-        ->and($stash->tags()->orderBy('name')->pluck('name')->all())
+    expect($stash->tags()->orderBy('name')->pluck('name')->all())
         ->toBe(['Design', 'inspiration'])
         ->and($stash->collections()->pluck('collections.id')->all())
         ->toBe([$collection->id]);

@@ -86,13 +86,12 @@ test('notes and colors are their text, even when a note looks like a link', func
     Queue::assertNotPushed(ExtractContent::class);
 });
 
-test('title, privacy, tags and my own collections are applied', function () {
+test('title, tags and my own collections are applied', function () {
     $mine = Collection::factory()->for($this->user)->create();
 
     save([
         'url' => 'https://example.com/a',
         'title' => 'My title',
-        'private' => true,
         'tags' => ['one', 'Two', '   '],
         'collection_ids' => [$mine->id],
     ])->assertCreated();
@@ -101,8 +100,6 @@ test('title, privacy, tags and my own collections are applied', function () {
 
     expect($stash->title)
         ->toBe('My title')
-        ->and($stash->is_private)
-        ->toBeTrue()
         ->and($stash->visibleTags->pluck('name')->sort()->values()->all())
         ->toBe(['Two', 'one'])
         ->and($stash->collections->pluck('id')->all())

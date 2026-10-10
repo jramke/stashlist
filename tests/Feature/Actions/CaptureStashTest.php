@@ -48,8 +48,6 @@ test('a link is saved with its dedupe hash and domain and extraction starts', fu
         ->toBe('example.com')
         ->and($stash->user_id)
         ->toBe($this->user->id)
-        ->and($stash->is_private)
-        ->toBeFalse()
         ->and($stash->ai_status)
         ->toBe(AiStatus::Skipped)
         ->and($stash->content_hash)
@@ -173,14 +171,11 @@ test('tags and collections are applied, and only the owner collections', functio
 
     $stash = $this->capture->capture($this->user, new CapturePayload(
         input: 'https://example.com/post',
-        private: true,
         tags: ['Design', '#inspiration', 'design'],
         collectionIds: [$mine->id, $foreign->id, 99999],
     ))->stash;
 
-    expect($stash->is_private)
-        ->toBeTrue()
-        ->and($stash->tags()->orderBy('name')->pluck('name')->all())
+    expect($stash->tags()->orderBy('name')->pluck('name')->all())
         ->toBe(['Design', 'inspiration'])
         ->and(Tag::query()->where('slug', 'design')->firstOrFail()->stashes_count)
         ->toBe(1)

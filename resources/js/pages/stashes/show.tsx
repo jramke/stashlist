@@ -4,7 +4,6 @@ import { CollectionPicker } from '@/components/collection-picker';
 import InputError from '@/components/input-error';
 import { TagEditor } from '@/components/tag-editor';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
@@ -143,23 +142,6 @@ export default function Show({ detail }: Props) {
                 <Separator />
 
                 <section className="flex flex-wrap items-center gap-4">
-                    <div className="flex items-center gap-2">
-                        <Checkbox
-                            id="private"
-                            checked={stash.is_private}
-                            onCheckedChange={(checked) =>
-                                router.patch(
-                                    StashController.update.url(stash.id),
-                                    { is_private: checked },
-                                    { preserveScroll: true },
-                                )
-                            }
-                        />
-                        <Label htmlFor="private">
-                            Private: no smart features for this stash
-                        </Label>
-                    </div>
-
                     {stash.ai_status === 'failed' && (
                         <Button
                             variant="outline"

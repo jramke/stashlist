@@ -20,7 +20,6 @@ final class UpdateStashRequest extends FormRequest
         return [
             'title' => ['sometimes', 'nullable', 'string', 'max:500'],
             'body' => ['sometimes', 'nullable', 'string', 'max:100000'],
-            'is_private' => ['sometimes', 'boolean'],
         ];
     }
 
@@ -63,6 +62,6 @@ final class UpdateStashRequest extends FormRequest
         /** @var array<string, mixed> $validated */
         $validated = $this->validated();
 
-        return array_intersect_key($validated, array_flip(['title', 'body', 'is_private']));
+        return array_intersect_key($validated, array_flip(['title', 'body']));
     }
 }

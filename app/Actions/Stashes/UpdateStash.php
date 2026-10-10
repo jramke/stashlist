@@ -10,9 +10,8 @@ use App\Pipeline\ContentHash;
 use App\Pipeline\StartPipeline;
 
 /**
- * Applies the user's edits to a stash: title, body and the privacy flag. When something the pipeline reads
- * changed (the hash of type, URL, body and file), the pipeline starts again; a new title or privacy flag
- * alone does not need that.
+ * Applies the user's edits to a stash: title and body. When something the pipeline reads changed (the hash of
+ * type, URL, body and file), the pipeline starts again; a new title alone does not need that.
  */
 final readonly class UpdateStash
 {
@@ -21,7 +20,7 @@ final readonly class UpdateStash
     ) {}
 
     /**
-     * @param  array<string, mixed>  $changes  any of title, body, is_private
+     * @param  array<string, mixed>  $changes  any of title, body
      */
     public function update(Stash $stash, array $changes): void
     {

@@ -92,7 +92,6 @@ final readonly class CaptureStash
             'url' => $draft->url,
             'url_hash' => $draft->urlHash,
             'domain' => $draft->domain,
-            'is_private' => $payload->private,
             'content_hash' => ContentHash::of(
                 $draft->type,
                 $draft->url,

@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * What the machine learned about a stash. Stage 1 (extraction) is local and also filled for private stashes;
- * stage 2 (the LLM columns) stays empty for them.
+ * What the machine learned about a stash. Stage 1 (extraction) is local and always runs; stage 2 (the LLM
+ * columns) stays empty for users who turned smart features off (users.ai_enabled).
  *
  * @property int $stash_id
  * @property int $user_id

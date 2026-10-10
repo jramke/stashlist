@@ -1,8 +1,6 @@
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 import { store } from '@/routes/stashes';
@@ -82,20 +80,6 @@ export function CaptureBox() {
                             {processing && <Spinner />}
                             Stash
                         </Button>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <Checkbox
-                            id="capture-private"
-                            name="private"
-                            value="1"
-                        />
-                        <Label
-                            htmlFor="capture-private"
-                            className="text-xs text-muted-foreground"
-                        >
-                            Private: no smart features for this stash
-                        </Label>
                     </div>
 
                     <InputError message={errors.input ?? errors.image} />

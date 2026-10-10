@@ -21,7 +21,6 @@ test('the search document holds the text, the tags and the collections of a stas
         'domain' => 'bakeclub.example',
         'subtype' => 'article',
         'body' => 'my own comment',
-        'is_private' => true,
     ]);
     StashEnrichment::query()->create([
         'stash_id' => $stash->id,
@@ -42,7 +41,6 @@ test('the search document holds the text, the tags and the collections of a stas
             'user_id' => $this->user->id,
             'type' => 'link',
             'subtype' => 'article',
-            'is_private' => true,
             'title' => 'Sourdough starters',
             'url' => 'https://bakeclub.example/starter',
             'domain' => 'bakeclub.example',

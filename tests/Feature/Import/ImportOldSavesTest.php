@@ -53,7 +53,6 @@ test('a link keeps its title, description, favicon and date', function () {
         ->title->toBe('An article')
         ->url->toBe('https://www.Example.com/post?utm_source=newsletter')
         ->domain->toBe('example.com')
-        ->is_private->toBeFalse()
         ->ai_status->toBe(AiStatus::Skipped)
         ->user_id->toBe($this->user->id)->and($link->meta)->toBe([
             'import_id' => 'w1',

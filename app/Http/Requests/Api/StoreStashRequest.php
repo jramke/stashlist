@@ -32,7 +32,6 @@ final class StoreStashRequest extends FormRequest
             'url' => ['nullable', 'string', 'max:2048', 'url:http,https'],
             'title' => ['nullable', 'string', 'max:500'],
             'body' => ['nullable', 'string', 'max:100000'],
-            'private' => ['nullable', 'boolean'],
             'tags' => ['nullable', 'array', 'max:50'],
             'tags.*' => ['nullable', 'string', 'max:100'],
             'collection_ids' => ['nullable', 'array', 'max:50'],
@@ -112,7 +111,6 @@ final class StoreStashRequest extends FormRequest
             input: $type === 'note' || $type === 'color' ? $body ?? $url : $url ?? $body,
             image: $image instanceof UploadedFile ? $image : null,
             title: CleanText::nullable($this->nullableString('title')),
-            private: $this->boolean('private'),
             tags: array_values(array_filter(
                 array_map(
                     static fn (mixed $tag): string => CleanText::of((string)$tag),

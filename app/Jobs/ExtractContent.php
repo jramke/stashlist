@@ -21,7 +21,7 @@ use Throwable;
 
 /**
  * Pipeline stage 1: look at what a stash points to (fetch the page or image, make thumbnails, read the text)
- * and record it in the stash's enrichment. Local work only, so it also runs for private stashes.
+ * and record it in the stash's enrichment. Local work only, so it runs whatever the user's smart-feature setting.
  *
  * The job carries ids, never content. A failure that cannot be fixed by waiting marks the stash as failed
  * (it stays saved and findable as a bare link); a timeout or a server error is tried again a few times.

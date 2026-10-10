@@ -33,7 +33,6 @@ final readonly class StashData
         public ?string $url,
         public ?string $domain,
         public ?string $body,
-        public bool $is_private,
         public AiStatus $ai_status,
         public ?string $ai_error,
         public ?ThumbnailData $thumbnail,
@@ -61,7 +60,6 @@ final readonly class StashData
             body: $stash->body === null
                 ? null
                 : Str::limit($stash->body, self::BODY_PREVIEW_LENGTH, preserveWords: true),
-            is_private: $stash->is_private,
             ai_status: $stash->ai_status,
             ai_error: $stash->ai_error,
             thumbnail: $thumb === null ? null : new ThumbnailData($storage->url($thumb), $thumb->width, $thumb->height),

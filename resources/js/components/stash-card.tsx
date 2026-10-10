@@ -6,7 +6,6 @@ import {
     Image as ImageIcon,
     Link2,
     Loader2,
-    Lock,
     Palette,
     StickyNote,
     TriangleAlert,
@@ -87,9 +86,6 @@ export function StashCard({ stash }: { stash: App.Data.StashData }) {
                                 <TriangleAlert className="size-3.5" />
                                 Failed
                             </span>
-                        )}
-                        {stash.is_private && (
-                            <Lock className="size-3.5" aria-label="Private" />
                         )}
                     </span>
                 </div>

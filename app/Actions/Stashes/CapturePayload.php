@@ -22,7 +22,6 @@ final readonly class CapturePayload
         public ?string $input = null,
         public ?UploadedFile $image = null,
         public ?string $title = null,
-        public bool $private = false,
         public array $tags = [],
         public array $collectionIds = [],
         public ?CapturedPage $capture = null,

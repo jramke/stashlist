@@ -26,7 +26,6 @@ final class StoreStashRequest extends FormRequest
                 'mimetypes:image/jpeg,image/png,image/gif,image/webp,image/avif',
             ],
             'title' => ['nullable', 'string', 'max:500'],
-            'private' => ['nullable', 'boolean'],
             'tags' => ['nullable', 'array', 'max:20'],
             'tags.*' => ['string', 'max:100'],
             'collection_ids' => ['nullable', 'array', 'max:20'],
@@ -42,7 +41,6 @@ final class StoreStashRequest extends FormRequest
             input: $this->input('input') === null ? null : $this->string('input')->toString(),
             image: $image instanceof UploadedFile ? $image : null,
             title: $this->input('title') === null ? null : $this->string('title')->toString(),
-            private: $this->boolean('private'),
             tags: array_values(array_map(strval(...), $this->array('tags'))),
             collectionIds: array_values(array_map(intval(...), $this->array('collection_ids'))),
         );

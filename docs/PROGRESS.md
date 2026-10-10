@@ -53,9 +53,9 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [x] `ImageProcessor` (WebP thumb 640 and preview 1280 without metadata, five dominant colors, limits) [5.4]
 - [x] `TagSync` (user side: add, remove, dismissed tombstones, counter cache) and `TagNormalizer`; `applyAi` joins in M2 [1.4]
 - [x] Web read path: `GET /stashes` (feed: cursor pagination of 60, filters type, tags, collection, status) and `GET /stashes/{stash}` with typed DTOs (`StashData`, `StashDetailData`, ...), the ownership policy, `/` redirecting signed-in users, collections in the shared props. The React pages are placeholders for now [6.2]
-- [x] Web write path: `POST /stashes` (capture box, rate limited 60/min), `PATCH` (title, body, privacy; restarts the pipeline only when the content hash changed), `DELETE` with a 10 s undo window (`DELETE /stashes/{stash}/deletion` undoes), `POST .../reprocess` (10/min), stash tags add and remove, form requests, HTTP isolation matrix [6.2, 10.1]
+- [x] Web write path: `POST /stashes` (capture box, rate limited 60/min), `PATCH` (title, body; restarts the pipeline only when the content hash changed), `DELETE` with a 10 s undo window (`DELETE /stashes/{stash}/deletion` undoes), `POST .../reprocess` (10/min), stash tags add and remove, form requests, HTTP isolation matrix [6.2, 10.1]
 - [x] Collections and tags controllers: collection CRUD with stash counts, sidebar order, stashes of a collection (set and order), the per-stash collection picker, tag list, rename (conflicts refused; merge is M5) and delete [6.2]
-- [x] React pages and layout: app frame with sidebar, feed (masonry, infinite scroll, polling while cards are fetched, filter chips), capture box (paste, drop, private), detail view (edit, tags, collections, retry, delete with undo), collections and tags pages. Plain and mouse-driven; polish and the keyboard layer are yours [6.2, 11.2]
+- [x] React pages and layout: app frame with sidebar, feed (masonry, infinite scroll, polling while cards are fetched, filter chips), capture box (paste, drop), detail view (edit, tags, collections, retry, delete with undo), collections and tags pages. Plain and mouse-driven; polish and the keyboard layer are yours [6.2, 11.2]
 - [ ] Keyboard and speed contract: command menu, grid navigation, quick-add, undo delete, shortcut sheet [11.2]
 - [x] `Stash` is `Searchable` (`StashSearchable`): the document comes from the stash, its enrichment, visible tags and collections; a save reindexes only when a searchable column changed; `MakeSearchableUniquely` folds rapid saves of one stash into one queued job [2.2, 2.5]
 - [x] `IndexStash` (queue `index`, last stage of the chain for every type, sets `indexed_at` without touching `updated_at`); tag and collection changes queue a reindex (`Stash::reindex`, `TagSync`, `CollectionSync`) [4.2]
@@ -88,7 +88,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 
 - [ ] `laravel/ai`, `config/stashlist.php`, `StashEnricher`, `EnrichmentResult`, `TagVocabulary`, `TagSync::applyAi`
 - [ ] Pipeline: `StartPipeline`, `PipelineJob`, `GenerateEnrichment`, `stash_runs`, `UsageRecorder`, rate limiters, circuit breaker, sweeper, retry job
-- [ ] Private flag and `ai_enabled` end to end: `PurgeAiData`, `Stash::skipsAi()`, `AiGuard`
+- [ ] `ai_enabled` end to end (the only switch; no per-stash flag): a guard that stops every AI call when the user has it off, a `User` check instead of `Stash::skipsAi()`
 - [ ] UI: tag chips with source, dismiss, status badge, retry, `usePoll`
 - [ ] `stashlist:bakeoff` (needs the OpenAI key)
 
@@ -119,6 +119,8 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [ ] M8 billing with Polar
 
 ## Decisions and deviations
+
+- 2026-10-10: **no per-stash Private flag** (your call). Smart features are one setting of the account, `users.ai_enabled` (default on), changed with a checkbox on `/settings/profile`. `stashes.is_private` is dropped (new migration), and so are the capture box and detail checkboxes, the lock on cards, the `private` field of the web and API requests, `is_private` in the search document, and the extension's Private toggle and default. `PurgeAiData` is not needed: turning the switch off stops new AI work and leaves what exists. When M2 lands, one guard in front of every provider call checks the user's switch.
 
 - 2026-10-10: the first browser run found three bugs the PHP tests could not: a deleted stash stayed in the feed during its undo window (now hidden in the feed, in search results and on its own page), a search or a polling reload appended a second copy of every card (the list is a merge prop: the search box now resets it and the list matches cards by id), and a search returned a 500 when the index settings were never synced (`scout:sync-index-settings` is part of `composer setup` now, and a failing engine shows a toast and an empty list instead of an error page).
 - 2026-10-10: the budget "150 KB gzipped" is counted as 150 x 1024 bytes. Counted in thousands the feed is at 151.3 KB, 1.3 KB over; in KiB it is 147.7 with 2.3 KiB to spare. The next component in the feed route will need an offsetting cut or a decision to raise the budget.

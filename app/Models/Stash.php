@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
- * Something the user saved. The user owns title, body, url and is_private; the pipeline owns subtype,
+ * Something the user saved. The user owns title, body and url; the pipeline owns subtype,
  * meta and the ai_* columns.
  *
  * @property int $id
@@ -34,7 +34,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string|null $url_hash raw sha256 (32 bytes) of the normalized url
  * @property string|null $domain
  * @property array<string, mixed>|null $meta
- * @property bool $is_private
  * @property string|null $content_hash
  * @property AiStatus $ai_status
  * @property AiStage|null $ai_stage
@@ -55,7 +54,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @method static \Laravel\Scout\Builder<Stash> search(string $query = '', \Closure|null $callback = null)
  * @method static mixed withoutSyncingToSearch(\Closure $callback) runs the callback without indexing the saves in it
  */
-#[Fillable(['type', 'subtype', 'title', 'body', 'url', 'url_hash', 'domain', 'meta', 'is_private', 'content_hash'])]
+#[Fillable(['type', 'subtype', 'title', 'body', 'url', 'url_hash', 'domain', 'meta', 'content_hash'])]
 #[Hidden(['url_hash'])]
 final class Stash extends Model
 {
@@ -73,7 +72,6 @@ final class Stash extends Model
             'ai_status' => AiStatus::class,
             'ai_stage' => AiStage::class,
             'meta' => 'array',
-            'is_private' => 'boolean',
             'processed_at' => 'datetime',
             'indexed_at' => 'datetime',
         ];
