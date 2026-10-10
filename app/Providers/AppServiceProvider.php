@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Pulse\Facades\Pulse;
+use Laravel\Sanctum\PersonalAccessToken;
 use Laravel\Scout\Scout;
 
 class AppServiceProvider extends ServiceProvider
@@ -72,6 +73,21 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('search', static fn (Request $request): Limit => $request->filled('q')
             ? Limit::perMinute(90)->by($perUser($request))
             : Limit::none());
+        // The API is limited per token, not per user: one runaway client must not lock the others out.
+        $perToken = static function (Request $request): string {
+            /** @var User|null $user */
+            $user = $request->user();
+            $token = $user?->currentAccessToken();
+
+            return 'token:'.($token instanceof PersonalAccessToken ? (string)$token->getKey() : (string)$request->ip());
+        };
+
+        RateLimiter::for('api-create', static fn (Request $request): Limit => Limit::perMinute(
+            config()->integer('stashlist.api.creates_per_minute'),
+        )->by($perToken($request)));
+        RateLimiter::for('api-lookup', static fn (Request $request): Limit => Limit::perMinute(
+            config()->integer('stashlist.api.lookups_per_minute'),
+        )->by($perToken($request)));
         RateLimiter::for('reprocess', static fn (Request $request): Limit => Limit::perMinute(10)->by($perUser(
             $request,
         )));

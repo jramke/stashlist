@@ -11,6 +11,9 @@ declare module 'react' {
 declare module '@inertiajs/core' {
     export interface InertiaConfig {
         sharedPageProps: App.Data.SharedData;
-        flashDataType: { toast?: App.Data.ToastData };
+        flashDataType: {
+            toast?: App.Data.ToastData;
+            new_token?: App.Data.NewTokenData;
+        };
     }
 }

@@ -13,10 +13,8 @@ void createInertiaApp({
             return null;
         }
 
-        // Sign-in and the account settings are small centered cards; everything else lives in the app frame.
-        return name.startsWith('auth/') || name.startsWith('settings/')
-            ? AuthLayout
-            : AppLayout;
+        // Signing in is a small centered card; everything else lives in the app frame.
+        return name.startsWith('auth/') ? AuthLayout : AppLayout;
     },
     strictMode: true,
     withApp(app) {

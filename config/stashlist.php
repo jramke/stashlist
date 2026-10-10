@@ -21,6 +21,26 @@ return [
 
     /*
      |--------------------------------------------------------------------------
+     | API
+     |--------------------------------------------------------------------------
+     |
+     | Limits of /api/v1, the capture API of the browser extension. Rates are per
+     | token. Sizes cap what a client we do not control may send.
+     |
+     */
+
+    'api' => [
+        'creates_per_minute' => 60,
+        'lookups_per_minute' => 120,
+        'max_json_bytes' => 1_000_000,
+        'max_markdown_bytes' => 200_000,
+        'max_screenshot_kb' => 2048,
+        'max_image_kb' => 20_480,
+        'max_tokens_per_user' => 20,
+    ],
+
+    /*
+     |--------------------------------------------------------------------------
      | Bot
      |--------------------------------------------------------------------------
      |
