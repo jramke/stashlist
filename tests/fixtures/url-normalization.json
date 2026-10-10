@@ -1,16 +1,22 @@
 {
-    "_comment": "Shared by the PHP tests and, from M1.6, the extension tests. input -> expected, null means 'not a valid web URL'. Rules: http/https only, no credentials, scheme and host lowercase, IDN host as punycode, trailing dot and default port removed, fragment removed, tracking parameters (utm_*, fbclid, gclid, mc_*) removed, empty path becomes /, non-ASCII bytes in path and query percent-encoded with uppercase hex.",
+    "_comment": "Shared by the PHP tests and, from M1.6, the extension tests. input -> expected, null means 'not a valid web URL'. Rules: http/https only, no credentials, scheme and host lowercase, IDN host as punycode, trailing dot and default port removed, fragment removed, tracking parameters (utm_*, fbclid, gclid, mc_*) removed, empty path becomes /, non-ASCII bytes in path and query percent-encoded with uppercase hex. Dot segments and the case of percent escapes are left alone on purpose: only what the rules above say changes.",
     "cases": [
         {
             "input": "https://Example.com/Path?x=1#frag",
             "expected": "https://example.com/Path?x=1"
         },
-        { "input": "HTTP://EXAMPLE.COM", "expected": "http://example.com/" },
+        {
+            "input": "HTTP://EXAMPLE.COM",
+            "expected": "http://example.com/"
+        },
         {
             "input": "  https://example.com/a  ",
             "expected": "https://example.com/a"
         },
-        { "input": "//example.com/a", "expected": "https://example.com/a" },
+        {
+            "input": "//example.com/a",
+            "expected": "https://example.com/a"
+        },
         {
             "input": "https://example.com:443/a",
             "expected": "https://example.com/a"
@@ -23,7 +29,10 @@
             "input": "https://example.com:8443/a",
             "expected": "https://example.com:8443/a"
         },
-        { "input": "http://[::1]:8080/x", "expected": "http://[::1]:8080/x" },
+        {
+            "input": "http://[::1]:8080/x",
+            "expected": "http://[::1]:8080/x"
+        },
         {
             "input": "https://example.com./a",
             "expected": "https://example.com/a"
@@ -60,10 +69,117 @@
             "input": "https://example.com/a?b=2&a=1",
             "expected": "https://example.com/a?b=2&a=1"
         },
-        { "input": "https://user:pw@example.com/", "expected": null },
-        { "input": "ftp://example.com/", "expected": null },
-        { "input": "javascript:alert(1)", "expected": null },
-        { "input": "not a url", "expected": null },
-        { "input": "", "expected": null }
+        {
+            "input": "https://user:pw@example.com/",
+            "expected": null
+        },
+        {
+            "input": "ftp://example.com/",
+            "expected": null
+        },
+        {
+            "input": "javascript:alert(1)",
+            "expected": null
+        },
+        {
+            "input": "not a url",
+            "expected": null
+        },
+        {
+            "input": "",
+            "expected": null
+        },
+        {
+            "input": "https://example.com/a b",
+            "expected": "https://example.com/a%20b"
+        },
+        {
+            "input": "HTTPS://Example.COM:8080/x",
+            "expected": "https://example.com:8080/x"
+        },
+        {
+            "input": "https://192.168.0.1/x",
+            "expected": "https://192.168.0.1/x"
+        },
+        {
+            "input": "https://example.com/?#x",
+            "expected": "https://example.com/"
+        },
+        {
+            "input": "https://example.com/a#",
+            "expected": "https://example.com/a"
+        },
+        {
+            "input": "https://example.com/a%2Fb?x=%7e",
+            "expected": "https://example.com/a%2Fb?x=%7e"
+        },
+        {
+            "input": "https://example.com/a/../b",
+            "expected": "https://example.com/a/../b"
+        },
+        {
+            "input": "https://example.com/a/./b//c",
+            "expected": "https://example.com/a/./b//c"
+        },
+        {
+            "input": "https://example.com:/a",
+            "expected": "https://example.com/a"
+        },
+        {
+            "input": "https://example.com:65536/a",
+            "expected": null
+        },
+        {
+            "input": "https://EXAMPLE.com/Ä",
+            "expected": "https://example.com/%C3%84"
+        },
+        {
+            "input": "https://example.com/a?x=1&utm_campaign=2#y",
+            "expected": "https://example.com/a?x=1"
+        },
+        {
+            "input": "https://example.com/a?x=a b",
+            "expected": "https://example.com/a?x=a%20b"
+        },
+        {
+            "input": "http://example.com?x=1",
+            "expected": "http://example.com/?x=1"
+        },
+        {
+            "input": "https://example.com#frag",
+            "expected": "https://example.com/"
+        },
+        {
+            "input": "https://日本語.example/パス",
+            "expected": "https://xn--wgv71a119e.example/%E3%83%91%E3%82%B9"
+        },
+        {
+            "input": "https://example.com/a?next=https://other.example/?utm_source=x",
+            "expected": "https://example.com/a?next=https://other.example/?utm_source=x"
+        },
+        {
+            "input": "https:example.com/a",
+            "expected": null
+        },
+        {
+            "input": "https:///example.com/a",
+            "expected": null
+        },
+        {
+            "input": "HtTpS://Example.com",
+            "expected": "https://example.com/"
+        },
+        {
+            "input": "https://example.com/a?mc_cid=1&MC_eid=2&keep=1",
+            "expected": "https://example.com/a?keep=1"
+        },
+        {
+            "input": "http://[2001:DB8::1]/x",
+            "expected": "http://[2001:db8::1]/x"
+        },
+        {
+            "input": "https://example.com/%e3%81%82",
+            "expected": "https://example.com/%e3%81%82"
+        }
     ]
 }
