@@ -22,6 +22,18 @@ export class NotStashable extends Error {
     }
 }
 
+/** The person asked for a highlight and there is no passage to mark. */
+export class NotHighlightable extends Error {
+    constructor(reason: 'nothing' | 'too-long') {
+        super(
+            reason === 'too-long'
+                ? 'That passage is too long to highlight. Select a shorter one.'
+                : 'Select some text on the page first.',
+        );
+        this.name = 'NotHighlightable';
+    }
+}
+
 /** A client for the instance and token in the settings, or an error that says what is missing. */
 export async function connect(): Promise<{
     client: Client;
@@ -96,7 +108,8 @@ export function explain(error: unknown): string {
     if (
         error instanceof ApiError ||
         error instanceof NotConfigured ||
-        error instanceof NotStashable
+        error instanceof NotStashable ||
+        error instanceof NotHighlightable
     ) {
         return error.message;
     }

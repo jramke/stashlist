@@ -12,7 +12,13 @@ export default defineConfig({
         name: 'Stashlist',
         description: 'Stash the page you are looking at in one gesture.',
         // Nothing is read from a page until you click, press the shortcut or use the menu (activeTab).
-        permissions: ['activeTab', 'scripting', 'contextMenus', 'storage'],
+        permissions: [
+            'activeTab',
+            'alarms',
+            'contextMenus',
+            'scripting',
+            'storage',
+        ],
         // The browser flows (e2e/) build with STASHLIST_E2E=1: the test pages are not on a host the extension is
         // allowed on, and nothing can click the permission prompt.
         host_permissions: e2e ? ['<all_urls>'] : ['https://stashlist.app/*'],
@@ -23,13 +29,17 @@ export default defineConfig({
                 suggested_key: { default: 'Alt+Shift+S' },
                 description: 'Stash the current page without opening the popup',
             },
+            highlight_selection: {
+                suggested_key: { default: 'Alt+Shift+H' },
+                description: 'Highlight the selected text',
+            },
         },
         ...(browser === 'firefox'
             ? {
                   browser_specific_settings: {
                       gecko: {
                           id: 'extension@stashlist.app',
-                          strict_min_version: '128.0',
+                          strict_min_version: '140.0',
                           // What AMO asks of a new extension: what leaves the browser, and only on the person's action.
                           data_collection_permissions: {
                               required: [

@@ -1,8 +1,16 @@
 import { Button, Input, Label, Note } from '@/components/ui';
 import { createClient } from '@/lib/api';
+import {
+    hideOnPages,
+    isShowingOnPages,
+    showOnPages,
+} from '@/lib/highlights/page-access';
+import { clearHighlights } from '@/lib/highlights/store';
+import { syncHighlights } from '@/lib/highlights/sync';
 import { parseTags } from '@/lib/payload';
 import {
     DEFAULT_INSTANCE,
+    ensureInstanceAccess,
     loadSettings,
     NO_DEFAULTS,
     normalizeInstance,
@@ -10,8 +18,7 @@ import {
 } from '@/lib/settings';
 import { explain } from '@/lib/stash-tab';
 import type { Collection, Defaults } from '@/lib/types';
-import { useEffect, useState } from 'react';
-import { browser } from 'wxt/browser';
+import { useEffect, useRef, useState } from 'react';
 
 type Status = { tone: 'muted' | 'error'; text: string } | null;
 
@@ -23,9 +30,15 @@ export function App() {
     const [tagText, setTagText] = useState('');
     const [collections, setCollections] = useState<Collection[]>([]);
     const [status, setStatus] = useState<Status>(null);
+    const [showing, setShowing] = useState(false);
+    const [highlightStatus, setHighlightStatus] = useState<Status>(null);
+    // Who the saved highlights belong to: another address or token means another person's.
+    const saved = useRef('');
 
     useEffect(() => {
+        void isShowingOnPages().then(setShowing);
         void loadSettings().then((settings) => {
+            saved.current = `${settings.instance} ${settings.token}`;
             setInstance(settings.instance);
             setToken(settings.token);
             setDefaults(settings.defaults);
@@ -45,20 +58,16 @@ export function App() {
 
     async function save(): Promise<void> {
         const address = normalizeInstance(instance);
-        const origin = `${new URL(address).origin}/*`;
 
         setStatus({ tone: 'muted', text: 'Saving…' });
 
-        // A self-hosted instance needs the browser's permission, which can only be asked for right after a click.
-        if (!(await browser.permissions.contains({ origins: [origin] }))) {
-            if (!(await browser.permissions.request({ origins: [origin] }))) {
-                setStatus({
-                    tone: 'error',
-                    text: `Without access to ${address} the extension cannot save there.`,
-                });
+        if (!(await ensureInstanceAccess(address))) {
+            setStatus({
+                tone: 'error',
+                text: `Without access to ${address} the extension cannot save there.`,
+            });
 
-                return;
-            }
+            return;
         }
 
         const next = { ...defaults, tags: parseTags(tagText) };
@@ -66,8 +75,16 @@ export function App() {
         setInstance(address);
         setDefaults(next);
 
+        if (saved.current !== `${address} ${token.trim()}`) {
+            await clearHighlights();
+            saved.current = `${address} ${token.trim()}`;
+        }
+
         try {
             const me = await createClient({ instance: address, token }).me();
+            void syncHighlights(
+                createClient({ instance: address, token }),
+            ).catch(() => undefined);
             setStatus({
                 tone: 'muted',
                 text: `Saved. Connected as ${me.name}.`,
@@ -77,6 +94,36 @@ export function App() {
             );
         } catch (error) {
             setStatus({ tone: 'error', text: `Saved, but ${explain(error)}` });
+        }
+    }
+
+    async function toggleShowing(on: boolean): Promise<void> {
+        setHighlightStatus(null);
+
+        if (on) {
+            const granted = await showOnPages();
+
+            setShowing(granted);
+
+            if (!granted) {
+                setHighlightStatus({
+                    tone: 'error',
+                    text: 'Without access to all sites your highlights cannot be shown on pages by themselves. You can still highlight and see them right away from the popup.',
+                });
+            }
+
+            return;
+        }
+
+        await hideOnPages();
+        setShowing(false);
+
+        // Giving back "all sites" may have taken the access to your own Stashlist with it.
+        if (!(await ensureInstanceAccess(normalizeInstance(instance)))) {
+            setHighlightStatus({
+                tone: 'error',
+                text: `The extension no longer has access to ${normalizeInstance(instance)}. Press "Save and test" to allow it again.`,
+            });
         }
     }
 
@@ -186,6 +233,43 @@ export function App() {
                             </label>
                         ))}
                     </fieldset>
+                )}
+            </section>
+
+            <section className="grid gap-3">
+                <h2 className="text-sm font-medium">Highlights</h2>
+
+                <p className="text-sm text-muted-foreground">
+                    Select text and press{' '}
+                    <kbd className="rounded border px-1 text-xs">Alt</kbd>+
+                    <kbd className="rounded border px-1 text-xs">Shift</kbd>+
+                    <kbd className="rounded border px-1 text-xs">H</kbd>, or use
+                    the right-click menu, to mark it and keep it in Stashlist.
+                </p>
+
+                <label className="flex items-start gap-2 text-sm">
+                    <input
+                        type="checkbox"
+                        className="mt-1"
+                        checked={showing}
+                        onChange={(event) =>
+                            void toggleShowing(event.target.checked)
+                        }
+                    />
+                    <span>
+                        Show my highlights on pages
+                        <span className="block text-xs text-muted-foreground">
+                            Needs access to all sites, so they appear when you
+                            open a page again. The addresses you visit stay in
+                            your browser: they are never sent to Stashlist.
+                        </span>
+                    </span>
+                </label>
+
+                {highlightStatus !== null && (
+                    <Note tone={highlightStatus.tone}>
+                        {highlightStatus.text}
+                    </Note>
                 )}
             </section>
 

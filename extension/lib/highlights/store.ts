@@ -1,4 +1,5 @@
 import { storage } from 'wxt/utils/storage';
+import { normalizeUrl, urlHash } from '../normalize-url';
 import type { StoredHighlight } from './types';
 
 /**
@@ -36,6 +37,15 @@ export async function saveMeta(meta: IndexMeta): Promise<void> {
 
 export async function readBucket(hash: string): Promise<StoredHighlight[]> {
     return (await storage.getItem<StoredHighlight[]>(bucketKey(hash))) ?? [];
+}
+
+/** The highlights kept for a page, found by the hash of its normalized address. */
+export async function highlightsOfPage(
+    url: string,
+): Promise<StoredHighlight[]> {
+    const normalized = normalizeUrl(url);
+
+    return normalized === null ? [] : readBucket(await urlHash(normalized));
 }
 
 async function writeBucket(

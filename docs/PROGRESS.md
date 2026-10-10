@@ -14,7 +14,9 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 M0 and M1 are done in code and green: `composer test` (490+ tests, mago clean, real Meilisearch in the search tests), nine browser flows (`npm run e2e`, Playwright against DDEV) and the feed's JavaScript at 143 of 150 KiB. What is left of them is yours: the keyboard layer and the Coolify/Hetzner spikes, plus the `LICENSE` file and the buckets (see below). Sign-in with GitHub and Google is written and tested with fakes; it needs OAuth apps to try for real.
 
-M1.5 is done in code: the capture API (tokens, `/api/v1`, the `capture` block, idempotency) and the browser extension in `extension/`, with four flows in a real Chrome. What is left is yours: privacy page, screenshots, the Chrome public key and the Defuddle spike (see the checklist). **Next: M1.6, persistent highlights** (`stash_highlights`, endpoints, shared URL normalization, then the extension side).
+M1.5 is done in code: the capture API (tokens, `/api/v1`, the `capture` block, idempotency) and the browser extension in `extension/`, with four flows in a real Chrome. What is left is yours: privacy page, screenshots, the Chrome public key and the Defuddle spike (see the checklist).
+
+M1.6 is done in code: persistent highlights on the server and the stash page, and in the extension (`Alt+Shift+H` or the menu, painting with the CSS Custom Highlight API, a local copy kept in step by sync, an opt-in "Show my highlights on pages"), with five more flows in a real Chrome. What is left is yours: try the anchoring on real pages (see the checklist). **Next: M2, auto-tagging.**
 
 ## Blocked on you
 
@@ -80,9 +82,10 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 ### M1.6. Persistent highlights [6.5]
 
 - [x] `stash_highlights` (composite key, ownership scope, revision), endpoints (create on a stash or on an address, `index` with ETag, by ids, edit, delete), caps from config, highlight texts in the search document, the stash page with "open at the passage" links and note editing. The embedding text joins in M3
-- [ ] Shared URL normalization with one JSON fixture, tested in PHP and TypeScript
-- [ ] Extension: highlight, anchoring, painting, local index, opt-in all-sites permission
-- [ ] Web app: highlights in the detail view with text-fragment links; anchoring spike
+- [x] Shared URL normalization with one JSON fixture, tested in PHP and TypeScript
+- [x] Extension: highlight (shortcut, menu, popup button), anchoring, painting, local index and sync, opt-in all-sites permission, list and remove in the popup. Unit tests for every part and five Chrome flows (`e2e/extension/highlights.spec.ts`)
+- [x] Web app: highlights in the detail view with text-fragment links
+- [ ] Anchoring spike on real pages (yours): highlight a passage on a news article, a documentation page, a blog with a cookie banner and a page that changes after load; reload each and see whether the paint comes back. The engine refuses to paint rather than guess, so "not painted" is the failure to look for
 
 ### M2. Auto-tagging [4, 9]
 
@@ -147,3 +150,6 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - 2026-10-10: `mago.toml` allows 16 constructor parameters (it was 10) because the data classes in `app/Data` carry a whole card.
 - 2026-10-10: the keyboard layer of 11.2 (command menu, grid navigation, shortcuts) is the part the plan leaves to you; the pages get plain mouse-driven versions first.
 - 2026-10-10: this file is tracked on purpose so the progress can be followed in git. Delete it whenever you do not need it.
+- 2026-10-10: the extension asks for `alarms` (a half-hourly check for changed highlights, one conditional request) and the Firefox minimum is 140, the first with the CSS Custom Highlight API. Highlights are painted by position only, so the page's own elements are never changed; a page that draws itself again is painted again after a second of quiet.
+- 2026-10-10: the local copy is keyed by the SHA-256 of the normalized address, computed in the browser and looked up in extension storage, so no visited address reaches the server. `crypto.subtle` does not exist in a content script on an http page, so `lib/sha256.ts` is a small fallback that is tested against the browser's.
+- 2026-10-10: turning "Show my highlights on pages" off gives back the all-sites permission. Chrome may drop the self-hosted Stashlist's own permission with it (it is one of "all sites"), so the options page checks that and asks again.

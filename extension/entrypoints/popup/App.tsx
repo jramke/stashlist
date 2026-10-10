@@ -1,6 +1,9 @@
 import { TagField } from '@/components/tag-field';
 import { Button, Input, Label, Note } from '@/components/ui';
 import type { Client } from '@/lib/api';
+import { highlightSelection } from '@/lib/highlights/create';
+import { highlightsOfPage, removeHighlight } from '@/lib/highlights/store';
+import type { StoredHighlight } from '@/lib/highlights/types';
 import { capturePage, isStashable } from '@/lib/page';
 import { buildSaveRequest } from '@/lib/payload';
 import { captureScreenshot } from '@/lib/screenshot';
@@ -19,6 +22,7 @@ const SCREENSHOT_LIMIT = 2 * 1024 * 1024;
 
 type Loaded = {
     client: Client;
+    tab: { id: number | undefined; url: string };
     instance: string;
     tabWindowId: number | undefined;
     page: PageCapture;
@@ -44,6 +48,11 @@ export function App() {
         collectionIds: [],
     });
     const [problem, setProblem] = useState<string | null>(null);
+    const [highlights, setHighlights] = useState<StoredHighlight[]>([]);
+    const [marking, setMarking] = useState(false);
+    const [highlightProblem, setHighlightProblem] = useState<string | null>(
+        null,
+    );
     // One key for this popup: pressing Save again after a failure repeats the same save, not a second one.
     const idempotencyKey = useRef(crypto.randomUUID());
 
@@ -73,6 +82,7 @@ export function App() {
                             : Promise.resolve(null),
                     ]);
 
+                setHighlights(await highlightsOfPage(tab.url));
                 setEdits({
                     title: page.title,
                     tags: settings.defaults.tags,
@@ -82,6 +92,7 @@ export function App() {
                     step: 'ready',
                     loaded: {
                         client,
+                        tab: { id: tab.id, url: tab.url },
                         instance: settings.instance,
                         tabWindowId: tab.windowId,
                         page,
@@ -148,6 +159,32 @@ export function App() {
         } catch (error) {
             setProblem(explain(error));
             setState({ step: 'ready', loaded });
+        }
+    }
+
+    async function mark(): Promise<void> {
+        setHighlightProblem(null);
+        setMarking(true);
+
+        try {
+            await highlightSelection(loaded.tab);
+            setHighlights(await highlightsOfPage(loaded.tab.url));
+        } catch (error) {
+            setHighlightProblem(explain(error));
+        } finally {
+            setMarking(false);
+        }
+    }
+
+    async function unmark(highlight: StoredHighlight): Promise<void> {
+        setHighlightProblem(null);
+
+        try {
+            await loaded.client.deleteHighlight(highlight.id);
+            await removeHighlight(highlight.id);
+            setHighlights(await highlightsOfPage(loaded.tab.url));
+        } catch (error) {
+            setHighlightProblem(explain(error));
         }
     }
 
@@ -260,6 +297,46 @@ export function App() {
             <Button onClick={() => void save()} disabled={saving}>
                 {saving ? 'Saving…' : 'Stash'}
             </Button>
+
+            <section className="grid gap-2 border-t pt-3">
+                <div className="flex items-center justify-between gap-2">
+                    <h2 className="text-xs font-medium text-muted-foreground">
+                        Highlights on this page
+                    </h2>
+                    <Button
+                        variant="outline"
+                        onClick={() => void mark()}
+                        disabled={marking}
+                    >
+                        Highlight selection
+                    </Button>
+                </div>
+
+                <ul className="grid gap-1.5">
+                    {highlights.map((highlight) => (
+                        <li
+                            key={highlight.id}
+                            className="flex items-start gap-2 text-sm"
+                        >
+                            <span className="line-clamp-2 flex-1">
+                                {highlight.text}
+                            </span>
+                            <button
+                                type="button"
+                                aria-label="Remove highlight"
+                                className="text-muted-foreground hover:text-foreground"
+                                onClick={() => void unmark(highlight)}
+                            >
+                                ×
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+
+                {highlightProblem !== null && (
+                    <Note tone="error">{highlightProblem}</Note>
+                )}
+            </section>
         </Shell>
     );
 }

@@ -1,3 +1,4 @@
+import { browser } from 'wxt/browser';
 import { storage } from 'wxt/utils/storage';
 import type { Defaults } from './types';
 
@@ -64,4 +65,17 @@ export function normalizeInstance(input: string): string {
 /** Whether the extension is set up well enough to try to save. */
 export function isConfigured(settings: Settings): boolean {
     return settings.token.trim() !== '';
+}
+
+/**
+ * Makes sure the browser lets the extension talk to the instance: a self-hosted one is asked for at runtime,
+ * one origin at a time, which can only be done right after a click.
+ */
+export async function ensureInstanceAccess(address: string): Promise<boolean> {
+    const origins = [`${new URL(address).origin}/*`];
+
+    return (
+        (await browser.permissions.contains({ origins })) ||
+        (await browser.permissions.request({ origins }))
+    );
 }

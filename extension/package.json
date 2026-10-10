@@ -14,6 +14,7 @@
         "zip": "wxt zip",
         "zip:firefox": "wxt zip -b firefox",
         "check": "tsc --noEmit",
+        "check:manifest": "node scripts/check-manifest.mjs",
         "test": "vitest run"
     },
     "dependencies": {

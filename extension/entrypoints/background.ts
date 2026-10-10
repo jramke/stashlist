@@ -1,17 +1,40 @@
-import { explain, needsNewToken, stashTab, stashThing } from '@/lib/stash-tab';
+import { highlightSelection } from '@/lib/highlights/create';
+import { syncHighlights } from '@/lib/highlights/sync';
+import {
+    connect,
+    explain,
+    needsNewToken,
+    stashTab,
+    stashThing,
+} from '@/lib/stash-tab';
 import { browser, type Browser } from 'wxt/browser';
 
 /** The most the API takes as a picture. */
 const IMAGE_LIMIT = 20 * 1024 * 1024;
 
+/** The local copy of the highlights is brought up to date this often; it is one small request. */
+const SYNC_ALARM = 'sync-highlights';
+const SYNC_MINUTES = 30;
+
 const MENUS: Browser.contextMenus.CreateProperties[] = [
     { id: 'stash-page', title: 'Stash page', contexts: ['page'] },
     { id: 'stash-link', title: 'Stash link', contexts: ['link'] },
     { id: 'stash-image', title: 'Stash image', contexts: ['image'] },
+    {
+        id: 'highlight-selection',
+        title: 'Highlight selection',
+        contexts: ['selection'],
+    },
     { id: 'pick-color', title: 'Pick a color…', contexts: ['page', 'action'] },
 ];
 
 export default defineBackground(() => {
+    browser.alarms.onAlarm.addListener((alarm) => {
+        if (alarm.name === SYNC_ALARM) void syncQuietly();
+    });
+    browser.runtime.onStartup.addListener(() => void syncQuietly());
+    void ensureSyncAlarm();
+
     browser.runtime.onInstalled.addListener(async ({ reason }) => {
         await browser.contextMenus.removeAll();
         MENUS.forEach((menu) => browser.contextMenus.create(menu));
@@ -19,11 +42,17 @@ export default defineBackground(() => {
         if (reason === 'install') {
             await browser.runtime.openOptionsPage();
         }
+
+        void syncQuietly();
     });
 
     browser.commands.onCommand.addListener(async (command, tab) => {
         if (command === 'quick_clip' && tab !== undefined) {
             await run(tab.id, () => stashTab(tab));
+        }
+
+        if (command === 'highlight_selection' && tab !== undefined) {
+            await highlight(tab);
         }
     });
 
@@ -42,6 +71,9 @@ export default defineBackground(() => {
                 if (info.srcUrl !== undefined && tab !== undefined)
                     await stashImage(tab, info.srcUrl);
                 break;
+            case 'highlight-selection':
+                if (tab !== undefined) await highlight(tab);
+                break;
             case 'pick-color':
                 await browser.windows.create({
                     url: browser.runtime.getURL('/picker.html'),
@@ -54,10 +86,41 @@ export default defineBackground(() => {
     });
 });
 
+async function ensureSyncAlarm(): Promise<void> {
+    if ((await browser.alarms.get(SYNC_ALARM)) === undefined) {
+        await browser.alarms.create(SYNC_ALARM, {
+            delayInMinutes: 1,
+            periodInMinutes: SYNC_MINUTES,
+        });
+    }
+}
+
+/** A sync nobody is waiting for: offline or a token that is not set up yet is not worth a message. */
+async function syncQuietly(): Promise<void> {
+    try {
+        await syncHighlights((await connect()).client);
+    } catch {
+        // The next alarm tries again.
+    }
+}
+
+async function highlight(tab: Browser.tabs.Tab): Promise<void> {
+    await run(
+        tab.id,
+        async () => {
+            const { created, highlight } = await highlightSelection(tab);
+
+            return { created, title: highlight.text };
+        },
+        { created: 'Highlighted', existing: 'Already highlighted' },
+    );
+}
+
 /** Runs a save and tells the person how it went on the toolbar icon: a tick, or a cross with the reason. */
 async function run(
     tabId: number | undefined,
     save: () => Promise<{ created: boolean; title: string }>,
+    words = { created: 'Stashed', existing: 'Already stashed' },
 ): Promise<void> {
     try {
         const result = await save();
@@ -67,8 +130,8 @@ async function run(
             result.created ? '✓' : '=',
             '#16a34a',
             result.created
-                ? `Stashed: ${result.title}`
-                : `Already stashed: ${result.title}`,
+                ? `${words.created}: ${result.title}`
+                : `${words.existing}: ${result.title}`,
         );
     } catch (error) {
         await flash(tabId, '✕', '#dc2626', explain(error));

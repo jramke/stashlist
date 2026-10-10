@@ -53,6 +53,12 @@ export function createPainter(document: Document, target: PaintTarget) {
          * @returns the ids of the highlights that were found
          */
         paint(highlights: StoredHighlight[]): number[] {
+            if (highlights.length === 0) {
+                this.clear();
+
+                return [];
+            }
+
             const page = buildPageText(document.body);
             const byColor = new Map<string, Range[]>();
             const found: number[] = [];
