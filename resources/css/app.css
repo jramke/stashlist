@@ -102,3 +102,67 @@
         @apply bg-background text-foreground;
     }
 }
+
+/* The hero of the front page (components/hero.tsx): icons that float, burst when clicked and fly into the vault. */
+@keyframes hero-float {
+    0%,
+    100% {
+        translate: 0 0;
+    }
+    50% {
+        translate: 0 -6px;
+    }
+}
+
+@keyframes hero-poof {
+    0% {
+        scale: 1;
+        opacity: 1;
+        box-shadow: 0 0 0 0
+            color-mix(in oklab, var(--foreground) 35%, transparent);
+    }
+    40% {
+        scale: 1.25;
+        opacity: 1;
+        box-shadow: 0 0 0 14px
+            color-mix(in oklab, var(--foreground) 0%, transparent);
+    }
+    100% {
+        scale: 0.2;
+        opacity: 0;
+        box-shadow: 0 0 0 0 transparent;
+        translate: var(--hero-dx, 0) var(--hero-dy, 0);
+    }
+}
+
+@keyframes hero-shimmer {
+    0% {
+        box-shadow: inset 0 0 0 0
+            color-mix(in oklab, var(--foreground) 0%, transparent);
+    }
+    40% {
+        box-shadow: inset 0 0 40px 0
+            color-mix(in oklab, var(--foreground) 22%, transparent);
+    }
+    100% {
+        box-shadow: inset 0 0 0 0
+            color-mix(in oklab, var(--foreground) 0%, transparent);
+    }
+}
+
+@keyframes hero-return {
+    from {
+        scale: 0.2;
+        opacity: 0;
+    }
+    to {
+        scale: 1;
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-motion {
+        animation: none !important;
+    }
+}

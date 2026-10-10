@@ -1,3 +1,4 @@
+import { Hero } from '@/components/hero';
 import { CallToAction } from '@/components/marketing';
 import { Seo } from '@/components/seo';
 import MarketingLayout from '@/layouts/marketing-layout';
@@ -48,26 +49,30 @@ export default function Home({ marketing }: Props) {
                 path="/"
             />
 
-            <section className="grid gap-6 pt-16 pb-24 sm:pt-24">
-                <h1 className="max-w-3xl text-4xl font-medium tracking-tight sm:text-6xl">
-                    A place for everything worth keeping.
-                </h1>
-                <p className="max-w-xl text-lg text-muted-foreground">
-                    Links, notes, images, colors. Save one in a gesture, find it
-                    again by what you remember.
-                </p>
-                <div className="flex flex-wrap gap-3">
-                    {joinable ? (
-                        <CallToAction href={register()}>
-                            Get started
+            <section className="grid items-center gap-12 pt-12 pb-20 sm:pt-20 lg:grid-cols-2">
+                <div className="grid gap-6">
+                    <h1 className="text-4xl font-medium tracking-tight sm:text-5xl">
+                        A place for everything worth keeping.
+                    </h1>
+                    <p className="max-w-xl text-lg text-muted-foreground">
+                        Links, notes, images, colors. Save one in a gesture,
+                        find it again by what you remember.
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                        {joinable ? (
+                            <CallToAction href={register()}>
+                                Get started
+                            </CallToAction>
+                        ) : (
+                            <CallToAction href={login()}>Log in</CallToAction>
+                        )}
+                        <CallToAction href={docs()} variant="outline">
+                            Host it yourself
                         </CallToAction>
-                    ) : (
-                        <CallToAction href={login()}>Log in</CallToAction>
-                    )}
-                    <CallToAction href={docs()} variant="outline">
-                        Host it yourself
-                    </CallToAction>
+                    </div>
                 </div>
+
+                <Hero />
             </section>
 
             <section className="grid gap-4 border-t py-16">
