@@ -114,7 +114,8 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 
 - [x] Registration modes (`STASHLIST_REGISTRATION`, invitations, `stashlist:invite`)
 - [x] Plans and `Support\Limits`: caps on stashes, storage, summaries per month and searches per minute, a usage page, `STASHLIST_PLAN=unlimited` for self-hosters
-- [ ] Export, account deletion, tag merge, tenant tokens, privacy page, self-host `docker-compose.yml` and README
+- [x] Tag merge (`TagMerge`: the user's choice wins, visible wins over dismissed; a select on the tags page)
+- [ ] Export, account deletion, tenant tokens, privacy page, self-host `docker-compose.yml` and README
 
 ### M5.5 and M5.6. Marketing site and hero [11]
 
@@ -176,3 +177,4 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - 2026-10-11: `<Deferred>` of Inertia needs a real fallback element, not `null`; the PHP tests could not see it and the browser flows broke on every detail page, which is what they are for.
 - 2026-10-12: `Limits` refuses a new stash or an upload that does not fit (`StashLimitReached`, shown as a toast on the web and as a rejected input, 422, through the API so the extension prints the reason). Saving a link that is saved already still answers "already saved" at the cap. The importer is not capped: it does not go through `CaptureStash`. Browsing the feed is never limited; a search is limited per minute by the plan.
 - 2026-10-12: registration is closed unless `STASHLIST_REGISTRATION` says otherwise, but an empty installation always lets its first account in. `.env.example`, `phpunit.xml` and the DDEV `.env` say `open`.
+- 2026-10-12: merging a tag deletes the old one. A later automatic run that proposes the old name makes it again, because there is no alias table; the matcher only catches plurals and near spellings. If that bothers you, an alias is a small column on `tags`.

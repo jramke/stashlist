@@ -54,6 +54,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('tags', [TagController::class, 'index'])->name('tags.index');
     Route::patch('tags/{tag}', [TagController::class, 'update'])->name('tags.update');
+    Route::post('tags/{tag}/merge', [TagController::class, 'merge'])->name('tags.merge');
     Route::delete('tags/{tag}', [TagController::class, 'destroy'])->name('tags.destroy');
 });
 

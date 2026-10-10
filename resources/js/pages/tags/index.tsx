@@ -10,6 +10,53 @@ type Props = {
     tags: App.Data.TagData[];
 };
 
+/** Folds the tag into another one: pick the other tag from the list. */
+function MergeInto({
+    tag,
+    others,
+}: {
+    tag: App.Data.TagData;
+    others: App.Data.TagData[];
+}) {
+    return (
+        <select
+            aria-label={`Merge ${tag.name} into`}
+            defaultValue=""
+            className="h-9 max-w-32 rounded-md border bg-transparent px-2 text-sm"
+            onChange={(event) => {
+                const target = others.find(
+                    (other) => other.id === Number(event.target.value),
+                );
+                event.target.value = '';
+
+                if (
+                    target !== undefined &&
+                    confirm(
+                        `Merge "${tag.name}" into "${target.name}"? The tag "${tag.name}" goes away and its stashes get "${target.name}".`,
+                    )
+                ) {
+                    router.post(
+                        TagController.merge.url(tag.id),
+                        { into: target.id },
+                        { preserveScroll: true },
+                    );
+                }
+            }}
+        >
+            <option value="" disabled>
+                Merge into…
+            </option>
+            {others
+                .filter((other) => other.id !== tag.id)
+                .map((other) => (
+                    <option key={other.id} value={other.id}>
+                        {other.name}
+                    </option>
+                ))}
+        </select>
+    );
+}
+
 export default function Index({ tags }: Props) {
     return (
         <>
@@ -19,8 +66,9 @@ export default function Index({ tags }: Props) {
                 <header className="grid gap-1">
                     <h1 className="text-2xl font-medium">Tags</h1>
                     <p className="text-sm text-muted-foreground">
-                        Rename a tag to change it on every stash. Deleting a tag
-                        only removes it from the stashes.
+                        Rename a tag to change it on every stash, or merge it
+                        into another. Deleting a tag only removes it from the
+                        stashes.
                     </p>
                 </header>
 
@@ -71,6 +119,10 @@ export default function Index({ tags }: Props) {
                                         ? 'stash'
                                         : 'stashes'}
                                 </Link>
+
+                                {tags.length > 1 && (
+                                    <MergeInto tag={tag} others={tags} />
+                                )}
 
                                 <Button
                                     variant="ghost"

@@ -6,8 +6,10 @@ namespace App\Http\Controllers;
 
 use App\Data\TagData;
 use App\Data\ToastData;
+use App\Http\Requests\MergeTagRequest;
 use App\Http\Requests\UpdateTagRequest;
 use App\Models\Tag;
+use App\Tags\TagMerge;
 use App\Tags\TagNameTaken;
 use App\Tags\TagSync;
 use Illuminate\Http\RedirectResponse;
@@ -47,6 +49,26 @@ final class TagController extends Controller
         }
 
         ToastData::success(Lang::string('Saved.'))->flash();
+
+        return back();
+    }
+
+    /**
+     * Folds this tag into another of the user's: its stashes get the other, and this one is gone.
+     */
+    public function merge(MergeTagRequest $request, Tag $tag, TagMerge $merge): RedirectResponse
+    {
+        $into = Tag::query()->findOrFail($request->target());
+
+        Gate::authorize('update', $tag);
+        Gate::authorize('update', $into);
+
+        $merge->merge($tag, $into);
+
+        ToastData::success(Lang::string('Merged :from into :into.', [
+            'from' => $tag->name,
+            'into' => $into->name,
+        ]))->flash();
 
         return back();
     }
