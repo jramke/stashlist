@@ -27,6 +27,7 @@ ddev npm run check        # prettier --check + tsc --noEmit
 ddev artisan typescript:transform   # regenerate the PHP -> TypeScript types
 ddev artisan scout:sync-index-settings   # push the index settings of config/scout.php to Meilisearch (run on every deploy)
 ddev artisan scout:import 'App\Models\Stash'   # index every stash again from the database
+ddev artisan stashlist:import-old dump.sql --user=ID [--old-user=ID] [--dry-run]   # one-time import of the old app's saves (app/Import)
 ```
 
 To run Artisan against the test database use `ddev exec 'DB_DATABASE=stashlist_test php artisan ...'`. `--env=testing` does **not** switch databases: `migrate:fresh --env=testing` wiped the dev database once. Never run `migrate:fresh`, `db:wipe` or `migrate:rollback` without pinning `DB_DATABASE` first.

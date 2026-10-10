@@ -12,6 +12,7 @@
         "php": "^8.4",
         "ext-imagick": "*",
         "ext-intl": "*",
+        "ext-pdo_sqlite": "*",
         "ext-redis": "*",
         "fivefilters/readability.php": "^4.1",
         "inertiajs/inertia-laravel": "^3.0",
