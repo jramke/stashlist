@@ -129,6 +129,8 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('user-ai', static fn (PipelineJob $job): Limit => Limit::perMinute(
             config()->integer('stashlist.ai.user_rpm'),
         )->by("user:{$job->userId}"));
+        // An export reads everything a user has: a few an hour is plenty.
+        RateLimiter::for('exports', static fn (Request $request): Limit => Limit::perHour(5)->by($perUser($request)));
         RateLimiter::for('reprocess', static fn (Request $request): Limit => Limit::perMinute(10)->by($perUser(
             $request,
         )));

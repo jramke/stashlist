@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Settings\ExportController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SmartFeaturesController;
 use App\Http\Controllers\Settings\TokenController;
@@ -16,6 +17,12 @@ Route::middleware(['auth'])->group(function () {
     );
 
     Route::get('settings/usage', [UsageController::class, 'show'])->name('usage.show');
+
+    Route::get('settings/export', [ExportController::class, 'index'])->name('exports.index');
+    Route::post('settings/export', [ExportController::class, 'store'])
+        ->middleware('throttle:exports')
+        ->name('exports.store');
+    Route::get('settings/export/{export}', [ExportController::class, 'download'])->name('exports.download');
 
     Route::get('settings/tokens', [TokenController::class, 'index'])->name('tokens.index');
     Route::post('settings/tokens', [TokenController::class, 'store'])->name('tokens.store');

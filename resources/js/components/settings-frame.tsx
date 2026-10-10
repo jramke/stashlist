@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { index as exports } from '@/routes/exports';
 import { edit as profile } from '@/routes/profile';
 import { index as tokens } from '@/routes/tokens';
 import { show as usage } from '@/routes/usage';
@@ -8,6 +9,7 @@ import type { ReactNode } from 'react';
 const sections = [
     { label: 'Profile', href: profile().url },
     { label: 'Usage', href: usage().url },
+    { label: 'Export', href: exports().url },
     { label: 'API tokens', href: tokens().url },
 ];
 
