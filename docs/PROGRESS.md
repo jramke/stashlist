@@ -18,7 +18,7 @@ M1.5 is done in code: the capture API (tokens, `/api/v1`, the `capture` block, i
 
 M1.6 is done in code: persistent highlights on the server and the stash page, and in the extension (`Alt+Shift+H` or the menu, painting with the CSS Custom Highlight API, a local copy kept in step by sync, an opt-in "Show my highlights on pages"), with five more flows in a real Chrome. What is left is yours: try the anchoring on real pages (see the checklist).
 
-M2 (auto-tagging), M3 (embeddings and hybrid search) and M4 (pictures) are done in code, with fakes and against a real Meilisearch. They need your OpenAI key to do anything for real: until `OPENAI_API_KEY` is in `.env` the AI stages are skipped everywhere. Yours after that: the model bake-off, the search eval set and the 1M spike (see the checklists). **Next: M5, launch readiness.**
+M2 (auto-tagging), M3 (embeddings and hybrid search) and M4 (pictures) are done in code, with fakes and against a real Meilisearch. They need your OpenAI key to do anything for real: until `OPENAI_API_KEY` is in `.env` the AI stages are skipped everywhere. Yours after that: the model bake-off, the search eval set and the 1M spike (see the checklists). M5 (launch readiness: registration modes, usage and limits, export, account deletion, self-hosting image, README), M5.5 (public pages with server-side rendering, Lighthouse in CI) and M5.6 (interactive hero) are done in code. **Next: M6 (rich links, optional), M7 (Raycast and extension v2) and M8 (billing with Polar).** M8 needs a Polar sandbox account; the rest of what is open is on the "Blocked on you" list.
 
 ## Blocked on you
 
