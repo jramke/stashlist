@@ -14,3 +14,7 @@ package-lock.json
 /.claude
 /.agents
 /tests/fixtures
+/extension/.output
+/extension/.output-e2e
+/extension/.wxt
+/extension/package-lock.json

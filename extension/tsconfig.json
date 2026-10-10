@@ -1,0 +1,24 @@
+{
+    "extends": "./.wxt/tsconfig.json",
+    "compilerOptions": {
+        "jsx": "react-jsx",
+        "strict": true,
+        "noUncheckedIndexedAccess": true,
+        "exactOptionalPropertyTypes": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitOverride": true,
+        "verbatimModuleSyntax": true,
+        "skipLibCheck": true
+    },
+    "include": [
+        ".wxt/wxt.d.ts",
+        "entrypoints/**/*",
+        "lib/**/*",
+        "tests/**/*",
+        "wxt.config.ts",
+        "vitest.config.ts"
+    ]
+}

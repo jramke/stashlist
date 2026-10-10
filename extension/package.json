@@ -1,0 +1,35 @@
+{
+    "name": "stashlist-extension",
+    "description": "Stash the page you are looking at in one gesture.",
+    "private": true,
+    "version": "2.0.0",
+    "type": "module",
+    "license": "AGPL-3.0-or-later",
+    "scripts": {
+        "prepare:wxt": "wxt prepare",
+        "dev": "wxt",
+        "dev:firefox": "wxt -b firefox",
+        "build": "wxt build",
+        "build:firefox": "wxt build -b firefox",
+        "zip": "wxt zip",
+        "zip:firefox": "wxt zip -b firefox",
+        "check": "tsc --noEmit",
+        "test": "vitest run"
+    },
+    "dependencies": {
+        "@wxt-dev/module-react": "^1.2.2",
+        "defuddle": "^0.19.4",
+        "react": "^19.3.0",
+        "react-dom": "^19.3.0",
+        "wxt": "^0.21.4"
+    },
+    "devDependencies": {
+        "@tailwindcss/vite": "^4.3.3",
+        "@types/react": "^19.3.0",
+        "@types/react-dom": "^19.3.0",
+        "happy-dom": "^20.14.6",
+        "tailwindcss": "^4.3.3",
+        "typescript": "^7.0.2",
+        "vitest": "^5.0.3"
+    }
+}
