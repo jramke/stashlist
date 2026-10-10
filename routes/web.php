@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\CollectionOrderController;
 use App\Http\Controllers\CollectionStashController;
+use App\Http\Controllers\HighlightController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SocialLoginController;
 use App\Http\Controllers\StashCollectionController;
@@ -41,6 +42,9 @@ Route::middleware('auth')->group(function () {
     Route::put('stashes/{stash}/collections', [StashCollectionController::class, 'update'])->name(
         'stashes.collections.update',
     );
+
+    Route::patch('highlights/{highlight}', [HighlightController::class, 'update'])->name('highlights.update');
+    Route::delete('highlights/{highlight}', [HighlightController::class, 'destroy'])->name('highlights.destroy');
 
     Route::put('collections/order', [CollectionOrderController::class, 'update'])->name('collections.order');
     Route::resource('collections', CollectionController::class)->only(['index', 'store', 'update', 'destroy']);

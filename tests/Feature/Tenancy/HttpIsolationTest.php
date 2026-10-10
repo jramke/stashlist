@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\Collection;
 use App\Models\Stash;
+use App\Models\StashHighlight;
 use App\Models\User;
 use App\Tags\TagSync;
 use Illuminate\Support\Facades\Queue;
@@ -22,6 +23,7 @@ beforeEach(function () {
     $this->tag = app(TagSync::class)->addByUser($this->stash, 'design');
     $this->bobStash = Stash::factory()->for($this->bob)->create();
     $this->collection = Collection::factory()->for($this->alice)->create();
+    $this->highlight = StashHighlight::factory()->onStash($this->stash)->create(['note' => 'alice']);
 });
 
 test("bob cannot reach alice's stash", function (string $method, Closure $uri, array $data) {
@@ -94,3 +96,19 @@ test("bob cannot reach alice's collections and tags", function (string $method, 
         ['collection_ids' => []],
     ],
 ]);
+
+test("bob cannot reach alice's highlight", function (string $method, Closure $uri, array $data) {
+    $this->actingAs($this->bob)->call($method, $uri($this), $data)->assertNotFound();
+
+    expect(StashHighlight::query()->withoutGlobalScopes()->find($this->highlight->id)?->note)->toBe('alice');
+})->with([
+    'change the note' => ['PATCH', fn ($t) => "/highlights/{$t->highlight->id}", ['note' => 'hijacked']],
+    'delete it' => ['DELETE', fn ($t) => "/highlights/{$t->highlight->id}", []],
+]);
+
+test("bob's stash page shows none of alice's highlights", function () {
+    $this
+        ->actingAs($this->bob)
+        ->get("/stashes/{$this->bobStash->id}")
+        ->assertInertia(fn (Inertia\Testing\AssertableInertia $page) => $page->has('detail.highlights', 0));
+});

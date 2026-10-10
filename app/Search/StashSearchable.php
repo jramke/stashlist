@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Search;
 
 use App\Models\Stash;
+use App\Models\StashHighlight;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Str;
@@ -22,7 +23,7 @@ trait StashSearchable
     use Searchable;
 
     /** Relations the search document is built from; load them before indexing. */
-    public const SEARCH_RELATIONS = ['enrichment', 'visibleTags', 'collections'];
+    public const SEARCH_RELATIONS = ['enrichment', 'visibleTags', 'collections', 'highlights:id,stash_id,text'];
 
     /**
      * Every stash is indexed; the search is always limited to the owner. Build the document from a stash with
@@ -48,6 +49,10 @@ trait StashSearchable
             'content' => Str::limit($enrichment->extracted_text ?? '', 20_000, ''),
             'ocr_text' => $enrichment->ocr_text ?? null,
             'objects' => $enrichment->objects ?? [],
+            'highlights' => $this->highlights
+                ->map(static fn (StashHighlight $highlight): string => Str::limit($highlight->text, 1_000, ''))
+                ->values()
+                ->all(),
             'tags' => $tags->pluck('name')->values()->all(),
             'tag_ids' => $tags->pluck('id')->values()->all(),
             'collection_ids' => $this->collections->pluck('id')->values()->all(),

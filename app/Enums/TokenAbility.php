@@ -16,6 +16,7 @@ enum TokenAbility: string
     case Create = 'stash:create';
     case Read = 'stash:read';
     case Search = 'stash:search';
+    case Highlight = 'highlight:manage';
 
     /**
      * @return list<string>

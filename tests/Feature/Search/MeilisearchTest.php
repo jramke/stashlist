@@ -79,6 +79,13 @@ test('a user finds their own stashes by title, tag, domain and the text of the p
         ->toBe([$byText->id]);
 });
 
+test('what a user highlighted on a page makes the stash easier to find', function () {
+    $stash = indexed_stash($this->user, ['title' => 'Plain title', 'url' => null, 'domain' => null]);
+    App\Models\StashHighlight::factory()->onStash($stash)->create(['text' => 'the fermentation lasts a full week']);
+
+    expect(found($this->user, text: 'fermentation'))->toBe([$stash->id]);
+});
+
 test('typing finds a stash before the word is complete, and a typo still finds it', function () {
     $stash = indexed_stash($this->user, ['title' => 'Sourdough starter guide']);
 

@@ -48,6 +48,28 @@ test('a stash cannot be put into the collection of another user', function (stri
     ]);
 })->with(['alice', 'bob'])->throws(QueryException::class);
 
+test('a highlight cannot be put on the stash of another user', function (string $claimedOwner) {
+    DB::table('stash_highlights')->insert([
+        'stash_id' => $this->aliceStash->id,
+        'user_id' => $this->{$claimedOwner}->id,
+        'text' => 'a passage',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+})->with(['bob'])->throws(QueryException::class);
+
+test('a highlight of the owner is accepted', function () {
+    DB::table('stash_highlights')->insert([
+        'stash_id' => $this->aliceStash->id,
+        'user_id' => $this->alice->id,
+        'text' => 'a passage',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    expect(DB::table('stash_highlights')->count())->toBe(1);
+});
+
 test('a file cannot be attached to the stash of another user', function () {
     DB::table('stash_files')->insert([
         'stash_id' => $this->aliceStash->id,

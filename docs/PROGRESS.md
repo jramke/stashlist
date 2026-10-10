@@ -79,7 +79,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 
 ### M1.6. Persistent highlights [6.5]
 
-- [ ] `stash_highlights`, endpoints, index and ETag sync, caps, search and embedding text
+- [x] `stash_highlights` (composite key, ownership scope, revision), endpoints (create on a stash or on an address, `index` with ETag, by ids, edit, delete), caps from config, highlight texts in the search document, the stash page with "open at the passage" links and note editing. The embedding text joins in M3
 - [ ] Shared URL normalization with one JSON fixture, tested in PHP and TypeScript
 - [ ] Extension: highlight, anchoring, painting, local index, opt-in all-sites permission
 - [ ] Web app: highlights in the detail view with text-fragment links; anchoring spike

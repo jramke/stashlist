@@ -1,6 +1,7 @@
 import StashController from '@/actions/App/Http/Controllers/StashController';
 import StashReprocessController from '@/actions/App/Http/Controllers/StashReprocessController';
 import { CollectionPicker } from '@/components/collection-picker';
+import { HighlightList } from '@/components/highlight-list';
 import InputError from '@/components/input-error';
 import { TagEditor } from '@/components/tag-editor';
 import { Button } from '@/components/ui/button';
@@ -138,6 +139,13 @@ export default function Show({ detail }: Props) {
                         selected={detail.collection_ids}
                     />
                 </section>
+
+                {detail.highlights.length > 0 && (
+                    <section className="grid gap-3">
+                        <h2 className="text-sm font-medium">Highlights</h2>
+                        <HighlightList highlights={detail.highlights} />
+                    </section>
+                )}
 
                 <Separator />
 

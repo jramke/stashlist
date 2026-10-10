@@ -6,6 +6,7 @@ namespace App\Data;
 
 use App\Enums\FileRole;
 use App\Models\Stash;
+use App\Models\StashHighlight;
 use App\Storage\StashStorage;
 use Illuminate\Support\Str;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
@@ -13,7 +14,7 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 /**
  * Everything the detail view needs on top of the card: the whole text, a larger preview image, where the
  * page came from and which collections the stash is in. Build it from a stash with `enrichment`,
- * `thumbnail`, `visibleTags`, `collections` and `files` loaded.
+ * `thumbnail`, `visibleTags`, `collections`, `highlights` and `files` loaded.
  */
 #[TypeScript]
 final readonly class StashDetailData
@@ -22,6 +23,7 @@ final readonly class StashDetailData
 
     /**
      * @param  list<int>  $collection_ids
+     * @param  list<HighlightData>  $highlights
      */
     public function __construct(
         public StashData $stash,
@@ -31,6 +33,7 @@ final readonly class StashDetailData
         public ?string $site_name,
         public ?string $favicon_url,
         public array $collection_ids,
+        public array $highlights,
     ) {}
 
     public static function fromModel(Stash $stash, StashStorage $storage): self
@@ -50,6 +53,12 @@ final readonly class StashDetailData
             favicon_url: is_string($meta['favicon_url'] ?? null) ? $meta['favicon_url'] : null,
             collection_ids: array_values(
                 $stash->collections->map(static fn ($collection): int => $collection->id)->all(),
+            ),
+            highlights: array_values(
+                $stash->highlights->map(static fn (StashHighlight $highlight): HighlightData => HighlightData::fromModel(
+                    $highlight,
+                    $stash->url,
+                ))->all(),
             ),
         );
     }

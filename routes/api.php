@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\CollectionController;
+use App\Http\Controllers\Api\HighlightController;
 use App\Http\Controllers\Api\MeController;
 use App\Http\Controllers\Api\StashController;
 use App\Http\Controllers\Api\TagController;
@@ -23,5 +24,24 @@ Route::prefix('v1')
             Route::get('stashes/lookup', [StashController::class, 'lookup'])->name('api.stashes.lookup');
             Route::get('tags', [TagController::class, 'index'])->name('api.tags.index');
             Route::get('collections', [CollectionController::class, 'index'])->name('api.collections.index');
+
+            Route::get('highlights/index', [HighlightController::class, 'index'])->name('api.highlights.index');
+            Route::get('highlights', [HighlightController::class, 'show'])->name('api.highlights.show');
+        });
+
+        // Marking passages. Creating one on an address can create the page's stash, which needs that ability too.
+        Route::middleware(['abilities:highlight:manage', 'throttle:api-create', 'json.limit'])->group(function () {
+            Route::post('stashes/{stash}/highlights', [HighlightController::class, 'storeForStash'])
+                ->whereNumber('stash')
+                ->name('api.highlights.store-for-stash');
+            Route::post('highlights', [HighlightController::class, 'storeForUrl'])
+                ->middleware('abilities:stash:create')
+                ->name('api.highlights.store');
+            Route::patch('highlights/{highlight}', [HighlightController::class, 'update'])
+                ->whereNumber('highlight')
+                ->name('api.highlights.update');
+            Route::delete('highlights/{highlight}', [HighlightController::class, 'destroy'])
+                ->whereNumber('highlight')
+                ->name('api.highlights.destroy');
         });
     });

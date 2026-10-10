@@ -34,7 +34,6 @@ final class TokenController extends Controller
                     ->map(TokenData::fromModel(...))
                     ->all(),
             ),
-            'abilities' => TokenAbility::cases(),
         ]);
     }
 

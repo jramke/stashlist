@@ -41,6 +41,25 @@ return [
 
     /*
      |--------------------------------------------------------------------------
+     | Highlights
+     |--------------------------------------------------------------------------
+     |
+     | Caps on the passages a user marks on pages: the length of one passage and
+     | how many there may be of them. Prefix and suffix are context for finding
+     | the passage again, not content.
+     |
+     */
+
+    'highlights' => [
+        'max_text' => 2000,
+        'max_context' => 200,
+        'max_note' => 1000,
+        'per_stash' => 500,
+        'per_user' => 20_000,
+    ],
+
+    /*
+     |--------------------------------------------------------------------------
      | Bot
      |--------------------------------------------------------------------------
      |

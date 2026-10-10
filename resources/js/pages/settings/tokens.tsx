@@ -11,16 +11,9 @@ import { useState } from 'react';
 
 type Props = {
     tokens: App.Data.TokenData[];
-    abilities: App.Enums.TokenAbility[];
 };
 
-const abilityLabels = {
-    'stash:create': 'save',
-    'stash:read': 'look up',
-    'stash:search': 'search',
-} satisfies Record<App.Enums.TokenAbility, string>;
-
-export default function Tokens({ tokens, abilities }: Props) {
+export default function Tokens({ tokens }: Props) {
     const newToken = usePage().flash.new_token;
 
     return (
@@ -60,11 +53,9 @@ export default function Tokens({ tokens, abilities }: Props) {
                             </div>
                             <InputError message={errors.name} />
                             <p className="text-xs text-muted-foreground">
-                                A token may{' '}
-                                {abilities
-                                    .map((a) => abilityLabels[a])
-                                    .join(', ')}{' '}
-                                stashes. It cannot delete or change them.
+                                A token may save, look up and search stashes and
+                                manage the highlights on them. It cannot delete
+                                or change a stash.
                             </p>
                         </>
                     )}

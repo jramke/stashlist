@@ -48,6 +48,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property \Illuminate\Database\Eloquent\Collection<int, Tag> $tags
  * @property \Illuminate\Database\Eloquent\Collection<int, Tag> $visibleTags
  * @property \Illuminate\Database\Eloquent\Collection<int, Collection> $collections
+ * @property \Illuminate\Database\Eloquent\Collection<int, StashHighlight> $highlights
  *
  * @method void searchable() queues an index write, Scout's Searchable trait
  * @method \Laravel\Scout\Engines\Engine searchableUsing()
@@ -99,6 +100,14 @@ final class Stash extends Model
     public function displayTitle(): string
     {
         return $this->title ?? $this->enrichment->title ?? $this->domain ?? 'Untitled';
+    }
+
+    /**
+     * @return HasMany<StashHighlight, $this>
+     */
+    public function highlights(): HasMany
+    {
+        return $this->hasMany(StashHighlight::class);
     }
 
     /**

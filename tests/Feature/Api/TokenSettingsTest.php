@@ -28,7 +28,7 @@ test('the page lists my tokens without their secrets and nobody else\'s', functi
                 ->component('settings/tokens')
                 ->has('tokens', 1)
                 ->where('tokens.0.name', 'Chrome on my MacBook')
-                ->where('tokens.0.abilities', ['stash:create', 'stash:read', 'stash:search'])
+                ->where('tokens.0.abilities', TokenAbility::values())
                 ->where('tokens.0.last_used_at', null)
                 ->missing('tokens.0.token'),
         );

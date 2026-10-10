@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\Collection;
 use App\Models\Stash;
 use App\Models\StashEnrichment;
+use App\Models\StashHighlight;
 use App\Models\User;
 use App\Search\MakeSearchableUniquely;
 use App\Tags\TagSync;
@@ -29,6 +30,7 @@ test('the search document holds the text, the tags and the collections of a stas
         'extracted_text' => 'A living culture of wild yeast.',
     ]);
     $tag = app(TagSync::class)->addByUser($stash, 'Baking');
+    StashHighlight::factory()->onStash($stash)->create(['text' => 'wild yeast and bacteria']);
     $collection = Collection::factory()->for($this->user)->create();
     $stash->collections()->attach($collection->id, ['user_id' => $this->user->id, 'created_at' => now()]);
 
@@ -46,6 +48,7 @@ test('the search document holds the text, the tags and the collections of a stas
             'domain' => 'bakeclub.example',
             'body' => 'my own comment',
             'content' => 'A living culture of wild yeast.',
+            'highlights' => ['wild yeast and bacteria'],
             'tags' => ['Baking'],
             'tag_ids' => [$tag->id],
             'collection_ids' => [$collection->id],
@@ -86,7 +89,7 @@ test('indexing a hundred stashes loads their relations in a fixed number of quer
     }
 
     // enrichments, visible tags (with pivot), collections: one query each, not one per stash.
-    expect(count(DB::getQueryLog()))->toBeLessThanOrEqual(3);
+    expect(count(DB::getQueryLog()))->toBeLessThanOrEqual(4);
 });
 
 test('only changes to searchable columns reindex a stash', function () {
