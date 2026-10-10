@@ -14,7 +14,7 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 M0 is done in code (`composer test` green on MariaDB, user A cannot read user B's rows). Left for M0: the `LICENSE` file and the buckets, both waiting on you (see above).
 
-M1 in progress. Next: Scout search (`Searchable` on Stash, `IndexStash`, `StashSearch`, as-you-type contract), then Socialite login, Pulse and the admin gate, `stashlist:import-old`, and the Playwright flows with the bundle-size check.
+M1 in progress. `Stash` is `Searchable` now. Next: the `IndexStash` job chained after extraction, `StashSearch` with the as-you-type contract and the Meilisearch isolation tests, then Socialite login, Pulse and the admin gate, `stashlist:import-old`, and the Playwright flows with the bundle-size check.
 
 ## Blocked on you
 
@@ -57,7 +57,8 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [x] Collections and tags controllers: collection CRUD with stash counts, sidebar order, stashes of a collection (set and order), the per-stash collection picker, tag list, rename (conflicts refused; merge is M5) and delete [6.2]
 - [x] React pages and layout: app frame with sidebar, feed (masonry, infinite scroll, polling while cards are fetched, filter chips), capture box (paste, drop, private), detail view (edit, tags, collections, retry, delete with undo), collections and tags pages. Plain and mouse-driven; polish and the keyboard layer are yours [6.2, 11.2]
 - [ ] Keyboard and speed contract: command menu, grid navigation, quick-add, undo delete, shortcut sheet [11.2]
-- [ ] Scout keyword search through `StashSearch`, as-you-type contract, `scout:sync-index-settings` [2.2, 2.5]
+- [x] `Stash` is `Searchable` (`StashSearchable`): the document comes from the stash, its enrichment, visible tags and collections; a save reindexes only when a searchable column changed; `MakeSearchableUniquely` folds rapid saves of one stash into one queued job [2.2, 2.5]
+- [ ] `IndexStash` after extraction, Scout keyword search through `StashSearch`, as-you-type contract, Meilisearch isolation tests, `scout:sync-index-settings` [2.2, 2.5]
 - [ ] Socialite login for GitHub and Google with the linking rules [6.4]
 - [ ] Horizon dashboard and Pulse behind the admin gate [7.5]
 - [ ] `stashlist:import-old` [M1 list]
@@ -121,7 +122,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - 2026-10-10: Horizon 5.50 serves its assets itself (`horizon:publish` is a no-op), so nothing under `public/vendor` is committed.
 - 2026-10-10: `intervention/image` resolved to v4 (the plan assumed v3) and `fivefilters/readability.php` to v4.1 (`(new Readability())->parse($html)` returns an `Article`). Both load and work in DDEV with the Imagick driver. Read their READMEs when writing `ImageProcessor` and `ExtractContent`.
 - 2026-10-10: the migrations are new files that alter and create, not edits of the starter kit's `create_users_table`, so a database that already ran the old ones just migrates forward.
-- 2026-10-10: `Searchable` (Scout) is not on `Stash` yet. The searchable document needs enrichments, highlights and embeddings, which arrive with the search step of M1 and later milestones.
+- 2026-10-10: the search document has no `_vectors`, highlights or color buckets yet. They join with M1.6 (highlights), M3 (embeddings) and M4 (colors).
 - 2026-10-10: `SafeHttp` downloads through a size-capped Guzzle sink instead of `stream => true`. Guzzle picks PHP's stream handler for `stream`, which ignores `CURLOPT_RESOLVE`, so the address pinning would silently not happen. Found by a live request; the tests assert the pinned entry.
 - 2026-10-10: `PublicAddress` blocks multicast and NAT64 (`64:ff9b::/96`) on top of PHP's `FILTER_FLAG_GLOBAL_RANGE`, which lets both through.
 - 2026-10-10: HEIC and the 12 named color buckets for the Meilisearch `colors` filter are left to M4; `ImageProcessor` accepts JPEG, PNG, GIF, WebP and AVIF and returns hex colors with their share. Animated GIFs get static derivatives of the first frame.

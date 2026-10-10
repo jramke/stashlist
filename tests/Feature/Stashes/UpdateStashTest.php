@@ -33,7 +33,7 @@ test('title and privacy can be changed without restarting the pipeline', functio
 
     expect($fresh->title)->toBe('New')->and($fresh->is_private)->toBeTrue();
 
-    Queue::assertNothingPushed();
+    Queue::assertNotPushed(ExtractContent::class);
 });
 
 test('an empty title clears the override', function () {
@@ -60,7 +60,7 @@ test('a changed body restarts the pipeline, an unchanged one does not', function
     ]);
 
     patch_stash($stash, ['body' => 'one'])->assertOk();
-    Queue::assertNothingPushed();
+    Queue::assertNotPushed(ExtractContent::class);
 
     patch_stash($stash, ['body' => 'two'])->assertOk();
     Queue::assertPushed(ExtractContent::class, 1);

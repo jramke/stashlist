@@ -9,6 +9,7 @@ use App\Enums\AiStatus;
 use App\Enums\FileRole;
 use App\Enums\StashType;
 use App\Models\Concerns\BelongsToUser;
+use App\Search\StashSearchable;
 use Carbon\CarbonImmutable;
 use Database\Factories\StashFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -54,7 +55,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 final class Stash extends Model
 {
     /** @use HasFactory<StashFactory> */
-    use BelongsToUser, HasFactory;
+    use BelongsToUser, HasFactory, StashSearchable;
 
     /**
      * @return array<string, string>

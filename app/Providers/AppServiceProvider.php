@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Extraction\DnsHostResolver;
 use App\Extraction\HostResolver;
+use App\Search\MakeSearchableUniquely;
 use Carbon\CarbonImmutable;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Scout\Scout;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,6 +39,8 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         $this->configureRateLimiting();
+
+        Scout::makeSearchableUsing(MakeSearchableUniquely::class);
     }
 
     /**

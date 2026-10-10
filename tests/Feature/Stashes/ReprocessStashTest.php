@@ -48,7 +48,7 @@ test('notes have nothing to run again', function () {
 
     expect($stash->fresh()->type)->toBe(StashType::Note);
 
-    Queue::assertNothingPushed();
+    Queue::assertNotPushed(ExtractContent::class);
 });
 
 test('retrying is rate limited', function () {
