@@ -112,7 +112,9 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 
 ### M5. Launch readiness [9]
 
-- [ ] Export, account deletion, plans and `Support\Limits`, registration modes, tag rename and merge, tenant tokens, privacy page, self-host `docker-compose.yml` and README
+- [x] Registration modes (`STASHLIST_REGISTRATION`, invitations, `stashlist:invite`)
+- [x] Plans and `Support\Limits`: caps on stashes, storage, summaries per month and searches per minute, a usage page, `STASHLIST_PLAN=unlimited` for self-hosters
+- [ ] Export, account deletion, tag merge, tenant tokens, privacy page, self-host `docker-compose.yml` and README
 
 ### M5.5 and M5.6. Marketing site and hero [11]
 
@@ -172,3 +174,5 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - 2026-10-11: the color filter needs the color names in the database too (`stash_enrichments.color_names`, backfilled by the migration), because the feed without a query does not use the search engine. `Hsl` and `ColorBuckets` decide the names; browns are dark, muted oranges and yellows, pinks are light reds and magentas.
 - 2026-10-11: HEIC and HEIF are accepted (the installed ImageMagick reads them; PHP's own image functions cannot, so the size is read with `pingImageBlob`). The original is stored as sent and only the WebP derivatives are shown.
 - 2026-10-11: `<Deferred>` of Inertia needs a real fallback element, not `null`; the PHP tests could not see it and the browser flows broke on every detail page, which is what they are for.
+- 2026-10-12: `Limits` refuses a new stash or an upload that does not fit (`StashLimitReached`, shown as a toast on the web and as a rejected input, 422, through the API so the extension prints the reason). Saving a link that is saved already still answers "already saved" at the cap. The importer is not capped: it does not go through `CaptureStash`. Browsing the feed is never limited; a search is limited per minute by the plan.
+- 2026-10-12: registration is closed unless `STASHLIST_REGISTRATION` says otherwise, but an empty installation always lets its first account in. `.env.example`, `phpunit.xml` and the DDEV `.env` say `open`.

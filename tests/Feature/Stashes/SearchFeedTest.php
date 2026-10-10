@@ -81,7 +81,7 @@ test('both phases of the as-you-type contract are accepted, anything else is not
         ->assertSessionHasErrors('q');
 });
 
-test('only a search is rate limited, 90 a minute per user', function () {
+test('only a search is rate limited, by the searches a minute of the plan', function () {
     $limiter = RateLimiter::limiter('search');
     $withText = Request::create('/stashes', 'GET', ['q' => 'bread']);
     $plain = Request::create('/stashes', 'GET');
@@ -89,7 +89,7 @@ test('only a search is rate limited, 90 a minute per user', function () {
     expect(Route::getRoutes()->getByName('stashes.index')?->gatherMiddleware())
         ->toContain('throttle:search')
         ->and($limiter($withText)->maxAttempts)
-        ->toBe(90)
+        ->toBe(60)
         ->and($limiter($plain)->maxAttempts)
         ->toBeGreaterThan(90_000);
 });

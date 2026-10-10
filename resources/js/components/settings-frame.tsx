@@ -1,11 +1,13 @@
 import { cn } from '@/lib/utils';
 import { edit as profile } from '@/routes/profile';
 import { index as tokens } from '@/routes/tokens';
+import { show as usage } from '@/routes/usage';
 import { Link, usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 
 const sections = [
     { label: 'Profile', href: profile().url },
+    { label: 'Usage', href: usage().url },
     { label: 'API tokens', href: tokens().url },
 ];
 

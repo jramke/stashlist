@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SmartFeaturesController;
 use App\Http\Controllers\Settings\TokenController;
+use App\Http\Controllers\Settings\UsageController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -13,6 +14,8 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('settings/smart-features', [SmartFeaturesController::class, 'update'])->name(
         'smart-features.update',
     );
+
+    Route::get('settings/usage', [UsageController::class, 'show'])->name('usage.show');
 
     Route::get('settings/tokens', [TokenController::class, 'index'])->name('tokens.index');
     Route::post('settings/tokens', [TokenController::class, 'store'])->name('tokens.store');

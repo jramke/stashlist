@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Data\ToastData;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\Idempotent;
 use App\Http\Middleware\LimitJsonBody;
+use App\Support\StashLimitReached;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -33,6 +35,19 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // A save over the plan's cap: the API answers like a rejected input, the web app with a toast.
+        $exceptions->render(function (StashLimitReached $limit, Request $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->json(
+                    ['message' => $limit->getMessage(), 'errors' => ['input' => [$limit->getMessage()]]],
+                    422,
+                );
+            }
+
+            ToastData::error($limit->getMessage())->flash();
+
+            return back();
+        });
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );

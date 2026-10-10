@@ -15,6 +15,8 @@ use App\Pipeline\ContentHash;
 use App\Pipeline\StartPipeline;
 use App\Storage\Blob;
 use App\Storage\StashStorage;
+use App\Support\Limits;
+use App\Support\StashLimitReached;
 use App\Tags\TagSync;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
@@ -35,11 +37,13 @@ final readonly class CaptureStash
         private CollectionSync $collections,
         private ApplyCapturedPage $captured,
         private StartPipeline $pipeline,
+        private Limits $limits,
     ) {}
 
     /**
      * @throws InvalidArgumentException when there is nothing to save
      * @throws InvalidImage when an upload is not an image we accept
+     * @throws StashLimitReached when the plan's cap on stashes or storage is reached
      */
     public function capture(User $user, CapturePayload $payload): CaptureResult
     {
@@ -85,6 +89,9 @@ final readonly class CaptureStash
 
     private function create(User $user, CapturePayload $payload, StashDraft $draft): Stash
     {
+        $this->limits->assertMayAddStash($user->id);
+        $this->limits->assertMayStore($user->id, strlen((string)$draft->fileBytes));
+
         $stash = new Stash([
             'type' => $draft->type,
             'title' => $payload->title,

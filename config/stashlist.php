@@ -157,14 +157,35 @@ return [
      | Plans
      |--------------------------------------------------------------------------
      |
-     | Fair-use caps by users.plan. `free` is you and invited friends. Stashes
-     | over the AI cap are saved normally and wait for the next month.
+     | Fair-use caps by users.plan; null means no cap. `free` is you and invited
+     | friends. A stash over the AI cap is saved normally and waits for the next
+     | month for its summary and tags. `plan` forces one plan on every account,
+     | which is how a self-hosted installation runs without limits:
+     | STASHLIST_PLAN=unlimited.
      |
      */
 
+    'plan' => (string)env('STASHLIST_PLAN', ''),
+
     'plans' => [
-        'free' => ['ai_stashes_per_month' => 300],
-        'flat' => ['ai_stashes_per_month' => 1000],
+        'free' => [
+            'stashes' => 2000,
+            'storage_megabytes' => 2048,
+            'ai_stashes_per_month' => 300,
+            'searches_per_minute' => 60,
+        ],
+        'flat' => [
+            'stashes' => 25_000,
+            'storage_megabytes' => 25_600,
+            'ai_stashes_per_month' => 1000,
+            'searches_per_minute' => 120,
+        ],
+        'unlimited' => [
+            'stashes' => null,
+            'storage_megabytes' => null,
+            'ai_stashes_per_month' => null,
+            'searches_per_minute' => 600,
+        ],
     ],
 
     /*

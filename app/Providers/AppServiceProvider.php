@@ -11,6 +11,7 @@ use App\Models\Stash;
 use App\Models\User;
 use App\Pipeline\PipelineJob;
 use App\Search\MakeSearchableUniquely;
+use App\Support\Limits;
 use Carbon\CarbonImmutable;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
@@ -93,9 +94,12 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('capture', static fn (Request $request): Limit => Limit::perMinute(60)->by($perUser(
             $request,
         )));
-        // Only a search is limited, the plain feed is not. Typing sends a request per pause.
+        // Only a search is limited, the plain feed is not. Typing sends a request per pause. How many a minute
+        // depends on the plan.
         RateLimiter::for('search', static fn (Request $request): Limit => $request->filled('q')
-            ? Limit::perMinute(90)->by($perUser($request))
+            ? Limit::perMinute(resolve(Limits::class)->planOf((int)Auth::id())->searchesPerMinute)->by($perUser(
+                $request,
+            ))
             : Limit::none());
         // The API is limited per token, not per user: one runaway client must not lock the others out.
         $perToken = static function (Request $request): string {
