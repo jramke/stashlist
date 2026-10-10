@@ -14,7 +14,7 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 M0 is done in code (`composer test` green on MariaDB, user A cannot read user B's rows). Left for M0: the `LICENSE` file and the buckets, both waiting on you (see above).
 
-M1 in progress. Search works end to end: `GET /stashes?q=...&mode=keyword|hybrid` (hybrid is keyword until M3), checked against a real Meilisearch, with a plain search box in the feed (not yet seen in a browser: no Playwright yet). Sign-in with GitHub and Google works in code (tests fake the providers; it needs OAuth apps from you to try for real). Next: Pulse and the admin gate, `stashlist:import-old`, and the Playwright flows with the bundle-size check.
+M1 in progress. Search works end to end: `GET /stashes?q=...&mode=keyword|hybrid` (hybrid is keyword until M3), checked against a real Meilisearch, with a plain search box in the feed (not yet seen in a browser: no Playwright yet). Sign-in with GitHub and Google works in code (tests fake the providers; it needs OAuth apps from you to try for real). Horizon and Pulse sit behind the admin gate. Next: `stashlist:import-old`, then the Playwright flows with the bundle-size check.
 
 ## Blocked on you
 
@@ -62,7 +62,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [x] Scout keyword search through `StashSearch` (owner filter first and enforced, tag/type/collection filters, 60 per page), the as-you-type request contract (`q`, `mode`, 90/min limit that only counts searches), isolation tests against a real Meilisearch in CI [2.2, 2.5, 2.6, 10.1]
 - [x] Search box in the feed UI (`SearchBox`): keyword request after about 120 ms, hybrid after 400 ms for three characters or more, partial reload of `stashes` and `filters`, `preserveState`, `replace`; the failed-status chip hides while searching [2.5]
 - [x] Socialite login for GitHub and Google with the linking rules: `ResolveSocialUser`, the four old paths, buttons on the login and register pages when a provider is configured, passwordless accounts [6.4]
-- [ ] Horizon dashboard and Pulse behind the admin gate [7.5]
+- [x] Horizon dashboard and Pulse behind the admin gate (`User::isAdmin()`: verified email on `STASHLIST_ADMINS`; no Gravatar in Pulse) [7.5]
 - [ ] `stashlist:import-old` [M1 list]
 - [x] `DeleteStash` (real delete in a transaction, tag counters recounted) and `PurgeStashFiles` (queued after commit, 5 tries); the Meilisearch side follows with `Searchable` [4.9]
 - [ ] Playwright keyboard flows and the bundle-size check in CI [10.6]
@@ -119,6 +119,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 
 ## Decisions and deviations
 
+- 2026-10-10: the admin gate needs a verified email, which the plan did not say. Registration with a password does not verify the address, so anyone could register an address from `STASHLIST_ADMINS` before its owner and get into Horizon and Pulse. Admins sign in with GitHub or Google (verified) until email verification exists.
 - 2026-10-10: `http-interop/http-factory-guzzle` is not installed. It caps `guzzlehttp/psr7` at ^2 and the app has 3.1; psr7 3 ships its own PSR-17 factory and `php-http/discovery` finds it. Checked with a live health call from the Meilisearch client.
 - 2026-10-10: `retry_after` for the Redis queue is 3700 s, not the plan's 360 s. The plan's own rule says it must exceed the longest job timeout, and the maintenance supervisor runs jobs for up to 3600 s.
 - 2026-10-10: Horizon 5.50 serves its assets itself (`horizon:publish` is a no-op), so nothing under `public/vendor` is committed.

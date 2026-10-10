@@ -40,8 +40,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(static fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        // An array, not a closure: the factory binds closure states to itself, which a static closure refuses.
+        return $this->state(['email_verified_at' => null]);
     }
 }

@@ -8,12 +8,16 @@ return [
      | Admins
      |--------------------------------------------------------------------------
      |
-     | Emails allowed into Horizon (and later Pulse) outside the local
-     | environment: STASHLIST_ADMINS="you@example.com,other@example.com".
+     | Emails allowed into Horizon and Pulse outside the local environment:
+     | STASHLIST_ADMINS="you@example.com,other@example.com". Lower case; the
+     | account must also have a verified email (see User::isAdmin()).
      |
      */
 
-    'admins' => array_values(array_filter(array_map(trim(...), explode(',', (string)env('STASHLIST_ADMINS', ''))))),
+    'admins' => array_values(array_filter(array_map(
+        static fn (string $email): string => mb_strtolower(trim($email)),
+        explode(',', (string)env('STASHLIST_ADMINS', '')),
+    ))),
 
     /*
      |--------------------------------------------------------------------------

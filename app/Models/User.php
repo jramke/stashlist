@@ -38,6 +38,19 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * Whether this account may open Horizon and Pulse: its email is on the STASHLIST_ADMINS list and verified.
+     * Registering with a password proves nothing about the address, so an unverified one never counts (an
+     * admin signs in with GitHub or Google, whose emails are verified).
+     */
+    public function isAdmin(): bool
+    {
+        return (
+            $this->email_verified_at !== null &&
+            in_array(mb_strtolower($this->email), config()->array('stashlist.admins'), strict: true)
+        );
+    }
+
+    /**
      * @return HasMany<Stash, $this>
      */
     public function stashes(): HasMany

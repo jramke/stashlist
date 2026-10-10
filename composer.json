@@ -20,6 +20,7 @@
         "laravel/fortify": "^1.37.2",
         "laravel/framework": "^13.17",
         "laravel/horizon": "^5.50",
+        "laravel/pulse": "^1.8",
         "laravel/scout": "^11.9",
         "laravel/socialite": "^5.31",
         "laravel/tinker": "^3.0",

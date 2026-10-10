@@ -22,15 +22,11 @@ final class HorizonServiceProvider extends HorizonApplicationServiceProvider
     }
 
     /**
-     * Outside the local environment only the emails in STASHLIST_ADMINS may open Horizon.
+     * Outside the local environment only the admins (STASHLIST_ADMINS) may open Horizon.
      */
     #[\Override]
     protected function gate(): void
     {
-        Gate::define(
-            'viewHorizon',
-            static fn (?User $user): bool => $user !== null &&
-            in_array($user->email, config()->array('stashlist.admins'), strict: true),
-        );
+        Gate::define('viewHorizon', static fn (?User $user): bool => $user?->isAdmin() === true);
     }
 }

@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Extraction\DnsHostResolver;
 use App\Extraction\HostResolver;
+use App\Models\User;
 use App\Search\MakeSearchableUniquely;
 use Carbon\CarbonImmutable;
 use GuzzleHttp\Client;
@@ -16,9 +17,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Pulse\Facades\Pulse;
 use Laravel\Scout\Scout;
 
 class AppServiceProvider extends ServiceProvider
@@ -39,8 +42,20 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         $this->configureRateLimiting();
+        $this->configurePulse();
 
         Scout::makeSearchableUsing(MakeSearchableUniquely::class);
+    }
+
+    /**
+     * Pulse sits behind the same admin list as Horizon. Pulse's own default gate only opens it locally, and it
+     * would show a Gravatar of every user, which tells a third party their hashed email: leave the avatar out.
+     */
+    protected function configurePulse(): void
+    {
+        Gate::define('viewPulse', static fn (?User $user): bool => app()->isLocal() || $user?->isAdmin() === true);
+
+        Pulse::user(static fn (User $user): array => ['name' => $user->name, 'extra' => $user->email]);
     }
 
     /**
