@@ -78,6 +78,7 @@
             "mago lint",
             "mago analyze",
             "@php artisan typescript:transform",
+            "@php artisan wayfinder:generate --with-form",
             "npm run check",
             "@php artisan test"
         ],

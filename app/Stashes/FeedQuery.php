@@ -15,7 +15,11 @@ use Illuminate\Database\Eloquent\Builder;
 final class FeedQuery
 {
     /** What a card needs, so rendering a page costs a fixed number of queries. */
-    public const EAGER = ['enrichment:stash_id,user_id,title,description,colors', 'thumbnail', 'visibleTags'];
+    public const EAGER = [
+        'enrichment:stash_id,user_id,title,description,colors,extracted_at',
+        'thumbnail',
+        'visibleTags',
+    ];
 
     /**
      * @return Builder<Stash>

@@ -67,6 +67,7 @@ test('a card carries what the grid needs', function () {
         'title' => 'Scraped title',
         'description' => 'Scraped description',
         'colors' => [['hex' => '#ff0000', 'pct' => 0.6]],
+        'extracted_at' => now(),
     ]);
     app(StashStorage::class)->store($stash, FileRole::Thumb, new Blob('thumb', 'image/webp', width: 640, height: 480));
     app(TagSync::class)->addByUser($stash, 'Design');
@@ -85,6 +86,7 @@ test('a card carries what the grid needs', function () {
                 ->where('stashes.data.0.domain', 'example.com')
                 ->where('stashes.data.0.is_private', false)
                 ->where('stashes.data.0.ai_status', 'pending')
+                ->where('stashes.data.0.fetching', false)
                 ->where('stashes.data.0.colors', [['hex' => '#ff0000', 'pct' => 0.6]])
                 ->where('stashes.data.0.thumbnail.width', 640)
                 ->where('stashes.data.0.thumbnail.height', 480)
@@ -97,7 +99,7 @@ test('a card carries what the grid needs', function () {
         );
 });
 
-test('the title falls back from my title to the scraped one to the domain', function () {
+test('the title falls back from my title to the scraped one to the domain, and a note has none', function () {
     Stash::factory()->for($this->user)->create(['title' => 'Mine', 'domain' => 'a.example']);
     $scraped = Stash::factory()->for($this->user)->create(['title' => null, 'domain' => 'b.example']);
     StashEnrichment::query()->create(['stash_id' => $scraped->id, 'user_id' => $this->user->id, 'title' => 'Scraped']);
@@ -111,7 +113,7 @@ test('the title falls back from my title to the scraped one to the domain', func
             'Mine',
             'Scraped',
             'c.example',
-            'Untitled',
+            null,
         ]));
 });
 
@@ -222,4 +224,30 @@ test('a note shows its text in the detail view', function () {
             'word ',
             times: 400,
         ))->where('detail.stash.type', StashType::Note->value));
+});
+
+test('a link waits for extraction until it is read, fails, or gets old', function () {
+    $waiting = Stash::factory()->for($this->user)->create(['title' => 'waiting']);
+    $read = Stash::factory()->for($this->user)->create(['title' => 'read']);
+    StashEnrichment::query()->create(['stash_id' => $read->id, 'user_id' => $this->user->id, 'extracted_at' => now()]);
+    Stash::factory()->for($this->user)->create(['title' => 'failed', 'ai_status' => AiStatus::Failed]);
+    Stash::factory()->for($this->user)->note()->create(['title' => 'note']);
+    $this->travelTo(now()->subHour());
+    Stash::factory()->for($this->user)->create(['title' => 'old']);
+    $this->travelBack();
+
+    $this
+        ->actingAs($this->user)
+        ->get('/stashes')
+        ->assertInertia(function (AssertableInertia $page) {
+            $fetching = collect($page->toArray()['props']['stashes']['data'])->pluck('fetching', 'title')->all();
+
+            return expect($fetching)->toEqual([
+                'waiting' => true,
+                'read' => false,
+                'failed' => false,
+                'note' => false,
+                'old' => false,
+            ]);
+        });
 });

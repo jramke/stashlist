@@ -113,7 +113,10 @@ final class StashController extends Controller
 
         $deletion->schedule($stash);
 
-        ToastData::success(Lang::string('Deleted.'))->flash();
+        ToastData::success(
+            Lang::string('Deleted.'),
+            undoUrl: route('stashes.deletion.destroy', $stash, absolute: false),
+        )->flash();
 
         return to_route('stashes.index');
     }

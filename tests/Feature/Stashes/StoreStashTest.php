@@ -36,7 +36,7 @@ test('a pasted link is saved, extraction is queued and the user is told', functi
     post_stash(['input' => 'https://example.com/post'])->assertInertia(
         fn (AssertableInertia $page) => $page
             ->component('stashes/index')
-            ->hasFlash('toast', ['type' => 'success', 'message' => 'Stashed.'])
+            ->hasFlash('toast', ['type' => 'success', 'message' => 'Stashed.', 'undo_url' => null])
             ->where('stashes.data.0.url', 'https://example.com/post'),
     );
 
@@ -54,6 +54,7 @@ test('saving the same link again says so and saves nothing', function () {
         fn (AssertableInertia $page) => $page->hasFlash('toast', [
             'type' => 'info',
             'message' => 'Already in your stashes.',
+            'undo_url' => null,
         ]),
     );
 

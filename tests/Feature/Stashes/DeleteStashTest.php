@@ -27,7 +27,11 @@ test('deleting starts an undo window and the stash is still there', function () 
         ->assertInertia(
             fn (AssertableInertia $page) => $page
                 ->component('stashes/index')
-                ->hasFlash('toast', ['type' => 'success', 'message' => 'Deleted.']),
+                ->hasFlash('toast', [
+                    'type' => 'success',
+                    'message' => 'Deleted.',
+                    'undo_url' => "/stashes/{$this->stash->id}/deletion",
+                ]),
         );
 
     Queue::assertPushed(
@@ -71,6 +75,7 @@ test('undo cancels the deletion', function () {
         ->assertInertia(fn (AssertableInertia $page) => $page->hasFlash('toast', [
             'type' => 'success',
             'message' => 'Restored.',
+            'undo_url' => null,
         ]));
 
     new FinishStashDeletion($this->stash->id, $this->user->id)->handle(

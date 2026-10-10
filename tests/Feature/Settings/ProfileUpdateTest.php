@@ -48,6 +48,6 @@ test('updating the profile flashes a success toast', function () {
         ->assertInertia(
             fn (AssertableInertia $page) => $page
                 ->component('settings/profile')
-                ->hasFlash('toast', ['type' => 'success', 'message' => 'Profile updated.']),
+                ->hasFlash('toast', ['type' => 'success', 'message' => 'Profile updated.', 'undo_url' => null]),
         );
 });
