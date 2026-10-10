@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Search;
 
+use App\Ai\Embedding\VectorCodec;
 use App\Models\Stash;
 use App\Models\StashHighlight;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -23,7 +24,13 @@ trait StashSearchable
     use Searchable;
 
     /** Relations the search document is built from; load them before indexing. */
-    public const SEARCH_RELATIONS = ['enrichment', 'visibleTags', 'collections', 'highlights:id,stash_id,text'];
+    public const SEARCH_RELATIONS = [
+        'enrichment',
+        'visibleTags',
+        'collections',
+        'highlights:id,stash_id,text',
+        'embeddings',
+    ];
 
     /**
      * Every stash is indexed; the search is always limited to the owner. Build the document from a stash with
@@ -57,9 +64,36 @@ trait StashSearchable
             'tag_ids' => $tags->pluck('id')->values()->all(),
             'collection_ids' => $this->collections->pluck('id')->values()->all(),
             'language' => $enrichment->language ?? null,
+            '_vectors' => $this->vectors(),
             'created_at' => $this->created_at?->timestamp,
             'updated_at' => $this->updated_at?->timestamp,
         ];
+    }
+
+    /**
+     * Every embedder of the instance gets a key; null says "no vector for this document" (not embedded yet, or
+     * the stash is something the model skips), which keeps the document searchable by words. A stored vector that
+     * does not fit its embedder (another model or size, left over from a changed config) is not sent: the search
+     * index would refuse the document.
+     *
+     * @return array<string, list<float>|null>
+     */
+    private function vectors(): array
+    {
+        $vectors = [];
+
+        foreach (array_keys(config()->array('stashlist.embedders')) as $key) {
+            $name = (string)$key;
+            $row = $this->embeddings->firstWhere('embedder', $name);
+            $fits =
+                $row !== null &&
+                $row->dimensions === config()->integer("stashlist.embedders.{$name}.dimensions") &&
+                $row->model === config()->string("stashlist.embedders.{$name}.model");
+
+            $vectors[$name] = $fits ? VectorCodec::unpack($row->vector) : null;
+        }
+
+        return $vectors;
     }
 
     /**

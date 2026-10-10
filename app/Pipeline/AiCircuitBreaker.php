@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Pipeline;
 
+use App\Jobs\ReembedStashes;
 use Closure;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -47,7 +48,7 @@ final class AiCircuitBreaker
         return Cache::has(self::KEY) ? Cache::string(self::KEY) : null;
     }
 
-    public function handle(PipelineJob $job, Closure $next): mixed
+    public function handle(PipelineJob|ReembedStashes $job, Closure $next): mixed
     {
         if (self::isOpen()) {
             $job->release(self::RECHECK);

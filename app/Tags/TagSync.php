@@ -7,6 +7,7 @@ namespace App\Tags;
 use App\Enums\TagSource;
 use App\Models\Stash;
 use App\Models\Tag;
+use App\Pipeline\RefreshEmbedding;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use InvalidArgumentException;
 
@@ -34,6 +35,7 @@ final class TagSync
 
         $this->recount($tag);
         $stash->searchable();
+        $this->refreshEmbeddings([$stash->id]);
 
         return $tag->refresh();
     }
@@ -56,7 +58,8 @@ final class TagSync
         }
 
         $tag->forceFill(['name' => $display, 'slug' => $slug])->save();
-        Stash::reindex($this->stashIds($tag));
+        Stash::reindex($ids = $this->stashIds($tag));
+        $this->refreshEmbeddings($ids);
 
         return $tag;
     }
@@ -70,6 +73,7 @@ final class TagSync
 
         $tag->delete();
         Stash::reindex($stashIds);
+        $this->refreshEmbeddings($stashIds);
     }
 
     /**
@@ -91,6 +95,17 @@ final class TagSync
 
         $this->recount($tag);
         $stash->searchable();
+        $this->refreshEmbeddings([$stash->id]);
+    }
+
+    /**
+     * Tags are part of the text a stash is embedded as, so a change makes its vector stale.
+     *
+     * @param  list<int>  $stashIds
+     */
+    private function refreshEmbeddings(array $stashIds): void
+    {
+        app(RefreshEmbedding::class)->schedule($stashIds);
     }
 
     /**

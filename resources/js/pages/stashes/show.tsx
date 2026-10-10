@@ -3,6 +3,7 @@ import StashReprocessController from '@/actions/App/Http/Controllers/StashReproc
 import { CollectionPicker } from '@/components/collection-picker';
 import { HighlightList } from '@/components/highlight-list';
 import InputError from '@/components/input-error';
+import { StashCard } from '@/components/stash-card';
 import { TagEditor } from '@/components/tag-editor';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,12 +14,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAuthUser } from '@/hooks/use-auth-user';
 import { aiErrorMessage } from '@/lib/ai-status';
 import { index } from '@/routes/stashes';
-import { Form, Head, Link, router, usePoll } from '@inertiajs/react';
+import { Deferred, Form, Head, Link, router, usePoll } from '@inertiajs/react';
 import { ArrowLeft, ExternalLink, RotateCw, Trash2 } from 'lucide-react';
 import { useEffect } from 'react';
 
 type Props = {
     detail: App.Data.StashDetailData;
+    /** Deferred: found after the page is shown. */
+    similar?: App.Data.StashData[];
 };
 
 const bodyLabels = {
@@ -32,7 +35,7 @@ const bodyLabels = {
 /** How often the page asks again while the stash is still being read or tagged. */
 const POLL_INTERVAL = 3000;
 
-export default function Show({ detail }: Props) {
+export default function Show({ detail, similar }: Props) {
     const { stash } = detail;
     const heading = stash.title ?? (stash.type === 'note' ? 'Note' : 'Color');
     const waiting = stash.fetching || stash.tagging;
@@ -183,6 +186,10 @@ export default function Show({ detail }: Props) {
                     </Button>
                 </section>
 
+                <Deferred data="similar" fallback={null}>
+                    <MoreLikeThis stashes={similar ?? []} />
+                </Deferred>
+
                 {detail.excerpt !== null && (
                     <details className="text-sm">
                         <summary className="cursor-pointer text-muted-foreground">
@@ -195,6 +202,24 @@ export default function Show({ detail }: Props) {
                 )}
             </div>
         </>
+    );
+}
+
+/** The stashes closest to this one, as small cards. Shows nothing when there are none. */
+function MoreLikeThis({ stashes }: { stashes: App.Data.StashData[] }) {
+    if (stashes.length === 0) {
+        return null;
+    }
+
+    return (
+        <section className="grid gap-3">
+            <h2 className="text-sm font-medium">More like this</h2>
+            <div className="columns-1 gap-4 sm:columns-2">
+                {stashes.map((stash) => (
+                    <StashCard key={stash.id} stash={stash} />
+                ))}
+            </div>
+        </section>
     );
 }
 

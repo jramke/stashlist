@@ -6,6 +6,7 @@ use App\Enums\AiStage;
 use App\Enums\AiStatus;
 use App\Enums\RunStatus;
 use App\Jobs\ExtractContent;
+use App\Jobs\GenerateEmbedding;
 use App\Jobs\GenerateEnrichment;
 use App\Jobs\IndexStash;
 use App\Jobs\RetryFailedStashes;
@@ -104,7 +105,11 @@ test('a failure in extraction starts again from the top', function () {
 
     app()->call([new RetryFailedStashes, 'handle']);
 
-    Queue::assertPushedWithChain(ExtractContent::class, [GenerateEnrichment::class, IndexStash::class]);
+    Queue::assertPushedWithChain(ExtractContent::class, [
+        GenerateEnrichment::class,
+        GenerateEmbedding::class,
+        IndexStash::class,
+    ]);
 });
 
 test('a stash that waited for the monthly cap runs once there is room', function () {

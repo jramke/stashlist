@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Tests\Support;
 
 use App\Ai\Agents\StashEnricher;
+use App\Ai\Embedding\Embedders;
+use App\Ai\Embedding\FakeEmbedder;
+use App\Models\Stash;
 use Closure;
 use Laravel\Ai\Gateway\FakeTextGateway;
 use Laravel\Ai\Responses\Data\Meta;
@@ -24,8 +27,32 @@ final class FakeAi
     {
         // A key is needed for the instance to count as having AI; nothing is ever sent with it.
         config(['stashlist.ai.enabled' => true, 'ai.providers.openai.key' => 'test-key']);
+        self::fakeEmbedder();
 
         return StashEnricher::fake($answers)->preventStrayPrompts();
+    }
+
+    /**
+     * Vectors come from a deterministic embedder of 16 dimensions instead of a provider.
+     */
+    public static function fakeEmbedder(): FakeEmbedder
+    {
+        $embedder = new FakeEmbedder('text_v1', dimensions: 16);
+
+        config(['stashlist.embedders.text_v1' => [
+            'provider' => $embedder->provider(),
+            'model' => $embedder->model(),
+            'dimensions' => $embedder->dimensions(),
+        ]]);
+        app()->instance(Embedders::class, new Embedders(['text_v1' => $embedder]));
+        // The search index is told the same size, as the app does at boot from the config above.
+        config([
+            'scout.meilisearch.index-settings.'.Stash::class.'.embedders' => [
+                'text_v1' => ['source' => 'userProvided', 'dimensions' => $embedder->dimensions()],
+            ],
+        ]);
+
+        return $embedder;
     }
 
     /**

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Search;
 
+use App\Ai\QueryEmbedder;
 use App\Data\FeedFiltersData;
+use App\Enums\SearchMode;
 use App\Models\Stash;
 use App\Models\User;
 use App\Stashes\FeedQuery;
@@ -26,6 +28,10 @@ use Meilisearch\Exceptions\ExceptionInterface;
  */
 final class StashSearch
 {
+    public function __construct(
+        private readonly QueryEmbedder $queryEmbedder,
+    ) {}
+
     /**
      * One page of the stashes that match the text, best match first.
      *
@@ -33,12 +39,17 @@ final class StashSearch
      *
      * @throws SearchUnavailable when the engine cannot be reached or is not set up
      */
-    public function search(User $user, string $text, FeedFiltersData $filters, int $perPage): LengthAwarePaginator
-    {
+    public function search(
+        User $user,
+        string $text,
+        FeedFiltersData $filters,
+        int $perPage,
+        SearchMode $mode = SearchMode::Hybrid,
+    ): LengthAwarePaginator {
         try {
             /** @var LengthAwarePaginator<int, Stash> */
             return $this
-                ->builder($user, $text, $filters)
+                ->builder($user, $text, $filters, $mode)
                 ->query(static fn (EloquentBuilder $stashes): EloquentBuilder => $stashes->with(FeedQuery::EAGER))
                 ->paginate($perPage);
         } catch (ExceptionInterface $failure) {
@@ -53,13 +64,23 @@ final class StashSearch
      *
      * @return Builder<Stash>
      */
-    public function builder(User $user, string $text, FeedFiltersData $filters): Builder
-    {
+    public function builder(
+        User $user,
+        string $text,
+        FeedFiltersData $filters,
+        SearchMode $mode = SearchMode::Hybrid,
+    ): Builder {
         // The owner comes first and from the User object. Nothing below may replace it.
         $search = Stash::search(trim($text), $this->guarded($user, $filters))->where(
             'user_id',
             $user->id,
         );
+
+        $semantic = $this->semantic($user, trim($text), $mode);
+
+        if ($semantic !== []) {
+            $search->options($semantic);
+        }
 
         if ($filters->type !== null) {
             $search->where('type', $filters->type->value);
@@ -75,6 +96,52 @@ final class StashSearch
         }
 
         return $search;
+    }
+
+    /**
+     * The semantic half of a hybrid search: the vector of the query and how much it counts. Empty (a plain
+     * keyword search) for the keyword mode, a query too short to mean anything, a user with smart features off
+     * and when the query could not be embedded.
+     *
+     * @return array<string, mixed>
+     */
+    private function semantic(User $user, string $text, SearchMode $mode): array
+    {
+        if (
+            $mode !== SearchMode::Hybrid ||
+            mb_strlen($text) < config()->integer('stashlist.search.min_semantic_chars')
+        ) {
+            return [];
+        }
+
+        $vector = $this->queryEmbedder->embed($user, $text);
+
+        return (
+            $vector === null
+                ? []
+                : [
+                    'vector' => $vector,
+                    'hybrid' => [
+                        'embedder' => config()->string('stashlist.search.embedder'),
+                        'semanticRatio' => $this->ratio($text),
+                    ],
+                    'rankingScoreThreshold' => config()->float('stashlist.search.threshold'),
+                ]
+        );
+    }
+
+    /**
+     * Single words are keywords, and their semantic neighbours are noise; a sentence is meaning.
+     */
+    private function ratio(string $text): float
+    {
+        $words = count(preg_split('/\s+/u', $text, flags: PREG_SPLIT_NO_EMPTY) ?: []);
+
+        return config()->float('stashlist.search.ratio.'.match (true) {
+            $words <= 1 => 'short',
+            $words === 2 => 'default',
+            default => 'long',
+        });
     }
 
     /**

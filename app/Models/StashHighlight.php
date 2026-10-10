@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToUser;
+use App\Pipeline\RefreshEmbedding;
 use Carbon\CarbonImmutable;
 use Database\Factories\StashHighlightFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -53,8 +54,13 @@ final class StashHighlight extends Model
         static::updating(static function (self $highlight): void {
             $highlight->revision++;
         });
-        static::saved(static fn (self $highlight) => Stash::reindex([$highlight->stash_id]));
-        static::deleted(static fn (self $highlight) => Stash::reindex([$highlight->stash_id]));
+        // Highlights are part of the text a stash is embedded as, so its vector goes stale too.
+        $changed = static function (self $highlight): void {
+            Stash::reindex([$highlight->stash_id]);
+            app(RefreshEmbedding::class)->schedule([$highlight->stash_id]);
+        };
+        static::saved($changed);
+        static::deleted($changed);
     }
 
     /**

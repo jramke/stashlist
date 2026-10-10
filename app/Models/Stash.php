@@ -49,8 +49,10 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property \Illuminate\Database\Eloquent\Collection<int, Tag> $visibleTags
  * @property \Illuminate\Database\Eloquent\Collection<int, Collection> $collections
  * @property \Illuminate\Database\Eloquent\Collection<int, StashHighlight> $highlights
+ * @property \Illuminate\Database\Eloquent\Collection<int, StashEmbedding> $embeddings
  *
  * @method void searchable() queues an index write, Scout's Searchable trait
+ * @method string searchableAs() the name of the search index
  * @method \Laravel\Scout\Engines\Engine searchableUsing()
  * @method static \Laravel\Scout\Builder<Stash> search(string $query = '', \Closure|null $callback = null)
  * @method static mixed withoutSyncingToSearch(\Closure $callback) runs the callback without indexing the saves in it
@@ -100,6 +102,14 @@ final class Stash extends Model
     public function displayTitle(): string
     {
         return $this->title ?? $this->enrichment->title ?? $this->domain ?? 'Untitled';
+    }
+
+    /**
+     * @return HasMany<StashEmbedding, $this>
+     */
+    public function embeddings(): HasMany
+    {
+        return $this->hasMany(StashEmbedding::class);
     }
 
     /**

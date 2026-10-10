@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Stashes\CaptureStash;
 use App\Actions\Stashes\UpdateStash;
+use App\Data\StashData;
 use App\Data\StashDetailData;
 use App\Data\TagData;
 use App\Data\ToastData;
@@ -16,6 +17,7 @@ use App\Images\InvalidImage;
 use App\Models\Stash;
 use App\Models\Tag;
 use App\Models\User;
+use App\Search\SimilarStashes;
 use App\Stashes\Feed;
 use App\Stashes\PendingDeletion;
 use App\Storage\StashStorage;
@@ -41,10 +43,11 @@ final class StashController extends Controller
         User $user,
     ): Response {
         $filters = $request->filters();
+        $mode = $request->mode();
 
         return Inertia::render('stashes/index', [
             // A reload of the list (polling) replaces cards by id instead of appending a second copy of each.
-            'stashes' => Inertia::scroll(static fn () => $feed->page($user, $filters, self::PER_PAGE))->matchOn(
+            'stashes' => Inertia::scroll(static fn () => $feed->page($user, $filters, self::PER_PAGE, $mode))->matchOn(
                 'data.id',
             ),
             'filters' => $filters,
@@ -60,8 +63,12 @@ final class StashController extends Controller
         ]);
     }
 
-    public function show(Stash $stash, StashStorage $storage, PendingDeletion $deletion): Response
-    {
+    public function show(
+        Stash $stash,
+        StashStorage $storage,
+        PendingDeletion $deletion,
+        SimilarStashes $similar,
+    ): Response {
         Gate::authorize('view', $stash);
         abort_if($deletion->isPending($stash->id), code: 404);
 
@@ -69,6 +76,14 @@ final class StashController extends Controller
 
         return Inertia::render('stashes/show', [
             'detail' => StashDetailData::fromModel($stash, $storage),
+            // Found after the page is shown: the search engine is asked, which the page does not wait for.
+            'similar' => Inertia::defer(static fn (): array => array_map(
+                static fn (Stash $found): StashData => StashData::fromModel($found, $storage),
+                $deletion
+                    ->without(collect($similar->for($stash)))
+                    ->values()
+                    ->all(),
+            )),
         ]);
     }
 

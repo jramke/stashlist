@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Ai\Embedding\Embedders;
 use App\Extraction\DnsHostResolver;
 use App\Extraction\HostResolver;
+use App\Models\Stash;
 use App\Models\User;
 use App\Pipeline\PipelineJob;
 use App\Search\MakeSearchableUniquely;
@@ -35,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(HostResolver::class, DnsHostResolver::class);
         $this->app->bind(ClientInterface::class, Client::class);
+        $this->app->singleton(Embedders::class, Embedders::fromConfig(...));
     }
 
     /**
@@ -45,8 +48,28 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
         $this->configureRateLimiting();
         $this->configurePulse();
+        $this->configureSearchEmbedders();
 
         Scout::makeSearchableUsing(MakeSearchableUniquely::class);
+    }
+
+    /**
+     * The embedders of the search index are those of config/stashlist.php: vectors come from this app
+     * (userProvided), so the index only needs to know their names and sizes. Done here because config/scout.php is
+     * loaded before config/stashlist.php. `scout:sync-index-settings` sends it to Meilisearch.
+     */
+    protected function configureSearchEmbedders(): void
+    {
+        $embedders = [];
+
+        foreach (array_keys(config()->array('stashlist.embedders')) as $name) {
+            $embedders[$name] = [
+                'source' => 'userProvided',
+                'dimensions' => config()->integer("stashlist.embedders.{$name}.dimensions"),
+            ];
+        }
+
+        config(['scout.meilisearch.index-settings.'.Stash::class.'.embedders' => $embedders]);
     }
 
     /**
@@ -92,6 +115,11 @@ class AppServiceProvider extends ServiceProvider
         // The model calls (plan 4.6): all users together, and each user on their own so that one big import
         // cannot keep everyone else waiting. These limit jobs, not requests.
         RateLimiter::for('llm', static fn (): Limit => Limit::perMinute(config()->integer('stashlist.ai.llm_rpm'))->by(
+            'global',
+        ));
+        RateLimiter::for('embed', static fn (): Limit => Limit::perMinute(config()->integer(
+            'stashlist.ai.embed_rpm',
+        ))->by(
             'global',
         ));
         RateLimiter::for('user-ai', static fn (PipelineJob $job): Limit => Limit::perMinute(

@@ -53,8 +53,9 @@ test('the search document holds the text, the tags and the collections of a stas
             'tag_ids' => [$tag->id],
             'collection_ids' => [$collection->id],
         ])
-        ->not
-        ->toHaveKey('_vectors')
+        // Not embedded yet: the key is there with no vector, so the stash is found by its words alone.
+        ->and($document['_vectors'])
+        ->toBe(['text_v1' => null])
         ->and($document['created_at'])
         ->toBeInt();
 });
@@ -88,8 +89,8 @@ test('indexing a hundred stashes loads their relations in a fixed number of quer
         $stash->toSearchableArray();
     }
 
-    // enrichments, visible tags (with pivot), collections: one query each, not one per stash.
-    expect(count(DB::getQueryLog()))->toBeLessThanOrEqual(4);
+    // enrichments, visible tags (with pivot), collections, highlights, embeddings: one query each, not one per stash.
+    expect(count(DB::getQueryLog()))->toBeLessThanOrEqual(5);
 });
 
 test('only changes to searchable columns reindex a stash', function () {

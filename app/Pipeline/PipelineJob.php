@@ -26,7 +26,7 @@ use Throwable;
  */
 abstract class PipelineJob implements ShouldQueue
 {
-    use Queueable;
+    use HandlesProviderFailures, Queueable;
 
     public int $timeout = 150;
 
@@ -43,6 +43,11 @@ abstract class PipelineJob implements ShouldQueue
     }
 
     abstract protected function stage(): AiStage;
+
+    /**
+     * The name of the rate limiter for calls of this kind, shared by all users.
+     */
+    abstract protected function limiter(): string;
 
     public function retryUntil(): DateTimeInterface
     {
@@ -66,7 +71,7 @@ abstract class PipelineJob implements ShouldQueue
             new WithoutOverlapping("stash:{$this->stashId}")->releaseAfter(30),
             new AiCircuitBreaker,
             new RateLimited('user-ai'),
-            new RateLimited('llm'),
+            new RateLimited($this->limiter()),
         ];
     }
 
@@ -85,9 +90,17 @@ abstract class PipelineJob implements ShouldQueue
             $exception,
         );
 
-        $code = PipelineError::code($exception, $this->stage());
+        // A stage that runs on its own (a refresh after a tag changed) must not turn a finished stash into a
+        // failed one; only a stage of the chain reports back to the person.
+        if (! $this->isInChain($stash)) {
+            return;
+        }
 
-        $stash->forceFill(['ai_status' => AiStatus::Failed, 'ai_stage' => $this->stage(), 'ai_error' => $code])->save();
+        $stash->forceFill([
+            'ai_status' => AiStatus::Failed,
+            'ai_stage' => $this->stage(),
+            'ai_error' => PipelineError::code($exception, $this->stage()),
+        ])->save();
 
         dispatch(new IndexStash($this->stashId, $this->userId));
     }

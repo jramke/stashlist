@@ -6,11 +6,13 @@ namespace App\Pipeline;
 
 use App\Actions\Stashes\CapturedPage;
 use App\Ai\AiGuard;
+use App\Ai\Embedding\Embedders;
 use App\Enums\AiStatus;
 use App\Enums\FileRole;
 use App\Enums\StashType;
 use App\Jobs\DeriveCapturedImage;
 use App\Jobs\ExtractContent;
+use App\Jobs\GenerateEmbedding;
 use App\Jobs\GenerateEnrichment;
 use App\Jobs\IndexStash;
 use App\Models\Stash;
@@ -28,6 +30,7 @@ final class StartPipeline
 {
     public function __construct(
         private readonly AiGuard $guard,
+        private readonly Embedders $embedders,
     ) {}
 
     public function start(Stash $stash, ?CapturedPage $captured = null): void
@@ -80,11 +83,28 @@ final class StartPipeline
     }
 
     /**
-     * Links and notes are read by the model. Images join with the vision stage.
+     * The model and the vectors, for the stashes they are for: links and notes (images join with the vision
+     * stage) of an owner who has smart features on, on an instance that has them. The vectors are left out
+     * where no embedder has a key.
+     *
+     * @return list<GenerateEnrichment|GenerateEmbedding>
      */
-    private function isEnrichable(Stash $stash): bool
+    private function smartJobs(Stash $stash): array
     {
-        return ($stash->type === StashType::Link || $stash->type === StashType::Note) && $this->guard->allows($stash);
+        if (
+            $stash->type !== StashType::Link && $stash->type !== StashType::Note ||
+            ! $this->guard->allows($stash)
+        ) {
+            return [];
+        }
+
+        $jobs = [new GenerateEnrichment($stash->id, $stash->user_id)];
+
+        if (array_any($this->embedders->all(), $this->guard->canEmbed(...))) {
+            $jobs[] = new GenerateEmbedding($stash->id, $stash->user_id);
+        }
+
+        return $jobs;
     }
 
     /**
@@ -100,7 +120,7 @@ final class StartPipeline
      */
     private function run(Stash $stash, array $lookAt): void
     {
-        $enrich = $this->isEnrichable($stash) ? [new GenerateEnrichment($stash->id, $stash->user_id)] : [];
+        $enrich = $this->smartJobs($stash);
 
         $stash->forceFill([
             'ai_status' => $enrich === [] ? AiStatus::Skipped : AiStatus::Pending,

@@ -7,6 +7,7 @@ namespace App\Stashes;
 use App\Data\FeedFiltersData;
 use App\Data\StashData;
 use App\Data\ToastData;
+use App\Enums\SearchMode;
 use App\Models\Stash;
 use App\Models\User;
 use App\Search\SearchUnavailable;
@@ -33,12 +34,16 @@ final readonly class Feed
     /**
      * @return AbstractCursorPaginator<int, Stash>|AbstractPaginator<int, Stash> its items are StashData already
      */
-    public function page(User $user, FeedFiltersData $filters, int $perPage): AbstractCursorPaginator|AbstractPaginator
-    {
+    public function page(
+        User $user,
+        FeedFiltersData $filters,
+        int $perPage,
+        SearchMode $mode = SearchMode::Hybrid,
+    ): AbstractCursorPaginator|AbstractPaginator {
         try {
             $page = $filters->q === null
                 ? $this->query->build($filters)->cursorPaginate($perPage)
-                : $this->search->search($user, $filters->q, $filters, $perPage);
+                : $this->search->search($user, $filters->q, $filters, $perPage, $mode);
         } catch (SearchUnavailable) {
             // The feed itself works without the search engine; only the search does not.
             ToastData::error(Lang::string('Search is not available right now. Try again in a moment.'))->flash();

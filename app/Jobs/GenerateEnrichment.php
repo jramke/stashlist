@@ -16,9 +16,7 @@ use App\Enums\StashType;
 use App\Enums\Subtype;
 use App\Models\Stash;
 use App\Models\StashEnrichment;
-use App\Pipeline\AiCircuitBreaker;
 use App\Pipeline\Attempt;
-use App\Pipeline\PipelineError;
 use App\Pipeline\PipelineJob;
 use App\Pipeline\UsageRecorder;
 use App\Support\Limits;
@@ -38,6 +36,11 @@ final class GenerateEnrichment extends PipelineJob
     protected function stage(): AiStage
     {
         return AiStage::Enrich;
+    }
+
+    protected function limiter(): string
+    {
+        return 'llm';
     }
 
     public function handle(
@@ -104,32 +107,6 @@ final class GenerateEnrichment extends PipelineJob
         $recorder->succeeded($stash, AiStage::Enrich, $attempt, $enrichment->call);
     }
 
-    /**
-     * What to do with a failure depends on what it says: wait and ask again, give up on this stash, or stop all
-     * AI work for a while.
-     */
-    private function handleFailure(Stash $stash, Throwable $failure): void
-    {
-        $code = PipelineError::code($failure, AiStage::Enrich);
-
-        match ($code) {
-            // Our key or credit is refused: every job would fail. Hold them all and try again in a while.
-            'halted' => $this->hold($stash, $code),
-            // The provider said "slow down": a release, not a failure.
-            'rate_limited' => $this->release(PipelineError::retryAfter($failure) ?? 60),
-            // A server error or a timeout: the framework retries it with backoff.
-            'provider_unavailable' => throw $failure,
-            default => $this->fail($failure),
-        };
-    }
-
-    private function hold(Stash $stash, string $code): void
-    {
-        AiCircuitBreaker::open('the provider refused our credentials or credit');
-        $this->mark($stash, AiStatus::Pending, AiStage::Enrich, $code);
-        $this->release(300);
-    }
-
     private function apply(Stash $stash, Enrichment $enrichment, string $hash, AiTagSync $tags): void
     {
         $result = $enrichment->result;
@@ -161,16 +138,5 @@ final class GenerateEnrichment extends PipelineJob
                 );
             }
         });
-    }
-
-    private function mark(Stash $stash, AiStatus $status, ?AiStage $stage = null, ?string $error = null): void
-    {
-        Stash::withoutSyncingToSearch(
-            static fn () => $stash->forceFill([
-                'ai_status' => $status,
-                'ai_stage' => $stage,
-                'ai_error' => $error,
-            ])->save(),
-        );
     }
 }

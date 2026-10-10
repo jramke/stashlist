@@ -37,7 +37,7 @@ final class UsageRecorder
                 'cost_micros' => $cost,
             ]);
 
-            $this->addToMonth($stash->user_id, $stage, $call->tokensIn, $call->tokensOut, $cost);
+            $this->addToMonth($stash->user_id, $stage, stashes: 1, call: $call, cost: $cost);
 
             return $run;
         });
@@ -94,11 +94,25 @@ final class UsageRecorder
         return $run;
     }
 
-    private function addToMonth(int $userId, AiStage $stage, int $tokensIn, int $tokensOut, int $cost): void
+    /**
+     * Adds a bulk call (a batch of stashes embedded together) to a user's month. There is no log line per stash
+     * for these: the batch is not worth a row each.
+     */
+    public function batch(int $userId, AiStage $stage, int $stashes, ProviderCall $call): void
+    {
+        $cost = Prices::cost($call->model, $call->tokensIn, $call->tokensOut);
+
+        $this->addToMonth($userId, $stage, $stashes, $call, $cost);
+        $this->addToDay($cost);
+    }
+
+    private function addToMonth(int $userId, AiStage $stage, int $stashes, ProviderCall $call, int $cost): void
     {
         $period = now()->format('Y-m');
-        $llm = $stage === AiStage::Enrich ? 1 : 0;
-        $embed = $stage === AiStage::Embed ? 1 : 0;
+        $llm = $stage === AiStage::Enrich ? $stashes : 0;
+        $embed = $stage === AiStage::Embed ? $stashes : 0;
+        $tokensIn = $call->tokensIn;
+        $tokensOut = $call->tokensOut;
 
         UsageMonthly::query()->upsert(
             [

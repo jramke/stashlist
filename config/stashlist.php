@@ -78,6 +78,7 @@ return [
         'prompt_version' => 1,
         // Calls per minute: all users together, and one user (one big import must not starve the others).
         'llm_rpm' => 300,
+        'embed_rpm' => 1000,
         'user_rpm' => 20,
         // Past this much estimated spend per day the circuit breaker opens until the next day.
         'daily_budget_usd' => 5.0,
@@ -92,7 +93,49 @@ return [
             'gpt-5-mini' => [0.25, 2.00],
             'gpt-5.4-nano' => [0.20, 1.25],
             'gpt-5.4-mini' => [0.75, 4.50],
+            'text-embedding-3-small' => [0.02, 0.0],
+            'text-embedding-3-large' => [0.13, 0.0],
         ],
+    ],
+
+    /*
+     |--------------------------------------------------------------------------
+     | Embeddings
+     |--------------------------------------------------------------------------
+     |
+     | Every entry gives each stash a vector and an embedder in the search index
+     | (under the same key). A vector is only comparable to vectors of its own
+     | model and size, so to change either, add a new entry (text_v2), fill it
+     | with `stashlist:reembed`, then point `search.embedder` at it.
+     |
+     */
+
+    'embedders' => [
+        'text_v1' => [
+            'provider' => 'openai',
+            'model' => 'text-embedding-3-large',
+            'dimensions' => 512,
+        ],
+    ],
+
+    /*
+     |--------------------------------------------------------------------------
+     | Search
+     |--------------------------------------------------------------------------
+     |
+     | The semantic part of a search. `ratio` is how much the meaning counts
+     | against the words, by the number of words in the query (one, two, three or
+     | more): a single word is a keyword, a sentence is a meaning. Results scoring
+     | under `threshold` are dropped. Starting values, tuned with the search eval.
+     |
+     */
+
+    'search' => [
+        'embedder' => (string)env('STASHLIST_EMBEDDER', 'text_v1'),
+        'ratio' => ['short' => 0.3, 'default' => 0.5, 'long' => 0.7],
+        'threshold' => 0.35,
+        'min_semantic_chars' => 3,
+        'query_cache_seconds' => 86_400,
     ],
 
     /*

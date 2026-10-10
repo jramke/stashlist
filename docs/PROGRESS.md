@@ -97,10 +97,11 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 
 ### M3. Embeddings and hybrid search [2, 9]
 
-- [ ] Spike: 1M synthetic documents on Meilisearch
-- [ ] `Embedder`, `LaravelAiEmbedder`, `EmbeddingText`, `VectorCodec`, `GenerateEmbedding`, `stash_embeddings`
-- [ ] Embedder in index settings, `_vectors`, `QueryEmbedder`, hybrid `StashSearch`, similar stashes
-- [ ] `stashlist:reindex`, `stashlist:reembed`, `stashlist:reconcile-index`, `stashlist:search-eval`
+- [ ] Spike: 1M synthetic documents on Meilisearch. The tool is written (`ddev artisan stashlist:search-spike --docs=1000000`), and a 10,000-document run here gave filtered hybrid p95 of 14 ms. The 1M run belongs on the target box (yours: it needs that machine's RAM and CPU; watch `docker stats` meanwhile)
+- [x] `Embedder`, `LaravelAiEmbedder`, `FakeEmbedder`, `EmbeddingText`, `VectorCodec`, `GenerateEmbedding` (also after a tag or highlight changed, debounced: `RefreshEmbedding`), `stash_embeddings`
+- [x] Embedder in index settings, `_vectors`, `QueryEmbedder` (cached, never fails a search), hybrid `StashSearch` with `mode=keyword|hybrid`, `SimilarStashes` with the tag fallback and "More like this" on the detail page
+- [x] `stashlist:reindex`, `stashlist:reembed`, `stashlist:reconcile-index`, `stashlist:search-eval`
+- [ ] The eval set itself (yours: 30 to 50 real queries in German and English with the stashes they should find, as `storage/app/search-eval.json`), then compare `text-embedding-3-large@512` with `-small@512` and tune ratio and threshold with `stashlist:search-eval`
 
 ### M4. Images [9]
 
@@ -160,3 +161,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - 2026-10-11: the tests run with `STASHLIST_AI=false` (`phpunit.xml`); the AI ones turn it on with `Tests\Support\FakeAi::install()`, which fakes the agent and fails on a prompt nobody planned. `composer require laravel/ai` ends with an error from the `boost:update` post-update script (Boost is not set up here); the package installs fine.
 - 2026-10-11: an instance counts as having AI only when `STASHLIST_AI` is not false and the chosen provider has a key (Ollama needs none). Without a key every call would fail, so the stashes are skipped instead of looping through the circuit breaker; that also keeps the DDEV site and the browser flows quiet until a key is set.
 - 2026-10-11: `mago.toml` allows 20 constructor parameters (16 before) for the card DTO; the fetching and tagging checks moved to `App\Stashes\Progress`.
+- 2026-10-11: the as-you-type contract was already in the UI (`search-box.tsx` asks for `mode=keyword` after 120 ms and `mode=hybrid` after 400 ms); the server now honours it. A query with no `mode` is hybrid. The keyword mode never calls a provider, and a hybrid search of a user with smart features off, or whose query cannot be embedded, quietly runs on words.
+- 2026-10-11: `stashlist:reindex` writes the documents over the old ones instead of building `stashes_next` and swapping, because the search keeps answering while documents are replaced in place. `--swap` can be added if a settings change ever needs a clean slate.
+- 2026-10-11: the real Meilisearch tests found two things the fakes could not. A document must name every `userProvided` embedder (`_vectors.text_v1`, null for none), or the engine rejects the write later and silently: the search document always sets it, and `stashlist:reconcile-index` lists such failed tasks. And `vector` is a reserved word in MariaDB 11.8, so the column is quoted.
+- 2026-10-11: `Stash::reindex()` is still the path for tag, collection and highlight changes; the ones that change the embedding text (tags, highlights) also schedule `RefreshEmbedding`. A collection change does not, because collections are not part of the embedding text.

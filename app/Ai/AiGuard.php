@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Ai;
 
+use App\Ai\Embedding\Embedder;
 use App\Models\Stash;
 use App\Models\User;
 
@@ -46,9 +47,33 @@ final class AiGuard
             return false;
         }
 
-        $name = Llm::configured()->provider;
+        return $this->providerIsConfigured(Llm::configured()->provider);
+    }
 
-        return config("ai.providers.{$name}.driver") === 'ollama' || filled(config("ai.providers.{$name}.key"));
+    /**
+     * Whether this instance can make vectors with the embedder: switched on, and its provider has a key.
+     */
+    public function canEmbed(Embedder $embedder): bool
+    {
+        return config()->boolean('stashlist.ai.enabled') && $this->providerIsConfigured($embedder->provider());
+    }
+
+    /**
+     * Whether a search by this user may embed the query: the same two switches as for a stash, and a key. With
+     * smart features off the search is on words alone, so no provider is called at all.
+     */
+    public function allowsQueryEmbedding(User $user, Embedder $embedder): bool
+    {
+        return $user->ai_enabled && $this->canEmbed($embedder);
+    }
+
+    private function providerIsConfigured(string $provider): bool
+    {
+        return (
+            $provider === 'fake' ||
+            config("ai.providers.{$provider}.driver") === 'ollama' ||
+            filled(config("ai.providers.{$provider}.key"))
+        );
     }
 
     private function userHasAi(int $userId): bool

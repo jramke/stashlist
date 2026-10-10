@@ -6,6 +6,7 @@ namespace App\Http\Requests;
 
 use App\Data\FeedFiltersData;
 use App\Enums\AiStatus;
+use App\Enums\SearchMode;
 use App\Enums\StashType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -24,10 +25,15 @@ final class IndexStashRequest extends FormRequest
             'tag.*' => ['integer', 'min:1'],
             'collection' => ['nullable', 'string', 'regex:/^(none|\d+)$/'],
             'q' => ['nullable', 'string', 'max:200'],
-            // The as-you-type pair: "keyword" answers fast, "hybrid" follows once the user paused. Until
-            // embeddings exist both are a keyword search.
-            'mode' => ['nullable', Rule::in(['keyword', 'hybrid'])],
+            // The as-you-type pair: "keyword" answers fast and calls no provider, "hybrid" follows once the user
+            // paused and adds the meaning of the query.
+            'mode' => ['nullable', Rule::enum(SearchMode::class)],
         ];
+    }
+
+    public function mode(): SearchMode
+    {
+        return SearchMode::tryFrom($this->string('mode')->toString()) ?? SearchMode::Hybrid;
     }
 
     public function filters(): FeedFiltersData

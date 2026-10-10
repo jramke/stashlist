@@ -6,6 +6,7 @@ use App\Actions\Stashes\CapturedPage;
 use App\Enums\AiStatus;
 use App\Enums\StashType;
 use App\Jobs\ExtractContent;
+use App\Jobs\GenerateEmbedding;
 use App\Jobs\GenerateEnrichment;
 use App\Jobs\IndexStash;
 use App\Models\Stash;
@@ -24,7 +25,11 @@ test('a link is read, then the model, then the index', function () {
 
     app(StartPipeline::class)->start($stash);
 
-    Queue::assertPushedWithChain(ExtractContent::class, [GenerateEnrichment::class, IndexStash::class]);
+    Queue::assertPushedWithChain(ExtractContent::class, [
+        GenerateEnrichment::class,
+        GenerateEmbedding::class,
+        IndexStash::class,
+    ]);
 
     expect($stash->fresh()->ai_status)->toBe(AiStatus::Pending);
 });
@@ -35,7 +40,7 @@ test('a note goes to the model without being read first', function () {
     app(StartPipeline::class)->start($stash);
 
     Queue::assertNotPushed(ExtractContent::class);
-    Queue::assertPushedWithChain(GenerateEnrichment::class, [IndexStash::class]);
+    Queue::assertPushedWithChain(GenerateEnrichment::class, [GenerateEmbedding::class, IndexStash::class]);
 
     expect($stash->fresh()->ai_status)->toBe(AiStatus::Pending);
 });
@@ -46,7 +51,7 @@ test('a page the client already read goes straight to the model', function () {
     app(StartPipeline::class)->start($stash, new CapturedPage(contentMarkdown: '# A page'));
 
     Queue::assertNotPushed(ExtractContent::class);
-    Queue::assertPushedWithChain(GenerateEnrichment::class, [IndexStash::class]);
+    Queue::assertPushedWithChain(GenerateEnrichment::class, [GenerateEmbedding::class, IndexStash::class]);
 });
 
 test('the model jobs wait on the ai queue and carry ids only', function () {
@@ -107,7 +112,11 @@ test('the retry button runs everything again, the model included', function () {
 
     app(StartPipeline::class)->restart($stash);
 
-    Queue::assertPushedWithChain(ExtractContent::class, [GenerateEnrichment::class, IndexStash::class]);
+    Queue::assertPushedWithChain(ExtractContent::class, [
+        GenerateEnrichment::class,
+        GenerateEmbedding::class,
+        IndexStash::class,
+    ]);
 });
 
 test('running only the model again leaves out extraction', function () {
@@ -116,7 +125,7 @@ test('running only the model again leaves out extraction', function () {
     app(StartPipeline::class)->enrichAgain($stash);
 
     Queue::assertNotPushed(ExtractContent::class);
-    Queue::assertPushedWithChain(GenerateEnrichment::class, [IndexStash::class]);
+    Queue::assertPushedWithChain(GenerateEnrichment::class, [GenerateEmbedding::class, IndexStash::class]);
 });
 
 test('switching smart features back on queues nothing by itself', function () {
