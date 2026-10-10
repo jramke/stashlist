@@ -1,5 +1,5 @@
 import AppLogoIcon from '@/components/app-logo-icon';
-import { home } from '@/routes';
+import { home, privacy } from '@/routes';
 import type { AuthLayoutProps } from '@/types';
 import { Link } from '@inertiajs/react';
 
@@ -26,6 +26,11 @@ export default function AuthLayout({
                         </div>
                     </div>
                     {children}
+                    <p className="text-center text-xs text-muted-foreground">
+                        <Link href={privacy()} className="underline">
+                            Privacy
+                        </Link>
+                    </p>
                 </div>
             </div>
         </div>

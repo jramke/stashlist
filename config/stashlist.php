@@ -196,6 +196,23 @@ return [
 
     /*
      |--------------------------------------------------------------------------
+     | Operator
+     |--------------------------------------------------------------------------
+     |
+     | Who runs this installation, for the privacy page: name, postal address
+     | and a contact email. Left empty, the page says that the operator has not
+     | filled these in yet.
+     |
+     */
+
+    'operator' => [
+        'name' => (string)env('STASHLIST_OPERATOR_NAME', ''),
+        'address' => (string)env('STASHLIST_OPERATOR_ADDRESS', ''),
+        'email' => (string)env('STASHLIST_OPERATOR_EMAIL', ''),
+    ],
+
+    /*
+     |--------------------------------------------------------------------------
      | Bot
      |--------------------------------------------------------------------------
      |

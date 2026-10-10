@@ -7,6 +7,7 @@ use App\Http\Controllers\CollectionOrderController;
 use App\Http\Controllers\CollectionStashController;
 use App\Http\Controllers\HighlightController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PrivacyController;
 use App\Http\Controllers\SocialLoginController;
 use App\Http\Controllers\StashCollectionController;
 use App\Http\Controllers\StashController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+Route::get('privacy', PrivacyController::class)->name('privacy');
 
 // Sign in with GitHub or Google. The paths are the ones the old app's OAuth apps already allow.
 Route::middleware('guest')->group(function () {

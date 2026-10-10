@@ -1,6 +1,6 @@
 import AppLogoIcon from '@/components/app-logo-icon';
 import { cn } from '@/lib/utils';
-import { home, logout } from '@/routes';
+import { home, logout, privacy } from '@/routes';
 import { index as collections } from '@/routes/collections';
 import { edit as profile } from '@/routes/profile';
 import { index as stashes } from '@/routes/stashes';
@@ -87,6 +87,13 @@ export default function AppLayout({ children }: { children?: ReactNode }) {
                         />
                     ))}
                 </nav>
+
+                <Link
+                    href={privacy()}
+                    className="px-2 text-xs text-muted-foreground hover:text-foreground"
+                >
+                    Privacy
+                </Link>
             </aside>
 
             <div className="flex min-w-0 flex-1 flex-col">
