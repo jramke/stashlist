@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Search;
 
-use App\Ai\QueryEmbedder;
 use App\Data\FeedFiltersData;
 use App\Enums\SearchMode;
 use App\Models\Stash;
@@ -29,7 +28,8 @@ use Meilisearch\Exceptions\ExceptionInterface;
 final class StashSearch
 {
     public function __construct(
-        private readonly QueryEmbedder $queryEmbedder,
+        private readonly HybridOptions $hybrid,
+        private readonly TenantSearch $tenant,
     ) {}
 
     /**
@@ -76,7 +76,7 @@ final class StashSearch
             $user->id,
         );
 
-        $semantic = $this->semantic($user, trim($text), $mode);
+        $semantic = $this->hybrid->options($user, trim($text), $mode);
 
         if ($semantic !== []) {
             $search->options($semantic);
@@ -103,52 +103,6 @@ final class StashSearch
     }
 
     /**
-     * The semantic half of a hybrid search: the vector of the query and how much it counts. Empty (a plain
-     * keyword search) for the keyword mode, a query too short to mean anything, a user with smart features off
-     * and when the query could not be embedded.
-     *
-     * @return array<string, mixed>
-     */
-    private function semantic(User $user, string $text, SearchMode $mode): array
-    {
-        if (
-            $mode !== SearchMode::Hybrid ||
-            mb_strlen($text) < config()->integer('stashlist.search.min_semantic_chars')
-        ) {
-            return [];
-        }
-
-        $vector = $this->queryEmbedder->embed($user, $text);
-
-        return (
-            $vector === null
-                ? []
-                : [
-                    'vector' => $vector,
-                    'hybrid' => [
-                        'embedder' => config()->string('stashlist.search.embedder'),
-                        'semanticRatio' => $this->ratio($text),
-                    ],
-                    'rankingScoreThreshold' => config()->float('stashlist.search.threshold'),
-                ]
-        );
-    }
-
-    /**
-     * Single words are keywords, and their semantic neighbours are noise; a sentence is meaning.
-     */
-    private function ratio(string $text): float
-    {
-        $words = count(preg_split('/\s+/u', $text, flags: PREG_SPLIT_NO_EMPTY) ?: []);
-
-        return config()->float('stashlist.search.ratio.'.match (true) {
-            $words <= 1 => 'short',
-            $words === 2 => 'default',
-            default => 'long',
-        });
-    }
-
-    /**
      * Scout writes the where() calls into the engine filter and hands it to this callback, which checks that the
      * owner filter is there and adds the one filter where() cannot say: a stash in no collection.
      */
@@ -157,7 +111,14 @@ final class StashSearch
         $owner = "user_id={$user->id}";
         $inNoCollection = $filters->collection === 'none';
 
-        return static function (Indexes $index, string $text, array $options) use ($owner, $inNoCollection): array {
+        // With a search key the request goes out under a token that only sees this user's documents.
+        $tenantIndex = $this->tenant->indexFor($user->id);
+
+        return static function (Indexes $index, string $text, array $options) use (
+            $owner,
+            $inNoCollection,
+            $tenantIndex,
+        ): array {
             $filter = (string)($options['filter'] ?? '');
 
             if ($filter !== $owner && ! str_starts_with($filter, "{$owner} AND ")) {
@@ -168,7 +129,7 @@ final class StashSearch
                 $options['filter'] = "{$filter} AND collection_ids IS EMPTY";
             }
 
-            return $index->rawSearch($text, $options);
+            return ($tenantIndex ?? $index)->rawSearch($text, $options);
         };
     }
 }

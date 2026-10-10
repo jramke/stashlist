@@ -150,6 +150,12 @@ return [
         'threshold' => 0.35,
         'min_semantic_chars' => 3,
         'query_cache_seconds' => 86_400,
+        // Searches are signed per user with a search-only key (`stashlist:search-key`), so the engine itself
+        // refuses to show anyone another user's documents. Off while these are empty.
+        'tenant' => [
+            'key' => (string)env('MEILISEARCH_SEARCH_KEY', ''),
+            'uid' => (string)env('MEILISEARCH_SEARCH_KEY_UID', ''),
+        ],
     ],
 
     /*

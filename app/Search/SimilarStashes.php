@@ -28,6 +28,7 @@ final class SimilarStashes
 
     public function __construct(
         private readonly Client $engine,
+        private readonly TenantSearch $tenant,
     ) {}
 
     /**
@@ -58,15 +59,15 @@ final class SimilarStashes
         }
 
         try {
-            $result = $this->engine
-                ->index($stash->searchableAs())
-                ->searchSimilarDocuments(
-                    new SimilarDocumentsQuery($stash->id, $embedder)
-                        ->setFilter(["user_id = {$stash->user_id}"])
-                        ->setLimit(max(1, $limit))
-                        ->setAttributesToRetrieve(['id'])
-                        ->setRankingScoreThreshold(self::THRESHOLD),
-                );
+            // With a search key the request goes out under a token that only sees this user's documents.
+            $index = $this->tenant->indexFor($stash->user_id) ?? $this->engine->index($stash->searchableAs());
+            $result = $index->searchSimilarDocuments(
+                new SimilarDocumentsQuery($stash->id, $embedder)
+                    ->setFilter(["user_id = {$stash->user_id}"])
+                    ->setLimit(max(1, $limit))
+                    ->setAttributesToRetrieve(['id'])
+                    ->setRankingScoreThreshold(self::THRESHOLD),
+            );
         } catch (ExceptionInterface $failure) {
             // The stash may not be indexed yet, or the engine is down: the tags still tell something.
             report($failure);
