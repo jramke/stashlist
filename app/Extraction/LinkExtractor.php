@@ -66,7 +66,9 @@ final readonly class LinkExtractor
     private function page(Stash $stash, FetchedResponse $response, string $hash): ExtractionResult
     {
         $page = $this->parser->parse($response);
-        $image = $page->imageUrl === null ? null : $this->openGraphImage($stash, $page->imageUrl);
+        // A picture the client sent from the page it has open wins over the one the server could fetch.
+        $clientPicture = ($stash->meta['client_picture'] ?? false) === true;
+        $image = $page->imageUrl === null || $clientPicture ? null : $this->openGraphImage($stash, $page->imageUrl);
 
         return new ExtractionResult(
             hash: $hash,

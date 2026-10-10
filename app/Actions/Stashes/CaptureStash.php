@@ -7,6 +7,7 @@ namespace App\Actions\Stashes;
 use App\Collections\CollectionSync;
 use App\Enums\AiStatus;
 use App\Enums\FileRole;
+use App\Enums\StashType;
 use App\Images\InvalidImage;
 use App\Models\Stash;
 use App\Models\User;
@@ -32,6 +33,7 @@ final readonly class CaptureStash
         private StashStorage $storage,
         private TagSync $tags,
         private CollectionSync $collections,
+        private ApplyCapturedPage $captured,
         private StartPipeline $pipeline,
     ) {}
 
@@ -58,6 +60,18 @@ final readonly class CaptureStash
         }
 
         return new CaptureResult($stash, created: true);
+    }
+
+    /**
+     * What the client captured about a link: its capture block, or just the pictures it sent along.
+     */
+    private function capturedPage(CapturePayload $payload): ?CapturedPage
+    {
+        if ($payload->capture === null && $payload->image === null && $payload->screenshot === null) {
+            return null;
+        }
+
+        return $payload->capture ?? new CapturedPage;
     }
 
     private function existing(User $user, StashDraft $draft): ?Stash
@@ -99,7 +113,14 @@ final readonly class CaptureStash
         }
 
         $this->collections->add($stash, $payload->collectionIds);
-        $this->pipeline->start($stash);
+
+        $page = $draft->type === StashType::Link ? $this->capturedPage($payload) : null;
+
+        if ($page !== null) {
+            $this->captured->apply($stash, $page, $payload->image, $payload->screenshot);
+        }
+
+        $this->pipeline->start($stash, $page);
 
         return $stash;
     }

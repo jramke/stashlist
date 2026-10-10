@@ -12,9 +12,9 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 ## Now
 
-M0 is done in code (`composer test` green on MariaDB, user A cannot read user B's rows). Left for M0: the `LICENSE` file and the buckets, both waiting on you (see above).
+M0 and M1 are done in code and green: `composer test` (443+ tests, mago clean, real Meilisearch in the search tests), eight browser flows (`npm run e2e`, Playwright against DDEV) and the feed's JavaScript at 147.7 of 150 KiB. What is left of them is yours: the keyboard layer and the Coolify/Hetzner spikes, plus the `LICENSE` file and the buckets (see below). Sign-in with GitHub and Google is written and tested with fakes; it needs OAuth apps to try for real.
 
-M1 in progress. Search works end to end: `GET /stashes?q=...&mode=keyword|hybrid` (hybrid is keyword until M3), checked against a real Meilisearch, with a plain search box in the feed (not yet seen in a browser: no Playwright yet). Sign-in with GitHub and Google works in code (tests fake the providers; it needs OAuth apps from you to try for real). Horizon and Pulse sit behind the admin gate, `stashlist:import-old` is written, and seven browser flows (Playwright) run green against DDEV; the feed's JavaScript is 147.7 of 150 KiB. M1 is done from my side: left are the keyboard layer and the Coolify/Hetzner spikes (yours). M1.5 started: API tokens and `/api/v1/me` are in; next the capture endpoint (`POST /api/v1/stashes` with the `capture` block), lookup, tags and collections, then the extension in `extension/`.
+M1.5: the whole backend is in (tokens, `/api/v1` capture with the `capture` block, lookup, tags, collections, me, idempotency). **Next: the extension in `extension/`** (WXT, React, Tailwind, defuddle), then its CI job and store prep.
 
 ## Blocked on you
 
@@ -71,8 +71,8 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 ### M1.5. Browser extension v1 [6.3, 6.5]
 
 - [x] Sanctum tokens (prefix `stl_`, bearer only, no cookie auth), the token settings page (create, shown once, list with last use, revoke; account settings moved into the app frame), `GET /api/v1/me`, per-token rate limits (`api-create` 60/min, `api-lookup` 120/min)
-- [ ] `POST /api/v1/stashes` with `Idempotency-Key`, payload validation and size caps, `GET /api/v1/stashes/lookup`, `GET /api/v1/tags`, `GET /api/v1/collections`, contract and isolation tests
-- [ ] `CaptureStash` accepts the `capture` block
+- [x] `POST /api/v1/stashes` (JSON or multipart, `Idempotency-Key`, validation and size caps, control characters stripped), `GET /api/v1/stashes/lookup`, `GET /api/v1/tags`, `GET /api/v1/collections`, contract and isolation tests
+- [x] `CaptureStash` accepts the `capture` block: page text and description skip the fetch, client picture bytes win (`DeriveCapturedImage`), an image address is fetched the safe way
 - [ ] `extension/` with WXT, React, Tailwind and `defuddle`: popup, context menus, quick clip, options page, Chrome and Firefox builds
 - [ ] Repo hygiene for `extension/` (own tsconfig, prettier ignores, CI job)
 - [ ] Store prep (privacy page, permission texts, listing); Defuddle spike

@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\Idempotent;
+use App\Http\Middleware\LimitJsonBody;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -22,6 +24,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
+            'idempotent' => Idempotent::class,
+            'json.limit' => LimitJsonBody::class,
         ]);
         $middleware->web(append: [
             HandleInertiaRequests::class,

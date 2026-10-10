@@ -31,7 +31,8 @@ final readonly class StashDraftFactory
      */
     public function fromPayload(CapturePayload $payload): StashDraft
     {
-        if ($payload->image !== null) {
+        // A file alone is an image stash. With a URL it is the picture of that page, kept by CaptureStash.
+        if ($payload->image !== null && trim((string)$payload->input) === '') {
             return $this->fromUpload($payload->image);
         }
 

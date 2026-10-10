@@ -8,7 +8,9 @@ use Illuminate\Http\UploadedFile;
 
 /**
  * What a client asks to save. The web form and the API both build one, so there is a single capture path.
- * Either $input (a URL, a CSS color or text) or $image (a picked or dropped file) is set.
+ * Either $input (a URL, a CSS color or text) or $image (a picked or dropped file) is set. With both, the file
+ * is the picture of the page the URL points to, as is $screenshot; $capture is what the client read from the
+ * page itself.
  */
 final readonly class CapturePayload
 {
@@ -23,5 +25,7 @@ final readonly class CapturePayload
         public bool $private = false,
         public array $tags = [],
         public array $collectionIds = [],
+        public ?CapturedPage $capture = null,
+        public ?UploadedFile $screenshot = null,
     ) {}
 }
