@@ -33,9 +33,15 @@ return [
      | Queue Data Syncing
      |--------------------------------------------------------------------------
      |
-     | Index writes go through the "index" queue, after the surrounding
-     | database transaction committed. Follows QUEUE_CONNECTION, so tests
-     | (sync) never need Redis.
+     | Index writes go through the "index" queue. The connection follows
+     | QUEUE_CONNECTION, so tests (sync) never need Redis.
+     |
+     | "after_commit" stays false on purpose. It would defer Scout's model
+     | observer until the surrounding transaction ends, and the observer decides
+     | whether to index by looking at what the last save changed; after several
+     | saves of one stash in a transaction it would look at the wrong one. The
+     | Redis connection (config/queue.php) pushes jobs after the commit anyway,
+     | and the job reads the stash from the database when it runs.
      |
      */
 
@@ -44,7 +50,7 @@ return [
         'queue' => 'index',
     ],
 
-    'after_commit' => true,
+    'after_commit' => false,
 
     'chunk' => [
         'searchable' => 500,

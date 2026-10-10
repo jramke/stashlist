@@ -26,6 +26,7 @@ final class CollectionSync
         }
 
         $stash->collections()->syncWithoutDetaching($this->memberships($stash, $collectionIds));
+        $stash->searchable();
     }
 
     /**
@@ -36,6 +37,7 @@ final class CollectionSync
     public function syncCollections(Stash $stash, array $collectionIds): void
     {
         $stash->collections()->sync($this->memberships($stash, $collectionIds));
+        $stash->searchable();
     }
 
     /**
@@ -57,7 +59,10 @@ final class CollectionSync
             strict: true,
         )));
 
-        $collection->stashes()->detach(array_values(array_diff($members, $ordered)));
+        $removed = array_values(array_diff($members, $ordered));
+        $added = [];
+
+        $collection->stashes()->detach($removed);
 
         foreach ($ordered as $position => $stashId) {
             if (in_array($stashId, $members, strict: true)) {
@@ -71,7 +76,22 @@ final class CollectionSync
                 'position' => $position,
                 'created_at' => now(),
             ]);
+            $added[] = $stashId;
         }
+
+        // Moving a stash within the collection changes no search document; joining or leaving does.
+        Stash::reindex([...$removed, ...$added]);
+    }
+
+    /**
+     * Deletes the collection and its links. The stashes stay.
+     */
+    public function delete(Collection $collection): void
+    {
+        $memberIds = array_values(array_map(intval(...), $collection->stashes()->pluck('stashes.id')->all()));
+
+        $collection->delete();
+        Stash::reindex($memberIds);
     }
 
     /**

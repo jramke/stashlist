@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Collections\CollectionSync;
 use App\Data\ToastData;
 use App\Http\Requests\StoreCollectionRequest;
 use App\Http\Requests\UpdateCollectionRequest;
@@ -55,11 +56,11 @@ final class CollectionController extends Controller
     /**
      * The stashes stay; only the collection and its links go.
      */
-    public function destroy(Collection $collection): RedirectResponse
+    public function destroy(Collection $collection, CollectionSync $sync): RedirectResponse
     {
         Gate::authorize('delete', $collection);
 
-        $collection->delete();
+        $sync->delete($collection);
 
         ToastData::success(Lang::string('Collection deleted.'))->flash();
 

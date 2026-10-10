@@ -9,6 +9,7 @@ use App\Enums\FileRole;
 use App\Enums\StashType;
 use App\Images\InvalidImage;
 use App\Jobs\ExtractContent;
+use App\Jobs\IndexStash;
 use App\Models\Collection;
 use App\Models\Stash;
 use App\Models\Tag;
@@ -58,6 +59,7 @@ test('a link is saved with its dedupe hash and domain and extraction starts', fu
         ExtractContent::class,
         fn (ExtractContent $job): bool => $job->stashId === $stash->id && $job->userId === $this->user->id,
     );
+    Queue::assertPushedWithChain(ExtractContent::class, [IndexStash::class]);
 });
 
 test('the same link again returns the stash that exists', function () {
@@ -108,7 +110,8 @@ test('text becomes a note and a color a color, without a pipeline', function (
         ->and($stash->url_hash)
         ->toBeNull();
 
-    Queue::assertNothingPushed();
+    Queue::assertNotPushed(ExtractContent::class);
+    Queue::assertPushed(IndexStash::class, fn (IndexStash $job): bool => $job->stashId === $stash->id);
 })->with([
     'note' => ['remember to call mum', StashType::Note, 'remember to call mum'],
     'color' => ['#E63946', StashType::Color, '#e63946'],

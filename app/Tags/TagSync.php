@@ -33,6 +33,7 @@ final class TagSync
         $this->linkAsUser($stash, $tag, $stash->tags()->where('tags.id', $tag->id)->first()?->pivot);
 
         $this->recount($tag);
+        $stash->searchable();
 
         return $tag->refresh();
     }
@@ -55,6 +56,7 @@ final class TagSync
         }
 
         $tag->forceFill(['name' => $display, 'slug' => $slug])->save();
+        Stash::reindex($this->stashIds($tag));
 
         return $tag;
     }
@@ -64,7 +66,10 @@ final class TagSync
      */
     public function delete(Tag $tag): void
     {
+        $stashIds = $this->stashIds($tag);
+
         $tag->delete();
+        Stash::reindex($stashIds);
     }
 
     /**
@@ -79,15 +84,23 @@ final class TagSync
             return;
         }
 
-        if ($row->getAttribute('source') === TagSource::User->value) {
-            $stash->tags()->detach($tag->id);
-            $this->recount($tag);
+        match ($row->getAttribute('source')) {
+            TagSource::User->value => $stash->tags()->detach($tag->id),
+            default => $stash->tags()->updateExistingPivot($tag->id, ['dismissed_at' => now()]),
+        };
 
-            return;
-        }
-
-        $stash->tags()->updateExistingPivot($tag->id, ['dismissed_at' => now()]);
         $this->recount($tag);
+        $stash->searchable();
+    }
+
+    /**
+     * The stashes that carry the tag in any state: their search documents hold its name.
+     *
+     * @return list<int>
+     */
+    private function stashIds(Tag $tag): array
+    {
+        return array_values(array_map(intval(...), $tag->stashes()->pluck('stashes.id')->all()));
     }
 
     /**

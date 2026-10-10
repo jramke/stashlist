@@ -66,7 +66,7 @@ test('text and colors are saved as notes and colors', function (string $input, S
 
     expect(Stash::query()->firstOrFail()->type)->toBe($type);
 
-    Queue::assertNothingPushed();
+    Queue::assertNotPushed(ExtractContent::class);
 })->with([
     'note' => ['buy flour', StashType::Note],
     'color' => ['#e63946', StashType::Color],

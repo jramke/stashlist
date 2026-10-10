@@ -75,6 +75,20 @@ trait StashSearchable
     }
 
     /**
+     * Queues these stashes for indexing. For changes the model observer cannot see, such as links to tags and
+     * collections, which live in pivot tables; the queued job reads the stash again when it runs.
+     *
+     * @param  list<int>  $ids
+     */
+    public static function reindex(array $ids): void
+    {
+        if ($ids !== []) {
+            // @mago-expect analysis:non-documented-method
+            static::query()->whereKey($ids)->searchable();
+        }
+    }
+
+    /**
      * A save only reindexes when a searchable column changed; flipping ai_status or touching indexed_at would
      * otherwise reindex on every pipeline step. The insert itself has no recorded changes, and the instance
      * keeps wasRecentlyCreated for the rest of its life, so that flag only counts while no update happened yet.
@@ -84,7 +98,7 @@ trait StashSearchable
         return (
             $this->wasRecentlyCreated &&
             $this->getChanges() === [] ||
-            $this->wasChanged(['title', 'body', 'url', 'domain', 'subtype', 'is_private'])
+            $this->wasChanged(['type', 'subtype', 'title', 'body', 'url', 'domain', 'is_private'])
         );
     }
 }

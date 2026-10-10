@@ -14,6 +14,13 @@ use Laravel\Scout\Jobs\MakeSearchable;
  */
 final class MakeSearchableUniquely extends MakeSearchable implements ShouldBeUniqueUntilProcessing
 {
+    /**
+     * Seconds the lock lasts at most. The lock is taken when the job is dispatched, but a dispatch inside a
+     * transaction only reaches the queue after the commit; if the transaction rolls back, no job ever
+     * releases the lock, and without an end the stash could not be indexed again.
+     */
+    public int $uniqueFor = 60;
+
     public function uniqueId(): string
     {
         $first = $this->models->first();

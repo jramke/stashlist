@@ -49,6 +49,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property \Illuminate\Database\Eloquent\Collection<int, Tag> $tags
  * @property \Illuminate\Database\Eloquent\Collection<int, Tag> $visibleTags
  * @property \Illuminate\Database\Eloquent\Collection<int, Collection> $collections
+ *
+ * @method void searchable() queues an index write, Scout's Searchable trait
+ * @method \Laravel\Scout\Engines\Engine searchableUsing()
  */
 #[Fillable(['type', 'subtype', 'title', 'body', 'url', 'url_hash', 'domain', 'meta', 'is_private', 'content_hash'])]
 #[Hidden(['url_hash'])]
