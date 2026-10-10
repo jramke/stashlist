@@ -48,11 +48,12 @@ export function StashCard({ stash }: { stash: App.Data.StashData }) {
                     </p>
                 )}
 
-                {stash.description !== null && stash.type === 'link' && (
-                    <p className="line-clamp-3 text-xs text-muted-foreground">
-                        {stash.description}
-                    </p>
-                )}
+                {(stash.summary ?? stash.description) !== null &&
+                    stash.type === 'link' && (
+                        <p className="line-clamp-3 text-xs text-muted-foreground">
+                            {stash.summary ?? stash.description}
+                        </p>
+                    )}
 
                 {tags.length > 0 && (
                     <ul className="flex flex-wrap gap-1">
@@ -76,6 +77,12 @@ export function StashCard({ stash }: { stash: App.Data.StashData }) {
                             <span className="flex items-center gap-1">
                                 <Loader2 className="size-3.5 animate-spin" />
                                 Fetching
+                            </span>
+                        )}
+                        {!stash.fetching && stash.tagging && (
+                            <span className="flex items-center gap-1">
+                                <Loader2 className="size-3.5 animate-spin" />
+                                Tagging
                             </span>
                         )}
                         {stash.ai_status === 'failed' && (

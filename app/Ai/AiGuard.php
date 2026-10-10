@@ -36,9 +36,19 @@ final class AiGuard
         }
     }
 
+    /**
+     * Whether this instance can reach a model at all: switched on, and the chosen provider has a key (a local
+     * Ollama needs none). Without a key every call would fail, so the stashes are skipped instead.
+     */
     public function instanceHasAi(): bool
     {
-        return config()->boolean('stashlist.ai.enabled');
+        if (! config()->boolean('stashlist.ai.enabled')) {
+            return false;
+        }
+
+        $name = Llm::configured()->provider;
+
+        return config("ai.providers.{$name}.driver") === 'ollama' || filled(config("ai.providers.{$name}.key"));
     }
 
     private function userHasAi(int $userId): bool

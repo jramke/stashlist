@@ -12,11 +12,13 @@ type Props = {
     tags: App.Data.TagData[];
 };
 
-/** How often the feed asks again while a card is still being filled in. */
+/** How often the feed asks again while a card is still being filled in or tagged. */
 const POLL_INTERVAL = 3000;
 
 export default function Index({ stashes, filters, tags }: Props) {
-    const waiting = stashes.data.some((stash) => stash.fetching);
+    const waiting = stashes.data.some(
+        (stash) => stash.fetching || stash.tagging,
+    );
     const { start, stop } = usePoll(
         POLL_INTERVAL,
         { only: ['stashes'] },

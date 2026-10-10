@@ -7,6 +7,7 @@ namespace App\Data;
 use App\Enums\AiStatus;
 use App\Enums\StashType;
 use App\Models\Stash;
+use App\Stashes\Progress;
 use App\Storage\StashStorage;
 use Illuminate\Support\Str;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
@@ -30,6 +31,7 @@ final readonly class StashData
         public ?string $subtype,
         public ?string $title,
         public ?string $description,
+        public ?string $summary,
         public ?string $url,
         public ?string $domain,
         public ?string $body,
@@ -40,6 +42,7 @@ final readonly class StashData
         public array $tags,
         public string $created_at,
         public bool $fetching,
+        public bool $tagging,
     ) {}
 
     public static function fromModel(Stash $stash, StashStorage $storage): self
@@ -55,6 +58,7 @@ final readonly class StashData
                 ? $stash->title
                 : $stash->displayTitle(),
             description: $stash->enrichment->description ?? null,
+            summary: $stash->enrichment->summary ?? null,
             url: $stash->url,
             domain: $stash->domain,
             body: $stash->body === null
@@ -69,25 +73,8 @@ final readonly class StashData
             ),
             tags: array_values($stash->visibleTags->map(TagData::fromModel(...))->all()),
             created_at: $stash->created_at?->toIso8601String() ?? '',
-            fetching: self::isFetching($stash),
-        );
-    }
-
-    /**
-     * Whether extraction is still expected to fill this card in: links and images that have not been read yet
-     * and have not failed. After ten minutes the card stops waiting, so a stopped queue does not leave a
-     * spinner running for good.
-     */
-    private static function isFetching(Stash $stash): bool
-    {
-        $extractable = $stash->type === StashType::Link || $stash->type === StashType::Image;
-
-        return (
-            $extractable &&
-            $stash->ai_status !== AiStatus::Failed &&
-            ($stash->enrichment->extracted_at ?? null) === null &&
-            $stash->created_at !== null &&
-            $stash->created_at->isAfter(now()->subMinutes(10))
+            fetching: Progress::isFetching($stash),
+            tagging: Progress::isTagging($stash),
         );
     }
 }

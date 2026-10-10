@@ -16,7 +16,7 @@ final class FeedQuery
 {
     /** What a card needs, so rendering a page costs a fixed number of queries. */
     public const EAGER = [
-        'enrichment:stash_id,user_id,title,description,colors,extracted_at',
+        'enrichment:stash_id,user_id,title,description,summary,colors,extracted_at',
         'thumbnail',
         'visibleTags',
     ];

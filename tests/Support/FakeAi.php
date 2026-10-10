@@ -22,7 +22,8 @@ final class FakeAi
      */
     public static function install(array|Closure $answers = []): FakeTextGateway
     {
-        config(['stashlist.ai.enabled' => true]);
+        // A key is needed for the instance to count as having AI; nothing is ever sent with it.
+        config(['stashlist.ai.enabled' => true, 'ai.providers.openai.key' => 'test-key']);
 
         return StashEnricher::fake($answers)->preventStrayPrompts();
     }

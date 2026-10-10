@@ -10,9 +10,12 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
+import { useAuthUser } from '@/hooks/use-auth-user';
+import { aiErrorMessage } from '@/lib/ai-status';
 import { index } from '@/routes/stashes';
-import { Form, Head, Link, router } from '@inertiajs/react';
+import { Form, Head, Link, router, usePoll } from '@inertiajs/react';
 import { ArrowLeft, ExternalLink, RotateCw, Trash2 } from 'lucide-react';
+import { useEffect } from 'react';
 
 type Props = {
     detail: App.Data.StashDetailData;
@@ -26,9 +29,26 @@ const bodyLabels = {
     color: 'Color',
 } satisfies Record<App.Enums.StashType, string>;
 
+/** How often the page asks again while the stash is still being read or tagged. */
+const POLL_INTERVAL = 3000;
+
 export default function Show({ detail }: Props) {
     const { stash } = detail;
     const heading = stash.title ?? (stash.type === 'note' ? 'Note' : 'Color');
+    const waiting = stash.fetching || stash.tagging;
+    const { start, stop } = usePoll(
+        POLL_INTERVAL,
+        { only: ['detail'] },
+        { autoStart: false },
+    );
+
+    useEffect(() => {
+        if (waiting) {
+            start();
+        } else {
+            stop();
+        }
+    }, [waiting, start, stop]);
 
     return (
         <>
@@ -72,9 +92,9 @@ export default function Show({ detail }: Props) {
                             <ExternalLink className="size-3.5 shrink-0" />
                         </a>
                     )}
-                    {stash.description !== null && (
+                    {(stash.summary ?? stash.description) !== null && (
                         <p className="text-sm text-muted-foreground">
-                            {stash.description}
+                            {stash.summary ?? stash.description}
                         </p>
                     )}
                 </header>
@@ -130,6 +150,7 @@ export default function Show({ detail }: Props) {
                 <section className="grid gap-3">
                     <h2 className="text-sm font-medium">Tags</h2>
                     <TagEditor stashId={stash.id} tags={stash.tags} />
+                    <SmartStatus stash={stash} />
                 </section>
 
                 <section className="grid gap-3">
@@ -150,24 +171,6 @@ export default function Show({ detail }: Props) {
                 <Separator />
 
                 <section className="flex flex-wrap items-center gap-4">
-                    {stash.ai_status === 'failed' && (
-                        <Button
-                            variant="outline"
-                            onClick={() =>
-                                router.post(
-                                    StashReprocessController.store.url(
-                                        stash.id,
-                                    ),
-                                    {},
-                                    { preserveScroll: true },
-                                )
-                            }
-                        >
-                            <RotateCw />
-                            Try again
-                        </Button>
-                    )}
-
                     <Button
                         variant="destructive"
                         className="ml-auto"
@@ -192,6 +195,69 @@ export default function Show({ detail }: Props) {
                 )}
             </div>
         </>
+    );
+}
+
+/** Says what the smart features are doing with this stash, and offers to try again where that helps. */
+function SmartStatus({ stash }: { stash: App.Data.StashData }) {
+    const user = useAuthUser();
+    const canMakeSome =
+        user.ai_enabled && (stash.type === 'link' || stash.type === 'note');
+
+    if (stash.tagging) {
+        return (
+            <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Spinner />
+                Making a summary and tags…
+            </p>
+        );
+    }
+
+    if (stash.ai_status === 'failed' || stash.ai_error !== null) {
+        return (
+            <div className="flex flex-wrap items-center gap-3">
+                <p className="text-sm text-muted-foreground">
+                    {aiErrorMessage(stash.ai_error)}
+                </p>
+                {stash.ai_status === 'failed' && <RetryButton id={stash.id} />}
+            </div>
+        );
+    }
+
+    // Saved while smart features were off (or before they existed): the person can ask for them one by one.
+    if (
+        stash.ai_status === 'skipped' &&
+        canMakeSome &&
+        stash.summary === null
+    ) {
+        return <RetryButton id={stash.id} label="Add a summary and tags" />;
+    }
+
+    return null;
+}
+
+function RetryButton({
+    id,
+    label = 'Try again',
+}: {
+    id: number;
+    label?: string;
+}) {
+    return (
+        <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+                router.post(
+                    StashReprocessController.store.url(id),
+                    {},
+                    { preserveScroll: true },
+                )
+            }
+        >
+            <RotateCw />
+            {label}
+        </Button>
     );
 }
 

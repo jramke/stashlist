@@ -92,7 +92,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [x] `laravel/ai`, `config/stashlist.php`, `StashEnricher`, `EnrichmentResult`, `TagVocabulary`, `AiTagSync` (the plan's `TagSync::applyAi`), `TagMatcher`
 - [x] Pipeline: `StartPipeline`, `PipelineJob`, `GenerateEnrichment`, `stash_runs`, `UsageRecorder`, rate limiters, circuit breaker, `SweepStuckStashes`, `RetryFailedStashes`, nightly prune
 - [x] `ai_enabled` end to end (the only switch; no per-stash flag): `AiGuard` stops every AI call when the user has it off (or the instance, `STASHLIST_AI=false`)
-- [ ] UI: tag chips with source, dismiss, status badge, retry, `usePoll`
+- [x] UI: tag chips with source (outlined = automatic), dismiss, a "Tagging" badge on cards and a status line with a retry button on the detail page, the summary on both, `usePoll` on the feed and the detail page
 - [ ] `stashlist:bakeoff` (needs the OpenAI key)
 
 ### M3. Embeddings and hybrid search [2, 9]
@@ -158,3 +158,5 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - 2026-10-11: the answer schema has `title`, `summary`, `tags`, `subtype` and `language` only. `objects` and `ocr_text` belong to the vision stage (M4) and join with a `prompt_version` bump. Images are skipped by the AI stage until then. A link that turns out to be an image during extraction is skipped too. An answer with nothing in it is a refusal (`llm_refused`, not asked again); one that breaks the rules is sent back twice (`llm_invalid`).
 - 2026-10-11: a failed AI stage queues `IndexStash` itself, because the chain stops at the failure and the text extraction found would otherwise never reach the search index. The run log never stores provider messages (they can quote the prompt, which holds page text): an HTTP error is logged as `HTTP 400`.
 - 2026-10-11: the tests run with `STASHLIST_AI=false` (`phpunit.xml`); the AI ones turn it on with `Tests\Support\FakeAi::install()`, which fakes the agent and fails on a prompt nobody planned. `composer require laravel/ai` ends with an error from the `boost:update` post-update script (Boost is not set up here); the package installs fine.
+- 2026-10-11: an instance counts as having AI only when `STASHLIST_AI` is not false and the chosen provider has a key (Ollama needs none). Without a key every call would fail, so the stashes are skipped instead of looping through the circuit breaker; that also keeps the DDEV site and the browser flows quiet until a key is set.
+- 2026-10-11: `mago.toml` allows 20 constructor parameters (16 before) for the card DTO; the fetching and tagging checks moved to `App\Stashes\Progress`.

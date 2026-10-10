@@ -44,6 +44,17 @@ test('the enricher refuses everything when the instance has AI off', function ()
     Http::assertNothingSent();
 });
 
+test('an instance without a key for its provider counts as having no AI', function () {
+    config(['ai.providers.openai.key' => null]);
+    $stash = Stash::factory()->note()->create();
+
+    expect(app(AiGuard::class)->allows($stash))->toBeFalse();
+
+    config(['stashlist.ai.llm' => 'ollama:llama3.2', 'ai.providers.ollama.key' => '']);
+
+    expect(app(AiGuard::class)->allows($stash))->toBeTrue();
+});
+
 test('the switch of one user does not touch another', function () {
     $off = Stash::factory()
         ->for(User::factory()->create(['ai_enabled' => false]))
