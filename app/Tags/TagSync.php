@@ -123,7 +123,7 @@ final class TagSync
         }
     }
 
-    private function findOrCreate(int $userId, string $name): Tag
+    public function findOrCreate(int $userId, string $name): Tag
     {
         $slug = TagNormalizer::slug($name);
         $existing = Tag::query()->where('user_id', $userId)->where('slug', $slug)->first();

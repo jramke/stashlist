@@ -66,8 +66,13 @@ test('Scout search is only called from the search classes', function () {
     expect(offenders('/\b[A-Z]\w+::search\(/', ['Search/']))->toBeEmpty();
 });
 
-test('tag rows are only written by TagSync', function () {
+test('tag rows are only written by the Tags namespace', function () {
     expect(offenders('/tags\(\)\s*->\s*(attach|sync|syncWithoutDetaching|detach|toggle|updateExistingPivot)\(/', [
-        'Tags/TagSync.php',
+        'Tags/',
     ]))->toBeEmpty();
+});
+
+test('the models of the AI layer are only reached through App\\Ai', function () {
+    // The guard is asked before the enricher prompts; no other class may prompt the agent or ask for embeddings.
+    expect(offenders('/\bStashEnricher\b|\bEmbeddings::/', ['Ai/']))->toBeEmpty();
 });

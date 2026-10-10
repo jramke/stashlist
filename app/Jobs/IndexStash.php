@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Enums\AiStatus;
 use App\Models\Stash;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -11,7 +12,7 @@ use Illuminate\Queue\Middleware\WithoutOverlapping;
 
 /**
  * Last pipeline stage: put the stash, with everything the pipeline learned about it, into the search index
- * and note when. The index is a projection of the database, so running this again is always safe.
+ * and note when. A stash the AI stage worked on is "done" now. The index is a projection of the database, so running this again is always safe.
  *
  * Saving a stash already queues an index write; this one exists because the enrichment (page text, later the
  * summary and tags) changes without the stash row changing.
@@ -61,6 +62,15 @@ final class IndexStash implements ShouldQueue
         $stash->searchableUsing()->update($stash->newCollection([$stash]));
 
         // indexed_at is bookkeeping: it must not change updated_at, which is part of the indexed document.
-        Stash::withoutTimestamps(static fn () => $stash->forceFill(['indexed_at' => now()])->saveQuietly());
+        // The stage before this one leaves the stash "processing"; having made it to the index, it is done.
+        Stash::withoutTimestamps(static function () use ($stash): void {
+            $stash->forceFill(['indexed_at' => now()]);
+
+            if ($stash->ai_status === AiStatus::Processing) {
+                $stash->forceFill(['ai_status' => AiStatus::Done, 'ai_stage' => null, 'processed_at' => now()]);
+            }
+
+            $stash->saveQuietly();
+        });
     }
 }

@@ -7,6 +7,7 @@ namespace App\Providers;
 use App\Extraction\DnsHostResolver;
 use App\Extraction\HostResolver;
 use App\Models\User;
+use App\Pipeline\PipelineJob;
 use App\Search\MakeSearchableUniquely;
 use Carbon\CarbonImmutable;
 use GuzzleHttp\Client;
@@ -88,6 +89,14 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('api-lookup', static fn (Request $request): Limit => Limit::perMinute(
             config()->integer('stashlist.api.lookups_per_minute'),
         )->by($perToken($request)));
+        // The model calls (plan 4.6): all users together, and each user on their own so that one big import
+        // cannot keep everyone else waiting. These limit jobs, not requests.
+        RateLimiter::for('llm', static fn (): Limit => Limit::perMinute(config()->integer('stashlist.ai.llm_rpm'))->by(
+            'global',
+        ));
+        RateLimiter::for('user-ai', static fn (PipelineJob $job): Limit => Limit::perMinute(
+            config()->integer('stashlist.ai.user_rpm'),
+        )->by("user:{$job->userId}"));
         RateLimiter::for('reprocess', static fn (Request $request): Limit => Limit::perMinute(10)->by($perUser(
             $request,
         )));

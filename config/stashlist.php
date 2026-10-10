@@ -60,6 +60,58 @@ return [
 
     /*
      |--------------------------------------------------------------------------
+     | AI
+     |--------------------------------------------------------------------------
+     |
+     | Summaries and tags come from a language model. Every call to a provider
+     | goes through App\Ai\AiGuard, which refuses when `enabled` is false (a
+     | self-hosted instance without keys) or when the owner turned smart features
+     | off. `llm` is "provider:model" as named in config/ai.php. Prices are USD
+     | per million tokens (input, output), used only to estimate cost.
+     |
+     */
+
+    'ai' => [
+        'enabled' => (bool)env('STASHLIST_AI', true),
+        'llm' => (string)env('STASHLIST_LLM', 'openai:gpt-5-mini'),
+        // Bump when the instructions change; `stashlist:reprocess --below-prompt=N` can re-run older stashes.
+        'prompt_version' => 1,
+        // Calls per minute: all users together, and one user (one big import must not starve the others).
+        'llm_rpm' => 300,
+        'user_rpm' => 20,
+        // Past this much estimated spend per day the circuit breaker opens until the next day.
+        'daily_budget_usd' => 5.0,
+        // How much of a page the model reads (characters, about 3,000 tokens).
+        'input_chars' => 12_000,
+        // The user's own tags shown to the model so it reuses them: the most used and the newest.
+        'vocabulary' => ['top' => 150, 'recent' => 30],
+        // How long the circuit breaker stays open after the provider refused our key or credit.
+        'breaker_minutes' => 15,
+        'prices' => [
+            'gpt-5-nano' => [0.05, 0.40],
+            'gpt-5-mini' => [0.25, 2.00],
+            'gpt-5.4-nano' => [0.20, 1.25],
+            'gpt-5.4-mini' => [0.75, 4.50],
+        ],
+    ],
+
+    /*
+     |--------------------------------------------------------------------------
+     | Plans
+     |--------------------------------------------------------------------------
+     |
+     | Fair-use caps by users.plan. `free` is you and invited friends. Stashes
+     | over the AI cap are saved normally and wait for the next month.
+     |
+     */
+
+    'plans' => [
+        'free' => ['ai_stashes_per_month' => 300],
+        'flat' => ['ai_stashes_per_month' => 1000],
+    ],
+
+    /*
+     |--------------------------------------------------------------------------
      | Bot
      |--------------------------------------------------------------------------
      |

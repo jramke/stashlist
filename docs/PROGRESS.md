@@ -89,9 +89,9 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 
 ### M2. Auto-tagging [4, 9]
 
-- [ ] `laravel/ai`, `config/stashlist.php`, `StashEnricher`, `EnrichmentResult`, `TagVocabulary`, `TagSync::applyAi`
-- [ ] Pipeline: `StartPipeline`, `PipelineJob`, `GenerateEnrichment`, `stash_runs`, `UsageRecorder`, rate limiters, circuit breaker, sweeper, retry job
-- [ ] `ai_enabled` end to end (the only switch; no per-stash flag): a guard that stops every AI call when the user has it off, a `User` check instead of `Stash::skipsAi()`
+- [x] `laravel/ai`, `config/stashlist.php`, `StashEnricher`, `EnrichmentResult`, `TagVocabulary`, `AiTagSync` (the plan's `TagSync::applyAi`), `TagMatcher`
+- [x] Pipeline: `StartPipeline`, `PipelineJob`, `GenerateEnrichment`, `stash_runs`, `UsageRecorder`, rate limiters, circuit breaker, `SweepStuckStashes`, `RetryFailedStashes`, nightly prune
+- [x] `ai_enabled` end to end (the only switch; no per-stash flag): `AiGuard` stops every AI call when the user has it off (or the instance, `STASHLIST_AI=false`)
 - [ ] UI: tag chips with source, dismiss, status badge, retry, `usePoll`
 - [ ] `stashlist:bakeoff` (needs the OpenAI key)
 
@@ -153,3 +153,8 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - 2026-10-10: the extension asks for `alarms` (a half-hourly check for changed highlights, one conditional request) and the Firefox minimum is 140, the first with the CSS Custom Highlight API. Highlights are painted by position only, so the page's own elements are never changed; a page that draws itself again is painted again after a second of quiet.
 - 2026-10-10: the local copy is keyed by the SHA-256 of the normalized address, computed in the browser and looked up in extension storage, so no visited address reaches the server. `crypto.subtle` does not exist in a content script on an http page, so `lib/sha256.ts` is a small fallback that is tested against the browser's.
 - 2026-10-10: turning "Show my highlights on pages" off gives back the all-sites permission. Chrome may drop the self-hosted Stashlist's own permission with it (it is one of "all sites"), so the options page checks that and asks again.
+- 2026-10-11: `Stash::skipsAi()` is `App\Ai\AiGuard`: the instance switch (`STASHLIST_AI`) and the owner's `ai_enabled`. It is asked when the chain is built, when `GenerateEnrichment` runs and once more inside `Enricher`, the only class that prompts the model (an architecture test forbids `StashEnricher` and `Embeddings::` outside `app/Ai`). A switch turned off after a job was queued is not an error: the job marks the stash skipped, makes no call and the chain goes on, so there is no `private` error code.
+- 2026-10-11: the plan's `TagSync::applyAi` is `AiTagSync::apply`, because `TagSync` was over the complexity limit of the linter. The architecture test now lets the whole `app/Tags` namespace write `stash_tag`. Tag matching (`TagMatcher`: same name, plural or singular, 90% alike for names of five letters or more) is its own class.
+- 2026-10-11: the answer schema has `title`, `summary`, `tags`, `subtype` and `language` only. `objects` and `ocr_text` belong to the vision stage (M4) and join with a `prompt_version` bump. Images are skipped by the AI stage until then. A link that turns out to be an image during extraction is skipped too. An answer with nothing in it is a refusal (`llm_refused`, not asked again); one that breaks the rules is sent back twice (`llm_invalid`).
+- 2026-10-11: a failed AI stage queues `IndexStash` itself, because the chain stops at the failure and the text extraction found would otherwise never reach the search index. The run log never stores provider messages (they can quote the prompt, which holds page text): an HTTP error is logged as `HTTP 400`.
+- 2026-10-11: the tests run with `STASHLIST_AI=false` (`phpunit.xml`); the AI ones turn it on with `Tests\Support\FakeAi::install()`, which fakes the agent and fails on a prompt nobody planned. `composer require laravel/ai` ends with an error from the `boost:update` post-update script (Boost is not set up here); the package installs fine.
