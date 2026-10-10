@@ -6,3 +6,6 @@ export type AuthLayoutProps = {
     title?: string;
     description?: string;
 };
+
+/** What an Inertia scroll prop looks like to the page: the items under `data`. */
+export type Scroll<T> = { data: T[] };

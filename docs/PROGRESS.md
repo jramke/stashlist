@@ -14,7 +14,7 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 M0 is done in code (`composer test` green on MariaDB, user A cannot read user B's rows). Left for M0: the `LICENSE` file and the buckets, both waiting on you (see above).
 
-M1 in progress. Next: the React pages (app layout, feed grid, capture box, detail view, collections and tags pages), then Scout search.
+M1 in progress. Next: Scout search (`Searchable` on Stash, `IndexStash`, `StashSearch`, as-you-type contract), then Socialite login, Pulse and the admin gate, `stashlist:import-old`, and the Playwright flows with the bundle-size check.
 
 ## Blocked on you
 
@@ -55,7 +55,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [x] Web read path: `GET /stashes` (feed: cursor pagination of 60, filters type, tags, collection, status) and `GET /stashes/{stash}` with typed DTOs (`StashData`, `StashDetailData`, ...), the ownership policy, `/` redirecting signed-in users, collections in the shared props. The React pages are placeholders for now [6.2]
 - [x] Web write path: `POST /stashes` (capture box, rate limited 60/min), `PATCH` (title, body, privacy; restarts the pipeline only when the content hash changed), `DELETE` with a 10 s undo window (`DELETE /stashes/{stash}/deletion` undoes), `POST .../reprocess` (10/min), stash tags add and remove, form requests, HTTP isolation matrix [6.2, 10.1]
 - [x] Collections and tags controllers: collection CRUD with stash counts, sidebar order, stashes of a collection (set and order), the per-stash collection picker, tag list, rename (conflicts refused; merge is M5) and delete [6.2]
-- [ ] React pages and layout: app layout, feed grid, capture box, detail view, collections, tags [6.2]
+- [x] React pages and layout: app frame with sidebar, feed (masonry, infinite scroll, polling while cards are fetched, filter chips), capture box (paste, drop, private), detail view (edit, tags, collections, retry, delete with undo), collections and tags pages. Plain and mouse-driven; polish and the keyboard layer are yours [6.2, 11.2]
 - [ ] Keyboard and speed contract: command menu, grid navigation, quick-add, undo delete, shortcut sheet [11.2]
 - [ ] Scout keyword search through `StashSearch`, as-you-type contract, `scout:sync-index-settings` [2.2, 2.5]
 - [ ] Socialite login for GitHub and Google with the linking rules [6.4]

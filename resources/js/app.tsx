@@ -1,5 +1,6 @@
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Toaster } from '@/components/ui/sonner';
+import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import { createInertiaApp } from '@inertiajs/react';
 
@@ -7,7 +8,16 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 void createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-    layout: (name) => (name === 'welcome' ? null : AuthLayout),
+    layout: (name) => {
+        if (name === 'welcome') {
+            return null;
+        }
+
+        // Sign-in and the account settings are small centered cards; everything else lives in the app frame.
+        return name.startsWith('auth/') || name.startsWith('settings/')
+            ? AuthLayout
+            : AppLayout;
+    },
     strictMode: true,
     withApp(app) {
         return (
