@@ -1,4 +1,10 @@
 import type {
+    HighlightIndex,
+    IndexAnswer,
+    NewHighlight,
+    StoredHighlight,
+} from './highlights/types';
+import type {
     Collection,
     Lookup,
     Me,
@@ -62,15 +68,16 @@ type Wire = {
 export function createClient(config: Config) {
     const base = config.instance.replace(/\/+$/, '');
 
-    async function call(
+    async function exchange(
         path: string,
         init: {
             method?: string;
             json?: unknown;
             form?: FormData;
             idempotencyKey?: string;
+            ifNoneMatch?: string;
         } = {},
-    ): Promise<unknown> {
+    ): Promise<{ body: unknown; response: Response }> {
         const headers: Record<string, string> = {
             Authorization: `Bearer ${config.token}`,
             Accept: 'application/json',
@@ -78,6 +85,10 @@ export function createClient(config: Config) {
 
         if (init.idempotencyKey !== undefined) {
             headers['Idempotency-Key'] = init.idempotencyKey;
+        }
+
+        if (init.ifNoneMatch !== undefined) {
+            headers['If-None-Match'] = init.ifNoneMatch;
         }
 
         if (init.json !== undefined) {
@@ -106,6 +117,11 @@ export function createClient(config: Config) {
             throw new Unauthorized();
         }
 
+        // "Nothing changed since the ETag you sent": an answer, not a failure.
+        if (response.status === 304) {
+            return { body: null, response };
+        }
+
         const body: unknown = await response.json().catch(() => null);
 
         if (!response.ok) {
@@ -116,7 +132,14 @@ export function createClient(config: Config) {
             );
         }
 
-        return body;
+        return { body, response };
+    }
+
+    async function call(
+        path: string,
+        init: Parameters<typeof exchange>[1] = {},
+    ): Promise<unknown> {
+        return (await exchange(path, init)).body;
     }
 
     return {
@@ -176,6 +199,70 @@ export function createClient(config: Config) {
                 name: collection.name,
                 stashesCount: collection.stashes_count,
             }));
+        },
+
+        /** The id and revision of every highlight; `changed` is false when the ETag still holds. */
+        async highlightIndex(etag: string | null): Promise<IndexAnswer> {
+            const { body, response } = await exchange(
+                'highlights/index',
+                etag === null ? {} : { ifNoneMatch: etag },
+            );
+
+            return response.status === 304
+                ? { changed: false }
+                : {
+                      changed: true,
+                      etag: response.headers.get('ETag'),
+                      list: body as HighlightIndex,
+                  };
+        },
+
+        async highlights(ids: number[]): Promise<StoredHighlight[]> {
+            const body = (await call(`highlights?ids=${ids.join(',')}`)) as {
+                data: WireHighlight[];
+            };
+
+            return body.data.map(fromWire);
+        },
+
+        /** Marks a passage on a page; the page's stash is made first when it is not saved yet. */
+        async createHighlight(
+            input: NewHighlight,
+        ): Promise<{ highlight: StoredHighlight; created: boolean }> {
+            const { body, response } = await exchange('highlights', {
+                method: 'POST',
+                json: prune({
+                    url: input.url,
+                    title: input.title,
+                    text: input.text,
+                    prefix: input.prefix,
+                    suffix: input.suffix,
+                    start_offset: input.startOffset,
+                    color: input.color,
+                    note: input.note,
+                }),
+            });
+
+            return {
+                highlight: fromWire(body as WireHighlight),
+                created: response.status === 201,
+            };
+        },
+
+        async updateHighlight(
+            id: number,
+            changes: { note?: string | null; color?: string | null },
+        ): Promise<StoredHighlight> {
+            return fromWire(
+                (await call(`highlights/${id}`, {
+                    method: 'PATCH',
+                    json: changes,
+                })) as WireHighlight,
+            );
+        },
+
+        async deleteHighlight(id: number): Promise<void> {
+            await call(`highlights/${id}`, { method: 'DELETE' });
         },
 
         /**
@@ -356,4 +443,32 @@ function failure(
                 errors,
             );
     }
+}
+
+type WireHighlight = {
+    id: number;
+    stash_id: number;
+    url_hash: string | null;
+    text: string;
+    prefix: string;
+    suffix: string;
+    start_offset: number | null;
+    color: string | null;
+    note: string | null;
+    revision: number;
+};
+
+function fromWire(wire: WireHighlight): StoredHighlight {
+    return {
+        id: wire.id,
+        stashId: wire.stash_id,
+        urlHash: wire.url_hash,
+        text: wire.text,
+        prefix: wire.prefix,
+        suffix: wire.suffix,
+        startOffset: wire.start_offset,
+        color: wire.color,
+        note: wire.note,
+        revision: wire.revision,
+    };
 }
