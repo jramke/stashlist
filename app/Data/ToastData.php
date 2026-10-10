@@ -24,6 +24,11 @@ final readonly class ToastData
         return new self(ToastType::Success, $message);
     }
 
+    public static function info(string $message): self
+    {
+        return new self(ToastType::Info, $message);
+    }
+
     public static function error(string $message): self
     {
         return new self(ToastType::Error, $message);

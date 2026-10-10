@@ -7,6 +7,7 @@ namespace Database\Factories;
 use App\Enums\StashType;
 use App\Models\Stash;
 use App\Models\User;
+use App\Pipeline\ContentHash;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -32,6 +33,17 @@ class StashFactory extends Factory
             'url_hash' => hash('sha256', $url, binary: true),
             'domain' => parse_url($url, PHP_URL_HOST),
         ];
+    }
+
+    /**
+     * Like a captured stash, a made one carries the fingerprint of what the user controls.
+     */
+    #[\Override]
+    public function configure(): static
+    {
+        return $this->afterMaking(static function (Stash $stash): void {
+            $stash->content_hash ??= ContentHash::of($stash->type, $stash->url, $stash->body, null);
+        });
     }
 
     public function note(): static

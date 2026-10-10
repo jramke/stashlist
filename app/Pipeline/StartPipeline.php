@@ -26,4 +26,16 @@ final class StartPipeline
 
         dispatch(new ExtractContent($stash->id, $stash->user_id)->afterCommit());
     }
+
+    /**
+     * Runs the pipeline again on request ("retry"), extracting even when the content looks unchanged.
+     */
+    public function restart(Stash $stash): void
+    {
+        $stash->forceFill(['ai_status' => AiStatus::Skipped, 'ai_stage' => null, 'ai_error' => null])->save();
+
+        if ($stash->type !== StashType::Note && $stash->type !== StashType::Color) {
+            dispatch(ExtractContent::forced($stash->id, $stash->user_id)->afterCommit());
+        }
+    }
 }

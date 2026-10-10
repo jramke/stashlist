@@ -9,9 +9,13 @@ use App\Extraction\HostResolver;
 use Carbon\CarbonImmutable;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -32,6 +36,22 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->configureRateLimiting();
+    }
+
+    /**
+     * Per-user limits, so typing cannot run up the bill and one client cannot flood the queues.
+     */
+    protected function configureRateLimiting(): void
+    {
+        $perUser = static fn (Request $request): string => (string)(Auth::id() ?? $request->ip());
+
+        RateLimiter::for('capture', static fn (Request $request): Limit => Limit::perMinute(60)->by($perUser(
+            $request,
+        )));
+        RateLimiter::for('reprocess', static fn (Request $request): Limit => Limit::perMinute(10)->by($perUser(
+            $request,
+        )));
     }
 
     /**
