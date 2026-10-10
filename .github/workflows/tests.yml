@@ -165,3 +165,38 @@ jobs:
 
             - name: Run the browser flows
               run: npm run e2e
+
+    extension:
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                working-directory: extension
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
+
+            - name: Setup Node
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: '22'
+
+            - name: Install
+              run: npm ci
+
+            - name: Generate the WXT types
+              run: npx wxt prepare
+
+            - name: Check types
+              run: npm run check
+
+            - name: Run the unit tests
+              run: npm test
+
+            - name: Build for Chrome and Firefox
+              run: |
+                  npm run build
+                  npm run build:firefox

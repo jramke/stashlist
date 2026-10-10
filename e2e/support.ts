@@ -1,6 +1,10 @@
 import { expect, type Page } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 
+/** Where the app runs: the DDEV site, or whatever CI serves. */
+export const BASE_URL =
+    process.env.E2E_BASE_URL ?? 'https://stashlist.ddev.site';
+
 /** Every user the flows create has an address like this, which is how the teardown finds them again. */
 export const E2E_DOMAIN = 'example.test';
 
@@ -15,7 +19,7 @@ export async function register(page: Page): Promise<Person> {
         password: 'E2e-Passw0rd!-long-enough',
     };
 
-    await page.goto('/register');
+    await page.goto(`${BASE_URL}/register`);
     await page.getByLabel('Name').fill(person.name);
     await page.getByLabel('Email address').fill(person.email);
     await page.getByLabel('Password', { exact: true }).fill(person.password);

@@ -12,9 +12,9 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 ## Now
 
-M0 and M1 are done in code and green: `composer test` (443+ tests, mago clean, real Meilisearch in the search tests), eight browser flows (`npm run e2e`, Playwright against DDEV) and the feed's JavaScript at 147.7 of 150 KiB. What is left of them is yours: the keyboard layer and the Coolify/Hetzner spikes, plus the `LICENSE` file and the buckets (see below). Sign-in with GitHub and Google is written and tested with fakes; it needs OAuth apps to try for real.
+M0 and M1 are done in code and green: `composer test` (490+ tests, mago clean, real Meilisearch in the search tests), nine browser flows (`npm run e2e`, Playwright against DDEV) and the feed's JavaScript at 143 of 150 KiB. What is left of them is yours: the keyboard layer and the Coolify/Hetzner spikes, plus the `LICENSE` file and the buckets (see below). Sign-in with GitHub and Google is written and tested with fakes; it needs OAuth apps to try for real.
 
-M1.5: the whole backend is in (tokens, `/api/v1` capture with the `capture` block, lookup, tags, collections, me, idempotency). **Next: the extension in `extension/`** (WXT, React, Tailwind, defuddle), then its CI job and store prep.
+M1.5 is done in code: the capture API (tokens, `/api/v1`, the `capture` block, idempotency) and the browser extension in `extension/`, with four flows in a real Chrome. What is left is yours: privacy page, screenshots, the Chrome public key and the Defuddle spike (see the checklist). **Next: M1.6, persistent highlights** (`stash_highlights`, endpoints, shared URL normalization, then the extension side).
 
 ## Blocked on you
 
@@ -73,9 +73,9 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [x] Sanctum tokens (prefix `stl_`, bearer only, no cookie auth), the token settings page (create, shown once, list with last use, revoke; account settings moved into the app frame), `GET /api/v1/me`, per-token rate limits (`api-create` 60/min, `api-lookup` 120/min)
 - [x] `POST /api/v1/stashes` (JSON or multipart, `Idempotency-Key`, validation and size caps, control characters stripped), `GET /api/v1/stashes/lookup`, `GET /api/v1/tags`, `GET /api/v1/collections`, contract and isolation tests
 - [x] `CaptureStash` accepts the `capture` block: page text and description skip the fetch, client picture bytes win (`DeriveCapturedImage`), an image address is fetched the safe way
-- [ ] `extension/` with WXT, React, Tailwind and `defuddle`: popup, context menus, quick clip, options page, Chrome and Firefox builds
-- [ ] Repo hygiene for `extension/` (own tsconfig, prettier ignores, CI job)
-- [ ] Store prep (privacy page, permission texts, listing); Defuddle spike
+- [x] `extension/` with WXT, React, Tailwind and `defuddle`: popup (title, tags with autocomplete, collections, already-saved state, screenshot), `Alt+Shift+S` quick clip with a badge as feedback, context menus (page, link, image, pick a color), options page, Chrome and Firefox (Manifest V3) builds; unit tests with saved pages and four browser flows in a real Chrome (`e2e/extension/`)
+- [x] Repo hygiene for `extension/` (own package.json, tsconfig and .npmrc, prettier ignores, CI job `extension`: types, unit tests, both builds)
+- [ ] Store prep: permission texts, data disclosure, listing text and release steps are in `docs/extension-store.md`; left: the privacy policy page (needs your legal details), screenshots, the Chrome public key, and the Defuddle spike on pages from your own browsing (articles, shops, X, YouTube, a JS-only app, a logged-in page) next to the server's Readability
 
 ### M1.6. Persistent highlights [6.5]
 
@@ -119,6 +119,9 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [ ] M8 billing with Polar
 
 ## Decisions and deviations
+
+- 2026-10-10: Chrome 137 and later ignore `--load-extension`, so the extension tests start the installed Chrome with a debugging port and load the build through the DevTools protocol (`Extensions.loadUnpacked`, needs `--enable-unsafe-extension-debugging`). The test build (`STASHLIST_E2E=1`) may read every page, because no test can answer the permission prompt. The popup reads `?tab=` to pick its tab, since in the tests the popup is a page of its own. Extension flows run on a developer machine only, not in CI.
+- 2026-10-10: on a 401 the extension opens its options page, where the token is pasted, and not the token page of the web app as the plan said; the options page links there. Feedback of a quick clip is the badge on the toolbar icon (tick or cross, with the reason as tooltip), not an in-page toast; a toast would need a script in the page for no gain yet.
 
 - 2026-10-10: **no per-stash Private flag** (your call). Smart features are one setting of the account, `users.ai_enabled` (default on), changed with a checkbox on `/settings/profile`. `stashes.is_private` is dropped (new migration), and so are the capture box and detail checkboxes, the lock on cards, the `private` field of the web and API requests, `is_private` in the search document, and the extension's Private toggle and default. `PurgeAiData` is not needed: turning the switch off stops new AI work and leaves what exists. When M2 lands, one guard in front of every provider call checks the user's switch.
 

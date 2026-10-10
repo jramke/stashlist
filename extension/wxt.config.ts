@@ -30,6 +30,13 @@ export default defineConfig({
                       gecko: {
                           id: 'extension@stashlist.app',
                           strict_min_version: '128.0',
+                          // What AMO asks of a new extension: what leaves the browser, and only on the person's action.
+                          data_collection_permissions: {
+                              required: [
+                                  'websiteContent',
+                                  'authenticationInfo',
+                              ],
+                          },
                       },
                   },
               }

@@ -18,10 +18,16 @@ export default defineConfig({
     projects: [
         {
             name: 'desktop',
+            testIgnore: /extension\//,
             use: {
                 ...devices['Desktop Chrome'],
                 ...(process.env.CI ? {} : { channel: 'chrome' }),
             },
         },
+        // The browser extension is loaded into a Chrome of its own (see e2e/extension/fixture.ts), on a
+        // developer machine only: CI has no Chrome to spare for it.
+        ...(process.env.CI
+            ? []
+            : [{ name: 'extension', testMatch: /extension\/.*\.spec\.ts/ }]),
     ],
 });
