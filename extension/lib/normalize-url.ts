@@ -9,6 +9,8 @@
  * Nothing else is touched: dot segments and the case of percent escapes stay as they are.
  */
 
+import { sha256Hex } from './sha256';
+
 const URL_PATTERN =
     /^([A-Za-z][A-Za-z0-9+.-]*):\/\/([^/?#]*)([^?#]*)(?:\?([^#]*))?(?:#.*)?$/;
 const AUTHORITY_PATTERN = /^(?:([^@]*)@)?(\[[^\]]*\]|[^:]*)(?::(\d*))?$/;
@@ -17,6 +19,7 @@ const TRACKING_PARAMETER = /^(utm_.*|fbclid|gclid|mc_.*)$/;
 /**
  * @returns the normalized address, or null when this is not a plain web address
  */
+
 export function normalizeUrl(input: string): string | null {
     let url = input.trim();
 
@@ -61,10 +64,14 @@ export function normalizeUrl(input: string): string | null {
 
 /** The 64 hex characters the server keeps as `url_hash` (as a hex string). */
 export async function urlHash(normalized: string): Promise<string> {
-    const digest = await crypto.subtle.digest(
-        'SHA-256',
-        new TextEncoder().encode(normalized),
-    );
+    const bytes = new TextEncoder().encode(normalized);
+
+    // Not there in a content script on an http page (no secure context).
+    if (globalThis.crypto?.subtle === undefined) {
+        return sha256Hex(bytes);
+    }
+
+    const digest = await crypto.subtle.digest('SHA-256', bytes);
 
     return Array.from(new Uint8Array(digest), (byte) =>
         byte.toString(16).padStart(2, '0'),
