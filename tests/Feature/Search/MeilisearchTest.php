@@ -189,3 +189,26 @@ test('the feed route answers a search with the matches of its user', function ()
 
     expect(array_column($response->viewData('page')['props']['stashes']['data'], 'id'))->toBe([$mine->id]);
 });
+
+test('pictures are narrowed by the color they were filed under', function () {
+    $red = indexed_stash($this->user, ['title' => 'Sneakers red', 'url' => null, 'domain' => null]);
+    $blue = indexed_stash($this->user, ['title' => 'Sneakers blue', 'url' => null, 'domain' => null]);
+
+    foreach ([[$red, ['red', 'white']], [$blue, ['blue']]] as [$stash, $names]) {
+        StashEnrichment::query()->create([
+            'stash_id' => $stash->id,
+            'user_id' => $this->user->id,
+            'color_names' => $names,
+        ]);
+        new App\Jobs\IndexStash($stash->id, $this->user->id)->handle();
+    }
+
+    expect(found($this->user, text: 'sneakers', filters: new FeedFiltersData(color: App\Enums\ColorName::Red)))
+        ->toBe([$red->id])
+        ->and(found($this->user, text: 'sneakers', filters: new FeedFiltersData(color: App\Enums\ColorName::White)))
+        ->toBe([$red->id])
+        ->and(found($this->user, text: 'sneakers', filters: new FeedFiltersData(color: App\Enums\ColorName::Green)))
+        ->toBeEmpty()
+        ->and(found($this->user, text: 'sneakers'))
+        ->toEqualCanonicalizing([$red->id, $blue->id]);
+});

@@ -23,7 +23,7 @@ final class StoreStashRequest extends FormRequest
                 'nullable',
                 'file',
                 'max:20480',
-                'mimetypes:image/jpeg,image/png,image/gif,image/webp,image/avif',
+                'mimetypes:image/jpeg,image/png,image/gif,image/webp,image/avif,image/heic,image/heif',
             ],
             'title' => ['nullable', 'string', 'max:500'],
             'tags' => ['nullable', 'array', 'max:20'],

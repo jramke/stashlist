@@ -24,6 +24,7 @@ final readonly class EnrichmentInput
         public ?string $description,
         public ?string $body,
         public ?string $text,
+        public ?string $pictureHash = null,
     ) {}
 
     public static function of(Stash $stash): self
@@ -39,7 +40,13 @@ final readonly class EnrichmentInput
             description: $stash->enrichment->description ?? null,
             body: $body,
             text: $text === null ? null : Str::limit($text, max(0, $budget - mb_strlen((string)$body)), ''),
+            pictureHash: $stash->type === StashType::Image ? PictureFingerprint::of($stash) : null,
         );
+    }
+
+    public function hasPicture(): bool
+    {
+        return $this->type === StashType::Image;
     }
 
     /**
@@ -53,6 +60,7 @@ final readonly class EnrichmentInput
             data: (string)json_encode([
                 $this->text,
                 $this->body,
+                $this->pictureHash,
                 config()->integer('stashlist.ai.prompt_version'),
                 $llm->name(),
             ]),
@@ -61,22 +69,15 @@ final readonly class EnrichmentInput
 
     public function isShort(): bool
     {
-        return mb_strlen((string)$this->body.(string)$this->text.(string)$this->description) < self::SHORT;
+        // A picture has little text and still deserves its tags.
+        return (
+            ! $this->hasPicture() &&
+            mb_strlen((string)$this->body.(string)$this->text.(string)$this->description) < self::SHORT
+        );
     }
 
     public function prompt(): string
     {
-        $parts = [
-            'Kind of item: '.$this->type->value,
-            $this->title === null ? null : 'Title: '.$this->title,
-            $this->domain === null ? null : 'Address: '.$this->domain,
-            $this->description === null ? null : 'Description: '.$this->description,
-            $this->body === null
-                ? null
-                : ($this->type === StashType::Note ? 'Text of the note' : 'Note by the person').":\n".$this->body,
-            $this->text === null ? null : "Text of the page:\n".$this->text,
-        ];
-
-        return implode("\n\n", array_filter($parts, static fn (?string $part): bool => $part !== null));
+        return EnrichmentPrompt::of($this);
     }
 }

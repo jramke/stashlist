@@ -59,7 +59,7 @@ export function CaptureBox() {
                             ref={picker}
                             type="file"
                             name="image"
-                            accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
+                            accept="image/jpeg,image/png,image/gif,image/webp,image/avif,image/heic,image/heif"
                             className="hidden"
                             onChange={(event) => {
                                 if (event.currentTarget.files?.length) {

@@ -79,6 +79,8 @@ final class StashEnricher implements Agent, HasProviderOptions, HasStructuredOut
             'tags' => $schema->array()->items($schema->string())->required(),
             'subtype' => $schema->string()->enum(Subtype::values())->required(),
             'language' => $schema->string()->required(),
+            'objects' => $schema->array()->items($schema->string())->required(),
+            'ocr_text' => $schema->string()->required(),
         ];
     }
 

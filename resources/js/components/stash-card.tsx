@@ -114,6 +114,8 @@ function Cover({ stash }: { stash: App.Data.StashData }) {
                 height={height ?? undefined}
                 loading="lazy"
                 className="w-full bg-muted object-cover"
+                // The main color of the picture fills the space until the picture has loaded.
+                style={{ backgroundColor: stash.colors[0]?.hex }}
             />
         );
     }

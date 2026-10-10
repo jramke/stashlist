@@ -28,6 +28,8 @@ final readonly class StashStorage
         'image/gif' => 'gif',
         'image/webp' => 'webp',
         'image/avif' => 'avif',
+        'image/heic' => 'heic',
+        'image/heif' => 'heif',
     ];
 
     public function __construct(

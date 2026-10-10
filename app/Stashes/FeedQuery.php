@@ -40,6 +40,15 @@ final class FeedQuery
             $query->whereHas('visibleTags', static fn (Builder $tags) => $tags->where('tags.id', $tagId));
         }
 
+        if ($filters->color !== null) {
+            $color = $filters->color->value;
+
+            $query->whereHas('enrichment', static fn (Builder $enrichment) => $enrichment->whereJsonContains(
+                'color_names',
+                $color,
+            ));
+        }
+
         return $this->inCollection($query, $filters->collection);
     }
 

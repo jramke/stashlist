@@ -6,6 +6,7 @@ namespace App\Http\Requests;
 
 use App\Data\FeedFiltersData;
 use App\Enums\AiStatus;
+use App\Enums\ColorName;
 use App\Enums\SearchMode;
 use App\Enums\StashType;
 use Illuminate\Foundation\Http\FormRequest;
@@ -25,6 +26,7 @@ final class IndexStashRequest extends FormRequest
             'tag.*' => ['integer', 'min:1'],
             'collection' => ['nullable', 'string', 'regex:/^(none|\d+)$/'],
             'q' => ['nullable', 'string', 'max:200'],
+            'color' => ['nullable', Rule::enum(ColorName::class)],
             // The as-you-type pair: "keyword" answers fast and calls no provider, "hybrid" follows once the user
             // paused and adds the meaning of the query.
             'mode' => ['nullable', Rule::enum(SearchMode::class)],
@@ -47,6 +49,7 @@ final class IndexStashRequest extends FormRequest
             collection: $collection === '' ? null : $collection,
             status: AiStatus::tryFrom($this->string('status')->toString()),
             q: $text === '' ? null : $text,
+            color: ColorName::tryFrom($this->string('color')->toString()),
         );
     }
 }

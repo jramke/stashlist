@@ -21,7 +21,7 @@ use App\Models\Stash;
  * Starts the background work for a new or changed stash: look at what it points to (links and images), ask the
  * model for a summary and tags, then the search index. The model is left out, and the stash is "skipped" as far
  * as AI goes, when the instance has AI off, the owner turned smart features off, or the stash is something the
- * model has nothing to say about (a color, an image for now).
+ * model has nothing to say about (a color).
  *
  * A client that has the page open can send the page's text and picture (CapturedPage). The server never
  * overrides that: with the text it does not fetch the page, and a picture the client sent is the one used.
@@ -83,18 +83,15 @@ final class StartPipeline
     }
 
     /**
-     * The model and the vectors, for the stashes they are for: links and notes (images join with the vision
-     * stage) of an owner who has smart features on, on an instance that has them. The vectors are left out
-     * where no embedder has a key.
+     * The model and the vectors, for the stashes they are for: everything but colors, of an owner who has smart
+     * features on, on an instance that has them. The model looks at the pictures of images. The vectors are left
+     * out where no embedder has a key.
      *
      * @return list<GenerateEnrichment|GenerateEmbedding>
      */
     private function smartJobs(Stash $stash): array
     {
-        if (
-            $stash->type !== StashType::Link && $stash->type !== StashType::Note ||
-            ! $this->guard->allows($stash)
-        ) {
+        if ($stash->type === StashType::Color || ! $this->guard->allows($stash)) {
             return [];
         }
 

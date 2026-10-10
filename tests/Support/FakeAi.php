@@ -69,6 +69,8 @@ final class FakeAi
             'tags' => ['sourdough', 'baking', 'bread', 'fermentation', 'recipes'],
             'subtype' => 'article',
             'language' => 'en',
+            'objects' => [],
+            'ocr_text' => '',
             ...$changes,
         ];
     }

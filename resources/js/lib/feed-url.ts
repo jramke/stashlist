@@ -24,6 +24,7 @@ export function feedUrl(
             collection: next.collection ?? undefined,
             tag: next.tags.length > 0 ? [...next.tags] : undefined,
             q: next.q ?? undefined,
+            color: next.color ?? undefined,
             mode: searching ? mode : undefined,
         },
     }).url;

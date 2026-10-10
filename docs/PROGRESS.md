@@ -105,7 +105,8 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 
 ### M4. Images [9]
 
-- [ ] Vision enrichment, color filter and picker, HEIC and GIF, image hash idempotency
+- [x] Vision enrichment (the model is sent the preview of a picture and answers with a caption-like summary, tags, objects and the text on it), the color filter with a swatch picker in the feed, HEIC and HEIF uploads, the card's placeholder color, and a hash of the picture in `enrich_hash` so the same picture is never sent twice
+- [ ] Try it on your own pictures once the key is in (yours): "red sneakers" and a phrase from a screenshot should find them. If the captions are poor, `stashlist:bakeoff` does not cover pictures yet; change `STASHLIST_LLM` and compare by eye
 
 ### M5. Launch readiness [9]
 
@@ -165,3 +166,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - 2026-10-11: `stashlist:reindex` writes the documents over the old ones instead of building `stashes_next` and swapping, because the search keeps answering while documents are replaced in place. `--swap` can be added if a settings change ever needs a clean slate.
 - 2026-10-11: the real Meilisearch tests found two things the fakes could not. A document must name every `userProvided` embedder (`_vectors.text_v1`, null for none), or the engine rejects the write later and silently: the search document always sets it, and `stashlist:reconcile-index` lists such failed tasks. And `vector` is a reserved word in MariaDB 11.8, so the column is quoted.
 - 2026-10-11: `Stash::reindex()` is still the path for tag, collection and highlight changes; the ones that change the embedding text (tags, highlights) also schedule `RefreshEmbedding`. A collection change does not, because collections are not part of the embedding text.
+- 2026-10-11: pictures reuse the text stage: `prompt_version` is 2, the schema gained `objects` and `ocr_text`, and the request carries the 1280 px WebP preview (metadata already stripped) as an attachment instead of the plan's 1024 px derivative, to avoid making a third size. Colors, not images, are what the model skips.
+- 2026-10-11: the color filter needs the color names in the database too (`stash_enrichments.color_names`, backfilled by the migration), because the feed without a query does not use the search engine. `Hsl` and `ColorBuckets` decide the names; browns are dark, muted oranges and yellows, pinks are light reds and magentas.
+- 2026-10-11: HEIC and HEIF are accepted (the installed ImageMagick reads them; PHP's own image functions cannot, so the size is read with `pingImageBlob`). The original is stored as sent and only the WebP derivatives are shown.
+- 2026-10-11: `<Deferred>` of Inertia needs a real fallback element, not `null`; the PHP tests could not see it and the browser flows broke on every detail page, which is what they are for.

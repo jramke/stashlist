@@ -27,7 +27,18 @@ final class ImageProcessor
     public const MAX_PIXELS = 80_000_000;
 
     /** SVG is not in this list on purpose: it can carry scripts. */
-    private const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif'];
+    private const ALLOWED_TYPES = [
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+        'image/avif',
+        'image/heic',
+        'image/heif',
+    ];
+
+    /** Phones save these; PHP cannot read their size, ImageMagick can (header only). */
+    private const HEIF_TYPES = ['image/heic', 'image/heif'];
 
     private const THUMB_WIDTH = 640;
 
@@ -95,7 +106,9 @@ final class ImageProcessor
             throw InvalidImage::unsupportedType($mime === false ? 'unknown' : $mime);
         }
 
-        $size = getimagesizefromstring($bytes);
+        $size = in_array($mime, self::HEIF_TYPES, strict: true)
+            ? $this->heifSize($bytes)
+            : getimagesizefromstring($bytes);
 
         if ($size === false) {
             throw InvalidImage::unreadable();
@@ -106,6 +119,23 @@ final class ImageProcessor
         }
 
         return $mime;
+    }
+
+    /**
+     * Width and height of a HEIC or HEIF image, read from its header without decoding the picture.
+     *
+     * @return array{0: int, 1: int}|false
+     */
+    private function heifSize(string $bytes): array|false
+    {
+        try {
+            $image = new Imagick;
+            $image->pingImageBlob($bytes);
+
+            return [$image->getImageWidth(), $image->getImageHeight()];
+        } catch (ImagickException) {
+            return false;
+        }
     }
 
     /**

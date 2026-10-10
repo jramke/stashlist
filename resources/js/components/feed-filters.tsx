@@ -13,6 +13,22 @@ const types: { value: StashType | null; label: string }[] = [
     { value: 'color', label: 'Colors' },
 ];
 
+/** The twelve color names the pictures are filed under, with the swatch shown for each. */
+const colors: Record<App.Enums.ColorName, string> = {
+    red: '#e5484d',
+    orange: '#f76b15',
+    yellow: '#f5d90a',
+    green: '#30a46c',
+    teal: '#12a594',
+    blue: '#0090ff',
+    purple: '#8e4ec6',
+    pink: '#e93d82',
+    brown: '#a18072',
+    black: '#1a1a1a',
+    white: '#f5f5f5',
+    gray: '#8b8d98',
+};
+
 type Filters = App.Data.FeedFiltersData;
 
 function Chip({
@@ -73,6 +89,31 @@ export function FeedFilters({
                         Failed
                     </Chip>
                 )}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-1.5">
+                {(Object.keys(colors) as App.Enums.ColorName[]).map((name) => {
+                    const active = filters.color === name;
+
+                    return (
+                        <Link
+                            key={name}
+                            href={feedUrl(filters, {
+                                color: active ? null : name,
+                            })}
+                            preserveScroll
+                            aria-label={`Color ${name}`}
+                            aria-pressed={active}
+                            title={name}
+                            className={cn(
+                                'size-5 rounded-full border border-foreground/20 outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+                                active &&
+                                    'ring-2 ring-foreground ring-offset-2',
+                            )}
+                            style={{ backgroundColor: colors[name] }}
+                        />
+                    );
+                })}
             </div>
 
             {tags.length > 0 && (

@@ -57,8 +57,8 @@ final class GenerateEnrichment extends PipelineJob
             return;
         }
 
-        // Extraction can find out a link is an image; the model has nothing to say about those yet.
-        if ($stash->type !== StashType::Link && $stash->type !== StashType::Note) {
+        // A color has nothing for the model to say.
+        if (! in_array($stash->type, [StashType::Link, StashType::Note, StashType::Image], strict: true)) {
             $this->mark($stash, AiStatus::Skipped);
 
             return;
@@ -119,6 +119,8 @@ final class GenerateEnrichment extends PipelineJob
                 // A title the page has wins; the model's only fills a gap.
                 'title' => $row->title ?? ($result->title === '' ? null : $result->title),
                 'summary' => $result->summary,
+                'objects' => $result->objects === [] ? null : $result->objects,
+                'ocr_text' => $result->ocrText === '' ? null : $result->ocrText,
                 'language' => $result->language,
                 'llm_provider' => $enrichment->call->provider,
                 'llm_model' => $enrichment->call->model,

@@ -78,7 +78,7 @@ test('a link gets a summary, tags, a language and a subtype', function () {
         ->and($enrichment->llm_model)
         ->toBe('gpt-5-mini')
         ->and($enrichment->prompt_version)
-        ->toBe(1)
+        ->toBe(2)
         ->and($enrichment->enrich_hash)
         ->toHaveLength(64)
         ->and($enrichment->enriched_at)
@@ -276,10 +276,15 @@ test('with AI off on the instance nothing is sent either', function () {
     expect($stash->fresh()->ai_status)->toBe(AiStatus::Skipped);
 });
 
-test('a link that turned out to be an image is left to the vision stage', function () {
+test('a color has nothing for the model to say', function () {
     FakeAi::install();
-    $stash = readable_stash();
-    $stash->forceFill(['type' => 'image'])->save();
+    $stash = Stash::factory()->create([
+        'type' => 'color',
+        'url' => null,
+        'url_hash' => null,
+        'domain' => null,
+        'body' => '#e63946',
+    ]);
 
     enrich($stash);
 

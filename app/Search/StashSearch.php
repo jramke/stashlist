@@ -86,6 +86,10 @@ final class StashSearch
             $search->where('type', $filters->type->value);
         }
 
+        if ($filters->color !== null) {
+            $search->where('colors', $filters->color->value);
+        }
+
         // Every tag is required, so every tag is a filter of its own.
         foreach ($filters->tags as $tagId) {
             $search->where('tag_ids', $tagId);

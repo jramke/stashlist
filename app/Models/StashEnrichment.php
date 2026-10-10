@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $description
  * @property string|null $extracted_text
  * @property list<array{hex: string, pct: float}>|null $colors
+ * @property list<string>|null $color_names the ColorName values the colors are filed under
  * @property string|null $extract_hash
  * @property CarbonImmutable|null $extracted_at
  * @property string|null $summary
@@ -41,6 +42,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'description',
     'extracted_text',
     'colors',
+    'color_names',
     'extract_hash',
     'extracted_at',
     'summary',
@@ -69,6 +71,7 @@ final class StashEnrichment extends Model
     {
         return [
             'colors' => 'array',
+            'color_names' => 'array',
             'objects' => 'array',
             'extracted_at' => 'datetime',
             'enriched_at' => 'datetime',

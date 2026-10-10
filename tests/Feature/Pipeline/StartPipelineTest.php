@@ -66,6 +66,20 @@ test('the model jobs wait on the ai queue and carry ids only', function () {
     );
 });
 
+test('an image is read first, then the model looks at the picture', function () {
+    $stash = Stash::factory()->create(['type' => StashType::Image]);
+
+    app(StartPipeline::class)->start($stash);
+
+    Queue::assertPushedWithChain(ExtractContent::class, [
+        GenerateEnrichment::class,
+        GenerateEmbedding::class,
+        IndexStash::class,
+    ]);
+
+    expect($stash->fresh()->ai_status)->toBe(AiStatus::Pending);
+});
+
 test('a color has nothing for the model to say', function () {
     $stash = Stash::factory()->create([
         'type' => StashType::Color,

@@ -66,6 +66,37 @@ test('a stash can be edited, tagged and found again through its tag', async ({
     await expect(card(page, /call the plumber/)).toHaveCount(0);
 });
 
+test('a stash shows the others that share its tags under "More like this"', async ({
+    page,
+}) => {
+    await register(page);
+    await capture(page, 'knead the dough for ten minutes');
+    await capture(page, 'feed the starter every morning');
+    await capture(page, 'call the plumber');
+
+    for (const [text, tag] of [
+        [/knead the dough/, 'Baking'],
+        [/feed the starter/, 'Baking'],
+    ] as const) {
+        await card(page, text).click();
+        await page.getByLabel('Add a tag').fill(tag);
+        await page.getByRole('button', { name: 'Add', exact: true }).click();
+        await expect(page.getByText(tag).first()).toBeVisible();
+        await page.getByRole('link', { name: 'All stashes' }).click();
+    }
+
+    await card(page, /knead the dough/).click();
+
+    const more = page.getByRole('heading', { name: 'More like this' });
+    await expect(more).toBeVisible();
+    await expect(
+        page.getByRole('link', { name: /feed the starter/ }),
+    ).toBeVisible();
+    await expect(
+        page.getByRole('link', { name: /call the plumber/ }),
+    ).toHaveCount(0);
+});
+
 test('a deleted stash can be brought back during the undo window', async ({
     page,
 }) => {

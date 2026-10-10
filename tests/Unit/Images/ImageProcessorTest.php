@@ -34,6 +34,8 @@ test('common formats are accepted and turned into webp derivatives', function (s
     'png' => ['png', 'image/png'],
     'gif' => ['gif', 'image/gif'],
     'webp' => ['webp', 'image/webp'],
+    // What a phone saves: PHP cannot read its size, ImageMagick can.
+    'heic' => ['heic', 'image/heic'],
 ]);
 
 test('small images are not enlarged', function () {
@@ -129,4 +131,10 @@ test('an image with too many pixels is refused without decoding it', function ()
     } catch (InvalidImage $exception) {
         expect($exception->reason)->toBe('image_too_many_pixels');
     }
+});
+
+test('a file that only claims to be heic is unreadable', function () {
+    $fake = substr(Images::make('heic', width: 20, height: 20), 0, 40);
+
+    expect(fn () => new ImageProcessor()->mime($fake))->toThrow(InvalidImage::class);
 });

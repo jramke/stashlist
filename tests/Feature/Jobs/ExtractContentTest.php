@@ -70,6 +70,9 @@ test('a page is read and its image is stored as thumbnail and preview', function
         ->toBeNull()
         ->and(array_column((array)$enrichment->colors, 'hex'))
         ->toContain('#ff0000')
+        // Filed under names for the color filter.
+        ->and($enrichment->color_names)
+        ->toEqualCanonicalizing(['red', 'blue'])
         ->and($fresh->type)
         ->toBe(StashType::Link)
         ->and($fresh->subtype)

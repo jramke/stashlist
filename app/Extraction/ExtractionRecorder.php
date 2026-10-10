@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Extraction;
 
+use App\Enums\ColorName;
+use App\Images\ColorBuckets;
 use App\Models\Stash;
 use App\Models\StashEnrichment;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +27,10 @@ final class ExtractionRecorder
                     'description' => $result->description,
                     'extracted_text' => $result->text,
                     'colors' => $result->colors,
+                    'color_names' => array_map(
+                        static fn (ColorName $name): string => $name->value,
+                        ColorBuckets::names($result->colors),
+                    ),
                     'extract_hash' => $result->hash,
                     'extracted_at' => now(),
                 ],

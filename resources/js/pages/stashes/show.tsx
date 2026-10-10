@@ -186,7 +186,7 @@ export default function Show({ detail, similar }: Props) {
                     </Button>
                 </section>
 
-                <Deferred data="similar" fallback={null}>
+                <Deferred data="similar" fallback={<></>}>
                     <MoreLikeThis stashes={similar ?? []} />
                 </Deferred>
 

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Ai;
 
 use App\Enums\Subtype;
-use App\Tags\TagNormalizer;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 /**
  * What the model says about a stash, checked against the rules the provider's schema cannot express.
@@ -19,22 +19,16 @@ final readonly class EnrichmentResult
 
     public const MAX_SUMMARY = 400;
 
-    /** Tags that say nothing about the content. */
-    private const STOPLIST = [
-        'website',
-        'web site',
-        'webpage',
-        'web page',
-        'image',
-        'picture',
-        'photo',
-        'link',
-        'page',
-        'url',
-    ];
+    public const MAX_OBJECTS = 12;
+
+    public const MAX_OBJECT_LENGTH = 60;
+
+    public const MAX_OCR = 5000;
 
     /**
      * @param  list<string>  $tags  cleaned, at most MAX_TAGS
+     * @param  list<string>  $objects  what is visible in a picture, at most MAX_OBJECTS; empty for anything else
+     * @param  string  $ocrText  the text visible in a picture, at most MAX_OCR characters; empty for anything else
      */
     public function __construct(
         public string $title,
@@ -42,6 +36,8 @@ final readonly class EnrichmentResult
         public array $tags,
         public ?Subtype $subtype,
         public string $language,
+        public array $objects = [],
+        public string $ocrText = '',
     ) {}
 
     /**
@@ -52,7 +48,7 @@ final readonly class EnrichmentResult
      */
     public static function from(array $data, int $minTags = 3): self
     {
-        $tags = self::cleanTags($data['tags'] ?? []);
+        $tags = AnswerCleaner::tags($data['tags'] ?? []);
         $data['tags'] = $tags;
         $data['language'] = is_string($data['language'] ?? null) ? mb_strtolower(trim($data['language'])) : null;
 
@@ -84,37 +80,8 @@ final readonly class EnrichmentResult
             tags: $tags,
             subtype: Subtype::from((string)$data['subtype']),
             language: (string)$data['language'],
+            objects: AnswerCleaner::objects($data['objects'] ?? []),
+            ocrText: Str::limit(trim(is_string($data['ocr_text'] ?? null) ? $data['ocr_text'] : ''), self::MAX_OCR, ''),
         );
-    }
-
-    /**
-     * Tags as the model should have written them: no #, short, no duplicates, nothing from the stoplist, and
-     * no more than MAX_TAGS (the first ones are the best by instruction).
-     *
-     * @return list<string>
-     */
-    private static function cleanTags(mixed $proposed): array
-    {
-        if (! is_array($proposed)) {
-            return [];
-        }
-
-        $tags = [];
-
-        foreach (array_filter($proposed, is_string(...)) as $tag) {
-            $name = TagNormalizer::name(str_replace(search: '#', replace: '', subject: $tag));
-
-            if (
-                $name === null ||
-                mb_strlen($name) > self::MAX_TAG_LENGTH ||
-                in_array(TagNormalizer::slug($name), self::STOPLIST, strict: true)
-            ) {
-                continue;
-            }
-
-            $tags[TagNormalizer::slug($name)] ??= $name;
-        }
-
-        return array_slice(array_values($tags), offset: 0, length: self::MAX_TAGS);
     }
 }

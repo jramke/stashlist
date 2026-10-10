@@ -75,7 +75,7 @@ final class StoreStashRequest extends FormRequest
             'image' => [
                 'nullable',
                 'file',
-                'mimetypes:image/jpeg,image/png,image/gif,image/webp,image/avif',
+                'mimetypes:image/jpeg,image/png,image/gif,image/webp,image/avif,image/heic,image/heif',
                 'max:'.config()->integer('stashlist.api.max_image_kb'),
             ],
         ];

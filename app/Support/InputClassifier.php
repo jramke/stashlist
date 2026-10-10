@@ -16,7 +16,7 @@ final class InputClassifier
 {
     private const MAX_URL_LENGTH = 2048;
 
-    private const IMAGE_EXTENSION = '/\.(jpe?g|png|webp|avif|gif)$/i';
+    private const IMAGE_EXTENSION = '/\.(jpe?g|png|webp|avif|gif|heic|heif)$/i';
 
     /** @var list<string> */
     private const COLOR_PATTERNS = [
