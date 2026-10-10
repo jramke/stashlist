@@ -27,7 +27,12 @@
         </style>
 
         <link rel="icon" href="/favicon.png" type="image/png">
-        <link rel="apple-touch-icon" href="/favicon.png">
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+        <link rel="manifest" href="/manifest.json">
+        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+        <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-title" content="Stashlist">
 
         @if (config('services.umami.script') && config('services.umami.website_id'))
             <script defer src="{{ config('services.umami.script') }}" data-website-id="{{ config('services.umami.website_id') }}"></script>

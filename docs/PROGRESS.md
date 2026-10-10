@@ -129,9 +129,14 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [ ] Screenshot and brand assets for the home page, an Open Graph image you like (`public/og.png` is a plain placeholder), terms and imprint read by someone who knows the law, a real changelog when you release, the "Keyboard first" card once the keyboard layer exists
 - [x] Hero interaction: nine things float around a vault, a click bursts one and sends it in (the vault shimmers and follows the pointer), real buttons with labels, still and complete on the server, reduced motion respected; three browser flows. It is plain CSS with a little state in a 3.8 KB chunk, not the plan's `motion` plus Rive: the original vault image and `poof.riv` are not in this repository, and the icons are neutral ones instead of brand logos
 
+### M5.7. Installable app and share sheet
+
+- [x] Web manifest, icons and theme colors so the app installs on desktop and phones; the share target (`/share`) fills the capture box from the phone's share sheet (Chrome on Android; iOS has none). No service worker on purpose
+- [ ] Try it on a real phone: install from Chrome, share a link to Stashlist (yours: needs a device and the live domain; icons are made from the placeholder logo)
+
 ### M6 to M8
 
-- [ ] M6 rich links for pasted URLs (optional)
+- [ ] M6 rich links for pasted URLs (optional, backlog: skipped for now; the extension keeps reading pages itself, because it sees signed-in and paywalled pages a server renderer cannot)
 - [ ] M7 Raycast and extension v2
 - [ ] M8 billing with Polar
 

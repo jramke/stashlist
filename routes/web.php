@@ -10,6 +10,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\PrivacyController;
 use App\Http\Controllers\SearchEngineFilesController;
+use App\Http\Controllers\ShareController;
 use App\Http\Controllers\SocialLoginController;
 use App\Http\Controllers\StashCollectionController;
 use App\Http\Controllers\StashController;
@@ -40,6 +41,7 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::get('share', ShareController::class)->name('share');
     Route::post('stashes', [StashController::class, 'store'])->middleware('throttle:capture')->name('stashes.store');
     Route::get('stashes', [StashController::class, 'index'])->middleware('throttle:search')->name('stashes.index');
     Route::resource('stashes', StashController::class)->only(['show', 'update', 'destroy']);

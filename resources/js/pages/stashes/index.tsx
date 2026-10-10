@@ -10,12 +10,13 @@ type Props = {
     stashes: Scroll<App.Data.StashData>;
     filters: App.Data.FeedFiltersData;
     tags: App.Data.TagData[];
+    share: string | null;
 };
 
 /** How often the feed asks again while a card is still being filled in or tagged. */
 const POLL_INTERVAL = 3000;
 
-export default function Index({ stashes, filters, tags }: Props) {
+export default function Index({ stashes, filters, tags, share }: Props) {
     const waiting = stashes.data.some(
         (stash) => stash.fetching || stash.tagging,
     );
@@ -33,6 +34,17 @@ export default function Index({ stashes, filters, tags }: Props) {
         }
     }, [waiting, start, stop]);
 
+    // The shared text sits in the box now; the address forgets it, so a reload or a save does not bring it back.
+    useEffect(() => {
+        if (share !== null) {
+            window.history.replaceState(
+                window.history.state,
+                '',
+                window.location.pathname,
+            );
+        }
+    }, [share]);
+
     const filtered =
         filters.q !== null ||
         filters.type !== null ||
@@ -45,7 +57,7 @@ export default function Index({ stashes, filters, tags }: Props) {
             <Head title="Stashes" />
 
             <div className="mx-auto grid max-w-7xl gap-6">
-                <CaptureBox />
+                <CaptureBox initial={share} />
                 <FeedFilters filters={filters} tags={tags} />
 
                 {stashes.data.length === 0 ? (

@@ -10,9 +10,9 @@ import { useRef, useState, type DragEvent } from 'react';
 
 /**
  * The one place to save things: paste a link, a color or a note, or drop an image on it. The server decides
- * what the input is.
+ * what the input is. `initial` is what the share sheet of a phone handed over.
  */
-export function CaptureBox() {
+export function CaptureBox({ initial }: { initial: string | null }) {
     const picker = useRef<HTMLInputElement>(null);
     const [dragging, setDragging] = useState(false);
 
@@ -52,6 +52,7 @@ export function CaptureBox() {
                             name="input"
                             aria-label="Paste a link, a color or a note"
                             placeholder="Paste a link, a color or a note, or drop an image"
+                            defaultValue={initial ?? undefined}
                             autoComplete="off"
                             className="h-9"
                         />
