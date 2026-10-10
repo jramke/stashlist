@@ -14,7 +14,7 @@ This file is the resume point for building Stashlist from the plan in `docs/PLAN
 
 M0 is done in code (`composer test` green on MariaDB, user A cannot read user B's rows). Left for M0: the `LICENSE` file and the buckets, both waiting on you (see above).
 
-M1 in progress. Search works on the server: `GET /stashes?q=...&mode=keyword|hybrid` (hybrid is keyword until M3), checked against a real Meilisearch. Next: the search box in the feed UI, then Socialite login, Pulse and the admin gate, `stashlist:import-old`, and the Playwright flows with the bundle-size check.
+M1 in progress. Search works end to end: `GET /stashes?q=...&mode=keyword|hybrid` (hybrid is keyword until M3), checked against a real Meilisearch, with a plain search box in the feed (not yet seen in a browser: no Playwright yet). Next: Socialite login, Pulse and the admin gate, `stashlist:import-old`, and the Playwright flows with the bundle-size check.
 
 ## Blocked on you
 
@@ -60,7 +60,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [x] `Stash` is `Searchable` (`StashSearchable`): the document comes from the stash, its enrichment, visible tags and collections; a save reindexes only when a searchable column changed; `MakeSearchableUniquely` folds rapid saves of one stash into one queued job [2.2, 2.5]
 - [x] `IndexStash` (queue `index`, last stage of the chain for every type, sets `indexed_at` without touching `updated_at`); tag and collection changes queue a reindex (`Stash::reindex`, `TagSync`, `CollectionSync`) [4.2]
 - [x] Scout keyword search through `StashSearch` (owner filter first and enforced, tag/type/collection filters, 60 per page), the as-you-type request contract (`q`, `mode`, 90/min limit that only counts searches), isolation tests against a real Meilisearch in CI [2.2, 2.5, 2.6, 10.1]
-- [ ] Search box in the feed UI: debounced keyword request after about 120 ms, hybrid after 400 ms (partial reload of `stashes`, `preserveState`, `replace`) [2.5]
+- [x] Search box in the feed UI (`SearchBox`): keyword request after about 120 ms, hybrid after 400 ms for three characters or more, partial reload of `stashes` and `filters`, `preserveState`, `replace`; the failed-status chip hides while searching [2.5]
 - [ ] Socialite login for GitHub and Google with the linking rules [6.4]
 - [ ] Horizon dashboard and Pulse behind the admin gate [7.5]
 - [ ] `stashlist:import-old` [M1 list]

@@ -1,5 +1,6 @@
+import { SearchBox } from '@/components/search-box';
+import { feedUrl } from '@/lib/feed-url';
 import { cn } from '@/lib/utils';
-import { index } from '@/routes/stashes';
 import { Link } from '@inertiajs/react';
 
 type StashType = App.Enums.StashType;
@@ -13,20 +14,6 @@ const types: { value: StashType | null; label: string }[] = [
 ];
 
 type Filters = App.Data.FeedFiltersData;
-
-/** The URL of the feed with some filters changed. Empty filters leave no trace in the URL. */
-function feedUrl(filters: Filters, change: Partial<Filters>): string {
-    const next = { ...filters, ...change };
-
-    return index({
-        query: {
-            type: next.type ?? undefined,
-            status: next.status ?? undefined,
-            collection: next.collection ?? undefined,
-            tag: next.tags.length > 0 ? [...next.tags] : undefined,
-        },
-    }).url;
-}
 
 function Chip({
     href,
@@ -53,7 +40,7 @@ function Chip({
     );
 }
 
-/** Narrow the feed by type, failure and tags. Every chip is a plain link, so the URL says what you see. */
+/** Search and narrow the feed by type, failure and tags. Every chip is a plain link, so the URL says what you see. */
 export function FeedFilters({
     filters,
     tags,
@@ -63,6 +50,8 @@ export function FeedFilters({
 }) {
     return (
         <div className="grid gap-3">
+            <SearchBox filters={filters} />
+
             <div className="flex flex-wrap items-center gap-2">
                 {types.map(({ value, label }) => (
                     <Chip
@@ -73,14 +62,17 @@ export function FeedFilters({
                         {label}
                     </Chip>
                 ))}
-                <Chip
-                    href={feedUrl(filters, {
-                        status: filters.status === 'failed' ? null : 'failed',
-                    })}
-                    active={filters.status === 'failed'}
-                >
-                    Failed
-                </Chip>
+                {filters.q === null && (
+                    <Chip
+                        href={feedUrl(filters, {
+                            status:
+                                filters.status === 'failed' ? null : 'failed',
+                        })}
+                        active={filters.status === 'failed'}
+                    >
+                        Failed
+                    </Chip>
+                )}
             </div>
 
             {tags.length > 0 && (

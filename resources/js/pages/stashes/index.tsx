@@ -32,6 +32,7 @@ export default function Index({ stashes, filters, tags }: Props) {
     }, [waiting, start, stop]);
 
     const filtered =
+        filters.q !== null ||
         filters.type !== null ||
         filters.status !== null ||
         filters.collection !== null ||
@@ -48,7 +49,7 @@ export default function Index({ stashes, filters, tags }: Props) {
                 {stashes.data.length === 0 ? (
                     <p className="py-16 text-center text-sm text-muted-foreground">
                         {filtered
-                            ? 'Nothing matches these filters.'
+                            ? 'Nothing matches.'
                             : 'Nothing here yet. Paste a link above to start.'}
                     </p>
                 ) : (
