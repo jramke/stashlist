@@ -1,0 +1,103 @@
+import { PageHeader, Section } from '@/components/marketing';
+import { Seo } from '@/components/seo';
+import MarketingLayout from '@/layouts/marketing-layout';
+import type { ReactNode } from 'react';
+
+type Props = {
+    marketing: App.Data.MarketingData;
+};
+
+function Key({ children }: { children: string }) {
+    return <kbd className="rounded border px-1.5 text-xs">{children}</kbd>;
+}
+
+export default function Extension({ marketing }: Props) {
+    return (
+        <>
+            <Seo
+                title="Browser extension"
+                description="Save the page you are looking at in one gesture, and highlight passages that come back when you revisit. For Chrome and Firefox."
+                path="/extension"
+            />
+
+            <PageHeader title="Browser extension">
+                Save the page you are looking at. Highlight what matters.
+            </PageHeader>
+
+            <div className="grid max-w-2xl gap-8">
+                <div className="flex flex-wrap gap-3">
+                    <a
+                        href={marketing.chrome_store_url}
+                        rel="noopener"
+                        className="inline-flex h-10 items-center rounded-lg bg-foreground px-5 text-sm font-medium text-background hover:opacity-90"
+                    >
+                        Add to Chrome
+                    </a>
+                    {marketing.firefox_store_url !== '' ? (
+                        <a
+                            href={marketing.firefox_store_url}
+                            rel="noopener"
+                            className="inline-flex h-10 items-center rounded-lg border px-5 text-sm font-medium hover:bg-muted"
+                        >
+                            Add to Firefox
+                        </a>
+                    ) : (
+                        <span className="inline-flex h-10 items-center rounded-lg border px-5 text-sm text-muted-foreground">
+                            Firefox: soon
+                        </span>
+                    )}
+                </div>
+
+                <Section title="Save">
+                    <p>
+                        Press <Key>Alt</Key>+<Key>Shift</Key>+<Key>S</Key> on
+                        any page and it is saved at once with your defaults, or
+                        click the button to change the title, tags and
+                        collections first. The page is read in your own browser,
+                        as you see it, so pages behind a login and pages built
+                        with JavaScript work. A tick on the icon says it worked.
+                    </p>
+                    <p>
+                        Right-click for more: save a link, an image, or pick any
+                        color on your screen.
+                    </p>
+                </Section>
+
+                <Section title="Highlight">
+                    <p>
+                        Select text and press <Key>Alt</Key>+<Key>Shift</Key>+
+                        <Key>H</Key>, or use the right-click menu. The passage
+                        is kept in your stash, the stash links back to it, and
+                        if you turn on <em>Show my highlights on pages</em> in
+                        the settings, it is painted again whenever you open the
+                        page. If the page changed and the text is gone, the
+                        highlight stays in your stash and is simply not painted.
+                    </p>
+                </Section>
+
+                <Section title="What it can see">
+                    <p>
+                        It reads a page only when you ask: a click, the shortcut
+                        or the menu. There is no script on every page and
+                        nothing is sent in the background, except a check every
+                        half hour for highlights you made elsewhere. The
+                        addresses of pages you visit never leave your browser.
+                    </p>
+                </Section>
+
+                <Section title="Your own server">
+                    <p>
+                        Open the extension&apos;s settings, type the address of
+                        your Stashlist and paste a token from{' '}
+                        <em>Settings, API tokens</em>. That works for the hosted
+                        service and for one you run yourself.
+                    </p>
+                </Section>
+            </div>
+        </>
+    );
+}
+
+Extension.layout = (page: ReactNode) => (
+    <MarketingLayout>{page}</MarketingLayout>
+);

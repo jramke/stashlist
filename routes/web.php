@@ -7,7 +7,9 @@ use App\Http\Controllers\CollectionOrderController;
 use App\Http\Controllers\CollectionStashController;
 use App\Http\Controllers\HighlightController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\PrivacyController;
+use App\Http\Controllers\SearchEngineFilesController;
 use App\Http\Controllers\SocialLoginController;
 use App\Http\Controllers\StashCollectionController;
 use App\Http\Controllers\StashController;
@@ -19,6 +21,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('privacy', PrivacyController::class)->name('privacy');
+Route::get('pricing', [MarketingController::class, 'pricing'])->name('pricing');
+Route::get('extension', [MarketingController::class, 'extension'])->name('extension');
+Route::get('docs', [MarketingController::class, 'docs'])->name('docs');
+Route::get('terms', [MarketingController::class, 'terms'])->name('terms');
+Route::get('imprint', [MarketingController::class, 'imprint'])->name('imprint');
+Route::get('changelog', [MarketingController::class, 'changelog'])->name('changelog');
+Route::get('mymind-alternative', [MarketingController::class, 'compare'])->name('compare');
+Route::get('sitemap.xml', [SearchEngineFilesController::class, 'sitemap'])->name('sitemap');
+Route::get('robots.txt', [SearchEngineFilesController::class, 'robots'])->name('robots');
 
 // Sign in with GitHub or Google. The paths are the ones the old app's OAuth apps already allow.
 Route::middleware('guest')->group(function () {

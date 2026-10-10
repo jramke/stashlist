@@ -1,20 +1,11 @@
-import { Head } from '@inertiajs/react';
+import { PageHeader, Section } from '@/components/marketing';
+import { Seo } from '@/components/seo';
+import MarketingLayout from '@/layouts/marketing-layout';
 import type { ReactNode } from 'react';
 
 type Props = {
     privacy: App.Data.PrivacyData;
 };
-
-function Section({ title, children }: { title: string; children: ReactNode }) {
-    return (
-        <section className="grid gap-2">
-            <h2 className="text-lg font-medium">{title}</h2>
-            <div className="grid gap-2 text-sm leading-relaxed text-muted-foreground">
-                {children}
-            </div>
-        </section>
-    );
-}
 
 /**
  * What this installation keeps about you, who else sees it, and how to take it back. It describes what the software
@@ -27,18 +18,18 @@ export default function Privacy({ privacy }: Props) {
 
     return (
         <>
-            <Head title="Privacy" />
+            <Seo
+                title="Privacy"
+                description="What this service keeps about you, who else handles it, how long, and how you take it back."
+                path="/privacy"
+            />
 
-            <div className="grid gap-8">
-                <header className="grid gap-2">
-                    <h1 className="text-2xl font-medium">Privacy</h1>
-                    <p className="text-sm text-muted-foreground">
-                        Stashlist keeps what you save for you. This page says
-                        what that is, who else handles it, and how you take it
-                        back.
-                    </p>
-                </header>
+            <PageHeader title="Privacy">
+                Stashlist keeps what you save for you. This page says what that
+                is, who else handles it, and how you take it back.
+            </PageHeader>
 
+            <div className="grid max-w-2xl gap-8">
                 <Section title="Who is responsible">
                     <p>
                         {operator === ''
@@ -156,3 +147,5 @@ export default function Privacy({ privacy }: Props) {
         </>
     );
 }
+
+Privacy.layout = (page: ReactNode) => <MarketingLayout>{page}</MarketingLayout>;

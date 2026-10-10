@@ -40,6 +40,12 @@ return [
         'redirect' => '/login/google/callback',
     ],
 
+    // Umami, self-hosted analytics without cookies. Off while the script address is empty.
+    'umami' => [
+        'script' => env('UMAMI_SCRIPT_URL', ''),
+        'website_id' => env('UMAMI_WEBSITE_ID', ''),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

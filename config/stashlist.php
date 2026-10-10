@@ -209,6 +209,33 @@ return [
         'name' => (string)env('STASHLIST_OPERATOR_NAME', ''),
         'address' => (string)env('STASHLIST_OPERATOR_ADDRESS', ''),
         'email' => (string)env('STASHLIST_OPERATOR_EMAIL', ''),
+        // For the imprint, where the law of the operator's country asks for them.
+        'phone' => (string)env('STASHLIST_OPERATOR_PHONE', ''),
+        'vat_id' => (string)env('STASHLIST_OPERATOR_VAT_ID', ''),
+        'register' => (string)env('STASHLIST_OPERATOR_REGISTER', ''),
+    ],
+
+    /*
+     |--------------------------------------------------------------------------
+     | Public site
+     |--------------------------------------------------------------------------
+     |
+     | The pages anyone may read (home, pricing, extension, docs ...). `billing`
+     | is "polar" only when paid plans can be bought; `compare_page` publishes
+     | the comparison page, which stays off until every claim on it has been
+     | checked again.
+     |
+     */
+
+    'site' => [
+        'repository_url' => (string)env('STASHLIST_REPOSITORY_URL', ''),
+        'chrome_store_url' => (string)env(
+            'STASHLIST_CHROME_STORE_URL',
+            'https://chromewebstore.google.com/detail/flpkpkopodpmfiobdcdhffgphjibolka',
+        ),
+        'firefox_store_url' => (string)env('STASHLIST_FIREFOX_STORE_URL', ''),
+        'billing' => (string)env('STASHLIST_BILLING', 'none'),
+        'compare_page' => (bool)env('STASHLIST_COMPARE_PAGE', false),
     ],
 
     /*

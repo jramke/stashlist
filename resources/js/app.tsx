@@ -2,7 +2,6 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { Toaster } from '@/components/ui/sonner';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
-import PublicLayout from '@/layouts/public-layout';
 import { createInertiaApp } from '@inertiajs/react';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
@@ -10,14 +9,10 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 void createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
-        if (name === 'welcome') {
+        // The pages anyone may read set their own frame (layouts/marketing-layout), so it stays out of the app's
+        // first download; signing in is a small centered card; everything else lives in the app frame.
+        if (name.startsWith('marketing/')) {
             return null;
-        }
-
-        // Signing in is a small centered card, the legal pages are open to everyone; everything else lives in the
-        // app frame.
-        if (name.startsWith('legal/')) {
-            return PublicLayout;
         }
 
         return name.startsWith('auth/') ? AuthLayout : AppLayout;

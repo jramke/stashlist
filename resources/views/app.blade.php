@@ -29,6 +29,10 @@
         <link rel="icon" href="/favicon.png" type="image/png">
         <link rel="apple-touch-icon" href="/favicon.png">
 
+        @if (config('services.umami.script') && config('services.umami.website_id'))
+            <script defer src="{{ config('services.umami.script') }}" data-website-id="{{ config('services.umami.website_id') }}"></script>
+        @endif
+
         @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
         <x-inertia::head>

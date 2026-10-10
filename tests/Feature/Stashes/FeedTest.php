@@ -30,8 +30,8 @@ test('guests are sent to the login page', function () {
     $this->get('/stashes')->assertRedirect('/login');
 });
 
-test('the home page sends signed-in users to their feed and shows the welcome page to guests', function () {
-    $this->get('/')->assertInertia(fn (AssertableInertia $page) => $page->component('welcome'));
+test('the home page sends signed-in users to their feed and shows the front page to guests', function () {
+    $this->get('/')->assertInertia(fn (AssertableInertia $page) => $page->component('marketing/home'));
     $this->actingAs($this->user)->get('/')->assertRedirect(route('stashes.index'));
 });
 

@@ -18,7 +18,7 @@ test('the privacy page is open to everyone and says who runs the installation', 
         ->assertOk()
         ->assertInertia(
             fn (AssertableInertia $page) => $page
-                ->component('legal/privacy')
+                ->component('marketing/privacy')
                 ->where('privacy.operator_name', 'Example Ltd')
                 ->where('privacy.operator_address', '1 Road, Town')
                 ->where('privacy.operator_email', 'hello@example.com'),

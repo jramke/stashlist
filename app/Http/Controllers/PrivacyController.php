@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Ai\AiGuard;
 use App\Ai\Llm;
+use App\Data\MarketingData;
 use App\Data\PrivacyData;
 use App\Enums\SocialProvider;
 use Inertia\Inertia;
@@ -26,7 +27,8 @@ final class PrivacyController extends Controller
      */
     public function __invoke(AiGuard $guard): Response
     {
-        return Inertia::render('legal/privacy', [
+        return Inertia::render('marketing/privacy', [
+            'marketing' => MarketingData::resolve(),
             'privacy' => new PrivacyData(
                 operator_name: config()->string('stashlist.operator.name'),
                 operator_address: config()->string('stashlist.operator.address'),

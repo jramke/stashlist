@@ -1,0 +1,35 @@
+{
+    "ci": {
+        "collect": {
+            "url": [
+                "http://127.0.0.1:8001/",
+                "http://127.0.0.1:8001/pricing",
+                "http://127.0.0.1:8001/extension",
+                "http://127.0.0.1:8001/docs",
+                "http://127.0.0.1:8001/privacy",
+                "http://127.0.0.1:8001/terms",
+                "http://127.0.0.1:8001/imprint",
+                "http://127.0.0.1:8001/changelog"
+            ],
+            "numberOfRuns": 1,
+            "settings": {
+                "chromeFlags": "--no-sandbox --headless=new",
+                "onlyCategories": [
+                    "performance",
+                    "accessibility",
+                    "best-practices",
+                    "seo"
+                ]
+            }
+        },
+        "assert": {
+            "assertions": {
+                "categories:performance": ["error", { "minScore": 0.9 }],
+                "categories:accessibility": ["error", { "minScore": 0.9 }],
+                "categories:best-practices": ["error", { "minScore": 0.9 }],
+                "categories:seo": ["error", { "minScore": 0.9 }],
+                "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }]
+            }
+        }
+    }
+}

@@ -21,6 +21,7 @@ final readonly class SharedData
      */
     public function __construct(
         public string $name,
+        public string $url,
         public AuthData $auth,
         public array $collections = [],
     ) {}
@@ -31,6 +32,7 @@ final readonly class SharedData
 
         return new self(
             name: config()->string('app.name'),
+            url: rtrim(config()->string('app.url'), characters: '/'),
             auth: new AuthData($user instanceof User ? UserData::fromModel($user) : null),
             collections: $user instanceof User
                 ? array_values(

@@ -166,6 +166,17 @@ jobs:
             - name: Run the browser flows
               run: npm run e2e
 
+            # The public pages are server-rendered by the SSR process and have to stay fast and readable: a
+            # second copy of the app with SSR on, measured by Lighthouse (the budget is in lighthouserc.json).
+            - name: Start the application with server-side rendering
+              run: |
+                  php artisan inertia:start-ssr > ssr.log 2>&1 &
+                  INERTIA_SSR_ENABLED=true php artisan serve --host=127.0.0.1 --port=8001 > serve-ssr.log 2>&1 &
+                  curl --retry 20 --retry-delay 1 --retry-connrefused --silent --output /dev/null http://127.0.0.1:8001/pricing
+
+            - name: Measure the public pages
+              run: npx --yes @lhci/cli@0.15.1 autorun --config=lighthouserc.json
+
     extension:
         runs-on: ubuntu-latest
 
