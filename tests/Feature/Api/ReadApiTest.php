@@ -162,3 +162,49 @@ test('a token of one user never reaches the data of another', function () {
         ->and(Tag::withoutGlobalScopes()->count())
         ->toBe(1);
 });
+
+test('the list gives the newest stashes without a query and carries what a result needs', function () {
+    $old = link_for($this->user, 'https://example.com/old', 'Old');
+    $old->forceFill(['created_at' => now()->subDay()])->save();
+    $new = link_for($this->user, 'https://example.com/new', 'New');
+    app(TagSync::class)->addByUser($new, 'Design');
+    link_for(User::factory()->create(), 'https://example.com/theirs', 'Theirs');
+
+    $this
+        ->withToken($this->token)
+        ->getJson('/api/v1/stashes')
+        ->assertOk()
+        ->assertJsonCount(2, 'data')
+        ->assertJsonPath('data.0.id', $new->id)
+        ->assertJsonPath('data.0.title', 'New')
+        ->assertJsonPath('data.0.tags', ['Design'])
+        ->assertJsonPath('data.0.web_url', route('stashes.show', $new))
+        ->assertJsonPath('data.1.id', $old->id)
+        ->assertJsonStructure([
+            'data' => [['id', 'type', 'url', 'title', 'summary', 'tags', 'web_url', 'thumbnail_url', 'created_at']],
+        ]);
+});
+
+test('a query lists the matches in the order of the engine, mine only', function () {
+    $engine = Tests\Support\FakeSearchEngine::install();
+    $alpha = link_for($this->user, 'https://example.com/a', 'Alpha');
+    $beta = link_for($this->user, 'https://example.com/b', 'Beta');
+    $theirs = link_for(User::factory()->create(), 'https://example.com/t', 'Theirs');
+    $engine->hits = [$theirs->id, $beta->id, $alpha->id];
+
+    $this
+        ->withToken($this->token)
+        ->getJson('/api/v1/stashes?q=bread&mode=keyword&limit=5')
+        ->assertOk()
+        ->assertJsonPath('data.*.title', ['Beta', 'Alpha']);
+});
+
+test('the list needs the search ability and a sane limit', function () {
+    $writeOnly = $this->user->createToken('w', [TokenAbility::Create->value])->plainTextToken;
+
+    $this->withToken($writeOnly)->getJson('/api/v1/stashes')->assertForbidden();
+    // The guard remembers the user of the request before; a real second request starts fresh.
+    app('auth')->forgetGuards();
+    $this->withToken($this->token)->getJson('/api/v1/stashes?limit=500')->assertUnprocessable();
+    $this->withToken($this->token)->getJson('/api/v1/stashes?mode=nonsense')->assertUnprocessable();
+});

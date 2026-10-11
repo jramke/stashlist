@@ -29,6 +29,10 @@ Route::prefix('v1')
             Route::get('highlights', [HighlightController::class, 'show'])->name('api.highlights.show');
         });
 
+        Route::get('stashes', [StashController::class, 'index'])
+            ->middleware(['abilities:stash:search', 'throttle:api-lookup'])
+            ->name('api.stashes.index');
+
         // Marking passages. Creating one on an address can create the page's stash, which needs that ability too.
         Route::middleware(['abilities:highlight:manage', 'throttle:api-create', 'json.limit'])->group(function () {
             Route::post('stashes/{stash}/highlights', [HighlightController::class, 'storeForStash'])

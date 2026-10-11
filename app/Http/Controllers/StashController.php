@@ -52,7 +52,9 @@ final class StashController extends Controller
             ),
             'filters' => $filters,
             // What the share sheet handed over, for the capture box.
-            'share' => $request->filled('share') ? mb_substr($request->string('share')->toString(), 0, 2000) : null,
+            'share' => $request->filled('share')
+                ? mb_substr($request->string('share')->toString(), start: 0, length: 2000)
+                : null,
             'tags' => array_values(
                 Tag::query()
                     ->orderByDesc('stashes_count')

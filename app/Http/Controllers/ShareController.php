@@ -22,6 +22,6 @@ final class ShareController extends Controller
             $request->string('url')->toString(),
         );
 
-        return to_route('stashes.index', $input === null ? [] : ['share' => mb_substr($input, 0, 2000)]);
+        return to_route('stashes.index', $input === null ? [] : ['share' => mb_substr($input, start: 0, length: 2000)]);
     }
 }
