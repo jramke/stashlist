@@ -208,3 +208,21 @@ test('the list needs the search ability and a sane limit', function () {
     $this->withToken($this->token)->getJson('/api/v1/stashes?limit=500')->assertUnprocessable();
     $this->withToken($this->token)->getJson('/api/v1/stashes?mode=nonsense')->assertUnprocessable();
 });
+
+test('the hashes of the saved addresses are listed with an ETag, mine only', function () {
+    $mine = link_for($this->user, 'https://example.com/mine');
+    link_for(User::factory()->create(), 'https://example.com/theirs');
+    Stash::factory()->for($this->user)->create(['url' => null, 'url_hash' => null]);
+
+    $response = $this->withToken($this->token)->getJson('/api/v1/stashes/hashes')->assertOk();
+
+    expect($response->json('hashes'))->toBe([bin2hex($mine->url_hash)]);
+
+    $etag = $response->headers->get('ETag');
+    app('auth')->forgetGuards();
+    $this
+        ->withToken($this->token)
+        ->withHeader('If-None-Match', $etag)
+        ->getJson('/api/v1/stashes/hashes')
+        ->assertStatus(304);
+});

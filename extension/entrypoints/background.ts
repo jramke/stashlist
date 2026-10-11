@@ -1,5 +1,6 @@
 import { highlightSelection } from '@/lib/highlights/create';
 import { syncHighlights } from '@/lib/highlights/sync';
+import { isBadgeOn, isSaved, syncSaved } from '@/lib/saved';
 import {
     connect,
     explain,
@@ -34,6 +35,19 @@ export default defineBackground(() => {
     });
     browser.runtime.onStartup.addListener(() => void syncQuietly());
     void ensureSyncAlarm();
+
+    // The check on the icon for a page that is saved already (only with the optional `tabs` permission).
+    browser.tabs.onUpdated.addListener((tabId, change, tab) => {
+        if (change.status === 'complete' || change.url !== undefined) {
+            void markIfSaved(tabId, tab.url);
+        }
+    });
+    browser.tabs.onActivated.addListener(({ tabId }) => {
+        void browser.tabs
+            .get(tabId)
+            .then((tab) => markIfSaved(tabId, tab.url))
+            .catch(() => undefined);
+    });
 
     browser.runtime.onInstalled.addListener(async ({ reason }) => {
         await browser.contextMenus.removeAll();
@@ -98,10 +112,35 @@ async function ensureSyncAlarm(): Promise<void> {
 /** A sync nobody is waiting for: offline or a token that is not set up yet is not worth a message. */
 async function syncQuietly(): Promise<void> {
     try {
-        await syncHighlights((await connect()).client);
+        const { client } = await connect();
+
+        await syncHighlights(client);
+
+        if (await isBadgeOn()) {
+            await syncSaved(client);
+        }
     } catch {
         // The next alarm tries again.
     }
+}
+
+/** A check on the icon of a tab whose page is saved, nothing on any other. */
+async function markIfSaved(
+    tabId: number,
+    url: string | undefined,
+): Promise<void> {
+    if (url === undefined || !(await isBadgeOn())) {
+        return;
+    }
+
+    const saved = await isSaved(url);
+
+    await browser.action.setBadgeBackgroundColor({ color: '#16a34a', tabId });
+    await browser.action.setBadgeText({ text: saved ? '✓' : '', tabId });
+    await browser.action.setTitle({
+        title: saved ? 'Stashlist: already stashed' : 'Stashlist',
+        tabId,
+    });
 }
 
 async function highlight(tab: Browser.tabs.Tab): Promise<void> {
@@ -157,6 +196,13 @@ async function flash(
     setTimeout(() => {
         void browser.action.setBadgeText({ text: '', ...target });
         void browser.action.setTitle({ title: 'Stashlist', ...target });
+
+        if (tabId !== undefined) {
+            void browser.tabs
+                .get(tabId)
+                .then((tab) => markIfSaved(tabId, tab.url))
+                .catch(() => undefined);
+        }
     }, 3000);
 }
 

@@ -56,6 +56,8 @@ const saved = {
 describe('stashing with the defaults', () => {
     beforeEach(async () => {
         fakeBrowser.reset();
+        // The check for saved pages is off: no `tabs` permission.
+        fakeBrowser.permissions.contains = vi.fn(async () => false);
         // The fake browser has no manifest of its own.
         vi.spyOn(fakeBrowser.runtime, 'getManifest').mockReturnValue({
             version: '2.0.0',

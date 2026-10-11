@@ -19,10 +19,15 @@ export default defineConfig({
             'identity',
             'scripting',
             'storage',
+            // Optional for people; the browser tests cannot answer the prompt for it.
+            ...(e2e ? ['tabs' as const] : []),
         ],
         // The browser flows (e2e/) build with STASHLIST_E2E=1: the test pages are not on a host the extension is
         // allowed on, and nothing can click the permission prompt.
         host_permissions: e2e ? ['<all_urls>'] : ['https://stashlist.app/*'],
+        // The check on the icon for pages that are saved already needs the address of every tab: asked for when the
+        // person turns it on, never at install.
+        optional_permissions: ['tabs'],
         // A self-hosted instance is asked for at runtime, one origin at a time.
         optional_host_permissions: ['https://*/*', 'http://*/*'],
         commands: {

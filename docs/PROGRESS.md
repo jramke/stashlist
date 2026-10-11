@@ -146,7 +146,7 @@ Decided 2026-10-11: no Safari build and no search in the extension's popup. Left
 
 - [x] Search API: `GET /api/v1/stashes?q=&limit=&mode=` (ability `stash:search`, newest first without `q`), for Raycast
 - [x] One-click Connect: `identity.launchWebAuthFlow` to `/connect/extension`, approval page, token back in the fragment of the extension's own redirect address (only `chromiumapp.org` and `extensions.allizom.org` accepted); new permission `identity` (no install warning), listed in the manifest guard; browser flow in a real Chrome. Not tried in Firefox
-- [ ] "Already saved" badge on the toolbar icon (optional permission)
+- [x] "Already saved" check on the toolbar icon, behind the optional `tabs` permission (options checkbox): the server lists the hashes of the saved addresses (`GET /api/v1/stashes/hashes`, ETag), the extension compares locally, so no visited address is sent; browser flow in a real Chrome
 - [ ] Raycast extension: search and save, in its own repo
 - [ ] M8 billing with Polar
 

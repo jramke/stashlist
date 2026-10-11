@@ -9,6 +9,7 @@ import {
 import { clearHighlights } from '@/lib/highlights/store';
 import { syncHighlights } from '@/lib/highlights/sync';
 import { parseTags } from '@/lib/payload';
+import { isBadgeOn, syncSaved, turnOffBadge, turnOnBadge } from '@/lib/saved';
 import {
     DEFAULT_INSTANCE,
     ensureInstanceAccess,
@@ -32,12 +33,15 @@ export function App() {
     const [collections, setCollections] = useState<Collection[]>([]);
     const [status, setStatus] = useState<Status>(null);
     const [showing, setShowing] = useState(false);
+    const [badge, setBadge] = useState(false);
+    const [badgeStatus, setBadgeStatus] = useState<Status>(null);
     const [highlightStatus, setHighlightStatus] = useState<Status>(null);
     // Who the saved highlights belong to: another address or token means another person's.
     const saved = useRef('');
 
     useEffect(() => {
         void isShowingOnPages().then(setShowing);
+        void isBadgeOn().then(setBadge);
         void loadSettings().then((settings) => {
             saved.current = `${settings.instance} ${settings.token}`;
             setInstance(settings.instance);
@@ -133,6 +137,38 @@ export function App() {
 
         setToken(received);
         await save(received);
+    }
+
+    async function toggleBadge(on: boolean): Promise<void> {
+        setBadgeStatus(null);
+
+        if (!on) {
+            await turnOffBadge();
+            setBadge(false);
+
+            return;
+        }
+
+        const granted = await turnOnBadge();
+
+        setBadge(granted);
+
+        if (!granted) {
+            setBadgeStatus({
+                tone: 'error',
+                text: 'Without access to the address of your tabs the icon cannot tell which pages are saved.',
+            });
+
+            return;
+        }
+
+        try {
+            await syncSaved(
+                createClient({ instance: normalizeInstance(instance), token }),
+            );
+        } catch (error) {
+            setBadgeStatus({ tone: 'error', text: explain(error) });
+        }
     }
 
     async function toggleShowing(on: boolean): Promise<void> {
@@ -312,6 +348,34 @@ export function App() {
                     <Note tone={highlightStatus.tone}>
                         {highlightStatus.text}
                     </Note>
+                )}
+            </section>
+
+            <section className="grid gap-3">
+                <h2 className="text-sm font-medium">Saved pages</h2>
+
+                <label className="flex items-start gap-2 text-sm">
+                    <input
+                        type="checkbox"
+                        className="mt-1"
+                        checked={badge}
+                        onChange={(event) =>
+                            void toggleBadge(event.target.checked)
+                        }
+                    />
+                    <span>
+                        Show a check on the icon for pages I saved already
+                        <span className="block text-xs text-muted-foreground">
+                            Needs access to the address of your tabs. Stashlist
+                            sends the extension a list of what you saved, and
+                            the extension compares it: the addresses you visit
+                            are never sent.
+                        </span>
+                    </span>
+                </label>
+
+                {badgeStatus !== null && (
+                    <Note tone={badgeStatus.tone}>{badgeStatus.text}</Note>
                 )}
             </section>
 

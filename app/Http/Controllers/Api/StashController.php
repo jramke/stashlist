@@ -95,6 +95,29 @@ final class StashController extends Controller
     }
 
     /**
+     * The hash (hex) of every saved address, so a client can tell on its own whether a page is saved and the
+     * address of a visited page never leaves the browser. With an ETag a client asks "anything new?" and gets 304.
+     * ponytail: the whole list in one answer, about 70 bytes per stash; a delta by creation date if libraries grow
+     * past a few hundred thousand.
+     */
+    public function hashes(Request $request): JsonResponse
+    {
+        $hashes = Stash::query()
+            ->whereNotNull('url_hash')
+            ->orderBy('id')
+            ->pluck('url_hash')
+            ->map(static fn (string $hash): string => bin2hex($hash))
+            ->values()
+            ->all();
+
+        $response = response()->json(['hashes' => $hashes]);
+        $response->setEtag(md5(implode(separator: '', array: $hashes)));
+        $response->isNotModified($request);
+
+        return $response;
+    }
+
+    /**
      * Whether a link is saved already: the "already saved" state of the extension's popup.
      */
     public function lookup(Request $request, #[CurrentUser] User $user): JsonResponse

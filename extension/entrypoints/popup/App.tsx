@@ -6,6 +6,7 @@ import { highlightsOfPage, removeHighlight } from '@/lib/highlights/store';
 import type { StoredHighlight } from '@/lib/highlights/types';
 import { capturePage, isStashable } from '@/lib/page';
 import { buildSaveRequest } from '@/lib/payload';
+import { rememberSaved } from '@/lib/saved';
 import { captureScreenshot } from '@/lib/screenshot';
 import { connect, explain, needsNewToken, version } from '@/lib/stash-tab';
 import type {
@@ -154,6 +155,7 @@ export function App() {
                 idempotencyKey.current,
             );
 
+            await rememberSaved(result.url);
             setState({ step: 'saved', loaded, result });
             setTimeout(() => window.close(), 1800);
         } catch (error) {

@@ -65,6 +65,10 @@ type Wire = {
  * The capture API of a Stashlist instance (plan 6.3). Every call carries the bearer token; nothing else is
  * ever sent, so there is no cookie to fight Laravel's CSRF and SameSite rules.
  */
+export type SavedAnswer =
+    | { changed: false }
+    | { changed: true; etag: string | null; hashes: string[] };
+
 export function createClient(config: Config) {
     const base = config.instance.replace(/\/+$/, '');
 
@@ -214,6 +218,22 @@ export function createClient(config: Config) {
                       changed: true,
                       etag: response.headers.get('ETag'),
                       list: body as HighlightIndex,
+                  };
+        },
+
+        /** The hash of every saved address; `changed` is false when the ETag still holds. */
+        async savedHashes(etag: string | null): Promise<SavedAnswer> {
+            const { body, response } = await exchange(
+                'stashes/hashes',
+                etag === null ? {} : { ifNoneMatch: etag },
+            );
+
+            return response.status === 304
+                ? { changed: false }
+                : {
+                      changed: true,
+                      etag: response.headers.get('ETag'),
+                      hashes: (body as { hashes: string[] }).hashes,
                   };
         },
 

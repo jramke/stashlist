@@ -2,6 +2,7 @@ import { browser } from 'wxt/browser';
 import { ApiError, createClient, Unauthorized, type Client } from './api';
 import { capturePage, isStashable } from './page';
 import { buildSaveRequest, quickEdits } from './payload';
+import { rememberSaved } from './saved';
 import { captureScreenshot } from './screenshot';
 import { isConfigured, loadSettings, type Settings } from './settings';
 import type { SaveRequest, SaveResult } from './types';
@@ -78,14 +79,16 @@ export async function stashTab(tab: {
         ? await captureScreenshot(tab.windowId, SCREENSHOT_LIMIT)
         : null;
 
-    return client.save(
-        buildSaveRequest(
-            page,
-            quickEdits(page, settings.defaults),
-            version(),
-            screenshot,
+    return remember(
+        await client.save(
+            buildSaveRequest(
+                page,
+                quickEdits(page, settings.defaults),
+                version(),
+                screenshot,
+            ),
+            crypto.randomUUID(),
         ),
-        crypto.randomUUID(),
     );
 }
 
@@ -93,14 +96,23 @@ export async function stashTab(tab: {
 export async function stashThing(request: SaveRequest): Promise<SaveResult> {
     const { client, settings } = await connect();
 
-    return client.save(
-        {
-            tags: settings.defaults.tags,
-            collectionIds: settings.defaults.collectionIds,
-            ...request,
-        },
-        crypto.randomUUID(),
+    return remember(
+        await client.save(
+            {
+                tags: settings.defaults.tags,
+                collectionIds: settings.defaults.collectionIds,
+                ...request,
+            },
+            crypto.randomUUID(),
+        ),
     );
+}
+
+/** Lets the icon's check know the page is saved without waiting for the next sync. */
+async function remember(result: SaveResult): Promise<SaveResult> {
+    await rememberSaved(result.url);
+
+    return result;
 }
 
 /** A sentence for a person about what went wrong. */

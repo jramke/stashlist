@@ -21,6 +21,7 @@ Route::prefix('v1')
             ->name('api.stashes.store');
 
         Route::middleware(['abilities:stash:read', 'throttle:api-lookup'])->group(function () {
+            Route::get('stashes/hashes', [StashController::class, 'hashes'])->name('api.stashes.hashes');
             Route::get('stashes/lookup', [StashController::class, 'lookup'])->name('api.stashes.lookup');
             Route::get('tags', [TagController::class, 'index'])->name('api.tags.index');
             Route::get('collections', [CollectionController::class, 'index'])->name('api.collections.index');
