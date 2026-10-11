@@ -18,7 +18,7 @@ M1.5 is done in code: the capture API (tokens, `/api/v1`, the `capture` block, i
 
 M1.6 is done in code: persistent highlights on the server and the stash page, and in the extension (`Alt+Shift+H` or the menu, painting with the CSS Custom Highlight API, a local copy kept in step by sync, an opt-in "Show my highlights on pages"), with five more flows in a real Chrome. What is left is yours: try the anchoring on real pages (see the checklist).
 
-M2 (auto-tagging), M3 (embeddings and hybrid search) and M4 (pictures) are done in code, with fakes and against a real Meilisearch. They need your OpenAI key to do anything for real: until `OPENAI_API_KEY` is in `.env` the AI stages are skipped everywhere. Yours after that: the model bake-off, the search eval set and the 1M spike (see the checklists). M5 (launch readiness: registration modes, usage and limits, export, account deletion, self-hosting image, README), M5.5 (public pages with server-side rendering, Lighthouse in CI) and M5.6 (interactive hero) are done in code. **Next: M6 (rich links, optional), M7 (Raycast and extension v2) and M8 (billing with Polar).** M8 needs a Polar sandbox account; the rest of what is open is on the "Blocked on you" list.
+M2 (auto-tagging), M3 (embeddings and hybrid search) and M4 (pictures) are done in code, with fakes and against a real Meilisearch. They need your OpenAI key to do anything for real: until `OPENAI_API_KEY` is in `.env` the AI stages are skipped everywhere. Yours after that: the model bake-off, the search eval set and the 1M spike (see the checklists). M5 (launch readiness: registration modes, usage and limits, export, account deletion, self-hosting image, README), M5.5 (public pages with server-side rendering, Lighthouse in CI) and M5.6 (interactive hero) are done in code. M5.7 (installable app, share sheet, iPhone Shortcut) and M7 (search API, one-click connect, saved-page check, Raycast extension; no Safari, no popup search) are done in code. **Next: M8 (billing with Polar); M6 (rich links) is in the backlog.** M8 needs a Polar sandbox account; the rest of what is open is on the "Blocked on you" list.
 
 ## Blocked on you
 
@@ -147,7 +147,8 @@ Decided 2026-10-11: no Safari build and no search in the extension's popup. Left
 - [x] Search API: `GET /api/v1/stashes?q=&limit=&mode=` (ability `stash:search`, newest first without `q`), for Raycast
 - [x] One-click Connect: `identity.launchWebAuthFlow` to `/connect/extension`, approval page, token back in the fragment of the extension's own redirect address (only `chromiumapp.org` and `extensions.allizom.org` accepted); new permission `identity` (no install warning), listed in the manifest guard; browser flow in a real Chrome. Not tried in Firefox
 - [x] "Already saved" check on the toolbar icon, behind the optional `tabs` permission (options checkbox): the server lists the hashes of the saved addresses (`GET /api/v1/stashes/hashes`, ETag), the extension compares locally, so no visited address is sent; browser flow in a real Chrome
-- [ ] Raycast extension: search and save, in its own repo
+- [x] Raycast extension in `raycast/` (decided to keep it in this repo; the store submission is a copy into raycast/extensions): `Search Stashes` and `Stash Link`, builds and type-checks, CI job `raycast`. Not run inside Raycast yet
+- [ ] Raycast: your Raycast username for `author` in `raycast/package.json` (`ray lint` fails on the placeholder), then try both commands in Raycast and submit it to the store
 - [ ] M8 billing with Polar
 
 ## Decisions and deviations

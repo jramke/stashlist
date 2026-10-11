@@ -1,0 +1,74 @@
+{
+    "$schema": "https://www.raycast.com/schemas/extension.json",
+    "name": "stashlist",
+    "title": "Stashlist",
+    "description": "Search your stashes and save links to Stashlist.",
+    "icon": "extension-icon.png",
+    "author": "jramke",
+    "license": "MIT",
+    "categories": [
+        "Productivity",
+        "Web"
+    ],
+    "platforms": [
+        "macOS",
+        "Windows"
+    ],
+    "commands": [
+        {
+            "name": "search-stashes",
+            "title": "Search Stashes",
+            "description": "Find what you saved, by words or by meaning.",
+            "mode": "view"
+        },
+        {
+            "name": "stash-link",
+            "title": "Stash Link",
+            "description": "Save a link to Stashlist. Without an argument it takes the link on the clipboard.",
+            "mode": "no-view",
+            "arguments": [
+                {
+                    "name": "link",
+                    "placeholder": "Link (or the clipboard)",
+                    "type": "text",
+                    "required": false
+                }
+            ]
+        }
+    ],
+    "preferences": [
+        {
+            "name": "instance",
+            "title": "Address",
+            "description": "The address of your Stashlist.",
+            "type": "textfield",
+            "required": true,
+            "default": "https://stashlist.app"
+        },
+        {
+            "name": "token",
+            "title": "API token",
+            "description": "Make one under Settings, API tokens in Stashlist.",
+            "type": "password",
+            "required": true
+        }
+    ],
+    "dependencies": {
+        "@raycast/api": "^1.100.0",
+        "@raycast/utils": "^2.0.0"
+    },
+    "devDependencies": {
+        "@raycast/eslint-config": "^2.0.0",
+        "@types/node": "22.x",
+        "@types/react": "19.x",
+        "eslint": "^9.0.0",
+        "prettier": "^3.0.0",
+        "typescript": "^5.0.0"
+    },
+    "scripts": {
+        "build": "ray build -e dist",
+        "dev": "ray develop",
+        "lint": "ray lint",
+        "check": "tsc --noEmit"
+    }
+}
