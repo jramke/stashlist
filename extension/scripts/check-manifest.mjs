@@ -8,6 +8,7 @@ const EXPECTED = {
         'activeTab',
         'alarms',
         'contextMenus',
+        'identity',
         'scripting',
         'storage',
     ],

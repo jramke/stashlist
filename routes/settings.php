@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\ConnectExtensionController;
 use App\Http\Controllers\Settings\AccountController;
 use App\Http\Controllers\Settings\ExportController;
 use App\Http\Controllers\Settings\ProfileController;
@@ -30,4 +31,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/tokens', [TokenController::class, 'index'])->name('tokens.index');
     Route::post('settings/tokens', [TokenController::class, 'store'])->name('tokens.store');
     Route::delete('settings/tokens/{id}', [TokenController::class, 'destroy'])->name('tokens.destroy');
+
+    // The browser extension asks for a token (see ConnectExtensionRequest for where it may be sent).
+    Route::get('connect/extension', [ConnectExtensionController::class, 'show'])->name('connect.extension');
+    Route::post('connect/extension', [ConnectExtensionController::class, 'store'])->name('connect.extension.store');
+    Route::post('connect/extension/deny', [ConnectExtensionController::class, 'deny'])->name('connect.extension.deny');
 });

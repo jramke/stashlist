@@ -1,5 +1,6 @@
 import { Button, Input, Label, Note } from '@/components/ui';
 import { createClient } from '@/lib/api';
+import { connect } from '@/lib/connect';
 import {
     hideOnPages,
     isShowingOnPages,
@@ -56,7 +57,7 @@ export function App() {
         });
     }, []);
 
-    async function save(): Promise<void> {
+    async function save(chosenToken: string = token): Promise<void> {
         const address = normalizeInstance(instance);
 
         setStatus({ tone: 'muted', text: 'Saving…' });
@@ -71,30 +72,67 @@ export function App() {
         }
 
         const next = { ...defaults, tags: parseTags(tagText) };
-        await saveSettings({ instance: address, token, defaults: next });
+        await saveSettings({
+            instance: address,
+            token: chosenToken,
+            defaults: next,
+        });
         setInstance(address);
         setDefaults(next);
 
-        if (saved.current !== `${address} ${token.trim()}`) {
+        if (saved.current !== `${address} ${chosenToken.trim()}`) {
             await clearHighlights();
-            saved.current = `${address} ${token.trim()}`;
+            saved.current = `${address} ${chosenToken.trim()}`;
         }
 
         try {
-            const me = await createClient({ instance: address, token }).me();
+            const me = await createClient({
+                instance: address,
+                token: chosenToken,
+            }).me();
             void syncHighlights(
-                createClient({ instance: address, token }),
+                createClient({ instance: address, token: chosenToken }),
             ).catch(() => undefined);
             setStatus({
                 tone: 'muted',
                 text: `Saved. Connected as ${me.name}.`,
             });
             setCollections(
-                await createClient({ instance: address, token }).collections(),
+                await createClient({
+                    instance: address,
+                    token: chosenToken,
+                }).collections(),
             );
         } catch (error) {
             setStatus({ tone: 'error', text: `Saved, but ${explain(error)}` });
         }
+    }
+
+    /** One click instead of a pasted token: the browser opens Stashlist, the person approves, the token comes back. */
+    async function connectToStashlist(): Promise<void> {
+        const address = normalizeInstance(instance);
+
+        // Asked first, while the click still counts: the token is useless without access to the address.
+        if (!(await ensureInstanceAccess(address))) {
+            setStatus({
+                tone: 'error',
+                text: `Without access to ${address} the extension cannot save there.`,
+            });
+
+            return;
+        }
+
+        setStatus({ tone: 'muted', text: 'Waiting for Stashlist…' });
+        const received = await connect(address);
+
+        if (received === null) {
+            setStatus({ tone: 'error', text: 'Not connected.' });
+
+            return;
+        }
+
+        setToken(received);
+        await save(received);
     }
 
     async function toggleShowing(on: boolean): Promise<void> {
@@ -151,8 +189,12 @@ export function App() {
                     />
                 </div>
 
+                <Button type="button" onClick={() => void connectToStashlist()}>
+                    Connect to Stashlist
+                </Button>
+
                 <div className="grid gap-1.5">
-                    <Label htmlFor="token">Token</Label>
+                    <Label htmlFor="token">Or paste a token</Label>
                     <Input
                         id="token"
                         type="password"

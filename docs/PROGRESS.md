@@ -139,12 +139,13 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 ### M6 to M8
 
 - [ ] M6 rich links for pasted URLs (optional, backlog: skipped for now; the extension keeps reading pages itself, because it sees signed-in and paywalled pages a server renderer cannot)
+
 ### M7. Raycast and extension v2
 
 Decided 2026-10-11: no Safari build and no search in the extension's popup. Left of extension v2: one-click Connect and the "already saved" badge.
 
 - [x] Search API: `GET /api/v1/stashes?q=&limit=&mode=` (ability `stash:search`, newest first without `q`), for Raycast
-- [ ] One-click Connect for the hosted domain: the extension gets a token without the person making one by hand
+- [x] One-click Connect: `identity.launchWebAuthFlow` to `/connect/extension`, approval page, token back in the fragment of the extension's own redirect address (only `chromiumapp.org` and `extensions.allizom.org` accepted); new permission `identity` (no install warning), listed in the manifest guard; browser flow in a real Chrome. Not tried in Firefox
 - [ ] "Already saved" badge on the toolbar icon (optional permission)
 - [ ] Raycast extension: search and save, in its own repo
 - [ ] M8 billing with Polar
