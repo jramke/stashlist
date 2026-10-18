@@ -1,199 +1,266 @@
-import { cn } from '@/lib/utils';
+import { LogoPoof } from '@/components/logo-poof';
 import {
     Bookmark,
-    Camera,
-    Code,
-    Globe,
-    Highlighter,
-    Image as ImageIcon,
-    Link2,
-    Palette,
-    StickyNote,
-    type LucideIcon,
-} from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+    Chrome,
+    Codepen,
+    Colors,
+    Dribbble,
+    GitHub,
+    Picture,
+    Star,
+    Text,
+} from '@/components/logos';
+import { cn } from '@/lib/utils';
+import { LazyMotion, domAnimation, useReducedMotion } from 'motion/react';
+import * as m from 'motion/react-m';
+import {
+    useEffect,
+    useRef,
+    useState,
+    type ComponentType,
+    type ReactNode,
+    type SVGProps,
+} from 'react';
 
-/** What people put in the vault, one icon each. Their places around it are fixed, so nothing shifts when it loads. */
-const things: {
+type Place = {
     label: string;
-    icon: LucideIcon;
-    left: string;
-    top: string;
-    delay: string;
-}[] = [
-    { label: 'a link', icon: Link2, left: '8%', top: '10%', delay: '0s' },
-    {
-        label: 'an image',
-        icon: ImageIcon,
-        left: '40%',
-        top: '2%',
-        delay: '-1.2s',
-    },
-    {
-        label: 'a color',
-        icon: Palette,
-        left: '74%',
-        top: '10%',
-        delay: '-2.4s',
-    },
-    {
-        label: 'a note',
-        icon: StickyNote,
-        left: '88%',
-        top: '40%',
-        delay: '-0.6s',
-    },
-    {
-        label: 'a bookmark',
-        icon: Bookmark,
-        left: '76%',
-        top: '72%',
-        delay: '-1.8s',
-    },
-    {
-        label: 'a highlight',
-        icon: Highlighter,
-        left: '42%',
-        top: '82%',
-        delay: '-3s',
-    },
-    {
-        label: 'a screenshot',
-        icon: Camera,
-        left: '8%',
-        top: '72%',
-        delay: '-2.1s',
-    },
-    { label: 'a snippet', icon: Code, left: '-2%', top: '40%', delay: '-0.3s' },
-    { label: 'a tab', icon: Globe, left: '14%', top: '40%', delay: '-1.5s' },
+    icon: ComponentType<SVGProps<SVGSVGElement>>;
+    /** Where it floats, in pixels from the middle of the vault. */
+    x: number;
+    y: number;
+};
+
+const places: Place[] = [
+    { label: 'Keep a repository', icon: GitHub, x: -170, y: -190 },
+    { label: 'Keep a star', icon: Star, x: -300, y: -110 },
+    { label: 'Keep a pen', icon: Codepen, x: -360, y: -20 },
+    { label: 'Keep an image', icon: Picture, x: -250, y: 20 },
+    { label: 'Keep a palette', icon: Colors, x: -320, y: 90 },
+    { label: 'Keep a bookmark', icon: Bookmark, x: 240, y: -150 },
+    { label: 'Keep a browser tab', icon: Chrome, x: 360, y: -80 },
+    { label: 'Keep a note', icon: Text, x: 270, y: 0 },
+    { label: 'Keep a shot', icon: Dribbble, x: 320, y: 90 },
 ];
 
-/** How long an icon takes to burst and fly in, and how long it is gone before it floats back. */
-const FLIGHT = 700;
-const GONE = 2200;
+/** How long the smoke plays before the mark sets off for the vault. */
+const SMOKE_TIME = 1000;
+
+/** A little different for every icon, but the same on every visit, so nothing shifts when the page loads. */
+function wobble(index: number) {
+    const odd = index % 2 === 0;
+
+    return {
+        '--float-from': `${odd ? -2 : 2}deg`,
+        '--float-to': `${odd ? 5 : -4}deg`,
+        '--float-x': `${odd ? 3 : -3}px`,
+        '--float-scale': index % 3 === 0 ? 1.1 : 1.05,
+        '--float-duration': `${2 + (index % 4) * 0.25}s`,
+        animationDelay: `-${(index * 0.37) % 2.4}s`,
+    } as const;
+}
 
 /**
- * Nine things around a vault. The page arrives with them in place and still; once it is running they float, and a
- * click bursts one, sends it into the vault and makes the vault shimmer, which also follows the pointer. Every icon
- * is a real button, and with reduced motion nothing moves: the click only says what was kept.
+ * A vault, and the places things get lost in floating round it. Press one and it puffs into the Stashlist mark,
+ * which flies into the vault and makes it shimmer. The shimmer follows the pointer, too. Every icon is a real
+ * button; with reduced motion nothing floats, puffs or flies, the icon is just kept.
  */
-export function Hero() {
+export function Hero({ children }: { children: ReactNode }) {
     const stage = useRef<HTMLDivElement>(null);
-    const vault = useRef<HTMLDivElement>(null);
-    const [flying, setFlying] = useState<string | null>(null);
+    const shimmer = useRef<HTMLSpanElement>(null);
     const [kept, setKept] = useState<string[]>([]);
+    const [flying, setFlying] = useState<string[]>([]);
     const [running, setRunning] = useState(false);
-    const timers = useRef<number[]>([]);
+    const busy = useRef(false);
+    const reduced = useReducedMotion();
+
+    /** One pass of light across the vault. */
+    function sweep() {
+        if (
+            matchMedia('(prefers-reduced-motion: reduce)').matches ||
+            shimmer.current === null
+        ) {
+            return;
+        }
+
+        busy.current = true;
+        shimmer.current
+            .animate(
+                [
+                    { left: '-20%', opacity: 1 },
+                    { left: '120%', opacity: 1 },
+                ],
+                { duration: 650, easing: 'ease-out' },
+            )
+            .finished.then(
+                () => {
+                    busy.current = false;
+                },
+                () => {
+                    busy.current = false;
+                },
+            );
+    }
 
     useEffect(() => {
         setRunning(true);
 
-        return () => timers.current.forEach(clearTimeout);
+        const timer = window.setTimeout(sweep, 300);
+        let frame = 0;
+
+        function follow(event: PointerEvent) {
+            cancelAnimationFrame(frame);
+            frame = requestAnimationFrame(() => {
+                const box = stage.current?.getBoundingClientRect();
+                const light = shimmer.current;
+
+                if (box === undefined || light === null || busy.current) {
+                    return;
+                }
+
+                const over =
+                    event.clientX > box.left - box.width * 0.25 &&
+                    event.clientX < box.right + box.width * 0.25 &&
+                    event.clientY > box.top - box.height * 0.25 &&
+                    event.clientY < box.bottom + box.height * 0.25;
+
+                light.style.left = `${((event.clientX - box.left) / box.width) * 100 - 20}%`;
+                light.style.opacity = over ? '1' : '0';
+            });
+        }
+
+        window.addEventListener('pointermove', follow);
+
+        return () => {
+            clearTimeout(timer);
+            cancelAnimationFrame(frame);
+            window.removeEventListener('pointermove', follow);
+        };
     }, []);
 
-    function keep(label: string, button: HTMLButtonElement) {
-        const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function poofed(label: string) {
+        setKept((list) => [...list, label]);
 
-        setKept((list) => [...list.filter((item) => item !== label), label]);
-
-        if (reduced || vault.current === null || stage.current === null) {
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
             return;
         }
 
-        const from = button.getBoundingClientRect();
-        const to = vault.current.getBoundingClientRect();
-
-        button.style.setProperty(
-            '--hero-dx',
-            `${to.left + to.width / 2 - (from.left + from.width / 2)}px`,
-        );
-        button.style.setProperty(
-            '--hero-dy',
-            `${to.top + to.height / 2 - (from.top + from.height / 2)}px`,
-        );
-        setFlying(label);
-
-        timers.current.push(
-            window.setTimeout(() => {
-                // The vault takes it in: restart its shimmer.
-                vault.current?.style.setProperty('animation', 'none');
-                void vault.current?.offsetWidth;
-                vault.current?.style.setProperty(
-                    'animation',
-                    'hero-shimmer 900ms ease-out',
-                );
-            }, FLIGHT - 150),
-            window.setTimeout(() => setFlying(null), FLIGHT + GONE),
-        );
-    }
-
-    function follow(event: React.PointerEvent) {
-        const box = vault.current?.getBoundingClientRect();
-
-        if (box === undefined) {
-            return;
-        }
-
-        vault.current?.style.setProperty(
-            '--hero-x',
-            `${Math.round(((event.clientX - box.left) / box.width) * 100)}%`,
-        );
-        vault.current?.style.setProperty(
-            '--hero-y',
-            `${Math.round(((event.clientY - box.top) / box.height) * 100)}%`,
+        // The smoke plays, then the mark flies in (Motion) and the vault answers with a shimmer when it lands.
+        window.setTimeout(
+            () => setFlying((list) => [...list, label]),
+            SMOKE_TIME,
         );
     }
 
     return (
-        <div
-            ref={stage}
-            onPointerMove={follow}
-            className="relative mx-auto aspect-[4/3] w-full max-w-lg select-none"
-        >
-            <div
-                ref={vault}
-                data-kept={kept.length}
-                className="hero-motion absolute top-1/2 left-1/2 grid h-2/5 w-2/5 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-3xl border bg-card"
-                style={{
-                    backgroundImage:
-                        'radial-gradient(circle at var(--hero-x, 50%) var(--hero-y, 30%), color-mix(in oklab, var(--foreground) 10%, transparent), transparent 60%)',
-                }}
-            >
-                <div className="h-1.5 w-1/2 rounded-full bg-foreground/80" />
-                <span className="absolute bottom-3 text-xs text-muted-foreground">
-                    {kept.length === 0 ? 'Your stash' : `${kept.length} kept`}
-                </span>
-            </div>
-
-            {things.map(({ label, icon: Icon, left, top, delay }) => (
-                <button
-                    key={label}
-                    type="button"
-                    aria-label={`Keep ${label}`}
-                    onClick={(event) => keep(label, event.currentTarget)}
-                    className={cn(
-                        'absolute grid size-12 place-items-center rounded-2xl border bg-background text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50',
-                        running &&
-                            flying !== label &&
-                            'hero-motion [animation:hero-float_5s_ease-in-out_infinite]',
-                        flying === label &&
-                            'hero-motion [animation:hero-poof_700ms_ease-in_forwards]',
-                    )}
-                    style={{
-                        left,
-                        top,
-                        animationDelay: flying === label ? undefined : delay,
-                    }}
+        <LazyMotion features={domAnimation} strict>
+            <div className="relative isolate flex flex-col items-center gap-8 text-center">
+                <svg
+                    height="0"
+                    width="0"
+                    aria-hidden="true"
+                    className="pointer-events-none absolute"
                 >
-                    <Icon className="size-5" />
-                </button>
-            ))}
+                    <defs>
+                        <clipPath
+                            id="vault-clip"
+                            clipPathUnits="objectBoundingBox"
+                        >
+                            <path d="M.07229,0C.04359,0,.02033,.02326,.02033,.05196v.08584H.0113C.00506,.1378,0,.14286,0,.1491v.11217C0,.26751,.00506,.27256,.0113,.27256h.00904v.42097H.0113C.00506,.69353,0,.69859,0,.70483v.11217C0,.82324,.00506,.82829,.0113,.82829h.00904v.08437c0,.0287,.02326,.05196,.05196,.05196h.04692v.02711c0,.00499,.00405,.00904,.00904,.00904H.90319c.00499,0,.00904-.00405,.00904-.00904v-.02711h.03659c.0287,0,.05196-.02326,.05196-.05196V.05196C1.00077,.02326,.97751,0,.94881,0H.07229Z" />
+                        </clipPath>
+                    </defs>
+                </svg>
 
-            <p aria-live="polite" className="sr-only">
-                {kept.length === 0
-                    ? ''
-                    : `Kept ${kept[kept.length - 1]}. ${kept.length} of ${things.length} in your stash.`}
-            </p>
-        </div>
+                <div
+                    ref={stage}
+                    className="relative grid h-[210px] w-[275px] place-content-center sm:h-[310px] sm:w-[375px]"
+                >
+                    <div className="relative z-20 hidden size-10 sm:block">
+                        {places.map((place, index) => {
+                            const gone = flying.includes(place.label);
+                            const Icon = place.icon;
+
+                            return (
+                                <m.span
+                                    key={place.label}
+                                    className="absolute top-0 left-0 size-10"
+                                    initial={{ x: place.x, y: place.y }}
+                                    animate={
+                                        gone
+                                            ? {
+                                                  x: 0,
+                                                  y: 0,
+                                                  scale: 0,
+                                                  opacity: 0,
+                                              }
+                                            : {
+                                                  x: place.x,
+                                                  y: place.y,
+                                                  scale: 1,
+                                                  opacity: 1,
+                                              }
+                                    }
+                                    // Pulls back before it shoots off, like a drawn bow.
+                                    transition={{
+                                        duration: reduced ? 0 : 0.45,
+                                        ease: 'backIn',
+                                    }}
+                                    onAnimationComplete={() => {
+                                        if (gone) {
+                                            sweep();
+                                        }
+                                    }}
+                                >
+                                    <span
+                                        className={cn(
+                                            'block size-10',
+                                            running && 'animate-float',
+                                        )}
+                                        style={wobble(index)}
+                                    >
+                                        <LogoPoof
+                                            label={place.label}
+                                            onPoof={() => poofed(place.label)}
+                                            className="size-10"
+                                            poofClassName="size-24"
+                                        >
+                                            <Icon className="size-10" />
+                                        </LogoPoof>
+                                    </span>
+                                </m.span>
+                            );
+                        })}
+                    </div>
+
+                    <div className="absolute inset-0 h-fit -rotate-6 [clip-path:url(#vault-clip)]">
+                        <span
+                            ref={shimmer}
+                            aria-hidden="true"
+                            className="pointer-events-none absolute top-1/2 left-full z-10 h-[200%] w-36 -translate-y-1/2 rotate-[19deg] bg-gradient-to-r from-white/0 via-white/55 to-white/0 opacity-0 transition-opacity duration-300"
+                        />
+                        <img
+                            src="/static/vault.webp"
+                            width={760}
+                            height={760}
+                            alt=""
+                            className="w-full"
+                        />
+                    </div>
+
+                    {/* Fades the vault out at the bottom, and hides what hangs below. */}
+                    <div className="absolute bottom-0 left-1/2 z-10 h-[120px] w-screen -translate-x-1/2 bg-gradient-to-t from-background to-background/0" />
+                    <div className="absolute top-full left-1/2 z-10 h-1/2 w-screen -translate-x-1/2 bg-background" />
+                </div>
+
+                <div className="relative z-10 grid max-w-[60ch] justify-items-center gap-6">
+                    {children}
+                </div>
+
+                <p aria-live="polite" className="sr-only">
+                    {kept.length === 0
+                        ? ''
+                        : `Kept ${kept.length} of ${places.length}.`}
+                </p>
+            </div>
+        </LazyMotion>
     );
 }

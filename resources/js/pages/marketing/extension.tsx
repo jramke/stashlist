@@ -1,5 +1,7 @@
+import { Kbd } from '@/components/kbd';
 import { PageHeader, Section } from '@/components/marketing';
 import { Seo } from '@/components/seo';
+import { buttonVariants } from '@/components/ui/button-variants';
 import MarketingLayout from '@/layouts/marketing-layout';
 import type { ReactNode } from 'react';
 
@@ -8,7 +10,7 @@ type Props = {
 };
 
 function Key({ children }: { children: string }) {
-    return <kbd className="rounded border px-1.5 text-xs">{children}</kbd>;
+    return <Kbd>{children}</Kbd>;
 }
 
 export default function Extension({ marketing }: Props) {
@@ -29,7 +31,7 @@ export default function Extension({ marketing }: Props) {
                     <a
                         href={marketing.chrome_store_url}
                         rel="noopener"
-                        className="inline-flex h-10 items-center rounded-lg bg-foreground px-5 text-sm font-medium text-background hover:opacity-90"
+                        className={buttonVariants({ size: 'lg' })}
                     >
                         Add to Chrome
                     </a>
@@ -37,12 +39,15 @@ export default function Extension({ marketing }: Props) {
                         <a
                             href={marketing.firefox_store_url}
                             rel="noopener"
-                            className="inline-flex h-10 items-center rounded-lg border px-5 text-sm font-medium hover:bg-muted"
+                            className={buttonVariants({
+                                variant: 'outline',
+                                size: 'lg',
+                            })}
                         >
                             Add to Firefox
                         </a>
                     ) : (
-                        <span className="inline-flex h-10 items-center rounded-lg border px-5 text-sm text-muted-foreground">
+                        <span className="inline-flex h-9 items-center px-2.5 text-muted-foreground">
                             Firefox: soon
                         </span>
                     )}

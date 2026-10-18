@@ -1,3 +1,4 @@
+import { buttonVariants } from '@/components/ui/button-variants';
 import { cn } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import type { ComponentProps, ReactNode } from 'react';
@@ -12,17 +13,18 @@ export function CallToAction({
         <Link
             {...props}
             className={cn(
-                'inline-flex h-10 items-center justify-center rounded-lg px-5 text-sm font-medium transition-opacity',
-                variant === 'solid'
-                    ? 'bg-foreground text-background hover:opacity-90'
-                    : 'border hover:bg-muted',
+                buttonVariants({
+                    variant: variant === 'solid' ? 'default' : 'outline',
+                    size: 'lg',
+                }),
+                'px-4',
                 className,
             )}
         />
     );
 }
 
-/** A block of a page with a heading, for the plain text pages. */
+/** A block of a page with a heading, for the plain text pages. Same size as the text: the weight says it is a heading. */
 export function Section({
     title,
     children,
@@ -32,10 +34,8 @@ export function Section({
 }) {
     return (
         <section className="grid gap-2">
-            <h2 className="text-lg font-medium">{title}</h2>
-            <div className="grid gap-2 text-sm leading-relaxed text-muted-foreground">
-                {children}
-            </div>
+            <h2 className="font-medium">{title}</h2>
+            <div className="grid gap-3 text-muted-foreground">{children}</div>
         </section>
     );
 }
@@ -49,8 +49,8 @@ export function PageHeader({
     children?: ReactNode;
 }) {
     return (
-        <header className="grid max-w-2xl gap-2 pt-8 pb-10">
-            <h1 className="text-3xl font-medium tracking-tight">{title}</h1>
+        <header className="grid gap-1 pt-10 sm:pt-16">
+            <h1 className="font-medium">{title}</h1>
             {children && <p className="text-muted-foreground">{children}</p>}
         </header>
     );
@@ -59,7 +59,7 @@ export function PageHeader({
 /** A command or a snippet to copy. */
 export function Code({ children }: { children: string }) {
     return (
-        <pre className="overflow-x-auto rounded-lg border bg-muted/40 p-3 text-xs leading-relaxed text-foreground">
+        <pre className="overflow-x-auto rounded-xl border bg-card p-3 text-foreground">
             <code>{children}</code>
         </pre>
     );

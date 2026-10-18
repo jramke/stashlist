@@ -21,11 +21,11 @@ export default function Pricing({ marketing }: Props) {
                 One plan, everything in it. Or run it yourself.
             </PageHeader>
 
-            <div className="grid gap-6 sm:grid-cols-2">
-                <section className="grid content-start gap-4 rounded-2xl border p-6">
-                    <h2 className="text-lg font-medium">Hosted</h2>
+            <div className="breakout grid gap-4 sm:grid-cols-2">
+                <section className="grid content-start gap-4 rounded-xl border bg-card p-5">
+                    <h2 className="font-medium">Hosted</h2>
                     <p>
-                        <span className="text-3xl font-medium">€4</span>{' '}
+                        <span className="font-medium">€4</span>{' '}
                         <span className="text-muted-foreground">
                             a month, or €40 a year
                         </span>
@@ -46,10 +46,10 @@ export default function Pricing({ marketing }: Props) {
                     )}
                 </section>
 
-                <section className="grid content-start gap-4 rounded-2xl border p-6">
-                    <h2 className="text-lg font-medium">Host it yourself</h2>
+                <section className="grid content-start gap-4 rounded-xl border bg-card p-5">
+                    <h2 className="font-medium">Host it yourself</h2>
                     <p>
-                        <span className="text-3xl font-medium">Free</span>{' '}
+                        <span className="font-medium">Free</span>{' '}
                         <span className="text-muted-foreground">
                             open source (AGPL-3.0)
                         </span>
