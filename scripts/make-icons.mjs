@@ -30,7 +30,13 @@ async function draw(markup, width, height = width, background = 'transparent') {
 }
 
 const icon = (source, size) =>
-    draw(source.replace('width="118" height="118"', `width="${size}" height="${size}"`), size);
+    draw(
+        source.replace(
+            'width="118" height="118"',
+            `width="${size}" height="${size}"`,
+        ),
+        size,
+    );
 
 const png = (path, bytes) => writeFileSync(path, bytes);
 
@@ -60,7 +66,10 @@ sizes.forEach((size, index) => {
 writeFileSync('public/favicon.ico', Buffer.concat([header, ...images]));
 
 // The picture a link to the app shows when it is shared.
-const mark = svg.replace('width="118" height="118"', 'width="168" height="168"');
+const mark = svg.replace(
+    'width="118" height="118"',
+    'width="168" height="168"',
+);
 png(
     'public/og.png',
     await draw(
