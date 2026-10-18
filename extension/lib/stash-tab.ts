@@ -17,11 +17,14 @@ export class NotConfigured extends Error {
 }
 
 export class NotStashable extends Error {
-    constructor() {
-        super('This page cannot be stashed.');
+    constructor(what: 'page' | 'image' = 'page') {
+        super(`This ${what} cannot be stashed.`);
         this.name = 'NotStashable';
     }
 }
+
+/** The picture a person pointed at to stand for the page it is on: where it is, and its bytes when the page let us read them. */
+export type ChosenPicture = { address: string | null; blob: Blob | null };
 
 /** The person asked for a highlight and there is no passage to mark. */
 export class NotHighlightable extends Error {
@@ -61,35 +64,46 @@ export function version(): string {
 
 /**
  * Stashes the page in a tab with the person's defaults and no questions: the keyboard shortcut and the menu.
+ *
+ * With a `picture` (a right-click on the page's own picture) that picture stands for the page: its address takes
+ * the place of the page's own, its bytes go along, and no screenshot is needed when they do.
  */
-export async function stashTab(tab: {
-    id?: number | undefined;
-    url?: string | undefined;
-    title?: string | undefined;
-    windowId?: number | undefined;
-}): Promise<SaveResult> {
+export async function stashTab(
+    tab: {
+        id?: number | undefined;
+        url?: string | undefined;
+        title?: string | undefined;
+        windowId?: number | undefined;
+    },
+    picture?: ChosenPicture,
+): Promise<SaveResult> {
     const { client, settings } = await connect();
 
     if (!isStashable(tab.url)) {
         throw new NotStashable();
     }
 
-    const page = await capturePage(tab);
-    const screenshot = settings.defaults.screenshot
-        ? await captureScreenshot(tab.windowId, SCREENSHOT_LIMIT)
-        : null;
-
-    return remember(
-        await client.save(
-            buildSaveRequest(
-                page,
-                quickEdits(page, settings.defaults),
-                version(),
-                screenshot,
-            ),
-            crypto.randomUUID(),
-        ),
+    const read = await capturePage(tab);
+    const page =
+        picture?.address == null
+            ? read
+            : { ...read, imageUrl: picture.address };
+    const screenshot =
+        settings.defaults.screenshot && picture?.blob == null
+            ? await captureScreenshot(tab.windowId, SCREENSHOT_LIMIT)
+            : null;
+    const request = buildSaveRequest(
+        page,
+        quickEdits(page, settings.defaults),
+        version(),
+        screenshot,
     );
+
+    if (picture?.blob != null) {
+        request.image = picture.blob;
+    }
+
+    return remember(await client.save(request, crypto.randomUUID()));
 }
 
 /** Stashes something that is not the page itself: a link or an image the person pointed at. */

@@ -340,6 +340,7 @@ export function toFields(request: SaveRequest): Record<string, unknown> {
         url: request.url,
         title: request.title,
         body: request.body,
+        source_url: request.sourceUrl,
         tags,
         collection_ids: collectionIds,
         capture: capture === undefined ? undefined : prune({ ...capture }),
@@ -459,7 +460,7 @@ function failure(
         default:
             return new ApiError(
                 status,
-                data.message ?? 'Stashlist could not save that.',
+                data.message ?? 'Stashlist could not stash that.',
                 errors,
             );
     }

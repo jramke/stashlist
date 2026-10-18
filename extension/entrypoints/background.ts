@@ -1,6 +1,7 @@
 import { highlightSelection } from '@/lib/highlights/create';
 import { syncHighlights } from '@/lib/highlights/sync';
 import { isBadgeOn, isSaved, syncSaved } from '@/lib/saved';
+import { stashImage } from '@/lib/stash-image';
 import {
     connect,
     explain,
@@ -9,9 +10,6 @@ import {
     stashThing,
 } from '@/lib/stash-tab';
 import { browser, type Browser } from 'wxt/browser';
-
-/** The most the API takes as a picture. */
-const IMAGE_LIMIT = 20 * 1024 * 1024;
 
 /** The local copy of the highlights is brought up to date this often; it is one small request. */
 const SYNC_ALARM = 'sync-highlights';
@@ -26,7 +24,7 @@ const MENUS: Browser.contextMenus.CreateProperties[] = [
         title: 'Highlight selection',
         contexts: ['selection'],
     },
-    { id: 'pick-color', title: 'Pick a color…', contexts: ['page', 'action'] },
+    { id: 'pick-color', title: 'Stash color…', contexts: ['page', 'action'] },
 ];
 
 export default defineBackground(() => {
@@ -70,35 +68,52 @@ export default defineBackground(() => {
         }
     });
 
-    browser.contextMenus.onClicked.addListener(async (info, tab) => {
-        switch (info.menuItemId) {
-            case 'stash-page':
-                if (tab !== undefined) await run(tab.id, () => stashTab(tab));
-                break;
-            case 'stash-link':
-                if (info.linkUrl !== undefined) {
-                    const url = info.linkUrl;
-                    await run(tab?.id, () => stashThing({ type: 'link', url }));
-                }
-                break;
-            case 'stash-image':
-                if (info.srcUrl !== undefined && tab !== undefined)
-                    await stashImage(tab, info.srcUrl);
-                break;
-            case 'highlight-selection':
-                if (tab !== undefined) await highlight(tab);
-                break;
-            case 'pick-color':
-                await browser.windows.create({
-                    url: browser.runtime.getURL('/picker.html'),
-                    type: 'popup',
-                    width: 340,
-                    height: 260,
-                });
-                break;
-        }
-    });
+    browser.contextMenus.onClicked.addListener(onMenuClick);
+
+    // The browser flows cannot click the browser's own menu: the end-to-end build lets them call the same handler.
+    if (import.meta.env.MODE === 'e2e') {
+        Object.assign(globalThis, { stashlistMenu: onMenuClick });
+    }
 });
+
+async function onMenuClick(
+    info: Browser.contextMenus.OnClickData,
+    tab: Browser.tabs.Tab | undefined,
+): Promise<void> {
+    switch (info.menuItemId) {
+        case 'stash-page':
+            if (tab !== undefined) await run(tab.id, () => stashTab(tab));
+            break;
+        case 'stash-link':
+            if (info.linkUrl !== undefined) {
+                const url = info.linkUrl;
+                await run(tab?.id, () => stashThing({ type: 'link', url }));
+            }
+            break;
+        case 'stash-image':
+            if (info.srcUrl !== undefined && tab !== undefined) {
+                const click = { srcUrl: info.srcUrl, frameId: info.frameId };
+                await run(tab.id, async () => {
+                    const { result, page } = await stashImage(tab, click);
+
+                    // Said on the icon, so a person sees which of the two they got.
+                    return page ? result : { ...result, words: IMAGE_WORDS };
+                });
+            }
+            break;
+        case 'highlight-selection':
+            if (tab !== undefined) await highlight(tab);
+            break;
+        case 'pick-color':
+            await browser.windows.create({
+                url: browser.runtime.getURL('/picker.html'),
+                type: 'popup',
+                width: 340,
+                height: 260,
+            });
+            break;
+    }
+}
 
 async function ensureSyncAlarm(): Promise<void> {
     if ((await browser.alarms.get(SYNC_ALARM)) === undefined) {
@@ -155,14 +170,28 @@ async function highlight(tab: Browser.tabs.Tab): Promise<void> {
     );
 }
 
-/** Runs a save and tells the person how it went on the toolbar icon: a tick, or a cross with the reason. */
+type Words = { created: string; existing: string };
+
+const PAGE_WORDS: Words = { created: 'Stashed', existing: 'Already stashed' };
+
+/** A picture that was stashed as itself says so, where a page stashed with its picture says what a page says. */
+const IMAGE_WORDS: Words = {
+    created: 'Stashed image',
+    existing: 'Already stashed image',
+};
+
+/**
+ * Runs a save and tells the person how it went on the toolbar icon: a tick, or a cross with the reason. A save
+ * may bring its own words for what it stashed.
+ */
 async function run(
     tabId: number | undefined,
-    save: () => Promise<{ created: boolean; title: string }>,
-    words = { created: 'Stashed', existing: 'Already stashed' },
+    save: () => Promise<{ created: boolean; title: string; words?: Words }>,
+    defaultWords = PAGE_WORDS,
 ): Promise<void> {
     try {
         const result = await save();
+        const words = result.words ?? defaultWords;
 
         await flash(
             tabId,
@@ -204,67 +233,4 @@ async function flash(
                 .catch(() => undefined);
         }
     }, 3000);
-}
-
-/**
- * The image the person sees, as bytes: fetched by the page itself, so a login or cookies the page has still
- * count. When that fails (another site's picture without CORS) the address is saved and the server fetches it.
- */
-async function stashImage(tab: Browser.tabs.Tab, src: string): Promise<void> {
-    await run(tab.id, async () => {
-        const bytes =
-            tab.id === undefined
-                ? null
-                : await fetchInPage(tab.id, src, IMAGE_LIMIT);
-
-        return stashThing(
-            bytes === null
-                ? { type: 'image', url: src }
-                : { type: 'image', image: bytes },
-        );
-    });
-}
-
-async function fetchInPage(
-    tabId: number,
-    src: string,
-    limit: number,
-): Promise<Blob | null> {
-    try {
-        const [injection] = await browser.scripting.executeScript({
-            target: { tabId },
-            args: [src, limit],
-            func: async (
-                address: string,
-                max: number,
-            ): Promise<string | null> => {
-                const response = await fetch(address, {
-                    credentials: 'include',
-                });
-                const blob = await response.blob();
-
-                if (
-                    !response.ok ||
-                    blob.size === 0 ||
-                    (max > 0 && blob.size > max)
-                ) {
-                    return null;
-                }
-
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result as string);
-                    reader.onerror = () => reject(reader.error);
-                    reader.readAsDataURL(blob);
-                });
-            },
-        });
-        const dataUrl = injection?.result;
-
-        return typeof dataUrl === 'string'
-            ? await (await fetch(dataUrl)).blob()
-            : null;
-    } catch {
-        return null;
-    }
 }

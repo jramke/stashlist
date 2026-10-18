@@ -272,6 +272,20 @@ describe('building a save', () => {
         });
     });
 
+    it('names the page a picture was on', () => {
+        expect(
+            toFields({
+                type: 'image',
+                title: 'A cat',
+                sourceUrl: 'https://blog.example/cats',
+            }),
+        ).toEqual({
+            type: 'image',
+            title: 'A cat',
+            source_url: 'https://blog.example/cats',
+        });
+    });
+
     it('turns booleans and nested values into form fields', () => {
         const form = toForm(
             {

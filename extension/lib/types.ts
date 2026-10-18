@@ -34,6 +34,8 @@ export type SaveRequest = {
     url?: string;
     title?: string;
     body?: string;
+    /** The page a picture was on; kept with an image, which has no address of its own when it is sent as bytes. */
+    sourceUrl?: string;
     tags?: string[];
     collectionIds?: number[];
     capture?: CaptureBlock;

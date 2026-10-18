@@ -15,7 +15,7 @@ const CHROME =
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const BUILD = resolve(
     import.meta.dirname,
-    '../../extension/.output-e2e/chrome-mv3',
+    '../../extension/.output-e2e/chrome-mv3-e2e',
 );
 
 export type Extension = {
@@ -72,7 +72,7 @@ export const test = base.extend<{ extension: Extension }, { build: void }>({
                     'exec',
                     '-d',
                     '/var/www/html/extension',
-                    'STASHLIST_E2E=1 npx wxt build',
+                    'STASHLIST_E2E=1 npx wxt build --mode e2e',
                 ],
                 {
                     stdio: 'pipe',

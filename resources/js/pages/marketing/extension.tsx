@@ -53,30 +53,37 @@ export default function Extension({ marketing }: Props) {
                     )}
                 </div>
 
-                <Section title="Save">
+                <Section title="Stash">
                     <p>
                         Press <Key>Alt</Key>+<Key>Shift</Key>+<Key>S</Key> on
-                        any page and it is saved at once with your defaults, or
-                        click the button to change the title, tags and
+                        any page and it is stashed at once with your defaults,
+                        or click the button to change the title, tags and
                         collections first. The page is read in your own browser,
                         as you see it, so pages behind a login and pages built
                         with JavaScript work. A tick on the icon says it worked.
                     </p>
                     <p>
-                        Right-click for more: save a link, an image, or pick any
-                        color on your screen.
+                        Right-click for more. <em>Stash link</em> keeps a link
+                        and <em>Stash color…</em> picks any color on your
+                        screen. <em>Stash image</em> looks at the page around
+                        the picture: if it is the page&apos;s own picture, like
+                        the photo on a product page, the page is stashed with
+                        it, price and all. Any other picture is stashed as a
+                        picture, titled by its caption, with a link back to the
+                        page it was on.
                     </p>
                 </Section>
 
                 <Section title="Highlight">
                     <p>
                         Select text and press <Key>Alt</Key>+<Key>Shift</Key>+
-                        <Key>H</Key>, or use the right-click menu. The passage
-                        is kept in your stash, the stash links back to it, and
-                        if you turn on <em>Show my highlights on pages</em> in
-                        the settings, it is painted again whenever you open the
-                        page. If the page changed and the text is gone, the
-                        highlight stays in your stash and is simply not painted.
+                        <Key>H</Key>, or right-click and choose{' '}
+                        <em>Highlight selection</em>. The passage is kept in
+                        your stash, the stash links back to it, and if you turn
+                        on <em>Show my highlights on pages</em> in the settings,
+                        it is painted again whenever you open the page. If the
+                        page changed and the text is gone, the highlight stays
+                        in your stash and is simply not painted.
                     </p>
                 </Section>
 
