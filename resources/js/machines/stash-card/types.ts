@@ -98,7 +98,7 @@ export interface StashCardSchema {
         | 'resetMedia'
         | 'mediaLoaded'
         | 'mediaBroken';
-    effect: 'endArrival';
+    effect: 'endArrival' | 'checkPicture';
     event:
         | { type: 'PHASE.SYNC' }
         | { type: 'MEDIA.SOURCE' }
@@ -119,10 +119,6 @@ export interface StashCardApi<T extends PropTypes = PropTypes> {
     title: string | null;
     indicator: CardIndicator;
     statuses: CardStatus[];
-    /** Tell the card its picture is on screen (also for a picture the browser already had). */
-    mediaLoaded(): void;
-    /** Tell the card its picture is not coming. */
-    mediaFailed(): void;
     getRootProps(): T['element'];
     getSurfaceProps(): T['element'];
     getMediaProps(): T['element'];

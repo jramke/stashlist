@@ -1,6 +1,7 @@
 import { dataAttr } from '@zag-js/dom-query';
 import type { NormalizeProps, PropTypes } from '@zag-js/types';
 import { parts } from './anatomy';
+import { dom } from './dom';
 import { describe } from './face';
 import type { CardStatus, StashCardApi, StashCardService } from './types';
 
@@ -34,13 +35,6 @@ export function connect<T extends PropTypes>(
         indicator: computed('indicator'),
         statuses: computed('statuses'),
 
-        mediaLoaded() {
-            send({ type: 'MEDIA.LOAD' });
-        },
-        mediaFailed() {
-            send({ type: 'MEDIA.ERROR' });
-        },
-
         getRootProps() {
             return normalize.element({
                 ...parts.root.attrs(scope.id),
@@ -73,6 +67,7 @@ export function connect<T extends PropTypes>(
         getImageProps() {
             return normalize.img({
                 ...parts.image.attrs(scope.id),
+                id: dom.getImageId(scope),
                 alt: '',
                 'data-media': media,
                 decoding: 'async',

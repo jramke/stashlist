@@ -1,4 +1,5 @@
 import { createMachine } from '@zag-js/core';
+import { dom } from './dom';
 import {
     faceOf,
     indicatorOf,
@@ -67,6 +68,8 @@ export const machine = createMachine<StashCardSchema>({
         );
     },
 
+    effects: ['checkPicture'],
+
     on: {
         'PHASE.SYNC': [
             { guard: 'isFailed', target: 'failed' },
@@ -118,6 +121,21 @@ export const machine = createMachine<StashCardSchema>({
         },
 
         effects: {
+            // A picture the browser finished before this card came alive (a server-rendered page) has fired its
+            // load event already, and nobody was listening. Ask the picture itself.
+            checkPicture({ scope, send }) {
+                const image = dom.getImageEl(scope);
+
+                if (image?.complete) {
+                    send({
+                        type:
+                            image.naturalWidth > 0
+                                ? 'MEDIA.LOAD'
+                                : 'MEDIA.ERROR',
+                    });
+                }
+            },
+
             endArrival({ context, send }) {
                 if (!context.get('arrived')) {
                     return;

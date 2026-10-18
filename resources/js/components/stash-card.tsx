@@ -248,12 +248,6 @@ function PhotoFace({
         <>
             <img
                 {...api.getImageProps()}
-                ref={(image) => {
-                    // A picture the browser already had is complete before React is.
-                    if (image?.complete && image.naturalWidth > 0) {
-                        api.mediaLoaded();
-                    }
-                }}
                 src={face.src}
                 width={face.width ?? undefined}
                 height={face.height ?? undefined}
