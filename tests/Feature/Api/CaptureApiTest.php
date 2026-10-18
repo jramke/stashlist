@@ -199,6 +199,42 @@ test('the page text the client sends replaces the fetch', function () {
     Queue::assertPushed(IndexStash::class, 1);
 });
 
+test('the JSON-LD the client sends says what the page is and what it costs', function () {
+    save([
+        'url' => 'https://shop.example/pan',
+        'capture' => [
+            'content_markdown' => 'A pan.',
+            'schema_org' => [
+                [
+                    '@context' => 'https://schema.org',
+                    '@graph' => [
+                        ['@type' => 'WebSite'],
+                        [
+                            '@type' => 'Product',
+                            'offers' => ['@type' => 'Offer', 'price' => '19,95', 'priceCurrency' => 'USD'],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ])->assertCreated();
+
+    $stash = Stash::query()->sole();
+
+    expect($stash->subtype)
+        ->toBe('product')
+        ->and($stash->meta['price'])
+        ->toBe(['amount' => '19.95', 'currency' => 'USD']);
+});
+
+test('a client that sends no JSON-LD leaves the kind to the model', function () {
+    save(['url' => 'https://example.com/post', 'capture' => ['content_markdown' => 'Text.']])->assertCreated();
+
+    $stash = Stash::query()->sole();
+
+    expect($stash->subtype)->toBeNull()->and($stash->meta)->not->toHaveKey('price');
+});
+
 test('without the page text the server still fetches the page', function () {
     save(['url' => 'https://example.com/post', 'capture' => ['site_name' => 'Example', 'description' => 'Hi']])
         ->assertCreated();

@@ -9,6 +9,9 @@ namespace App\Extraction;
  */
 final readonly class ParsedPage
 {
+    /**
+     * @param  list<string>  $schemaTypes
+     */
     public function __construct(
         public ?string $title = null,
         public ?string $description = null,
@@ -18,5 +21,8 @@ final readonly class ParsedPage
         public ?string $language = null,
         public ?string $openGraphType = null,
         public ?string $text = null,
+        /** The schema.org types the page describes (JSON-LD), lower case. */
+        public array $schemaTypes = [],
+        public ?Price $price = null,
     ) {}
 }

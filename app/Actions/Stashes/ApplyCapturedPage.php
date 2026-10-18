@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Actions\Stashes;
 
 use App\Enums\FileRole;
+use App\Extraction\JsonLd;
+use App\Extraction\Offers;
+use App\Extraction\Subtypes;
 use App\Images\ImageProcessor;
 use App\Images\InvalidImage;
 use App\Models\Stash;
@@ -40,9 +43,13 @@ final readonly class ApplyCapturedPage
         $this->storeFile($stash, FileRole::Og, $image);
         $this->storeFile($stash, FileRole::Screenshot, $screenshot);
 
+        // The page's JSON-LD says what kind of page it is and what it costs, so the model is not needed for that.
+        $structured = JsonLd::fromDocuments($page->schemaOrg);
+
         $stash
             ->forceFill([
-                'meta' => [...($stash->meta ?? []), ...$this->meta($page, $image)],
+                'subtype' => Subtypes::of($stash->domain, null, $structured->types()) ?? $stash->subtype,
+                'meta' => [...($stash->meta ?? []), ...$this->meta($page, $image, $structured)],
             ])
             ->save();
 
@@ -54,7 +61,7 @@ final readonly class ApplyCapturedPage
     /**
      * @return array<string, mixed>
      */
-    private function meta(CapturedPage $page, ?UploadedFile $image): array
+    private function meta(CapturedPage $page, ?UploadedFile $image, JsonLd $structured): array
     {
         return array_filter(
             [
@@ -67,6 +74,7 @@ final readonly class ApplyCapturedPage
                 // The picture the client sent wins over any the server could fetch.
                 'client_picture' => $image === null ? null : true,
                 'schema_org' => $page->schemaOrg === [] ? null : $page->schemaOrg,
+                'price' => Offers::priceIn($structured->nodes)?->toArray(),
                 'captured_by' => array_filter(['source' => $page->source, 'version' => $page->version]),
             ],
             static fn (mixed $value): bool => $value !== null && $value !== [],

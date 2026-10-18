@@ -19,8 +19,6 @@ final readonly class LinkExtractor
 
     private const IMAGE_LIMIT = 10 * 1024 * 1024;
 
-    private const REPO_HOSTS = ['github.com', 'gitlab.com', 'codeberg.org'];
-
     public function __construct(
         private SafeHttp $http,
         private PageParser $parser,
@@ -72,11 +70,12 @@ final readonly class LinkExtractor
 
         return new ExtractionResult(
             hash: $hash,
-            subtype: $this->subtype($page, $stash->domain),
+            subtype: Subtypes::of($stash->domain, $page->openGraphType, $page->schemaTypes),
             meta: array_filter([
                 'site_name' => $page->siteName,
                 'favicon_url' => $page->faviconUrl,
                 'lang' => $page->language,
+                'price' => $page->price?->toArray(),
             ]),
             title: $page->title,
             description: $page->description,
@@ -98,18 +97,5 @@ final readonly class LinkExtractor
         } catch (BlockedUrl|FetchFailed|InvalidImage) {
             return null;
         }
-    }
-
-    private function subtype(ParsedPage $page, ?string $domain): ?string
-    {
-        $type = $page->openGraphType ?? '';
-
-        return match (true) {
-            str_starts_with($type, 'video') => 'video',
-            str_starts_with($type, 'product') => 'product',
-            $type === 'article' => 'article',
-            in_array($domain, self::REPO_HOSTS, strict: true) => 'repo',
-            default => null,
-        };
     }
 }

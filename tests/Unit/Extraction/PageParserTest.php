@@ -112,3 +112,32 @@ test('metadata is capped', function () {
         ->and(mb_strlen((string)$parsed->description))
         ->toBe(1000);
 });
+
+test('a shop page gives its kind and its price from the JSON-LD', function () {
+    $parsed = new PageParser()->parse(page('shop', url: 'https://hearth.example/skillet'));
+
+    expect($parsed->schemaTypes)
+        ->toBe(['product'])
+        ->and($parsed->price?->toArray())
+        ->toBe(['amount' => '39.90', 'currency' => 'EUR'])
+        ->and($parsed->openGraphType)
+        ->toBe('product');
+});
+
+test('the price can be in Open Graph tags, or in microdata, and broken JSON-LD is passed over', function () {
+    $og = new PageParser()->parse(page('price-og', url: 'https://shop.example/molen'));
+    $microdata = new PageParser()->parse(page('price-microdata', url: 'https://shop.example/lamp'));
+
+    expect($og->price?->toArray())
+        ->toBe(['amount' => '1299.00', 'currency' => 'EUR'])
+        ->and($og->schemaTypes)
+        ->toBeEmpty()
+        ->and($microdata->price?->toArray())
+        ->toBe(['amount' => '24.50', 'currency' => 'USD'])
+        ->and($microdata->schemaTypes)
+        ->toBeEmpty();
+});
+
+test('a page with no price has none', function () {
+    expect(new PageParser()->parse(page('article'))->price)->toBeNull();
+});

@@ -19,6 +19,7 @@ final class PageParser
     {
         $html = HtmlDecoder::toUtf8($response);
         $document = HTMLDocument::createFromString($html, LIBXML_NOERROR, overrideEncoding: 'UTF-8');
+        $structured = JsonLd::fromPage($document);
 
         return new ParsedPage(
             title: $this->limit($this->meta($document, 'og:title', 'twitter:title') ?? $document->title, 500),
@@ -35,6 +36,8 @@ final class PageParser
             language: $this->language($document),
             openGraphType: $this->limit($this->meta($document, 'og:type'), 50),
             text: ReadableText::from($html),
+            schemaTypes: $structured->types(),
+            price: Offers::priceIn($structured->nodes) ?? MarkupPrice::of($document),
         );
     }
 

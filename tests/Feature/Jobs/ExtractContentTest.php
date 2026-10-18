@@ -99,6 +99,32 @@ test('a page is read and its image is stored as thumbnails and preview', functio
     }
 });
 
+test('a shop page is a product, and its price is kept', function () {
+    $stash = link_stash('https://bakeclub.example/shop/skillet');
+    FakeWeb::install(DNS, [
+        FakeWeb::html('shop'),
+        FakeWeb::image(Images::make('png', width: 600, height: 600)),
+    ]);
+
+    dispatch(new ExtractContent($stash->id, $stash->user_id));
+
+    $fresh = $stash->fresh();
+
+    expect($fresh->subtype)
+        ->toBe('product')
+        ->and($fresh->meta['price'])
+        ->toBe(['amount' => '39.90', 'currency' => 'EUR']);
+});
+
+test('a link to a video site is a video before any model has looked at it', function () {
+    $stash = link_stash('https://youtu.be/abc123');
+    FakeWeb::install(['youtu.be' => ['93.184.216.40']], [FakeWeb::html('minimal')]);
+
+    dispatch(new ExtractContent($stash->id, $stash->user_id));
+
+    expect($stash->fresh()->subtype)->toBe('video');
+});
+
 test('a url that serves an image becomes an image stash', function () {
     $stash = link_stash('https://cdn.example/cat');
     FakeWeb::install(DNS, [FakeWeb::image(Images::make('jpeg', width: 1200, height: 800), 'image/jpeg')]);
