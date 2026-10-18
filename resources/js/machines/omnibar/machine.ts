@@ -212,8 +212,8 @@ function startImageStash(params: P, files: File[]): void {
 }
 
 /**
- * Keys, text, the list, files and the server's answers all arrive here. Whatever the state, the box follows
- * the same few rules, so the events that two states share are written once (`interactions`).
+ * What the box does with keys, text, the list and files. `idle` and `open` follow the same rules, so they are
+ * written once; `stashing` takes none of them, which is how it refuses a second request.
  */
 const interactions = {
     // Typing: a note is old news, a mistake is forgiven, and the list offers what the word could become.
