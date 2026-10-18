@@ -5,12 +5,24 @@ import type { Stash } from '@/machines/stash-card';
  * `/playground/art`, which draws any size and color, and can be slow or broken on request.
  */
 
-let counter = 1000;
+/**
+ * A number made from some text. The page is rendered on the server and again in the browser, and the two must
+ * agree, so a fixture's id comes from what the fixture says and not from a counter.
+ */
+function idOf(text: string): number {
+    let hash = 5381;
+
+    for (let index = 0; index < text.length; index++) {
+        hash = (hash * 33 + text.charCodeAt(index)) % 1_000_000;
+    }
+
+    return 1000 + hash;
+}
 
 /** A stash with every field filled in, so a fixture only says what is special about it. */
 export function stash(overrides: Partial<Stash> = {}): Stash {
     return {
-        id: counter++,
+        id: idOf(JSON.stringify(overrides)),
         type: 'link',
         subtype: null,
         title: 'A page worth keeping',
@@ -24,7 +36,7 @@ export function stash(overrides: Partial<Stash> = {}): Stash {
         thumbnail: null,
         colors: [],
         tags: [],
-        created_at: new Date().toISOString(),
+        created_at: '2026-10-18T10:00:00.000Z',
         fetching: false,
         tagging: false,
         ...overrides,
@@ -54,12 +66,15 @@ function tint(hue: number): string {
 
 type Art = Pick<NonNullable<Stash['thumbnail']>, 'url' | 'width' | 'height'>;
 
-/** A picture of the given size; `delay` (seconds) makes it slow, `status` makes it fail. */
+/**
+ * A picture of the given size; `delay` (seconds) makes it slow, `status` makes it fail, and `again` is a number
+ * that makes the browser ask once more instead of using what it kept.
+ */
 export function art(
     width: number,
     height: number,
     hue: number,
-    extra: { delay?: number; status?: number } = {},
+    extra: { delay?: number; status?: number; again?: number } = {},
 ): { thumbnail: Art; colors: Stash['colors'] } {
     const query = new URLSearchParams({
         w: String(width),
@@ -67,6 +82,7 @@ export function art(
         hue: String(hue),
         ...(extra.delay === undefined ? {} : { delay: String(extra.delay) }),
         ...(extra.status === undefined ? {} : { status: String(extra.status) }),
+        ...(extra.again === undefined ? {} : { n: String(extra.again) }),
     });
 
     return {

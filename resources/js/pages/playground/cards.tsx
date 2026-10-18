@@ -40,20 +40,24 @@ function Section({
     title,
     children,
     description,
+    action,
 }: {
     title: string;
     description?: string;
+    /** A button for the section, under its description. */
+    action?: ReactNode;
     children: ReactNode;
 }) {
     return (
         <section className="grid gap-4">
-            <header className="grid gap-1">
+            <header className="grid justify-items-start gap-1">
                 <h2 className="text-sm font-medium">{title}</h2>
                 {description !== undefined && (
                     <p className="max-w-2xl text-xs text-muted-foreground">
                         {description}
                     </p>
                 )}
+                {action}
             </header>
             <div className="grid grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] gap-3">
                 {children}
@@ -108,6 +112,70 @@ function PipelineDemo() {
     );
 }
 
+/**
+ * Pictures that are slow or never come. They load on a click, because the browser writes the 404 and the 500
+ * in its console, and a page that opens with errors in the console is a page nobody trusts. Every click loads
+ * them again.
+ */
+function LostPictures() {
+    const [round, setRound] = useState(0);
+
+    return (
+        <Section
+            title="Pictures on the way, and lost"
+            description="Slow: the ground waits. Broken: the card falls back to a tile instead of an empty box. The browser logs the 404 and the 500 in its console; that is the point."
+            action={
+                <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setRound((count) => count + 1)}
+                >
+                    {round === 0 ? 'Load the pictures' : 'Load them again'}
+                </Button>
+            }
+        >
+            {round > 0 && (
+                <>
+                    <Case
+                        key={`slow-${round}`}
+                        label="slow (6 s)"
+                        stash={stash({
+                            subtype: 'article',
+                            ...art(1200, 630, 255, {
+                                delay: 6,
+                                again: round,
+                            }),
+                        })}
+                    />
+                    <Case
+                        key={`404-${round}`}
+                        label="404"
+                        stash={stash({
+                            subtype: 'video',
+                            title: 'The picture is gone',
+                            ...art(1200, 630, 25, {
+                                status: 404,
+                                again: round,
+                            }),
+                        })}
+                    />
+                    <Case
+                        key={`500-${round}`}
+                        label="500"
+                        stash={stash({
+                            title: 'The server stumbled',
+                            ...art(1200, 630, 100, {
+                                status: 500,
+                                again: round,
+                            }),
+                        })}
+                    />
+                </>
+            )}
+        </Section>
+    );
+}
+
 const WIDTHS = {
     narrow: 'max-w-[22rem]',
     medium: 'max-w-3xl',
@@ -119,50 +187,58 @@ function LiveGrid() {
     const [width, setWidth] = useState<keyof typeof WIDTHS>('wide');
     const [opened, setOpened] = useState<number | null>(null);
     const items = useMemo(
-        () => [
-            stash({ type: 'note', title: null, body: 'buy sourdough flour' }),
-            ...SUBTYPES.map((name, index) => subtype(name, index % 2 === 0)),
-            stash({ type: 'color', title: null, body: '#e63946' }),
-            ...PLAIN_SITES.map(([title, domain]) =>
-                stash({ title, domain, url: `https://${domain}/x` }),
-            ),
-            stash({
-                type: 'image',
-                title: 'IMG_2041.jpg',
-                url: null,
-                domain: null,
-                ...art(900, 1200, 190),
-            }),
-            stash({ type: 'note', title: null, body: LONG_NOTE }),
-            stash({ type: 'color', title: null, body: '#264653' }),
-            stash({
-                type: 'file',
-                title: 'invoice-2026-10.pdf',
-                url: null,
-                domain: null,
-            }),
-            stash({
-                title: 'Still being read',
-                fetching: true,
-                ai_status: 'pending',
-            }),
-            stash({
-                title: 'Being tagged',
-                tagging: true,
-                ai_status: 'processing',
-            }),
-            stash({
-                title: null,
-                ai_status: 'failed',
-                ai_error: 'The page could not be read.',
-            }),
-            stash({
-                type: 'note',
-                title: null,
-                body: 'call the plumber',
-                subtype: 'quote',
-            }),
-        ],
+        () =>
+            [
+                stash({
+                    type: 'note',
+                    title: null,
+                    body: 'buy sourdough flour',
+                }),
+                ...SUBTYPES.map((name, index) =>
+                    subtype(name, index % 2 === 0),
+                ),
+                stash({ type: 'color', title: null, body: '#e63946' }),
+                ...PLAIN_SITES.map(([title, domain]) =>
+                    stash({ title, domain, url: `https://${domain}/x` }),
+                ),
+                stash({
+                    type: 'image',
+                    title: 'IMG_2041.jpg',
+                    url: null,
+                    domain: null,
+                    ...art(900, 1200, 190),
+                }),
+                stash({ type: 'note', title: null, body: LONG_NOTE }),
+                stash({ type: 'color', title: null, body: '#264653' }),
+                stash({
+                    type: 'file',
+                    title: 'invoice-2026-10.pdf',
+                    url: null,
+                    domain: null,
+                }),
+                stash({
+                    title: 'Still being read',
+                    fetching: true,
+                    ai_status: 'pending',
+                }),
+                stash({
+                    title: 'Being tagged',
+                    tagging: true,
+                    ai_status: 'processing',
+                }),
+                stash({
+                    title: null,
+                    ai_status: 'failed',
+                    ai_error: 'The page could not be read.',
+                }),
+                stash({
+                    type: 'note',
+                    title: null,
+                    body: 'call the plumber',
+                    subtype: 'quote',
+                }),
+                // The list needs a value of its own for every item.
+            ].map((item, index) => ({ ...item, id: 9000 + index })),
         [],
     );
     const grid = useStashGrid(items, (id) => setOpened(id));
@@ -457,33 +533,7 @@ export default function Cards() {
                     <PipelineDemo />
                 </section>
 
-                <Section
-                    title="Pictures on the way, and lost"
-                    description="Slow: the ground waits. Broken: the card falls back to a tile instead of an empty box."
-                >
-                    <Case
-                        label="slow (6 s)"
-                        stash={stash({
-                            subtype: 'article',
-                            ...art(1200, 630, 255, { delay: 6 }),
-                        })}
-                    />
-                    <Case
-                        label="404"
-                        stash={stash({
-                            subtype: 'video',
-                            title: 'The picture is gone',
-                            ...art(1200, 630, 25, { status: 404 }),
-                        })}
-                    />
-                    <Case
-                        label="500"
-                        stash={stash({
-                            title: 'The server stumbled',
-                            ...art(1200, 630, 100, { status: 500 }),
-                        })}
-                    />
-                </Section>
+                <LostPictures />
 
                 <Section
                     title="Under the pointer and under the keyboard"
