@@ -126,7 +126,7 @@ export default function Home({ marketing }: Props) {
                 <p>But what if there was a better way?</p>
                 <p className="font-medium">
                     Introducing{' '}
-                    <AppLogoIcon className="mx-0.5 -mt-1 inline size-5 fill-current" />{' '}
+                    <AppLogoIcon className="mx-0.5 -mt-1 inline size-5" />{' '}
                     {name}: a place for everything worth keeping.
                 </p>
             </section>

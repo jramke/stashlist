@@ -51,7 +51,7 @@ export default function MarketingLayout({
                         href={home()}
                         className="flex items-center gap-2 rounded-lg font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
                     >
-                        <AppLogoIcon className="size-5 fill-current" />
+                        <AppLogoIcon className="size-5" />
                         {name}
                     </Link>
 
@@ -116,7 +116,7 @@ export default function MarketingLayout({
             <footer className="content-grid full-width text-muted-foreground">
                 <div className="breakout flex flex-wrap items-center gap-x-6 gap-y-2 border-t py-6">
                     <span className="flex items-center gap-2 text-foreground">
-                        <AppLogoIcon className="size-4 fill-current" />
+                        <AppLogoIcon className="size-4" />
                         {name}
                     </span>
                     {footer.map((item) => (

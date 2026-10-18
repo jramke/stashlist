@@ -14,7 +14,7 @@ export default function AuthLayout({
                 <div className="flex flex-col gap-8">
                     <div className="flex flex-col items-center gap-4">
                         <Link href={home()} className="font-medium">
-                            <AppLogoIcon className="size-9 fill-current text-foreground" />
+                            <AppLogoIcon className="size-9" />
                             <span className="sr-only">{title}</span>
                         </Link>
 

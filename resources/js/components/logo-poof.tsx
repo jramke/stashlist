@@ -107,7 +107,7 @@ export function LogoPoof({
                     <AppLogoIcon
                         aria-hidden="true"
                         className={cn(
-                            'size-full animate-logo-in fill-current',
+                            'size-full animate-logo-in',
                             markClassName,
                         )}
                     />

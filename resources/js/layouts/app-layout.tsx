@@ -51,7 +51,7 @@ export default function AppLayout({ children }: { children?: ReactNode }) {
                     href={home()}
                     className="flex items-center gap-2 rounded-lg font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
-                    <AppLogoIcon className="size-5 fill-current" />
+                    <AppLogoIcon className="size-5" />
                     {name}
                 </Link>
 
