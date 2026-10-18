@@ -124,3 +124,43 @@ test('the server does not fetch the page picture when the client sent one', func
 
     expect($web->urls())->toBe(['https://bakeclub.example/post'])->and(stored_roles($this->stash))->toBeEmpty();
 });
+
+test('the page picture by its address wins over a screenshot, which the extension sends with it', function () {
+    $web = FakeWeb::install(CAPTURE_DNS, [FakeWeb::image(Images::make('png', 800, 600, 'red', 'blue'))]);
+    $this->stash->forceFill(['meta' => ['image_url' => 'https://cdn.example/og.png']])->save();
+    app(StashStorage::class)->store(
+        $this->stash,
+        FileRole::Screenshot,
+        new Blob(Images::make('png', 400, 300, 'green'), 'image/png'),
+    );
+
+    derive($this->stash);
+
+    expect($web->urls())
+        ->toBe(['https://cdn.example/og.png'])
+        ->and(stored_roles($this->stash))
+        ->toBe(['og', 'preview', 'screenshot', 'thumb', 'thumb_small'])
+        ->and(array_column((array)StashEnrichment::query()->findOrFail($this->stash->id)->colors, 'hex'))
+        ->toContain('#ff0000')
+        ->not->toContain('#008000');
+});
+
+test('the screenshot is used when the page picture cannot be had or is not a picture', function (Response $answer) {
+    FakeWeb::install(CAPTURE_DNS, [$answer]);
+    $this->stash->forceFill(['meta' => ['image_url' => 'https://cdn.example/og.png']])->save();
+    app(StashStorage::class)->store(
+        $this->stash,
+        FileRole::Screenshot,
+        new Blob(Images::make('png', 400, 300, 'green'), 'image/png'),
+    );
+
+    derive($this->stash);
+
+    expect(stored_roles($this->stash))
+        ->toBe(['preview', 'screenshot', 'thumb'])
+        ->and(array_column((array)StashEnrichment::query()->findOrFail($this->stash->id)->colors, 'hex'))
+        ->toContain('#008000');
+})->with([
+    'gone' => [fn () => new Response(404, ['Content-Type' => 'text/html'], 'gone')],
+    'not a picture' => [fn () => new Response(200, ['Content-Type' => 'image/png'], 'this is not a png')],
+]);

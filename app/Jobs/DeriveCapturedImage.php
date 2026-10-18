@@ -6,6 +6,7 @@ namespace App\Jobs;
 
 use App\Enums\FileRole;
 use App\Extraction\BlockedUrl;
+use App\Extraction\DerivedImage;
 use App\Extraction\FetchFailed;
 use App\Extraction\ImageExtractor;
 use App\Extraction\SafeHttp;
@@ -13,14 +14,17 @@ use App\Images\InvalidImage;
 use App\Models\Stash;
 use App\Models\StashEnrichment;
 use App\Storage\StashStorage;
+use Generator;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 
 /**
- * Makes the thumbnail and preview of a stash from the picture its client captured: the page's own picture, a
- * screenshot, or, when the client sent only an address, that address fetched the safe way. The stash is
- * complete without a picture, so nothing here marks it as failed.
+ * Makes the thumbnails and preview of a stash from the picture its client captured, best first: the page's own
+ * picture when the client sent its bytes; the page's own picture by the address the client sent (the browser
+ * extension sends the address, not the bytes), fetched the safe way; a screenshot of what the client saw. A source
+ * that cannot be fetched or is not a picture passes the turn to the next. The stash is complete without a
+ * picture, so nothing here marks it as failed.
  */
 final class DeriveCapturedImage implements ShouldQueue
 {
@@ -63,16 +67,17 @@ final class DeriveCapturedImage implements ShouldQueue
             return;
         }
 
-        try {
-            $source = $this->source($stash, $http, $storage);
+        $derived = null;
 
-            if ($source === null) {
-                return;
+        foreach ($this->sources($stash, $http, $storage) as [$bytes, $keepAs]) {
+            $derived = $this->derived($images, $stash, $bytes, $keepAs);
+
+            if ($derived !== null) {
+                break;
             }
+        }
 
-            [$bytes, $keepAs] = $source;
-            $derived = $images->derive($stash, $bytes, keepAs: $keepAs);
-        } catch (BlockedUrl|FetchFailed|InvalidImage) {
+        if ($derived === null) {
             return;
         }
 
@@ -83,45 +88,53 @@ final class DeriveCapturedImage implements ShouldQueue
     }
 
     /**
-     * The bytes to make the picture from, and the role to keep them under (null: they are stored already).
-     *
-     * @return array{string, FileRole|null}|null
-     *
-     * @throws BlockedUrl
-     * @throws FetchFailed
+     * The picture made from some bytes, or null when they are not a picture: the next source may be.
      */
-    private function source(Stash $stash, SafeHttp $http, StashStorage $storage): ?array
+    private function derived(ImageExtractor $images, Stash $stash, string $bytes, ?FileRole $keepAs): ?DerivedImage
     {
-        $stored = $this->stored($stash, $storage);
+        try {
+            return $images->derive($stash, $bytes, keepAs: $keepAs);
+        } catch (InvalidImage) {
+            return null;
+        }
+    }
 
-        if ($stored !== null) {
-            return [$stored, null];
+    /**
+     * The bytes to make the picture from, best first, each with the role to keep them under (null: they are
+     * stored already). Fetching waits until the sources before it have been tried.
+     *
+     * @return Generator<int, array{string, FileRole|null}>
+     */
+    private function sources(Stash $stash, SafeHttp $http, StashStorage $storage): Generator
+    {
+        $own = $this->stored($stash, $storage, FileRole::Og);
+
+        if ($own !== null) {
+            yield [$own, null];
         }
 
         $fetched = $this->fetched($stash, $http);
 
-        return $fetched === null ? null : [$fetched, FileRole::Og];
-    }
-
-    /**
-     * The picture the client sent: the page's own, else the screenshot.
-     */
-    private function stored(Stash $stash, StashStorage $storage): ?string
-    {
-        foreach ([FileRole::Og, FileRole::Screenshot] as $role) {
-            $file = $stash->files()->where('role', $role->value)->first();
-
-            if ($file !== null) {
-                return $storage->contents($file);
-            }
+        if ($fetched !== null) {
+            yield [$fetched, FileRole::Og];
         }
 
-        return null;
+        $screenshot = $this->stored($stash, $storage, FileRole::Screenshot);
+
+        if ($screenshot !== null) {
+            yield [$screenshot, null];
+        }
+    }
+
+    private function stored(Stash $stash, StashStorage $storage, FileRole $role): ?string
+    {
+        $file = $stash->files()->where('role', $role->value)->first();
+
+        return $file === null ? null : $storage->contents($file);
     }
 
     /**
-     * @throws BlockedUrl
-     * @throws FetchFailed
+     * The picture at the address the client sent, or null when there is none or it cannot be had.
      */
     private function fetched(Stash $stash, SafeHttp $http): ?string
     {
@@ -132,6 +145,10 @@ final class DeriveCapturedImage implements ShouldQueue
             return null;
         }
 
-        return $http->get($url, ['image/*' => self::IMAGE_LIMIT])->body;
+        try {
+            return $http->get($url, ['image/*' => self::IMAGE_LIMIT])->body;
+        } catch (BlockedUrl|FetchFailed) {
+            return null;
+        }
     }
 }
