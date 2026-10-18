@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { BASE_URL, capture, drainQueue, register } from './support';
+import { BASE_URL, capture, drainQueue, menu, register } from './support';
 
 test('smart features are one switch of the account', async ({ page }) => {
     await register(page);
 
-    await page.getByRole('link', { name: 'E2E Person' }).click();
+    await menu(page, 'Settings');
     const smart = page.getByRole('checkbox', {
         name: /Use AI to tag and summarize/,
     });
@@ -19,7 +19,7 @@ test('smart features are one switch of the account', async ({ page }) => {
     ).not.toBeChecked();
 
     // Nothing on the capture box or a stash asks about it any more.
-    await page.getByRole('link', { name: 'All stashes' }).click();
+    await page.goto('/stashes');
     await expect(
         page.getByText(/no smart features for this stash/i),
     ).toHaveCount(0);
@@ -31,10 +31,11 @@ test('deleting the account locks it at once and removes everything', async ({
     const person = await register(page);
     await capture(page, 'a note that will be removed with the account');
 
-    await page.getByRole('link', { name: 'E2E Person' }).click();
+    await menu(page, 'Settings');
     await page.getByLabel('Your password').fill(person.password);
-    page.once('dialog', (dialog) => dialog.accept());
+    // Two presses: the first one only asks.
     await page.getByRole('button', { name: 'Delete my account' }).click();
+    await page.getByRole('button', { name: /Everything goes/ }).click();
 
     // Signed out, back on the front page.
     await expect(page).toHaveURL(/\/$/);

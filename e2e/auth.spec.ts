@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { register } from './support';
+import { menu, register } from './support';
 
 test('guests are sent to the login page and see no provider buttons without OAuth apps', async ({
     page,
@@ -20,7 +20,7 @@ test('a person can sign up, see an empty feed, log out and log in again', async 
 
     await expect(page.getByText('Nothing here yet')).toBeVisible();
 
-    await page.getByRole('button', { name: 'Log out' }).click();
+    await menu(page, 'Log out');
     await expect(page).toHaveURL(/\/$/);
 
     await page.goto('/login');

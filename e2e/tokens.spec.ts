@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { register } from './support';
+import { menu, register } from './support';
 
 test('an API token is shown once, works until it is revoked', async ({
     page,
@@ -7,7 +7,7 @@ test('an API token is shown once, works until it is revoked', async ({
 }) => {
     await register(page);
 
-    await page.getByRole('link', { name: 'E2E Person' }).click();
+    await menu(page, 'Settings');
     await page.getByRole('link', { name: 'API tokens' }).click();
     await expect(page.getByText('No tokens yet.')).toBeVisible();
 
@@ -31,10 +31,12 @@ test('an API token is shown once, works until it is revoked', async ({
     await expect(page.getByLabel('Your new token')).toHaveCount(0);
     await expect(page.getByText('Chrome on my MacBook')).toBeVisible();
 
-    page.once('dialog', (dialog) => dialog.accept());
-    await page
-        .getByRole('button', { name: 'Revoke Chrome on my MacBook' })
-        .click();
+    const revoke = page.getByRole('button', {
+        name: 'Revoke Chrome on my MacBook',
+    });
+    // Two presses: the first one only asks.
+    await revoke.click();
+    await revoke.click();
     await expect(page.getByText('No tokens yet.')).toBeVisible();
 
     const revoked = await request.get('/api/v1/me', { headers });
