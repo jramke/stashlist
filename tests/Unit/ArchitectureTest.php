@@ -84,3 +84,38 @@ test('the models of the AI layer are only reached through App\\Ai', function () 
     // The guard is asked before the enricher prompts; no other class may prompt the agent or ask for embeddings.
     expect(offenders('/\bStashEnricher\b|\bEmbeddings::/', ['Ai/']))->toBeEmpty();
 });
+
+test('no favicon service is asked for the icon of a site: it comes from the site itself', function () {
+    // Such a service would be told every address the person keeps.
+    $services = '~google\.com/s2/favicons|gstatic\.com/favicon|icons\.duckduckgo\.com|favicon\.im|icon\.horse|favicone\.com|faviconkit\.com|favicongrabber\.com|favicon\.yandex\.net|logo\.clearbit\.com~i';
+    $root = dirname(__DIR__, levels: 2);
+    $found = [];
+
+    foreach (Finder::create()
+        ->files()
+        ->in(array_values(array_filter(
+            array_map(
+                static fn (string $directory): string => "{$root}/{$directory}",
+                [
+                    'app',
+                    'config',
+                    'resources/js',
+                    'resources/views',
+                    'extension/entrypoints',
+                    'extension/lib',
+                    'raycast/src',
+                ],
+            ),
+            is_dir(...),
+        )))
+        ->name(['*.php', '*.ts', '*.tsx', '*.mjs'])
+        ->exclude('generated') as $file) {
+        if (preg_match($services, $file->getContents()) !== 1) {
+            continue;
+        }
+
+        $found[] = $file->getRelativePathname();
+    }
+
+    expect($found)->toBeEmpty();
+});
