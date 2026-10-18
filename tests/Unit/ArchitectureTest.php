@@ -119,3 +119,12 @@ test('no favicon service is asked for the icon of a site: it comes from the site
 
     expect($found)->toBeEmpty();
 });
+
+test('an svg is only drawn by SvgIcon, from the plain copy the sanitizer writes and never from the document', function () {
+    // ImageMagick follows what an SVG names (files, addresses, entities) and may hand it to programs, so it is never told
+    // to read one anywhere else, and SvgIcon gives it nothing but the sanitizer's copy.
+    expect(offenders('/setFormat\(\s*[\'"]\s*(?:msvg|svg)/i', ['Images/SvgIcon.php']))
+        ->toBeEmpty()
+        ->and(file_get_contents(dirname(__DIR__, levels: 2).'/app/Images/SvgIcon.php'))
+        ->toContain('readImageBlob(SvgSanitizer::clean(');
+});

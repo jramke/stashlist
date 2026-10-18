@@ -9,7 +9,8 @@ use Dom\HTMLDocument;
 
 /**
  * Where a page says its icons are, best first: the touch icons (large, made for a home screen) before the small
- * ones, the larger before the smaller. SVG is left out, because it cannot be read safely (it can carry scripts).
+ * ones, the larger before the smaller. An SVG comes after every picture: it is only wanted from a site that has no
+ * other icon, and it is never read as it came, `FaviconProcessor` draws it from a plain copy it makes.
  */
 final class PageIcons
 {
@@ -27,9 +28,10 @@ final class PageIcons
         ) as $link) {
             $url = $link instanceof Element ? AbsoluteUrl::of($base, $link->getAttribute('href')) : null;
 
-            if ($link instanceof Element && $url !== null && ! self::isSvg($url, $link)) {
+            if ($link instanceof Element && $url !== null) {
                 $found[] = [
                     'url' => $url,
+                    'picture' => ! self::isSvg($url, $link),
                     'touch' => str_contains((string)$link->getAttribute('rel'), 'apple-touch'),
                     'size' => self::size($link),
                 ];
@@ -37,7 +39,12 @@ final class PageIcons
         }
 
         // Stable: icons that tie keep the order of the page.
-        usort($found, static fn (array $a, array $b): int => [$b['touch'], $b['size']] <=> [$a['touch'], $a['size']]);
+        usort(
+            $found,
+            static fn (array $a, array $b): int => (
+                [$b['picture'], $b['touch'], $b['size']] <=> [$a['picture'], $a['touch'], $a['size']]
+            ),
+        );
 
         return array_slice(array_values(array_unique(array_column($found, 'url'))), offset: 0, length: self::MAX);
     }

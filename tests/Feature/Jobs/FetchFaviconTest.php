@@ -181,3 +181,59 @@ test('an error of our own is reported and does not stop the chain the job sits i
 test('a stash that another run is busy with goes without an icon instead of holding the chain up', function () {
     expect(new FetchFavicon(1, 1)->middleware()[0]->releaseAfter)->toBeNull();
 });
+
+const ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect width="16" height="16" fill="#0000ff"/></svg>';
+
+test('a site whose only icon is an svg gets it drawn small, from the address a link saved earlier still has', function () {
+    // What a link saved before svgs were read holds: the address the page gave, and no list of icons.
+    $this->stash->forceFill(['meta' => ['favicon_url' => 'https://bakeclub.example/favicon.svg']])->save();
+    $web = FakeWeb::install(ICON_DNS, [FakeWeb::image(ICON_SVG, 'image/svg+xml')]);
+
+    fetch_favicon($this->stash);
+
+    $favicon = $this->stash->fresh()->favicon;
+
+    expect($web->urls())
+        ->toBe(['https://bakeclub.example/favicon.svg'])
+        ->and($favicon->mime)
+        ->toBe('image/webp')
+        ->and($favicon->width)
+        ->toBe(64);
+    Storage::assertExists($favicon->path);
+    expect(str_contains(Storage::get($favicon->path), '<svg'))->toBeFalse();
+})->skip(Imagick::queryFormats('MSVG') === [], 'ImageMagick without its SVG renderer');
+
+test('an svg is only asked for when no picture gave an icon', function () {
+    $this->stash->forceFill([
+        'meta' => ['icon_urls' => [
+            'https://bakeclub.example/touch.png',
+            'https://bakeclub.example/favicon.svg',
+        ]],
+    ])->save();
+    $web = FakeWeb::install(ICON_DNS, [missing(), FakeWeb::image(ICON_SVG, 'image/svg+xml')]);
+
+    fetch_favicon($this->stash);
+
+    expect($web->urls())
+        ->toBe(['https://bakeclub.example/touch.png', 'https://bakeclub.example/favicon.svg'])
+        ->and($this->stash->fresh()->favicon?->width)
+        ->toBe(64);
+})->skip(Imagick::queryFormats('MSVG') === [], 'ImageMagick without its SVG renderer');
+
+test('an svg that cannot be read is skipped like any icon that is no picture', function () {
+    $this->stash->forceFill(['meta' => ['icon_urls' => ['https://bakeclub.example/favicon.svg']]])->save();
+    $web = FakeWeb::install(ICON_DNS, [
+        FakeWeb::image(
+            '<?xml version="1.0"?><!DOCTYPE svg [<!ENTITY x SYSTEM "file:///etc/passwd">]><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><title>&x;</title><rect width="16" height="16"/></svg>',
+            'image/svg+xml',
+        ),
+        FakeWeb::image(Images::make('png', 32, 32)),
+    ]);
+
+    fetch_favicon($this->stash);
+
+    expect($web->urls())
+        ->toBe(['https://bakeclub.example/favicon.svg', 'https://bakeclub.example/favicon.ico'])
+        ->and($this->stash->fresh()->favicon?->width)
+        ->toBe(32);
+});

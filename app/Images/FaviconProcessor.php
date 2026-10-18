@@ -12,15 +12,13 @@ use ImagickException;
 /**
  * Makes the icon of a site small: the largest picture in the file, at most 64 px, as WebP without metadata. The
  * icon comes from the site itself, so it is as untrusted as any file from the web: only the formats of an icon are
- * read, and SVG is not one of them (it can carry scripts).
+ * read. An SVG is a drawing, and has its own way in (`SvgIcon`): it is never read as it came.
  */
 final class FaviconProcessor
 {
     public const MAX_BYTES = 512 * 1024;
 
     private const MAX_PIXELS = 4_000_000;
-
-    private const SIZE = 64;
 
     private const PICTURES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
 
@@ -31,6 +29,10 @@ final class FaviconProcessor
      */
     public function process(string $bytes): Blob
     {
+        if (SvgIcon::is($bytes)) {
+            return SvgIcon::process($bytes);
+        }
+
         $mime = $this->check($bytes);
 
         try {
@@ -56,22 +58,8 @@ final class FaviconProcessor
             }
 
             $icon->setIteratorIndex($index);
-            $picture = $icon->getImage();
 
-            if ($picture->getImageWidth() > self::SIZE || $picture->getImageHeight() > self::SIZE) {
-                $picture->thumbnailImage(self::SIZE, self::SIZE, bestfit: true);
-            }
-
-            $picture->setImageFormat('webp');
-            $picture->setImageCompressionQuality(85);
-            $picture->stripImage();
-
-            return new Blob(
-                contents: $picture->getImageBlob(),
-                mime: 'image/webp',
-                width: $picture->getImageWidth(),
-                height: $picture->getImageHeight(),
-            );
+            return IconWebp::from($icon->getImage());
         } catch (ImagickException) {
             throw InvalidImage::unreadable();
         }

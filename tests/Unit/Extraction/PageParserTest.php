@@ -142,7 +142,7 @@ test('a page with no price has none', function () {
     expect(new PageParser()->parse(page('article'))->price)->toBeNull();
 });
 
-test('the icons a page declares come best first: touch icons, then the larger ones, and never an svg', function () {
+test('the icons a page declares come best first: touch icons, then the larger ones, and svgs last', function () {
     $parsed = new PageParser()->parse(page('icons', url: 'https://example.com/blog/post'));
 
     expect($parsed->iconUrls)->toBe([
