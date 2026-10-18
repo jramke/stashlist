@@ -295,3 +295,5 @@ hooks:
     post-start:
         # Tests run on their own database so RefreshDatabase never wipes the dev data.
         - exec: mysql -h db -uroot -proot -e "CREATE DATABASE IF NOT EXISTS stashlist_test; GRANT ALL ON stashlist_test.* TO 'db'@'%';"
+        # Index settings (filterable fields, embedders) live in Meilisearch, so a fresh container has none. Idempotent; waits for the container first.
+        - exec: for i in $(seq 1 30); do curl -sf http://meilisearch:7700/health >/dev/null && break; sleep 1; done; php artisan scout:sync-index-settings
