@@ -7,13 +7,14 @@ namespace App\Data;
 use App\Enums\AiStatus;
 use App\Enums\StashType;
 use App\Models\Stash;
+use App\Models\StashFile;
 use App\Stashes\Progress;
 use App\Storage\StashStorage;
 use Illuminate\Support\Str;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 /**
- * A stash as a card in the feed. $title is null for a note or color the user did not title. Build it from a stash with `enrichment`, `thumbnail` and `visibleTags`
+ * A stash as a card in the feed. $title is null for a note or color the user did not title. Build it from a stash with `enrichment`, `thumbnail`, `thumbnailSmall` and `visibleTags`
  * loaded (see FeedQuery::EAGER), so no query runs per card.
  */
 #[TypeScript]
@@ -48,6 +49,7 @@ final readonly class StashData
     public static function fromModel(Stash $stash, StashStorage $storage): self
     {
         $thumb = $stash->thumbnail;
+        $small = $stash->thumbnailSmall;
 
         return new self(
             id: $stash->id,
@@ -66,7 +68,14 @@ final readonly class StashData
                 : Str::limit($stash->body, self::BODY_PREVIEW_LENGTH, preserveWords: true),
             ai_status: $stash->ai_status,
             ai_error: $stash->ai_error,
-            thumbnail: $thumb === null ? null : new ThumbnailData($storage->url($thumb), $thumb->width, $thumb->height),
+            thumbnail: $thumb === null
+                ? null
+                : new ThumbnailData(
+                    $storage->url($thumb),
+                    $thumb->width,
+                    $thumb->height,
+                    srcset: self::srcset($thumb, $small, $storage),
+                ),
             colors: array_map(
                 static fn (array $color): ColorData => new ColorData($color['hex'], $color['pct']),
                 $stash->enrichment->colors ?? [],
@@ -76,5 +85,17 @@ final readonly class StashData
             fetching: Progress::isFetching($stash),
             tagging: Progress::isTagging($stash),
         );
+    }
+
+    /**
+     * Both thumbnails as the value of an `srcset` attribute, the small one first; null when there is only one.
+     */
+    private static function srcset(StashFile $thumb, ?StashFile $small, StashStorage $storage): ?string
+    {
+        if ($small === null || $small->width === null || $thumb->width === null) {
+            return null;
+        }
+
+        return $storage->url($small)." {$small->width}w, ".$storage->url($thumb)." {$thumb->width}w";
     }
 }

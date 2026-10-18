@@ -64,7 +64,7 @@ function tint(hue: number): string {
     return `#${channel(0)}${channel(8)}${channel(4)}`;
 }
 
-type Art = Pick<NonNullable<Stash['thumbnail']>, 'url' | 'width' | 'height'>;
+type Art = NonNullable<Stash['thumbnail']>;
 
 /**
  * A picture of the given size; `delay` (seconds) makes it slow, `status` makes it fail, and `again` is a number
@@ -86,7 +86,12 @@ export function art(
     });
 
     return {
-        thumbnail: { url: `/playground/art?${query}`, width, height },
+        thumbnail: {
+            url: `/playground/art?${query}`,
+            width,
+            height,
+            srcset: null,
+        },
         colors: [{ hex: tint(hue), pct: 0.6 }],
     };
 }

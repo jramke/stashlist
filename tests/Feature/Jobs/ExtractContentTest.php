@@ -43,7 +43,7 @@ function article_hash(): string
     );
 }
 
-test('a page is read and its image is stored as thumbnail and preview', function () {
+test('a page is read and its image is stored as thumbnails and preview', function () {
     $stash = link_stash();
     $web = FakeWeb::install(DNS, [
         FakeWeb::html('article'),
@@ -92,7 +92,7 @@ test('a page is read and its image is stored as thumbnail and preview', function
                 ->values()
                 ->all(),
         )
-        ->toBe(['og', 'preview', 'thumb']);
+        ->toBe(['og', 'preview', 'thumb', 'thumb_small']);
 
     foreach ($stash->files as $file) {
         Storage::assertExists($file->path);
@@ -120,7 +120,7 @@ test('a url that serves an image becomes an image stash', function () {
                 ->values()
                 ->all(),
         )
-        ->toBe(['original', 'preview', 'thumb'])
+        ->toBe(['original', 'preview', 'thumb', 'thumb_small'])
         ->and(StashEnrichment::findOrFail($stash->id)->colors)
         ->not->toBeEmpty();
 });
@@ -183,7 +183,7 @@ test('an uploaded image gets derivatives without any request', function () {
     expect($web->requestCount())
         ->toBe(0)
         ->and($stash->files()->count())
-        ->toBe(3)
+        ->toBe(4)
         ->and($stash->fresh()->meta)
         ->toMatchArray(['width' => 900, 'height' => 600, 'mime' => 'image/png']);
 });

@@ -44,6 +44,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property CarbonImmutable|null $updated_at
  * @property StashEnrichment|null $enrichment
  * @property StashFile|null $thumbnail
+ * @property StashFile|null $thumbnailSmall
  * @property \Illuminate\Database\Eloquent\Collection<int, StashFile> $files
  * @property \Illuminate\Database\Eloquent\Collection<int, Tag> $tags
  * @property \Illuminate\Database\Eloquent\Collection<int, Tag> $visibleTags
@@ -59,6 +60,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  */
 #[Fillable(['type', 'subtype', 'title', 'body', 'url', 'url_hash', 'domain', 'meta', 'content_hash'])]
 #[Hidden(['url_hash'])]
+// A model's methods are its relations.
+// @mago-expect lint:too-many-methods
 final class Stash extends Model
 {
     /** @use HasFactory<StashFactory> */
@@ -94,6 +97,14 @@ final class Stash extends Model
     public function thumbnail(): HasOne
     {
         return $this->hasOne(StashFile::class)->where('role', FileRole::Thumb->value);
+    }
+
+    /**
+     * @return HasOne<StashFile, $this>
+     */
+    public function thumbnailSmall(): HasOne
+    {
+        return $this->hasOne(StashFile::class)->where('role', FileRole::ThumbSmall->value);
     }
 
     /**

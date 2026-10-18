@@ -374,6 +374,61 @@ test('an image pasted into the box is stashed', async ({ page }) => {
     await expect(page.locator('[data-card]')).toHaveCount(1);
 });
 
+test('a big picture comes in two sizes, and the card lets the browser take the smaller', async ({
+    page,
+}) => {
+    await register(page);
+
+    // A 1200x800 PNG, drawn in the page and handed to the box the way a paste does.
+    await box(page).evaluate(async (node) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 1200;
+        canvas.height = 800;
+
+        const context = canvas.getContext('2d');
+
+        if (context === null) {
+            throw new Error('No canvas.');
+        }
+
+        context.fillStyle = '#e63946';
+        context.fillRect(0, 0, 600, 800);
+        context.fillStyle = '#264653';
+        context.fillRect(600, 0, 600, 800);
+
+        const blob = await new Promise<Blob>((resolve, reject) =>
+            canvas.toBlob(
+                (made) =>
+                    made === null
+                        ? reject(new Error('No PNG.'))
+                        : resolve(made),
+                'image/png',
+            ),
+        );
+        const data = new DataTransfer();
+        data.items.add(new File([blob], 'big.png', { type: 'image/png' }));
+        node.dispatchEvent(
+            new ClipboardEvent('paste', {
+                clipboardData: data,
+                bubbles: true,
+                cancelable: true,
+            }),
+        );
+    });
+
+    await expect(page.getByText('Stashed.')).toBeVisible();
+    drainQueue();
+
+    // The card asks again while the picture is being made; the small one comes first in the list.
+    const picture = page.locator('[data-card] img');
+
+    await expect(picture).toHaveAttribute('srcset', /^\S+ 400w, \S+ 640w$/, {
+        timeout: 20_000,
+    });
+    await expect(picture).toHaveAttribute('loading', 'lazy');
+    await expect(picture).toHaveAttribute('data-media', 'loaded');
+});
+
 test('a key belongs to a place: stash keys are silent on the feed, the sheet comes from the catalog', async ({
     page,
 }) => {

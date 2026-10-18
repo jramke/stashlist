@@ -142,6 +142,7 @@ export function faceOf(stash: Stash, media: MediaStatus): CardFace {
         return {
             kind: 'photo',
             src: stash.thumbnail.url,
+            srcset: stash.thumbnail.srcset,
             width: stash.thumbnail.width,
             height: stash.thumbnail.height,
             tint: stash.colors[0]?.hex ?? null,

@@ -42,6 +42,13 @@ import {
     type ReactNode,
 } from 'react';
 
+/**
+ * How wide the picture of a card is on the screen, for the browser to pick the smallest sharp enough of the sizes
+ * there are (`srcset`): a column of the grid, which is about this on a screen wide enough for several, and the
+ * width of the page on a phone, where there is one.
+ */
+const PICTURE_SIZES = '(min-width: 640px) 12rem, calc(100vw - 4rem)';
+
 /** The small picture of each kind of stash, top left on the card. */
 export const glyphIcons: Record<Glyph, LucideIcon> = {
     link: Link2,
@@ -289,6 +296,10 @@ function PhotoFace({
             <img
                 {...api.getImageProps()}
                 src={face.src}
+                srcSet={face.srcset ?? undefined}
+                sizes={face.srcset === null ? undefined : PICTURE_SIZES}
+                // The ones off the screen wait until the grid is scrolled near them.
+                loading="lazy"
                 width={face.width ?? undefined}
                 height={face.height ?? undefined}
                 className="h-auto max-h-full w-auto max-w-full rounded-lg object-contain opacity-0 shadow-[0_0_0_1px_rgb(0_0_0/0.08),0_2px_8px_rgb(0_0_0/0.08)] transition-opacity duration-200 data-[media=loaded]:opacity-100"

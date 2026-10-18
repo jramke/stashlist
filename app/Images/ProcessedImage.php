@@ -19,6 +19,7 @@ final readonly class ProcessedImage
         public int $width,
         public int $height,
         public Blob $thumb,
+        public ?Blob $thumbSmall,
         public Blob $preview,
         public array $colors,
     ) {}

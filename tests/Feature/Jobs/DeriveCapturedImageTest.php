@@ -37,7 +37,7 @@ function stored_roles(Stash $stash): array
         ->all();
 }
 
-test('the picture the client sent becomes thumbnail and preview, and its colors are noted', function () {
+test('the picture the client sent becomes thumbnails and preview, and its colors are noted', function () {
     $web = FakeWeb::install(CAPTURE_DNS, []);
     app(StashStorage::class)->store(
         $this->stash,
@@ -48,7 +48,7 @@ test('the picture the client sent becomes thumbnail and preview, and its colors 
     derive($this->stash);
 
     expect(stored_roles($this->stash))
-        ->toBe(['og', 'preview', 'thumb'])
+        ->toBe(['og', 'preview', 'thumb', 'thumb_small'])
         ->and(array_column((array)StashEnrichment::query()->findOrFail($this->stash->id)->colors, 'hex'))
         ->toContain('#ff0000')
         ->and($web->requestCount())
@@ -77,7 +77,7 @@ test('an address is fetched the safe way and kept as the page picture', function
     expect($web->urls())
         ->toBe(['https://cdn.example/og.png'])
         ->and(stored_roles($this->stash))
-        ->toBe(['og', 'preview', 'thumb']);
+        ->toBe(['og', 'preview', 'thumb', 'thumb_small']);
 });
 
 test('an address that cannot be used leaves the stash without a picture and not failed', function (

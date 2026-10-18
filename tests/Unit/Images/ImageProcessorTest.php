@@ -28,7 +28,13 @@ test('common formats are accepted and turned into webp derivatives', function (s
         ->and($processed->thumb->height)
         ->toBe(320)
         ->and(new finfo(FILEINFO_MIME_TYPE)->buffer($processed->thumb->contents))
-        ->toBe('image/webp');
+        ->toBe('image/webp')
+        ->and($processed->thumbSmall?->mime)
+        ->toBe('image/webp')
+        ->and($processed->thumbSmall?->width)
+        ->toBe(400)
+        ->and($processed->thumbSmall?->height)
+        ->toBe(200);
 })->with([
     'jpeg' => ['jpeg', 'image/jpeg'],
     'png' => ['png', 'image/png'],
@@ -47,6 +53,45 @@ test('small images are not enlarged', function () {
         ->toBe(100)
         ->and($processed->preview->height)
         ->toBe(50);
+});
+
+test('a picture that is no wider than the small thumbnail has none', function (int $width) {
+    $processed = new ImageProcessor()->process(Images::make('png', width: $width, height: 100));
+
+    expect($processed->thumbSmall)->toBeNull();
+})->with([
+    'tiny' => [100],
+    'as wide as the small one' => [400],
+]);
+
+test('a picture a little wider than the small thumbnail gets the small one, and not twice the big one', function () {
+    $processed = new ImageProcessor()->process(Images::make('png', width: 500, height: 250));
+
+    expect($processed->thumb->width)
+        ->toBe(500)
+        ->and($processed->thumbSmall?->width)
+        ->toBe(400)
+        ->and($processed->thumbSmall?->height)
+        ->toBe(200);
+});
+
+test('the small thumbnail can be made from a stored thumbnail', function () {
+    $thumb = new ImageProcessor()->process(Images::make('png', width: 2000, height: 1000))->thumb;
+
+    $small = new ImageProcessor()->smallFrom($thumb->contents);
+
+    expect($small?->width)
+        ->toBe(400)
+        ->and($small?->height)
+        ->toBe(200)
+        ->and(new finfo(FILEINFO_MIME_TYPE)->buffer($small->contents ?? ''))
+        ->toBe('image/webp')
+        ->and(new ImageProcessor()->smallFrom(Images::make('webp', width: 300, height: 200)))
+        ->toBeNull();
+});
+
+test('a stored thumbnail that is not an image is refused', function () {
+    expect(fn () => new ImageProcessor()->smallFrom('this is not a picture'))->toThrow(InvalidImage::class);
 });
 
 test('very tall images are capped in height', function () {
@@ -89,7 +134,7 @@ test('exif gps data does not survive in the derivatives', function () {
 
     $processed = new ImageProcessor()->process($original);
 
-    foreach ([$processed->thumb, $processed->preview] as $derivative) {
+    foreach (array_filter([$processed->thumb, $processed->thumbSmall, $processed->preview]) as $derivative) {
         expect($derivative->contents)->not->toContain('EXIF')->not->toContain('Exif')->not->toContain('GPS');
 
         $image = new Imagick;

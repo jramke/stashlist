@@ -76,7 +76,15 @@ final class StashController extends Controller
         Gate::authorize('view', $stash);
         abort_if($deletion->isPending($stash->id), code: 404);
 
-        $stash->load(['enrichment', 'thumbnail', 'visibleTags', 'collections', 'highlights', 'files']);
+        $stash->load([
+            'enrichment',
+            'thumbnail',
+            'thumbnailSmall',
+            'visibleTags',
+            'collections',
+            'highlights',
+            'files',
+        ]);
 
         return Inertia::render('stashes/show', [
             'detail' => StashDetailData::fromModel($stash, $storage),

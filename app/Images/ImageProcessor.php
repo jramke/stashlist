@@ -15,8 +15,9 @@ use Intervention\Image\ImageManager;
 use Intervention\Image\Interfaces\ImageInterface;
 
 /**
- * Validates image bytes and derives what the app shows: a 640 px thumbnail, a 1280 px preview (both WebP, all
- * metadata stripped, so no EXIF GPS leaves the original) and up to five dominant colors.
+ * Validates image bytes and derives what the app shows: a 640 px thumbnail, a 400 px one for the cards of a feed
+ * on a screen of ordinary density, a 1280 px preview (all WebP, all metadata stripped, so no EXIF GPS leaves the
+ * original) and up to five dominant colors.
  *
  * The original is not touched; storing it is the caller's business.
  */
@@ -25,6 +26,9 @@ final class ImageProcessor
     public const MAX_BYTES = 20 * 1024 * 1024;
 
     public const MAX_PIXELS = 80_000_000;
+
+    /** The width of the small thumbnail, the one a card on a screen of ordinary density needs. */
+    public const THUMB_SMALL_WIDTH = 400;
 
     /** SVG is not in this list on purpose: it can carry scripts. */
     private const ALLOWED_TYPES = [
@@ -73,15 +77,39 @@ final class ImageProcessor
 
             $preview = $this->derive($image, self::PREVIEW_WIDTH);
             $thumb = $this->derive($image, self::THUMB_WIDTH);
+            // A picture that is no wider than the small one has nothing to save by it.
+            $small = ($thumb->width ?? 0) > self::THUMB_SMALL_WIDTH
+                ? $this->derive($image, self::THUMB_SMALL_WIDTH)
+                : null;
 
             return new ProcessedImage(
                 mime: $mime,
                 width: $width,
                 height: $height,
                 thumb: $thumb,
+                thumbSmall: $small,
                 preview: $preview,
                 colors: $this->colors($image),
             );
+        } catch (ImageException|ImagickException) {
+            throw InvalidImage::unreadable();
+        }
+    }
+
+    /**
+     * The small thumbnail made from a stored thumbnail, for pictures that were processed before it existed.
+     * Null when the thumbnail is no wider than the small one.
+     *
+     * @throws InvalidImage
+     */
+    public function smallFrom(string $thumbnail): ?Blob
+    {
+        try {
+            $image = $this->manager->decodeBinary($thumbnail);
+
+            return $image->width() > self::THUMB_SMALL_WIDTH
+                ? $this->derive($image, self::THUMB_SMALL_WIDTH)
+                : null;
         } catch (ImageException|ImagickException) {
             throw InvalidImage::unreadable();
         }

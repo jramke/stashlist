@@ -12,7 +12,7 @@ use App\Storage\Blob;
 use App\Storage\StashStorage;
 
 /**
- * Turns image bytes into stored derivatives for a stash: thumbnail and preview, optionally the source
+ * Turns image bytes into stored derivatives for a stash: thumbnails and preview, optionally the source
  * itself, plus the facts that go into meta and colors.
  */
 final readonly class ImageExtractor
@@ -40,6 +40,7 @@ final readonly class ImageExtractor
         }
 
         $this->storage->store($stash, FileRole::Thumb, $processed->thumb);
+        $this->storeSmall($stash, $processed->thumbSmall);
         $this->storage->store($stash, FileRole::Preview, $processed->preview);
 
         return new DerivedImage(
@@ -51,5 +52,24 @@ final readonly class ImageExtractor
             ],
             colors: $processed->colors,
         );
+    }
+
+    /**
+     * The small thumbnail goes next to the big one. A picture too small to have one must not keep the small
+     * thumbnail of the picture it replaces.
+     */
+    private function storeSmall(Stash $stash, ?Blob $small): void
+    {
+        if ($small !== null) {
+            $this->storage->store($stash, FileRole::ThumbSmall, $small);
+
+            return;
+        }
+
+        $old = $stash->files()->where('role', FileRole::ThumbSmall->value)->first();
+
+        if ($old !== null) {
+            $this->storage->forget($old);
+        }
     }
 }

@@ -250,3 +250,28 @@ test('a link waits for extraction until it is read, fails, or gets old', functio
             ]);
         });
 });
+
+test('a card gets both thumbnails as an srcset, the small one first, and only the big one when there is no small one', function () {
+    $both = Stash::factory()->for($this->user)->create([
+        'url' => 'https://example.com/both',
+        'domain' => 'example.com',
+    ]);
+    $one = Stash::factory()->for($this->user)->create(['url' => 'https://example.com/one', 'domain' => 'example.com']);
+    $storage = app(StashStorage::class);
+
+    $storage->store($both, FileRole::Thumb, new Blob('big', 'image/webp', width: 640, height: 480));
+    $storage->store($both, FileRole::ThumbSmall, new Blob('small', 'image/webp', width: 400, height: 300));
+    $storage->store($one, FileRole::Thumb, new Blob('big', 'image/webp', width: 300, height: 200));
+
+    $this
+        ->actingAs($this->user)
+        ->get('/stashes')
+        ->assertInertia(function (AssertableInertia $page) use ($both, $one) {
+            $cards = collect($page->toArray()['props']['stashes']['data'])->keyBy('id');
+
+            expect($cards[$both->id]['thumbnail']['srcset'])
+                ->toMatch('~^\S+ 400w, \S+ 640w$~')
+                ->and($cards[$one->id]['thumbnail']['srcset'])
+                ->toBeNull();
+        });
+});

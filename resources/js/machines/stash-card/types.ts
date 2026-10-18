@@ -35,6 +35,8 @@ export type CardFace =
     | {
           kind: 'photo';
           src: string;
+          /** The same picture in more than one size (`<url> 400w, <url> 640w`), when there is more than one. */
+          srcset: string | null;
           width: number | null;
           height: number | null;
           tint: string | null;

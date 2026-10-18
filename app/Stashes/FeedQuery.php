@@ -18,6 +18,7 @@ final class FeedQuery
     public const EAGER = [
         'enrichment:stash_id,user_id,title,description,summary,colors,extracted_at',
         'thumbnail',
+        'thumbnailSmall',
         'visibleTags',
     ];
 
