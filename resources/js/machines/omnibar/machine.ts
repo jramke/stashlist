@@ -20,13 +20,7 @@ import {
     queryOf,
     suggestionsOf,
 } from './grammar';
-import type {
-    Chip,
-    Filters,
-    OmnibarSchema,
-    OmnibarState,
-    Row,
-} from './types';
+import type { Chip, Filters, OmnibarSchema, OmnibarState, Row } from './types';
 
 type P = Params<OmnibarSchema>;
 
@@ -562,7 +556,10 @@ export const machine = createMachine<OmnibarSchema>({
                 }
             },
             forgetGuess({ context, event, refs }) {
-                if (event.type === 'VISIT.END' && event.visit === refs.get('visits')) {
+                if (
+                    event.type === 'VISIT.END' &&
+                    event.visit === refs.get('visits')
+                ) {
                     context.set('guess', null);
                 }
             },
