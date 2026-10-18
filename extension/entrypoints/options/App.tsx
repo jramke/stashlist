@@ -24,7 +24,7 @@ import { useEffect, useRef, useState } from 'react';
 
 type Status = { tone: 'muted' | 'error'; text: string } | null;
 
-/** Where the person says which Stashlist to talk to, with which token, and what a quick clip does. */
+/** Where the person says which Stashlist to talk to, with which token, and what the shortcut and the menu stash with. */
 export function App() {
     const [instance, setInstance] = useState(DEFAULT_INSTANCE);
     const [token, setToken] = useState('');
@@ -156,7 +156,7 @@ export function App() {
         if (!granted) {
             setBadgeStatus({
                 tone: 'error',
-                text: 'Without access to the address of your tabs the icon cannot tell which pages are saved.',
+                text: 'Without access to the address of your tabs the icon cannot tell which pages are stashed.',
             });
 
             return;
@@ -251,7 +251,9 @@ export function App() {
             </section>
 
             <section className="grid gap-4">
-                <h2 className="text-sm font-medium">What a quick clip does</h2>
+                <h2 className="text-sm font-medium">
+                    Defaults for the shortcut and the menu
+                </h2>
 
                 <label className="flex items-center gap-2 text-sm">
                     <input
@@ -352,7 +354,7 @@ export function App() {
             </section>
 
             <section className="grid gap-3">
-                <h2 className="text-sm font-medium">Saved pages</h2>
+                <h2 className="text-sm font-medium">Stashed pages</h2>
 
                 <label className="flex items-start gap-2 text-sm">
                     <input
@@ -364,7 +366,7 @@ export function App() {
                         }
                     />
                     <span>
-                        Show a check on the icon for pages I saved already
+                        Show a check on the icon for pages I stashed already
                         <span className="block text-xs text-muted-foreground">
                             Needs access to the address of your tabs. Stashlist
                             sends the extension a list of what you saved, and

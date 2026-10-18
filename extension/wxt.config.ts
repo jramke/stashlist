@@ -33,11 +33,11 @@ export default defineConfig({
         commands: {
             quick_clip: {
                 suggested_key: { default: 'Alt+Shift+S' },
-                description: 'Stash the current page without opening the popup',
+                description: 'Stash page without the popup',
             },
             highlight_selection: {
                 suggested_key: { default: 'Alt+Shift+H' },
-                description: 'Highlight the selected text',
+                description: 'Highlight selection',
             },
         },
         ...(browser === 'firefox'

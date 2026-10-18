@@ -194,9 +194,7 @@ export function App() {
         return (
             <Shell>
                 <Note>
-                    {state.result.created
-                        ? 'Stashed.'
-                        : 'Already in your stashes.'}
+                    {state.result.created ? 'Stashed.' : 'Already stashed.'}
                 </Note>
                 <a
                     className="text-sm underline"
@@ -297,7 +295,7 @@ export function App() {
             {problem !== null && <Note tone="error">{problem}</Note>}
 
             <Button onClick={() => void save()} disabled={saving}>
-                {saving ? 'Saving…' : 'Stash'}
+                {saving ? 'Stashing…' : 'Stash'}
             </Button>
 
             <section className="grid gap-2 border-t pt-3">

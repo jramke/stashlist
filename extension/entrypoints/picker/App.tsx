@@ -27,7 +27,7 @@ export function App() {
     }
 
     async function stash(): Promise<void> {
-        setStatus({ tone: 'muted', text: 'Saving…' });
+        setStatus({ tone: 'muted', text: 'Stashing…' });
 
         try {
             const result = await stashThing({ type: 'color', body: color });
