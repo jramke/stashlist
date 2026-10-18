@@ -1,14 +1,9 @@
-import { useEffect, useState } from 'react';
+import { actions } from '@/commands/actions';
+import { useKeysReady } from '@/commands/hooks';
 
-/** The name of the main modifier key on this machine, for the shortcut hints. Ctrl until the browser has said otherwise. */
+/** The name of the main modifier key as the hotkey library sees this machine (what `mod` means), for the hints in the box. */
 export function useModKey(): string {
-    const [mod, setMod] = useState('Ctrl');
+    useKeysReady();
 
-    useEffect(() => {
-        if (/Mac|iPhone|iPad/.test(navigator.platform)) {
-            setMod('⌘');
-        }
-    }, []);
-
-    return mod;
+    return actions.platform() === 'mac' ? '⌘' : 'Ctrl';
 }

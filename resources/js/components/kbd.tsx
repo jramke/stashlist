@@ -7,7 +7,7 @@ export function Kbd({
     className,
 }: {
     children: ReactNode;
-    className?: string;
+    className?: string | undefined;
 }) {
     return (
         <kbd
