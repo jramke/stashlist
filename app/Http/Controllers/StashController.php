@@ -80,6 +80,7 @@ final class StashController extends Controller
             'enrichment',
             'thumbnail',
             'thumbnailSmall',
+            'favicon',
             'visibleTags',
             'collections',
             'highlights',

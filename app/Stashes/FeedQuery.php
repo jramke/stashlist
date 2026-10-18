@@ -19,6 +19,7 @@ final class FeedQuery
         'enrichment:stash_id,user_id,title,description,summary,colors,extracted_at',
         'thumbnail',
         'thumbnailSmall',
+        'favicon',
         'visibleTags',
     ];
 

@@ -49,8 +49,17 @@ export type CardFace =
     | { kind: 'note'; text: string; quote: boolean }
     /** A document: what the file is, by its extension. */
     | { kind: 'file'; extension: string }
-    /** Nothing to show yet, or at all: the glyph of the kind on a tinted tile, or the first letter of the site. */
-    | { kind: 'tile'; glyph: Glyph; hue: number; monogram: string | null };
+    /**
+     * Nothing to show yet, or at all: the glyph of the kind on a tinted tile, or, for a plain link, the icon of its
+     * site, or the first letter of the site when the icon is not there.
+     */
+    | {
+          kind: 'tile';
+          glyph: Glyph;
+          hue: number;
+          monogram: string | null;
+          icon: string | null;
+      };
 
 export interface CardIndicator {
     glyph: Glyph;
@@ -84,6 +93,8 @@ export interface StashCardSchema {
         media: MediaStatus;
         /** Set when the card has just become ready from a busy phase, for a moment. */
         arrived: boolean;
+        /** The icon of the site could not be loaded: the card goes without it. */
+        iconBroken: boolean;
     };
     computed: {
         face: CardFace;
@@ -92,6 +103,8 @@ export interface StashCardSchema {
         statuses: CardStatus[];
         /** What the page says it costs, as short text. */
         price: string | null;
+        /** The icon of the site, small beside the title, when the face does not wear it already. */
+        icon: string | null;
         busy: boolean;
     };
     tag: 'busy' | 'settled';
@@ -101,13 +114,17 @@ export interface StashCardSchema {
         | 'clearArrived'
         | 'resetMedia'
         | 'mediaLoaded'
-        | 'mediaBroken';
+        | 'mediaBroken'
+        | 'resetIcon'
+        | 'iconBroken';
     effect: 'endArrival' | 'checkPicture';
     event:
         | { type: 'PHASE.SYNC' }
         | { type: 'MEDIA.SOURCE' }
         | { type: 'MEDIA.LOAD' }
         | { type: 'MEDIA.ERROR' }
+        | { type: 'ICON.SOURCE' }
+        | { type: 'ICON.ERROR' }
         | { type: 'ARRIVED.END' };
 }
 
@@ -125,10 +142,13 @@ export interface StashCardApi<T extends PropTypes = PropTypes> {
     statuses: CardStatus[];
     /** The price the page states, as short text, or null. */
     price: string | null;
+    /** The icon of the site to show small beside the title, or null. */
+    icon: string | null;
     getRootProps(): T['element'];
     getSurfaceProps(): T['element'];
     getMediaProps(): T['element'];
     getImageProps(): T['img'];
+    getIconProps(): T['img'];
     getOverlayProps(): T['element'];
     getTextProps(): T['element'];
     getTileProps(): T['element'];

@@ -30,6 +30,20 @@ test('the card playground opens without a word in the console, runs its pipeline
     await expect(page.getByText('£30', { exact: true })).toBeVisible();
     await expect(page.getByText('SEK 299', { exact: true })).toBeVisible();
 
+    // The icon of a site: big on the tile of a plain link in place of the letter, small before the title elsewhere,
+    // never both on one card.
+    const icons = page.locator('section').filter({
+        has: page.getByRole('heading', { name: 'Site icons' }),
+    });
+
+    await expect(icons.locator('[data-stash-card-icon]')).toHaveCount(5);
+    await expect(
+        icons.locator('[data-stash-card-tile] [data-stash-card-icon]'),
+    ).toHaveCount(2);
+    await expect(
+        icons.locator('[data-stash-card-title] [data-stash-card-icon]'),
+    ).toHaveCount(3);
+
     // A stash that fails its pipeline: the same card, in another phase.
     const live = page.locator('section').filter({
         has: page.getByRole('heading', { name: 'The pipeline, live' }),
@@ -45,4 +59,12 @@ test('the card playground opens without a word in the console, runs its pipeline
     await expect(page.getByText('slow (6 s)')).toBeVisible();
     await expect(page.getByText('404', { exact: true })).toBeVisible();
     await expect(page.getByText('500', { exact: true })).toBeVisible();
+
+    // An icon that never comes: the tile goes back to the first letter of the site.
+    const lost = page
+        .locator('figure')
+        .filter({ hasText: 'icon lost: the letter' });
+
+    await expect(lost.locator('[data-stash-card-tile]')).toHaveText('E');
+    await expect(lost.locator('[data-stash-card-icon]')).toHaveCount(0);
 });

@@ -40,6 +40,7 @@ export function stash(overrides: Partial<Stash> = {}): Stash {
         fetching: false,
         tagging: false,
         price: null,
+        favicon: null,
         ...overrides,
     };
 }
@@ -95,6 +96,16 @@ export function art(
         },
         colors: [{ hex: tint(hue), pct: 0.6 }],
     };
+}
+
+/**
+ * The icon of a site: a rounded square with a letter, as an inline SVG, so a card that shows one asks for nothing
+ * and the page opens without a word in the console.
+ */
+export function icon(letter: string, hue: number): string {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="hsl(${hue} 65% 52%)"/><text x="32" y="45" text-anchor="middle" font-family="system-ui,sans-serif" font-size="36" font-weight="700" fill="#fff">${letter}</text></svg>`;
+
+    return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
 export const LONG_NOTE = `The best ideas arrive while walking. Take a notebook, never a phone.

@@ -31,7 +31,6 @@ final readonly class StashDetailData
         public ?string $excerpt,
         public ?ThumbnailData $preview,
         public ?string $site_name,
-        public ?string $favicon_url,
         public array $collection_ids,
         public array $highlights,
     ) {}
@@ -50,7 +49,6 @@ final readonly class StashDetailData
                 ? null
                 : new ThumbnailData($storage->url($preview), $preview->width, $preview->height),
             site_name: is_string($meta['site_name'] ?? null) ? $meta['site_name'] : null,
-            favicon_url: is_string($meta['favicon_url'] ?? null) ? $meta['favicon_url'] : null,
             collection_ids: array_values(
                 $stash->collections->map(static fn ($collection): int => $collection->id)->all(),
             ),

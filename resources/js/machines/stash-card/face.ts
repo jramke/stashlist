@@ -12,7 +12,8 @@ import type {
  * What a card says about a stash, decided in one place and with no DOM in it: which phase it is in, what the
  * middle shows, what the corners say. The machine calls these; the playground shows every answer they can give.
  *
- * Faces, by what the stash is:
+ * Faces, by what the stash is (a link also has the icon of its site, fetched by the server from the site itself:
+ * big on the tile of a plain link, small beside the title everywhere else):
  *  - a picture (an image, or a link with a page picture): the picture in its own ratio on the gray; a video
  *    gets a play button over it
  *  - a color: the swatch
@@ -122,8 +123,17 @@ function extensionOf(stash: Stash): string {
     return (match?.[1] ?? 'file').toUpperCase();
 }
 
+/** The icon of the site, when the stash has one and it has not failed to load: only a link has one. */
+function siteIcon(stash: Stash, iconBroken: boolean): string | null {
+    return stash.type === 'link' && !iconBroken ? stash.favicon : null;
+}
+
 /** The middle of the card. */
-export function faceOf(stash: Stash, media: MediaStatus): CardFace {
+export function faceOf(
+    stash: Stash,
+    media: MediaStatus,
+    iconBroken = false,
+): CardFace {
     const glyph = glyphOf(stash);
 
     if (stash.type === 'color') {
@@ -160,9 +170,24 @@ export function faceOf(stash: Stash, media: MediaStatus): CardFace {
         hue:
             GLYPH_HUES[glyph] ??
             hash(stash.domain ?? stash.title ?? String(stash.id)),
-        // A plain link is told by its site; the other kinds are told by their glyph.
+        // A plain link is told by its site, by its icon or else by its first letter; the other kinds are told by
+        // their glyph.
         monogram: glyph === 'link' ? monogramOf(stash) : null,
+        icon: glyph === 'link' ? siteIcon(stash, iconBroken) : null,
     };
+}
+
+/** The icon of the site, small beside the title: not when the tile in the middle wears it already. */
+export function iconOf(
+    stash: Stash,
+    media: MediaStatus,
+    iconBroken: boolean,
+): string | null {
+    const face = faceOf(stash, media, iconBroken);
+
+    return face.kind === 'tile' && face.icon !== null
+        ? null
+        : siteIcon(stash, iconBroken);
 }
 
 /** The line under the middle, or null when there is none: a note is its own text. */

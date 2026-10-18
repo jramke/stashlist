@@ -2,6 +2,7 @@ import { createMachine } from '@zag-js/core';
 import { dom } from './dom';
 import {
     faceOf,
+    iconOf,
     indicatorOf,
     initialMedia,
     phaseOf,
@@ -19,7 +20,8 @@ const ARRIVED_FOR = 1600;
  * the new props arrive as `PHASE.SYNC`); the machine remembers where it came from, which props cannot: a card
  * that turns ready from fetching or tagging has just *arrived*, and says so for a moment. The picture has its
  * own small story (loading, loaded, broken) that decides which face shows: a broken picture falls back to a
- * tile instead of an empty box.
+ * tile instead of an empty box. The icon of the site has a smaller one (it works, or it does not): without it the
+ * tile goes back to the first letter of the site.
  *
  *   fetching ──► tagging ──► ready        any phase ──► failed (and back, when a retry works)
  *      └───────────────────►
@@ -35,12 +37,17 @@ export const machine = createMachine<StashCardSchema>({
                 defaultValue: initialMedia(prop('stash')),
             })),
             arrived: bindable<boolean>(() => ({ defaultValue: false })),
+            iconBroken: bindable<boolean>(() => ({ defaultValue: false })),
         };
     },
 
     computed: {
         face: ({ prop, context }) =>
-            faceOf(prop('stash'), context.get('media')),
+            faceOf(
+                prop('stash'),
+                context.get('media'),
+                context.get('iconBroken'),
+            ),
         title: ({ prop }) => titleOf(prop('stash')),
         indicator: ({ prop }) => indicatorOf(prop('stash')),
         statuses: ({ prop, context }) =>
@@ -50,6 +57,12 @@ export const machine = createMachine<StashCardSchema>({
                 context.get('arrived'),
             ),
         price: ({ prop }) => priceOf(prop('stash')),
+        icon: ({ prop, context }) =>
+            iconOf(
+                prop('stash'),
+                context.get('media'),
+                context.get('iconBroken'),
+            ),
         busy: ({ prop }) => {
             const phase = phaseOf(prop('stash'));
 
@@ -68,6 +81,9 @@ export const machine = createMachine<StashCardSchema>({
         track([() => prop('stash').thumbnail?.url ?? null], () =>
             send({ type: 'MEDIA.SOURCE' }),
         );
+        track([() => prop('stash').favicon], () =>
+            send({ type: 'ICON.SOURCE' }),
+        );
     },
 
     effects: ['checkPicture'],
@@ -83,6 +99,8 @@ export const machine = createMachine<StashCardSchema>({
         'MEDIA.SOURCE': { actions: ['resetMedia'] },
         'MEDIA.LOAD': { actions: ['mediaLoaded'] },
         'MEDIA.ERROR': { actions: ['mediaBroken'] },
+        'ICON.SOURCE': { actions: ['resetIcon'] },
+        'ICON.ERROR': { actions: ['iconBroken'] },
         'ARRIVED.END': { actions: ['clearArrived'] },
     },
 
@@ -119,6 +137,12 @@ export const machine = createMachine<StashCardSchema>({
             },
             mediaBroken({ context }) {
                 context.set('media', 'broken');
+            },
+            resetIcon({ context }) {
+                context.set('iconBroken', false);
+            },
+            iconBroken({ context }) {
+                context.set('iconBroken', true);
             },
         },
 

@@ -127,14 +127,13 @@ export default function Show({ detail, similar }: Props) {
                             rel="noopener noreferrer"
                             className="flex w-fit max-w-full items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
                         >
-                            {detail.favicon_url !== null && (
+                            {stash.favicon !== null && (
                                 <img
-                                    src={detail.favicon_url}
+                                    src={stash.favicon}
                                     alt=""
                                     width={16}
                                     height={16}
-                                    referrerPolicy="no-referrer"
-                                    className="size-4"
+                                    className="size-4 rounded-[3px] object-contain"
                                 />
                             )}
                             <span className="truncate">

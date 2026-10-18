@@ -237,11 +237,21 @@ function CardBody({ api }: { api: StashCardApi }) {
             <p
                 {...api.getTitleProps()}
                 className={cn(
-                    'absolute inset-x-3 bottom-3 truncate text-center text-[13px] leading-5 font-medium text-foreground/80 transition-colors group-hover/card:text-foreground group-data-[peek]/card:text-foreground data-[empty]:hidden keyboard:transition-none',
+                    'absolute inset-x-3 bottom-3 flex items-center justify-center gap-1.5 text-[13px] leading-5 font-medium text-foreground/80 transition-colors group-hover/card:text-foreground group-data-[peek]/card:text-foreground data-[empty]:hidden keyboard:transition-none',
                     face.kind === 'swatch' && 'font-mono text-xs tracking-wide',
                 )}
             >
-                {api.title}
+                {api.icon !== null && (
+                    <img
+                        {...api.getIconProps()}
+                        src={api.icon}
+                        width={14}
+                        height={14}
+                        loading="lazy"
+                        className="size-3.5 shrink-0 rounded-[3px] object-contain"
+                    />
+                )}
+                <span className="truncate">{api.title}</span>
             </p>
         </div>
     );
@@ -347,7 +357,16 @@ function TileFace({
                 color: `oklch(0.42 0.1 ${face.hue})`,
             }}
         >
-            {face.monogram === null ? (
+            {face.icon !== null ? (
+                <img
+                    {...api.getIconProps()}
+                    src={face.icon}
+                    width={32}
+                    height={32}
+                    loading="lazy"
+                    className="size-8 rounded-md object-contain"
+                />
+            ) : face.monogram === null ? (
                 <Glyph className="size-7" strokeWidth={1.5} />
             ) : (
                 <span className="text-2xl leading-none font-semibold">

@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 /**
- * A stash as a card in the feed. $title is null for a note or color the user did not title. Build it from a stash with `enrichment`, `thumbnail`, `thumbnailSmall` and `visibleTags`
+ * A stash as a card in the feed. $title is null for a note or color the user did not title. Build it from a stash with `enrichment`, `thumbnail`, `thumbnailSmall`, `favicon` and `visibleTags`
  * loaded (see FeedQuery::EAGER), so no query runs per card.
  */
 #[TypeScript]
@@ -45,6 +45,8 @@ final readonly class StashData
         public bool $fetching,
         public bool $tagging,
         public ?PriceData $price,
+        /** The icon of the site, made small and kept with the stash (never the site's own address). */
+        public ?string $favicon,
     ) {}
 
     public static function fromModel(Stash $stash, StashStorage $storage): self
@@ -86,6 +88,7 @@ final readonly class StashData
             fetching: Progress::isFetching($stash),
             tagging: Progress::isTagging($stash),
             price: PriceData::fromMeta($stash->meta['price'] ?? null),
+            favicon: $stash->favicon === null ? null : $storage->url($stash->favicon),
         );
     }
 

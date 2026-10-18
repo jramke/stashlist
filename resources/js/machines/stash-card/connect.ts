@@ -35,6 +35,7 @@ export function connect<T extends PropTypes>(
         indicator: computed('indicator'),
         statuses: computed('statuses'),
         price: computed('price'),
+        icon: computed('icon'),
 
         getRootProps() {
             return normalize.element({
@@ -77,6 +78,16 @@ export function connect<T extends PropTypes>(
                 },
                 onError() {
                     send({ type: 'MEDIA.ERROR' });
+                },
+            });
+        },
+        getIconProps() {
+            return normalize.img({
+                ...parts.icon.attrs(scope.id),
+                alt: '',
+                decoding: 'async',
+                onError() {
+                    send({ type: 'ICON.ERROR' });
                 },
             });
         },

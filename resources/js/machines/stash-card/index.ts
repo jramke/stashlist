@@ -5,6 +5,7 @@ export {
     describe,
     faceOf,
     glyphOf,
+    iconOf,
     indicatorOf,
     initialMedia,
     phaseOf,

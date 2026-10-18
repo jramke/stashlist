@@ -5,6 +5,7 @@ import { useStashGrid } from '@/hooks/use-stash-grid';
 import type { Stash } from '@/machines/stash-card';
 import {
     art,
+    icon,
     LONG_NOTE,
     pipeline,
     PLAIN_SITES,
@@ -170,6 +171,14 @@ function LostPictures() {
                             }),
                         })}
                     />
+                    <Case
+                        key={`icon-${round}`}
+                        label="icon lost: the letter"
+                        stash={stash({
+                            title: 'The icon is gone',
+                            favicon: `/playground/art?w=64&h=64&status=404&n=${round}`,
+                        })}
+                    />
                 </>
             )}
         </Section>
@@ -199,8 +208,16 @@ function LiveGrid() {
             }),
             ...SUBTYPES.map((name, index) => subtype(name, index % 2 === 0)),
             stash({ type: 'color', title: null, body: '#e63946' }),
-            ...PLAIN_SITES.map(([title, domain]) =>
-                stash({ title, domain, url: `https://${domain}/x` }),
+            ...PLAIN_SITES.map(([title, domain], index) =>
+                stash({
+                    title,
+                    domain,
+                    url: `https://${domain}/x`,
+                    favicon:
+                        index % 2 === 0
+                            ? icon(domain.charAt(0).toUpperCase(), index * 47)
+                            : null,
+                }),
             ),
             stash({
                 type: 'image',
@@ -403,6 +420,58 @@ export default function Cards() {
                             })}
                         />
                     ))}
+                </Section>
+
+                <Section
+                    title="Site icons"
+                    description="The icon of the site, fetched by the server from the site itself. On the tile of a plain link it takes the place of the letter; everywhere else it sits small before the title."
+                >
+                    <Case
+                        label="plain link, no icon: the letter"
+                        stash={stash({
+                            title: 'Docs: getting started',
+                            domain: 'laravel.com',
+                        })}
+                    />
+                    <Case
+                        label="plain link, with the icon"
+                        stash={stash({
+                            title: 'Docs: getting started',
+                            domain: 'laravel.com',
+                            favicon: icon('L', 12),
+                        })}
+                    />
+                    <Case
+                        label="no title: the site, the icon big"
+                        stash={stash({
+                            title: null,
+                            domain: 'breadlab.example',
+                            favicon: icon('B', 35),
+                        })}
+                    />
+                    <Case
+                        label="subtype tile, icon by the title"
+                        stash={{
+                            ...subtype('article', false),
+                            favicon: icon('B', 35),
+                        }}
+                    />
+                    <Case
+                        label="with a picture, icon by the title"
+                        stash={{
+                            ...subtype('article', true),
+                            favicon: icon('B', 35),
+                        }}
+                    />
+                    <Case
+                        label="long title: cut, the icon stays"
+                        stash={stash({
+                            title: 'An exceptionally long title that would never fit on one line of a card',
+                            subtype: 'article',
+                            favicon: icon('A', 200),
+                            ...art(1200, 630, 255),
+                        })}
+                    />
                 </Section>
 
                 <Section

@@ -13,6 +13,7 @@ export const anatomy = createAnatomy('stash-card').parts(
     'file',
     'title',
     'indicator',
+    'icon',
     'price',
     'statuses',
     'status',

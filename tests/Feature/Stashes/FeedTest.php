@@ -204,6 +204,22 @@ test('the detail page shows my stash and refuses other users', function () {
     $this->actingAs($this->user)->get("/stashes/{$other->id}")->assertNotFound();
 });
 
+test('the detail page shows the stored icon of the site and never hands over the address the site gave', function () {
+    $stash = Stash::factory()
+        ->for($this->user)
+        ->create(['meta' => ['favicon_url' => 'https://tracker.example/pixel.png']]);
+    app(StashStorage::class)->store($stash, FileRole::Favicon, new Blob('icon', 'image/webp', width: 32, height: 32));
+
+    $this
+        ->actingAs($this->user)
+        ->get("/stashes/{$stash->id}")
+        ->assertInertia(
+            fn (AssertableInertia $page) => $page
+                ->where('detail.stash.favicon', fn (string $url): bool => str_contains($url, 'favicon'))
+                ->missing('detail.favicon_url'),
+        );
+});
+
 test('the detail page needs a login', function () {
     $stash = Stash::factory()->for($this->user)->create();
 
@@ -300,6 +316,28 @@ test('a card carries the price its page states, and none when the meta has nothi
                 ->and($cards[$broken->id]['price'])
                 ->toBeNull()
                 ->and($cards[$plain->id]['price'])
+                ->toBeNull();
+        });
+});
+
+test('a card carries the icon of its site when it has one, and nothing when it has none', function () {
+    $with = Stash::factory()->for($this->user)->create(['url' => 'https://example.com/a', 'domain' => 'example.com']);
+    $without = Stash::factory()->for($this->user)->create([
+        'url' => 'https://example.com/b',
+        'domain' => 'example.com',
+    ]);
+    app(StashStorage::class)->store($with, FileRole::Favicon, new Blob('icon', 'image/webp', width: 32, height: 32));
+
+    $this
+        ->actingAs($this->user)
+        ->get('/stashes')
+        ->assertInertia(function (AssertableInertia $page) use ($with, $without) {
+            $cards = collect($page->toArray()['props']['stashes']['data'])->keyBy('id');
+
+            expect($cards[$with->id]['favicon'])
+                ->toBeString()
+                ->toContain('favicon')
+                ->and($cards[$without->id]['favicon'])
                 ->toBeNull();
         });
 });
