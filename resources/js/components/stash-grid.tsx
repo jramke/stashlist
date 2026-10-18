@@ -3,6 +3,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { onFirstRow, type StashGrid as Grid } from '@/hooks/use-stash-grid';
 import type { Stash } from '@/machines/stash-card';
 import { InfiniteScroll } from '@inertiajs/react';
+import type { MouseEvent } from 'react';
 
 /**
  * The cards, in a plain CSS grid, as the parts of a listbox (`useStashGrid`). The grid is the list, the cards are
@@ -30,6 +31,12 @@ export function StashGrid({
 }) {
     const { api } = grid;
     const content = api.getContentProps();
+    // The list takes the focus on a press, as it does in zag, but without letting the browser scroll it into
+    // view: the whole grid is the list, so a press on a card used to take the page to the top of the grid.
+    const focusList = (event: MouseEvent) => {
+        event.preventDefault();
+        document.getElementById(grid.listId)?.focus({ preventScroll: true });
+    };
     const list = {
         ...api.getListProps(),
         'data-stash-grid': '',
@@ -47,7 +54,10 @@ export function StashGrid({
                 // The ring and the growing picture are for a keyboard that is on the card.
                 highlighted={state.focusVisible}
                 fresh={freshAfter !== null && stash.id > freshAfter}
-                itemProps={api.getItemProps({ item: stash })}
+                itemProps={{
+                    ...api.getItemProps({ item: stash }),
+                    onMouseDown: focusList,
+                }}
             />
         );
     });

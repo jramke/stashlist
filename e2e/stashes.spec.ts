@@ -360,6 +360,45 @@ test('a chip is gone the moment it is taken off, and stays gone when a word is t
     await expect(card(page, /buy sourdough flour/)).toBeVisible();
 });
 
+test('pressing a card while the focus is elsewhere does not scroll the page to the top of the grid', async ({
+    page,
+}) => {
+    // One narrow column, so a few cards make a long page.
+    await page.setViewportSize({ width: 360, height: 640 });
+    await register(page);
+
+    for (const text of [
+        'one',
+        'two',
+        'three',
+        'four',
+        'five',
+        'six',
+        'seven',
+    ]) {
+        await capture(page, text);
+    }
+
+    // Down at the end of the feed, where the grid does not cover the screen: that is where a focus scrolls it.
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await expect(box(page)).toBeFocused();
+
+    const before = await page.evaluate(() => window.scrollY);
+
+    expect(before).toBeGreaterThan(900);
+
+    // The press, without the release: a release on the card would open it.
+    await page.mouse.move(180, 400);
+    await page.mouse.down();
+    await expect(page.locator('[data-stash-grid]')).toBeFocused();
+    await page.waitForTimeout(250);
+
+    expect(await page.evaluate(() => window.scrollY)).toBe(before);
+
+    await page.mouse.move(180, 20);
+    await page.mouse.up();
+});
+
 test('a link to a private address fails safely, shows it on the card and can be tried again', async ({
     page,
 }) => {

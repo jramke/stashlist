@@ -10,11 +10,14 @@ export function focusBox(): boolean {
 /** The list of cards, as the feed marks it. */
 const GRID = '[data-stash-grid]';
 
-/** Puts the focus on the list of cards, which highlights the first one if none is. */
+/**
+ * Puts the focus on the list of cards, which highlights the first one if none is. The page does not scroll to
+ * the list for it (the list is the whole grid); the highlighted card scrolls itself into view.
+ */
 export function focusGrid(): boolean {
     const grid = document.querySelector<HTMLElement>(GRID);
 
-    grid?.focus();
+    grid?.focus({ preventScroll: true });
 
     return grid !== null;
 }
