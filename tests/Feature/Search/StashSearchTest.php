@@ -32,7 +32,8 @@ function filter_sent_to_engine(Laravel\Scout\Builder $builder, string $scoutFilt
     $index = Mockery::mock(Indexes::class);
     $index
         ->shouldReceive('rawSearch')
-        ->once()
+        // The first call looks for the best hit, which sets the score cut; the last one is the search.
+        ->twice()
         ->andReturnUsing(function (string $text, array $options) use (&$sent): array {
             $sent = [$text, $options];
 
@@ -95,6 +96,12 @@ test('a search without the owner filter does not run', function (string $scoutFi
 test('options Scout set besides the filter are passed on', function () {
     $builder = $this->search->builder($this->user, 'bread', new FeedFiltersData);
     $index = Mockery::mock(Indexes::class);
+    // The best hit is looked up first, on a page of one.
+    $index
+        ->shouldReceive('rawSearch')
+        ->once()
+        ->with('bread', ['filter' => "user_id={$this->user->id}", 'limit' => 1, 'showRankingScore' => true])
+        ->andReturn(['hits' => []]);
     $index
         ->shouldReceive('rawSearch')
         ->once()
@@ -107,3 +114,33 @@ test('options Scout set besides the filter are passed on', function () {
         'page' => 2,
     ]);
 });
+
+test('nothing scoring far under the best result is shown, and a higher floor still wins', function (
+    float $best,
+    ?float $floor,
+    float $expected,
+) {
+    $builder = $this->search->builder($this->user, 'bread', new FeedFiltersData);
+    $sent = [];
+    $index = Mockery::mock(Indexes::class);
+    $index
+        ->shouldReceive('rawSearch')
+        ->twice()
+        ->andReturnUsing(function (string $text, array $options) use (&$sent, $best): array {
+            $sent = $options;
+
+            return ['hits' => [['id' => 1, '_rankingScore' => $best]]];
+        });
+
+    ($builder->callback)($index, $builder->query, [
+        'filter' => "user_id={$this->user->id}",
+        ...($floor === null ? [] : ['rankingScoreThreshold' => $floor]),
+    ]);
+
+    // 0.75 of the best result, unless the floor of the search is higher.
+    expect($sent['rankingScoreThreshold'])->toEqualWithDelta($expected, 0.0001);
+})->with([
+    'a clear match cuts the neighbours behind it' => [1.0, 0.68, 0.75],
+    'a loose best result keeps its loose matches' => [0.8, 0.68, 0.68],
+    'a keyword search has no floor of its own' => [0.9, null, 0.675],
+]);

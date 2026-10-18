@@ -139,15 +139,27 @@ return [
      |
      | The semantic part of a search. `ratio` is how much the meaning counts
      | against the words, by the number of words in the query (one, two, three or
-     | more): a single word is a keyword, a sentence is a meaning. Results scoring
-     | under `threshold` are dropped. Starting values, tuned with the search eval.
+     | more): a single word is a keyword, a sentence is a meaning.
+     |
+     | Two cuts keep the unrelated out. `threshold` drops what scores under it in
+     | a hybrid search. The scores of text-embedding-3-large are squeezed into a
+     | narrow band: documents that have nothing to do with the query still score
+     | about 0.6, and real neighbours 0.68 to 0.8, so a threshold under 0.65 lets
+     | the whole library through (0.35 did: "plants" listed every stash). It is
+     | tied to the embedder; measure it again with `stashlist:search-eval` when
+     | the model changes. `relative_threshold` also drops what scores under this
+     | part of the best result of the same search, so a query that has clear
+     | matches shows those and not the weak neighbours behind them, while a query
+     | whose best result is a loose match keeps its loose matches. Values from
+     | 250 stashes of the developer's own library, 2026-10-17.
      |
      */
 
     'search' => [
         'embedder' => (string)env('STASHLIST_EMBEDDER', 'text_v1'),
         'ratio' => ['short' => 0.3, 'default' => 0.5, 'long' => 0.7],
-        'threshold' => 0.35,
+        'threshold' => 0.68,
+        'relative_threshold' => 0.75,
         'min_semantic_chars' => 3,
         'query_cache_seconds' => 86_400,
         // Searches are signed per user with a search-only key (`stashlist:search-key`), so the engine itself

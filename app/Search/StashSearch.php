@@ -113,11 +113,13 @@ final class StashSearch
 
         // With a search key the request goes out under a token that only sees this user's documents.
         $tenantIndex = $this->tenant->indexFor($user->id);
+        $relative = config()->float('stashlist.search.relative_threshold');
 
         return static function (Indexes $index, string $text, array $options) use (
             $owner,
             $inNoCollection,
             $tenantIndex,
+            $relative,
         ): array {
             $filter = (string)($options['filter'] ?? '');
 
@@ -129,7 +131,9 @@ final class StashSearch
                 $options['filter'] = "{$filter} AND collection_ids IS EMPTY";
             }
 
-            return ($tenantIndex ?? $index)->rawSearch($text, $options);
+            $engine = $tenantIndex ?? $index;
+
+            return $engine->rawSearch($text, ScoreCut::apply($engine, $text, $options, $relative));
         };
     }
 }

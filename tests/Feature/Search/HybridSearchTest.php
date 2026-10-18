@@ -42,7 +42,7 @@ test('a hybrid search sends the vector of the query, the embedder, a ratio and a
         ->and($options['hybrid'])
         ->toBe(['embedder' => 'text_v1', 'semanticRatio' => 0.7])
         ->and($options['rankingScoreThreshold'])
-        ->toBe(0.35)
+        ->toBe(0.68)
         ->and($this->embedder->calls)
         ->toBe([['that article about sourdough starters']]);
 });
@@ -121,7 +121,7 @@ test('the vector and the owner filter both reach the engine', function () {
     $index = Mockery::mock(Indexes::class);
     $index
         ->shouldReceive('rawSearch')
-        ->once()
+        ->twice()
         ->andReturnUsing(function (string $text, array $options) use (&$sent): array {
             $sent = $options;
 
