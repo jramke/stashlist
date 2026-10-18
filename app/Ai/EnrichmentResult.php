@@ -42,11 +42,12 @@ final readonly class EnrichmentResult
 
     /**
      * @param  array<string, mixed>  $data  the structured answer of the model
-     * @param  int  $minTags  what is enough: three for a page, fewer for a very short note
+     * @param  int  $minTags  what is enough: two for a page, one for a very short note. Counted on what the model
+     *                        gave, before the language tag is taken out: sent back, a model pads the list again.
      *
      * @throws EnrichmentInvalid
      */
-    public static function from(array $data, int $minTags = 3): self
+    public static function from(array $data, int $minTags = 2): self
     {
         $tags = AnswerCleaner::tags($data['tags'] ?? []);
         $data['tags'] = $tags;
@@ -77,7 +78,7 @@ final readonly class EnrichmentResult
         return new self(
             title: trim((string)($data['title'] ?? '')),
             summary: trim((string)$data['summary']),
-            tags: $tags,
+            tags: AnswerCleaner::withoutLanguage($tags, (string)$data['language']),
             subtype: Subtype::from((string)$data['subtype']),
             language: (string)$data['language'],
             objects: AnswerCleaner::objects($data['objects'] ?? []),

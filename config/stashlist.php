@@ -101,8 +101,9 @@ return [
     'ai' => [
         'enabled' => (bool)env('STASHLIST_AI', true),
         'llm' => (string)env('STASHLIST_LLM', 'openai:gpt-5-mini'),
-        // Bump when the instructions change; `stashlist:reprocess --below-prompt=N` can re-run older stashes.
-        'prompt_version' => 2,
+        // Bump when the instructions or the rules an answer is checked by change. It is part of the input hash, so
+        // a stash is asked again the next time it is enriched; nothing queues the older ones by itself.
+        'prompt_version' => 3,
         // Calls per minute: all users together, and one user (one big import must not starve the others).
         'llm_rpm' => 300,
         'embed_rpm' => 1000,

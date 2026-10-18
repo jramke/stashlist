@@ -61,7 +61,7 @@ final class Enricher
             }
 
             try {
-                $result = EnrichmentResult::from($answer, $input->isShort() ? 1 : 3);
+                $result = EnrichmentResult::from($answer, $input->isShort() ? 1 : 2);
             } catch (EnrichmentInvalid $invalid) {
                 $prompt =
                     $input->prompt().

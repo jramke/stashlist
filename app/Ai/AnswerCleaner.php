@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Ai;
 
 use App\Tags\TagNormalizer;
+use Locale;
 
 /**
  * Puts what a model sent into the shape the rules ask for, where cleaning is kinder than asking again: no "#" in
@@ -80,5 +81,30 @@ final class AnswerCleaner
         }
 
         return array_slice(array_values($tags), offset: 0, length: EnrichmentResult::MAX_TAGS);
+    }
+
+    /**
+     * Takes out the tags that only name the language the item is written in ("german", "Deutsch"): the language is
+     * stored on its own, and a tag for it lands on every page in that language, so it groups nothing by topic.
+     * Only the item's own language goes; "english" on a German page may well be about English.
+     *
+     * @param  list<string>  $tags
+     * @param  string  $language  the two-letter code the model gave
+     * @return list<string>
+     */
+    public static function withoutLanguage(array $tags, string $language): array
+    {
+        $names = array_map(
+            static fn (string $inLanguage): string => mb_strtolower((string)Locale::getDisplayLanguage(
+                $language,
+                $inLanguage,
+            )),
+            ['en', $language],
+        );
+
+        return array_values(array_filter(
+            $tags,
+            static fn (string $tag): bool => ! in_array(TagNormalizer::slug($tag), $names, strict: true),
+        ));
     }
 }

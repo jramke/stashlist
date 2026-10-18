@@ -96,7 +96,7 @@ test('the model is sent the picture itself and answers with what is in it and th
         ->toBe(AiStatus::Processing);
 });
 
-test('a picture needs its three tags like a page does, however little text it has', function () {
+test('a picture needs its two tags like a page does, however little text it has', function () {
     FakeAi::install([FakeAi::answer(['tags' => ['sneakers']]), FakeAi::answer()]);
     $stash = picture_stash();
 
@@ -105,7 +105,7 @@ test('a picture needs its three tags like a page does, however little text it ha
     StashEnricher::assertPromptedTimes(2);
     StashEnricher::assertPrompted(fn (AgentPrompt $prompt): bool => str_contains(
         $prompt->prompt,
-        'Give at least 3 tags',
+        'Give at least 2 tags',
     ));
 });
 
