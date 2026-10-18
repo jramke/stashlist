@@ -80,7 +80,9 @@ export function InlineField({
         placeholder,
         'aria-label': label,
         'aria-invalid': error !== null || undefined,
-        onBlur: () => save(value),
+        // What is in the field, not what the last render saw: a blur right after a keystroke is ahead of the render.
+        onBlur: (event: { currentTarget: { value: string } }) =>
+            save(event.currentTarget.value),
         className: cn(
             '-mx-2 w-[calc(100%+1rem)] rounded-lg bg-transparent px-2 py-1 transition-colors outline-none placeholder:text-muted-foreground/60 hover:bg-foreground/[0.04] focus:bg-foreground/[0.04] aria-invalid:text-destructive',
             className,
