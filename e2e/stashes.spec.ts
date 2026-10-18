@@ -93,8 +93,9 @@ test('a stash can be edited, tagged and found again through its tag', async ({
 
     await page.getByLabel('Add a tag').fill('Baking');
     await page.getByLabel('Add a tag').press('Enter');
-    // Exactly: with smart features on, the model may add tags and a summary that mention baking too.
-    await expect(page.getByText('Baking', { exact: true })).toBeVisible();
+    // The tag, whatever its case (a model that tagged the stash "baking" first owns the spelling), and nothing
+    // longer: with smart features on, the summary may mention baking too.
+    await expect(page.getByText(/^baking$/i).first()).toBeVisible();
 
     await toFeed(page);
     await expect(card(page, /Flour list/)).toBeVisible();
