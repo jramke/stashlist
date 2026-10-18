@@ -75,3 +75,18 @@ test('what counts as a color is the same here and in the box', function () {
         expect($classifier->classify($text)->type)->toBe(StashType::Note, $text);
     }
 });
+
+test('a color field takes a color name, which the box does not', function () {
+    $classifier = new InputClassifier;
+
+    expect($classifier->isColorValue('Rebeccapurple'))
+        ->toBeTrue()
+        ->and($classifier->isColorValue(' #FFF '))
+        ->toBeTrue()
+        ->and($classifier->isColorValue('oklch(0.7 0.1 200)'))
+        ->toBeTrue()
+        ->and($classifier->isColorValue('sourdough'))
+        ->toBeFalse()
+        ->and($classifier->classify('Rebeccapurple')->type)
+        ->toBe(StashType::Note);
+});

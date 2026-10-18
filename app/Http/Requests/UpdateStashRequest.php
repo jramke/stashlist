@@ -38,10 +38,7 @@ final class UpdateStashRequest extends FormRequest
 
                 $body = $this->string('body')->toString();
 
-                if (
-                    $stash->type === StashType::Color &&
-                    new InputClassifier()->classify($body)->type !== StashType::Color
-                ) {
+                if ($stash->type === StashType::Color && ! new InputClassifier()->isColorValue($body)) {
                     $validator->errors()->add('body', 'This is not a color.');
                 }
 
