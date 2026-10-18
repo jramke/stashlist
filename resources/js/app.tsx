@@ -1,3 +1,4 @@
+import { SoundEffects } from '@/components/sound-effects';
 import { Toaster } from '@/components/ui/sonner';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
@@ -21,6 +22,7 @@ void createInertiaApp({
         return (
             <>
                 {app}
+                <SoundEffects />
                 <Toaster />
             </>
         );
