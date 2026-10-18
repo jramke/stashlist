@@ -1,12 +1,3 @@
-/** True while the key goes into a text field, where single-key shortcuts must stay out of the way. */
-export function isTyping(target: EventTarget | null): boolean {
-    return (
-        target instanceof HTMLElement &&
-        (target.isContentEditable ||
-            ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))
-    );
-}
-
 /** Focuses the one box that searches and stashes, if this page has it. */
 export function focusBox(): boolean {
     const box = document.querySelector<HTMLElement>('[data-omnibar-input]');

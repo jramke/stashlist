@@ -1,65 +1,59 @@
+import { actions } from '@/commands/actions';
+import type { ActionDef, Category } from '@/commands/catalog';
+import { useKeysReady } from '@/commands/hooks';
 import { Kbd } from '@/components/kbd';
-import { useModKey } from '@/hooks/use-mod-key';
+import { Keys } from '@/components/keys';
 
-type Shortcut = { keys: string[]; label: string };
+const categories: Category[] = [
+    'Anywhere',
+    'The box',
+    'Your stashes',
+    'One stash',
+];
 
-/** Every shortcut of the app on one inline panel. It opens with `?` and is not a dialog: the page stays usable. */
+/** The keys of one action: a group of caps for each of its hotkeys, or the caps the catalog says to show. */
+function KeysOf({ action }: { action: ActionDef }) {
+    const ready = useKeysReady();
+
+    if (!ready) {
+        return null;
+    }
+
+    if (action.show !== undefined) {
+        return (
+            <span className="inline-flex gap-1">
+                {action.show.flatMap((hotkey) =>
+                    actions
+                        .caps(hotkey)
+                        .map((cap, index) => (
+                            <Kbd key={`${hotkey}${index}`}>{cap}</Kbd>
+                        )),
+                )}
+            </span>
+        );
+    }
+
+    return (
+        <span className="inline-flex items-center gap-1.5">
+            {action.hotkeys.map((hotkey, index) => (
+                <span key={hotkey} className="inline-flex items-center gap-1.5">
+                    {index > 0 && (
+                        <span className="text-xs text-muted-foreground">
+                            or
+                        </span>
+                    )}
+                    <Keys hotkey={hotkey} />
+                </span>
+            ))}
+        </span>
+    );
+}
+
+/**
+ * Every action of the app on one inline panel, with its keys, read from the catalog (`commands/catalog.ts`), so
+ * what it says is what the keys do. It opens with `?` and is not a dialog: the page stays usable.
+ */
 export function ShortcutSheet({ onClose }: { onClose: () => void }) {
-    const mod = useModKey();
-
-    const groups: { title: string; items: Shortcut[] }[] = [
-        {
-            title: 'Anywhere',
-            items: [
-                { keys: ['/'], label: 'Search or stash' },
-                {
-                    keys: [mod, 'K'],
-                    label: 'Search or stash, even while typing',
-                },
-                { keys: ['g', 'h'], label: 'Go to your stashes' },
-                { keys: ['g', 'c'], label: 'Go to collections' },
-                { keys: ['g', 't'], label: 'Go to tags' },
-                { keys: ['g', 's'], label: 'Go to settings' },
-                { keys: ['Esc'], label: 'Back' },
-                { keys: ['m'], label: 'Sounds on or off' },
-            ],
-        },
-        {
-            title: 'The box',
-            items: [
-                { keys: ['↵'], label: 'Stash a link or a color code' },
-                { keys: [mod, '↵'], label: 'Stash what is typed as a note' },
-                { keys: ['Tab'], label: 'Turn the suggestion into a filter' },
-                {
-                    keys: ['⌫'],
-                    label: 'At the start: take the last filter off',
-                },
-                { keys: ['↓'], label: 'Into your stashes' },
-                { keys: [mod, 'V'], label: 'Paste an image to stash it' },
-            ],
-        },
-        {
-            title: 'Your stashes',
-            items: [
-                {
-                    keys: ['←', '↑', '↓', '→'],
-                    label: 'Move (j and k work too)',
-                },
-                { keys: ['↵'], label: 'Open' },
-                { keys: ['⌫'], label: 'Delete (x works too)' },
-                { keys: [mod, 'Z'], label: 'Undo a delete' },
-            ],
-        },
-        {
-            title: 'One stash',
-            items: [
-                { keys: ['o'], label: 'Open the original' },
-                { keys: ['t'], label: 'Add a tag' },
-                { keys: [mod, '⌫'], label: 'Delete' },
-            ],
-        },
-    ];
-
     return (
         <section
             aria-label="Keyboard shortcuts"
@@ -70,34 +64,39 @@ export function ShortcutSheet({ onClose }: { onClose: () => void }) {
                 <button
                     type="button"
                     onClick={onClose}
-                    className="ml-auto rounded px-1 text-xs text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+                    className="ml-auto inline-flex items-center gap-1.5 rounded px-1 text-xs text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
                 >
-                    Close <Kbd>Esc</Kbd>
+                    Close <Keys hotkey="Escape" />
                 </button>
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2">
-                {groups.map((group) => (
-                    <div key={group.title} className="grid content-start gap-2">
+                {categories.map((category) => (
+                    <div key={category} className="grid content-start gap-2">
                         <h3 className="text-xs text-muted-foreground">
-                            {group.title}
+                            {category}
                         </h3>
                         <ul className="grid gap-1.5 text-sm">
-                            {group.items.map((item) => (
-                                <li
-                                    key={item.label}
-                                    className="flex items-center gap-3"
-                                >
-                                    <span className="min-w-0 flex-1 truncate">
-                                        {item.label}
-                                    </span>
-                                    <span className="flex shrink-0 gap-1">
-                                        {item.keys.map((key) => (
-                                            <Kbd key={key}>{key}</Kbd>
-                                        ))}
-                                    </span>
-                                </li>
-                            ))}
+                            {actions
+                                .list()
+                                .filter(
+                                    (action) =>
+                                        action.category === category &&
+                                        action.hidden !== true,
+                                )
+                                .map((action) => (
+                                    <li
+                                        key={action.id}
+                                        className="flex items-center gap-3"
+                                    >
+                                        <span className="min-w-0 flex-1 truncate">
+                                            {action.label}
+                                        </span>
+                                        <span className="shrink-0">
+                                            <KeysOf action={action} />
+                                        </span>
+                                    </li>
+                                ))}
                         </ul>
                     </div>
                 ))}

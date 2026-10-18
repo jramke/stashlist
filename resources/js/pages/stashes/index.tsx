@@ -1,4 +1,5 @@
 import StashController from '@/actions/App/Http/Controllers/StashController';
+import { useAction, useScope } from '@/commands/hooks';
 import { Omnibar } from '@/components/omnibar';
 import { StashCard } from '@/components/stash-card';
 import { Spinner } from '@/components/ui/spinner';
@@ -10,10 +11,10 @@ import {
     moveTo,
     neighbour,
 } from '@/lib/grid';
-import { focusBox, isTyping } from '@/lib/keys';
+import { focusBox } from '@/lib/keys';
 import type { Scroll } from '@/types';
 import { Head, InfiniteScroll, router, usePoll } from '@inertiajs/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type Props = {
     stashes: Scroll<App.Data.StashData>;
@@ -41,12 +42,6 @@ export default function Index({ stashes, filters, tags, share }: Props) {
         { only: ['stashes'] },
         { autoStart: false },
     );
-    const latest = useRef({ note, stashes });
-
-    useEffect(() => {
-        latest.current = { note, stashes };
-    });
-
     useEffect(() => {
         if (waiting) {
             start();
@@ -76,68 +71,45 @@ export default function Index({ stashes, filters, tags, share }: Props) {
         return () => clearTimeout(timer);
     }, [freshAfter]);
 
-    // The keyboard in the feed: arrows (or j and k) move between the cards, Backspace deletes, Cmd+Z takes it back.
-    useEffect(() => {
-        function keyDown(event: KeyboardEvent) {
-            if (event.defaultPrevented) {
-                return;
-            }
+    // The keyboard in the feed (the keys are in the catalog): arrows or j and k move between the cards, Backspace
+    // deletes, Cmd+Z takes it back.
+    useScope('feed');
+    useAction('card.move', (event) => {
+        const direction = directionOf(event?.key ?? '');
 
-            const undoUrl = latest.current.note?.undo_url ?? null;
-
-            if (
-                (event.metaKey || event.ctrlKey) &&
-                event.key === 'z' &&
-                undoUrl !== null &&
-                !isTyping(event.target)
-            ) {
-                event.preventDefault();
-                router.delete(undoUrl, { preserveScroll: true });
-
-                return;
-            }
-
-            if (event.metaKey || event.ctrlKey || event.altKey) {
-                return;
-            }
-
-            const card = focusedCard();
-
-            if (isTyping(event.target)) {
-                return;
-            }
-
-            const direction = directionOf(event.key);
-
-            if (direction !== undefined) {
-                event.preventDefault();
-
-                if (card !== null && direction === 'up') {
-                    const above = neighbour('up');
-
-                    if (above === null) {
-                        focusBox();
-                    } else {
-                        moveTo(above);
-                    }
-                } else {
-                    card === null
-                        ? focusCard('first')
-                        : moveTo(neighbour(direction));
-                }
-            } else if (
-                card !== null &&
-                ['Backspace', 'Delete', 'x'].includes(event.key)
-            ) {
-                event.preventDefault();
-                remove(card);
-            }
+        if (direction === undefined) {
+            return;
         }
 
-        document.addEventListener('keydown', keyDown);
+        const card = focusedCard();
 
-        return () => document.removeEventListener('keydown', keyDown);
-    }, []);
+        if (card === null) {
+            focusCard('first');
+        } else if (direction === 'up' && neighbour('up') === null) {
+            // Off the top row: back into the box.
+            focusBox();
+        } else {
+            moveTo(neighbour(direction));
+        }
+    });
+    useAction('card.delete', {
+        run: () => {
+            const card = focusedCard();
+
+            if (card !== null) {
+                remove(card);
+            }
+        },
+        enabled: () => focusedCard() !== null,
+    });
+    useAction('stash.undo', {
+        run: () => {
+            if (note?.undo_url) {
+                router.delete(note.undo_url, { preserveScroll: true });
+            }
+        },
+        enabled: () => note?.undo_url != null,
+    });
 
     /** Takes the card off the screen now and asks the server; the note in the box offers the undo. */
     function remove(card: HTMLElement) {

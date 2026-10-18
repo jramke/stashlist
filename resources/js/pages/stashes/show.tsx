@@ -1,24 +1,24 @@
 import StashController from '@/actions/App/Http/Controllers/StashController';
 import StashReprocessController from '@/actions/App/Http/Controllers/StashReprocessController';
+import { useAction, useScope } from '@/commands/hooks';
 import { CollectionPicker } from '@/components/collection-picker';
 import { FlashNote } from '@/components/flash-note';
 import { HighlightList } from '@/components/highlight-list';
 import { InlineField } from '@/components/inline-field';
 import { Kbd } from '@/components/kbd';
+import { Keys } from '@/components/keys';
 import { StashCard } from '@/components/stash-card';
 import { TagEditor } from '@/components/tag-editor';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { useAuthUser } from '@/hooks/use-auth-user';
 import { useFlashNote } from '@/hooks/use-flash-note';
-import { useModKey } from '@/hooks/use-mod-key';
 import { aiErrorMessage } from '@/lib/ai-status';
 import { goBack } from '@/lib/back';
-import { isTyping } from '@/lib/keys';
 import { index } from '@/routes/stashes';
 import { Deferred, Head, router, usePoll } from '@inertiajs/react';
 import { ArrowLeft, ExternalLink, RotateCw, Trash2 } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 type Props = {
     detail: App.Data.StashDetailData;
@@ -40,19 +40,12 @@ const POLL_INTERVAL = 3000;
 export default function Show({ detail, similar }: Props) {
     const { stash } = detail;
     const { note, clear } = useFlashNote();
-    const mod = useModKey();
     const waiting = stash.fetching || stash.tagging;
     const { start, stop } = usePoll(
         POLL_INTERVAL,
         { only: ['detail'] },
         { autoStart: false },
     );
-    const latest = useRef(stash);
-
-    useEffect(() => {
-        latest.current = stash;
-    });
-
     useEffect(() => {
         if (waiting) {
             start();
@@ -61,43 +54,22 @@ export default function Show({ detail, similar }: Props) {
         }
     }, [waiting, start, stop]);
 
-    // The keys of one stash: o opens the original, t goes to the tags, Cmd+Backspace deletes.
-    useEffect(() => {
-        function keyDown(event: KeyboardEvent) {
-            if (event.defaultPrevented) {
-                return;
+    // The keys of one stash (they are in the catalog): o opens the original, t goes to the tags, Cmd+Backspace deletes.
+    useScope('stash');
+    useAction('stash.open-original', {
+        run: () => {
+            if (stash.url !== null) {
+                window.open(stash.url, '_blank', 'noopener,noreferrer');
             }
-
-            const current = latest.current;
-
-            if (
-                (event.metaKey || event.ctrlKey) &&
-                event.key === 'Backspace' &&
-                !isTyping(event.target)
-            ) {
-                event.preventDefault();
-                router.delete(StashController.destroy.url(current.id));
-            } else if (
-                !event.metaKey &&
-                !event.ctrlKey &&
-                !event.altKey &&
-                !isTyping(event.target)
-            ) {
-                if (event.key === 't') {
-                    event.preventDefault();
-                    document
-                        .querySelector<HTMLElement>('[data-tag-input]')
-                        ?.focus();
-                } else if (event.key === 'o' && current.url !== null) {
-                    window.open(current.url, '_blank', 'noopener,noreferrer');
-                }
-            }
-        }
-
-        document.addEventListener('keydown', keyDown);
-
-        return () => document.removeEventListener('keydown', keyDown);
-    }, []);
+        },
+        enabled: () => stash.url !== null,
+    });
+    useAction('stash.add-tag', () =>
+        document.querySelector<HTMLElement>('[data-tag-input]')?.focus(),
+    );
+    useAction('stash.delete', () =>
+        router.delete(StashController.destroy.url(stash.id)),
+    );
 
     return (
         <>
@@ -169,7 +141,7 @@ export default function Show({ detail, similar }: Props) {
                                 {detail.site_name ?? stash.domain ?? stash.url}
                             </span>
                             <ExternalLink className="size-3.5 shrink-0" />
-                            <Kbd>o</Kbd>
+                            <Keys action="stash.open-original" />
                         </a>
                     )}
                     {(stash.summary ?? stash.description) !== null && (
@@ -240,7 +212,7 @@ export default function Show({ detail, similar }: Props) {
                     >
                         <Trash2 />
                         Delete
-                        <Kbd className="ml-1">{mod}⌫</Kbd>
+                        <Keys action="stash.delete" className="ml-1" />
                     </Button>
                 </div>
             </div>

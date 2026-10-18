@@ -179,8 +179,9 @@ test('the feed works from the keyboard: move, open, delete, undo', async ({
     await expect(page.getByText('Deleted.')).toBeVisible();
     await expect(page.locator('[data-card]')).toHaveCount(1);
 
-    // Cmd or Ctrl with Z takes it back, outside the box.
-    await page.keyboard.press('ControlOrMeta+z');
+    // Ctrl with Z takes it back, outside the box. (The hotkey library reads the platform from the browser, and
+    // Playwright's Desktop Chrome says Windows, so mod is Ctrl here whatever the machine.)
+    await page.keyboard.press('Control+z');
     await expect(page.getByText('Restored.')).toBeVisible();
     await expect(page.locator('[data-card]')).toHaveCount(2);
 
@@ -284,4 +285,47 @@ test('an image pasted into the box is stashed', async ({ page }) => {
 
     await expect(page.getByText('Stashed.')).toBeVisible();
     await expect(page.locator('[data-card]')).toHaveCount(1);
+});
+
+test('a key belongs to a place: stash keys are silent on the feed, the sheet comes from the catalog', async ({
+    page,
+}) => {
+    await register(page);
+    await capture(page, 'buy sourdough flour');
+
+    // Out of the box. Stash keys do nothing on the feed.
+    await page.keyboard.press('Escape');
+    await expect(box(page)).not.toBeFocused();
+    await page.keyboard.press('t');
+    await page.keyboard.press('o');
+    await expect(page).toHaveURL(/\/stashes$/);
+    await expect(page.getByLabel('Add a tag')).toHaveCount(0);
+
+    // g then c goes to the collections, from anywhere that is not a field.
+    await page.keyboard.press('g');
+    await page.keyboard.press('c');
+    await expect(page).toHaveURL(/\/collections$/);
+    await page.keyboard.press('Escape');
+    await expect(page).toHaveURL(/\/stashes$/);
+
+    // On a stash the stash keys work: t goes to the tags, and the sheet lists what the catalog says.
+    await card(page, /buy sourdough flour/).click();
+    await expect(page).toHaveURL(/\/stashes\/\d+$/);
+    await page.keyboard.press('t');
+    await expect(page.getByLabel('Add a tag')).toBeFocused();
+
+    // Escape lets go of the field first, and the sheet has the next one.
+    await page.keyboard.press('Escape');
+    await page.keyboard.press('?');
+    const sheet = page.getByRole('region', { name: 'Keyboard shortcuts' });
+    await expect(sheet).toBeVisible();
+    await expect(sheet.getByText('Undo a delete')).toBeVisible();
+    await expect(sheet.getByText('Open the original')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(sheet).toHaveCount(0);
+    await expect(page).toHaveURL(/\/stashes\/\d+$/);
+
+    // And back, when nothing else wants the key.
+    await page.keyboard.press('Escape');
+    await expect(page).toHaveURL(/\/stashes$/);
 });

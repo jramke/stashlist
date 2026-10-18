@@ -1,4 +1,5 @@
-import { Kbd } from '@/components/kbd';
+import type { ActionId } from '@/commands/catalog';
+import { Keys } from '@/components/keys';
 import { setSoundEnabled, useSoundEnabled } from '@/lib/sound';
 import { cn } from '@/lib/utils';
 import { logout, privacy } from '@/routes';
@@ -121,13 +122,13 @@ export function AccountMenu({ className }: { className?: string }) {
                     <p className="truncate px-2 py-1.5 text-xs text-muted-foreground">
                         {name}
                     </p>
-                    <MenuLink href={collections().url} keys={['g', 'c']}>
+                    <MenuLink href={collections().url} action="go.collections">
                         Collections
                     </MenuLink>
-                    <MenuLink href={tags().url} keys={['g', 't']}>
+                    <MenuLink href={tags().url} action="go.tags">
                         Tags
                     </MenuLink>
-                    <MenuLink href={profile().url} keys={['g', 's']}>
+                    <MenuLink href={profile().url} action="go.settings">
                         Settings
                     </MenuLink>
                     <MenuLink href={privacy().url}>Privacy</MenuLink>
@@ -141,7 +142,7 @@ export function AccountMenu({ className }: { className?: string }) {
                         Sounds
                         <span className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground">
                             {sounds ? 'On' : 'Off'}
-                            <Kbd>m</Kbd>
+                            <Keys action="sound.toggle" />
                         </span>
                     </button>
                     <div className="my-1 h-px bg-border" />
@@ -161,11 +162,11 @@ export function AccountMenu({ className }: { className?: string }) {
 
 function MenuLink({
     href,
-    keys,
+    action,
     children,
 }: {
     href: string;
-    keys?: string[];
+    action?: ActionId;
     children: string;
 }) {
     return (
@@ -175,11 +176,9 @@ function MenuLink({
             className="flex items-center gap-2 rounded-lg px-2 py-1.5 outline-none hover:bg-muted focus-visible:bg-muted"
         >
             {children}
-            {keys !== undefined && (
-                <span className="ml-auto flex gap-1">
-                    {keys.map((key) => (
-                        <Kbd key={key}>{key}</Kbd>
-                    ))}
+            {action !== undefined && (
+                <span className="ml-auto">
+                    <Keys action={action} />
                 </span>
             )}
         </Link>
