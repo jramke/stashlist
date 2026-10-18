@@ -331,6 +331,8 @@ test('a chip is gone the moment it is taken off, and stays gone when a word is t
 }) => {
     await register(page);
     await capture(page, 'buy sourdough flour');
+    // The word typed below is a search: the note has to be in the index by then, whatever else is running.
+    drainQueue();
     await filterBy(page, 'notes');
     await expect(
         page.getByRole('button', { name: 'Remove Notes' }),
