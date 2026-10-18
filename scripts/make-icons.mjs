@@ -1,6 +1,7 @@
 // Makes the raster icons of the app from public/favicon.svg, the one source of the icon: the favicon in three
-// sizes (png, ico), the icons of the installed app, the touch icon and the picture shown when a link to the app
-// is shared. Needs the Chrome that the browser flows use (it draws the SVG with its filters):
+// sizes (png, ico), the icons of the installed app, the touch icon, the picture shown when a link to the app
+// is shared, and the icons of the browser extension (toolbar and stores) and of the Raycast extension. Needs the
+// Chrome that the browser flows use (it draws the SVG with its filters):
 //   node scripts/make-icons.mjs
 import { chromium } from '@playwright/test';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -40,11 +41,19 @@ const icon = (source, size) =>
 
 const png = (path, bytes) => writeFileSync(path, bytes);
 
+const icon512 = await icon(svg, 512);
+
 png('public/favicon.png', await icon(svg, 96));
 png('public/icons/icon-192.png', await icon(svg, 192));
-png('public/icons/icon-512.png', await icon(svg, 512));
+png('public/icons/icon-512.png', icon512);
 png('public/icons/apple-touch-icon.png', await icon(square, 180));
 png('public/icons/maskable-512.png', await icon(square, 512));
+
+// The browser extension (WXT finds public/icon/<size>.png by itself) and Raycast (512 px): the plain rounded square.
+for (const size of [16, 32, 48, 128]) {
+    png(`extension/public/icon/${size}.png`, await icon(svg, size));
+}
+png('raycast/assets/extension-icon.png', icon512);
 
 // An .ico that holds PNGs: what browsers that ask for /favicon.ico get.
 const sizes = [16, 32, 48];
