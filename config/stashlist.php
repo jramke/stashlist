@@ -21,6 +21,19 @@ return [
 
     /*
      |--------------------------------------------------------------------------
+     | Playground
+     |--------------------------------------------------------------------------
+     |
+     | /playground/cards shows every state of the stash card (a type, a subtype,
+     | a phase, a picture that is slow or broken) for building the interface. On
+     | in the local environment, off everywhere else unless told otherwise.
+     |
+     */
+
+    'playground' => (bool)env('STASHLIST_PLAYGROUND', env('APP_ENV') === 'local'),
+
+    /*
+     |--------------------------------------------------------------------------
      | Registration
      |--------------------------------------------------------------------------
      |

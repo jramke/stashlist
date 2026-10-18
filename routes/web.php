@@ -8,6 +8,7 @@ use App\Http\Controllers\CollectionStashController;
 use App\Http\Controllers\HighlightController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MarketingController;
+use App\Http\Controllers\PlaygroundController;
 use App\Http\Controllers\PrivacyController;
 use App\Http\Controllers\SearchEngineFilesController;
 use App\Http\Controllers\ShareController;
@@ -66,6 +67,10 @@ Route::middleware('auth')->group(function () {
     Route::put('collections/{collection}/stashes', [CollectionStashController::class, 'update'])->name(
         'collections.stashes.update',
     );
+
+    // For building the interface; they answer 404 unless config `stashlist.playground` is on.
+    Route::get('playground/cards', [PlaygroundController::class, 'cards'])->name('playground.cards');
+    Route::get('playground/art', [PlaygroundController::class, 'art'])->name('playground.art');
 
     Route::get('tags', [TagController::class, 'index'])->name('tags.index');
     Route::patch('tags/{tag}', [TagController::class, 'update'])->name('tags.update');
