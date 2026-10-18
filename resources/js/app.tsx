@@ -1,5 +1,5 @@
 import { SoundEffects } from '@/components/sound-effects';
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from '@/components/toaster';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import { createInertiaApp } from '@inertiajs/react';

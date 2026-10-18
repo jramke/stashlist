@@ -1,12 +1,12 @@
 import { goBack } from '@/lib/back';
 import { focusBox, isTextField } from '@/lib/keys';
 import { setSoundEnabled, soundEnabled } from '@/lib/sound';
+import { notify } from '@/lib/toast';
 import { index as collections } from '@/routes/collections';
 import { edit as profile } from '@/routes/profile';
 import { index as stashes } from '@/routes/stashes';
 import { index as tags } from '@/routes/tags';
 import { router } from '@inertiajs/react';
-import { toast } from 'sonner';
 
 /**
  * Where an action is on offer. `*` (everything that has no scope) is always on; the others are switched on by the
@@ -58,7 +58,7 @@ function toggleSound() {
     const on = !soundEnabled();
 
     setSoundEnabled(on);
-    toast(on ? 'Sounds on' : 'Sounds off', { duration: 1500 });
+    notify('message', on ? 'Sounds on' : 'Sounds off', { duration: 1500 });
 }
 
 /**

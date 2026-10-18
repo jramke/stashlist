@@ -1,6 +1,6 @@
+import { notify } from '@/lib/toast';
 import { router } from '@inertiajs/react';
 import { useEffect } from 'react';
-import { toast } from 'sonner';
 import { hasFlashSink } from './use-flash-note';
 
 /** How long a toast with an undo button stays: the server keeps a deletion open for ten seconds. */
@@ -26,7 +26,8 @@ export function useFlashToast(): void {
 
                 const undoUrl = data.undo_url;
 
-                toast[data.type](
+                notify(
+                    data.type,
                     data.message,
                     undoUrl === null
                         ? undefined
