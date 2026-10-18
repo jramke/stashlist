@@ -20,14 +20,17 @@ test('the popup stashes the page with its text, a tag and a picture', async ({
     drainQueue();
     await web.goto(`${BASE_URL}/stashes`);
 
-    const card = web.getByRole('link', {
+    const card = web.getByRole('option', {
         name: /How to raise a sourdough starter/,
     });
     await expect(card).toBeVisible();
-    await expect(card).toContainText('bread');
     await expect(card.locator('img')).toHaveCount(1);
 
+    // Cards show no tags; the stash page does.
     await card.click();
+    await expect(
+        web.getByRole('button', { name: 'Remove bread' }),
+    ).toBeVisible();
     await web.getByText('Text of the page').click();
     await expect(web.getByText('living culture of wild yeast')).toBeVisible();
 });
@@ -48,7 +51,7 @@ test('the popup knows a page that is stashed already', async ({
 
     await web.goto(`${BASE_URL}/stashes`);
     await expect(
-        web.getByRole('link', { name: /How to raise a sourdough starter/ }),
+        web.getByRole('option', { name: /How to raise a sourdough starter/ }),
     ).toHaveCount(1);
 });
 
@@ -60,8 +63,10 @@ test('a revoked token stops the extension and says why', async ({
     await article.bringToFront();
 
     await web.goto(`${BASE_URL}/settings/tokens`);
-    web.once('dialog', (dialog) => dialog.accept());
-    await web.getByRole('button', { name: /^Revoke / }).click();
+    // Two presses: the first one only asks.
+    const revoke = web.getByRole('button', { name: /^Revoke / });
+    await revoke.click();
+    await revoke.click();
     await expect(web.getByText('No tokens yet.')).toBeVisible();
 
     const popup = await openExtensionPage(extension, `popup.html?tab=${tabId}`);

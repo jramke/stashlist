@@ -56,7 +56,7 @@ test('a highlight made in the popup is saved, listed and painted at once', async
 
     // The page was stashed on the way, and the passage is on its page in the web app.
     await web.goto(`${BASE_URL}/stashes`);
-    await web.getByRole('link', { name: /Sourdough starters/ }).click();
+    await web.getByRole('option', { name: /Sourdough starters/ }).click();
     await expect(web.getByText(PASSAGE)).toBeVisible();
 });
 
@@ -119,7 +119,7 @@ test('removing a highlight in the popup takes the paint off the page and deletes
     await expect.poll(() => painted(article)).toBe(0);
 
     await web.goto(`${BASE_URL}/stashes`);
-    await web.getByRole('link', { name: /Sourdough starters/ }).click();
+    await web.getByRole('option', { name: /Sourdough starters/ }).click();
     await expect(web.getByText(PASSAGE)).toHaveCount(0);
 });
 
