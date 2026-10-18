@@ -1,6 +1,6 @@
 import { createAnatomy } from '@zag-js/anatomy';
 
-/** The parts of the box. Each one carries `data-scope="omnibar"` and its own `data-part`. */
+/** The parts of the box. Each one gets an attribute like `data-omnibar-chip-remove="<machine id>"`. */
 export const anatomy = createAnatomy('omnibar').parts(
     'root',
     'field',
