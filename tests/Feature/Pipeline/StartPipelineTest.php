@@ -6,6 +6,7 @@ use App\Actions\Stashes\CapturedPage;
 use App\Enums\AiStatus;
 use App\Enums\StashType;
 use App\Jobs\ExtractContent;
+use App\Jobs\FetchFavicon;
 use App\Jobs\GenerateEmbedding;
 use App\Jobs\GenerateEnrichment;
 use App\Jobs\IndexStash;
@@ -20,12 +21,13 @@ beforeEach(function () {
     FakeAi::install();
 });
 
-test('a link is read, then the model, then the index', function () {
+test('a link is read, its icon fetched, then the model, then the index', function () {
     $stash = Stash::factory()->create();
 
     app(StartPipeline::class)->start($stash);
 
     Queue::assertPushedWithChain(ExtractContent::class, [
+        FetchFavicon::class,
         GenerateEnrichment::class,
         GenerateEmbedding::class,
         IndexStash::class,
@@ -40,18 +42,23 @@ test('a note goes to the model without being read first', function () {
     app(StartPipeline::class)->start($stash);
 
     Queue::assertNotPushed(ExtractContent::class);
+    Queue::assertNotPushed(FetchFavicon::class);
     Queue::assertPushedWithChain(GenerateEnrichment::class, [GenerateEmbedding::class, IndexStash::class]);
 
     expect($stash->fresh()->ai_status)->toBe(AiStatus::Pending);
 });
 
-test('a page the client already read goes straight to the model', function () {
+test('a page the client already read is not read again, only its icon is fetched before the model', function () {
     $stash = Stash::factory()->create();
 
     app(StartPipeline::class)->start($stash, new CapturedPage(contentMarkdown: '# A page'));
 
     Queue::assertNotPushed(ExtractContent::class);
-    Queue::assertPushedWithChain(GenerateEnrichment::class, [GenerateEmbedding::class, IndexStash::class]);
+    Queue::assertPushedWithChain(FetchFavicon::class, [
+        GenerateEnrichment::class,
+        GenerateEmbedding::class,
+        IndexStash::class,
+    ]);
 });
 
 test('the model jobs wait on the ai queue and carry ids only', function () {
@@ -66,11 +73,12 @@ test('the model jobs wait on the ai queue and carry ids only', function () {
     );
 });
 
-test('an image is read first, then the model looks at the picture', function () {
+test('an image is read first, then the model looks at the picture, and it has no site to take an icon from', function () {
     $stash = Stash::factory()->create(['type' => StashType::Image]);
 
     app(StartPipeline::class)->start($stash);
 
+    Queue::assertNotPushed(FetchFavicon::class);
     Queue::assertPushedWithChain(ExtractContent::class, [
         GenerateEnrichment::class,
         GenerateEmbedding::class,
@@ -127,6 +135,7 @@ test('the retry button runs everything again, the model included', function () {
     app(StartPipeline::class)->restart($stash);
 
     Queue::assertPushedWithChain(ExtractContent::class, [
+        FetchFavicon::class,
         GenerateEnrichment::class,
         GenerateEmbedding::class,
         IndexStash::class,

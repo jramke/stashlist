@@ -45,6 +45,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property StashEnrichment|null $enrichment
  * @property StashFile|null $thumbnail
  * @property StashFile|null $thumbnailSmall
+ * @property StashFile|null $favicon
  * @property \Illuminate\Database\Eloquent\Collection<int, StashFile> $files
  * @property \Illuminate\Database\Eloquent\Collection<int, Tag> $tags
  * @property \Illuminate\Database\Eloquent\Collection<int, Tag> $visibleTags
@@ -105,6 +106,14 @@ final class Stash extends Model
     public function thumbnailSmall(): HasOne
     {
         return $this->hasOne(StashFile::class)->where('role', FileRole::ThumbSmall->value);
+    }
+
+    /**
+     * @return HasOne<StashFile, $this>
+     */
+    public function favicon(): HasOne
+    {
+        return $this->hasOne(StashFile::class)->where('role', FileRole::Favicon->value);
     }
 
     /**

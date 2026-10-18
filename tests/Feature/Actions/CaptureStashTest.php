@@ -9,6 +9,7 @@ use App\Enums\FileRole;
 use App\Enums\StashType;
 use App\Images\InvalidImage;
 use App\Jobs\ExtractContent;
+use App\Jobs\FetchFavicon;
 use App\Jobs\IndexStash;
 use App\Models\Collection;
 use App\Models\Stash;
@@ -57,7 +58,7 @@ test('a link is saved with its dedupe hash and domain and extraction starts', fu
         ExtractContent::class,
         fn (ExtractContent $job): bool => $job->stashId === $stash->id && $job->userId === $this->user->id,
     );
-    Queue::assertPushedWithChain(ExtractContent::class, [IndexStash::class]);
+    Queue::assertPushedWithChain(ExtractContent::class, [FetchFavicon::class, IndexStash::class]);
 });
 
 test('the same link again returns the stash that exists', function () {

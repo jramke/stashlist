@@ -11,6 +11,7 @@ final readonly class ParsedPage
 {
     /**
      * @param  list<string>  $schemaTypes
+     * @param  list<string>  $iconUrls
      */
     public function __construct(
         public ?string $title = null,
@@ -24,5 +25,7 @@ final readonly class ParsedPage
         /** The schema.org types the page describes (JSON-LD), lower case. */
         public array $schemaTypes = [],
         public ?Price $price = null,
+        /** Where the page says its icons are, best first. */
+        public array $iconUrls = [],
     ) {}
 }

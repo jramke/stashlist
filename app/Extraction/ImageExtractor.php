@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Extraction;
 
 use App\Enums\FileRole;
+use App\Images\FaviconProcessor;
 use App\Images\ImageProcessor;
 use App\Images\InvalidImage;
 use App\Models\Stash;
@@ -19,6 +20,7 @@ final readonly class ImageExtractor
 {
     public function __construct(
         private ImageProcessor $processor,
+        private FaviconProcessor $favicons,
         private StashStorage $storage,
     ) {}
 
@@ -52,6 +54,16 @@ final readonly class ImageExtractor
             ],
             colors: $processed->colors,
         );
+    }
+
+    /**
+     * Keeps the icon of the site a link points to, made small, with the stash.
+     *
+     * @throws InvalidImage
+     */
+    public function keepFavicon(Stash $stash, string $bytes): void
+    {
+        $this->storage->store($stash, FileRole::Favicon, $this->favicons->process($bytes));
     }
 
     /**

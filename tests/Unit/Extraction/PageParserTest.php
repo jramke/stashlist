@@ -141,3 +141,18 @@ test('the price can be in Open Graph tags, or in microdata, and broken JSON-LD i
 test('a page with no price has none', function () {
     expect(new PageParser()->parse(page('article'))->price)->toBeNull();
 });
+
+test('the icons a page declares come best first: touch icons, then the larger ones, and never an svg', function () {
+    $parsed = new PageParser()->parse(page('icons', url: 'https://example.com/blog/post'));
+
+    expect($parsed->iconUrls)->toBe([
+        'https://example.com/touch-180.png',
+        'https://example.com/blog/favicon-32.png',
+        'https://example.com/favicon-16.png',
+        'https://cdn.example/fav.ico',
+    ]);
+});
+
+test('a page without icon links declares none', function () {
+    expect(new PageParser()->parse(page('minimal', url: 'https://example.de/seite'))->iconUrls)->toBeEmpty();
+});

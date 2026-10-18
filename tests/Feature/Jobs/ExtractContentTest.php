@@ -81,6 +81,7 @@ test('a page is read and its image is stored as thumbnails and preview', functio
         ->toBe([
             'site_name' => 'Bake Club',
             'favicon_url' => 'https://bakeclub.example/static/favicon.png',
+            'icon_urls' => ['https://bakeclub.example/static/favicon.png'],
             'lang' => 'en',
         ])
         ->and(

@@ -6,6 +6,7 @@ use App\Enums\StashType;
 use App\Enums\TokenAbility;
 use App\Jobs\DeriveCapturedImage;
 use App\Jobs\ExtractContent;
+use App\Jobs\FetchFavicon;
 use App\Jobs\IndexStash;
 use App\Models\Collection;
 use App\Models\Stash;
@@ -55,7 +56,7 @@ test('a link is saved, extraction is queued and the answer says what was made', 
             'web_url' => route('stashes.show', $stash),
         ]);
     expect($stash->user_id)->toBe($this->user->id)->and($stash->domain)->toBe('example.com');
-    Queue::assertPushedWithChain(ExtractContent::class, [IndexStash::class]);
+    Queue::assertPushedWithChain(ExtractContent::class, [FetchFavicon::class, IndexStash::class]);
 });
 
 test('the same link again answers 200 with the stash that exists', function () {
@@ -196,7 +197,7 @@ test('the page text the client sends replaces the fetch', function () {
 
     Queue::assertNotPushed(ExtractContent::class);
     Queue::assertNotPushed(DeriveCapturedImage::class);
-    Queue::assertPushed(IndexStash::class, 1);
+    Queue::assertPushedWithChain(FetchFavicon::class, [IndexStash::class]);
 });
 
 test('the JSON-LD the client sends says what the page is and what it costs', function () {
@@ -242,7 +243,7 @@ test('without the page text the server still fetches the page', function () {
     expect(Stash::query()->sole()->meta)
         ->toBe(['site_name' => 'Example']);
     expect(StashEnrichment::query()->count())->toBe(0);
-    Queue::assertPushedWithChain(ExtractContent::class, [IndexStash::class]);
+    Queue::assertPushedWithChain(ExtractContent::class, [FetchFavicon::class, IndexStash::class]);
 });
 
 test('an image address from the client is fetched by a job, before nothing else', function () {
@@ -251,7 +252,7 @@ test('an image address from the client is fetched by a job, before nothing else'
         'capture' => ['content_markdown' => 'text', 'image_url' => 'https://example.com/og.jpg'],
     ])->assertCreated();
 
-    Queue::assertPushedWithChain(DeriveCapturedImage::class, [IndexStash::class]);
+    Queue::assertPushedWithChain(DeriveCapturedImage::class, [FetchFavicon::class, IndexStash::class]);
     Queue::assertNotPushed(ExtractContent::class);
     expect(Stash::query()->sole()->meta['image_url'])->toBe('https://example.com/og.jpg');
 });
@@ -288,7 +289,7 @@ test('picture bytes from the client are stored and win over the address', functi
         ->toBe(['og', 'screenshot'])
         ->and($stash->meta['client_picture'])
         ->toBeTrue();
-    Queue::assertPushedWithChain(DeriveCapturedImage::class, [IndexStash::class]);
+    Queue::assertPushedWithChain(DeriveCapturedImage::class, [FetchFavicon::class, IndexStash::class]);
 });
 
 test('a file that is no image is refused', function (string $field, string $bytes) {

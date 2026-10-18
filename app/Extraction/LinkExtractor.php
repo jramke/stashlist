@@ -78,6 +78,7 @@ final readonly class LinkExtractor
             meta: array_filter([
                 'site_name' => $page->siteName,
                 'favicon_url' => $page->faviconUrl,
+                'icon_urls' => $page->iconUrls,
                 'lang' => $page->language,
                 'price' => $page->price?->toArray(),
             ]),

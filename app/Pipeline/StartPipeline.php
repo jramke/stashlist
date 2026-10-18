@@ -12,6 +12,7 @@ use App\Enums\FileRole;
 use App\Enums\StashType;
 use App\Jobs\DeriveCapturedImage;
 use App\Jobs\ExtractContent;
+use App\Jobs\FetchFavicon;
 use App\Jobs\GenerateEmbedding;
 use App\Jobs\GenerateEnrichment;
 use App\Jobs\IndexStash;
@@ -43,13 +44,18 @@ final class StartPipeline
      */
     public function restart(Stash $stash): void
     {
-        $this->run($stash, $this->isExtractable($stash) ? [ExtractContent::forced($stash->id, $stash->user_id)] : []);
+        $this->run(
+            $stash,
+            $this->isExtractable($stash)
+                ? [ExtractContent::forced($stash->id, $stash->user_id), new FetchFavicon($stash->id, $stash->user_id)]
+                : [],
+        );
     }
 
     /**
      * The jobs that look at what the stash points to, in order.
      *
-     * @return list<DeriveCapturedImage|ExtractContent>
+     * @return list<DeriveCapturedImage|ExtractContent|FetchFavicon>
      */
     private function lookAt(Stash $stash, ?CapturedPage $captured): array
     {
@@ -65,6 +71,11 @@ final class StartPipeline
 
         if ($captured === null || ! $captured->hasContent()) {
             $jobs[] = new ExtractContent($stash->id, $stash->user_id);
+        }
+
+        // After the page has been read: it says where its icons are.
+        if ($stash->type === StashType::Link) {
+            $jobs[] = new FetchFavicon($stash->id, $stash->user_id);
         }
 
         return $jobs;
@@ -113,7 +124,7 @@ final class StartPipeline
     }
 
     /**
-     * @param  list<DeriveCapturedImage|ExtractContent>  $lookAt
+     * @param  list<DeriveCapturedImage|ExtractContent|FetchFavicon>  $lookAt
      */
     private function run(Stash $stash, array $lookAt): void
     {

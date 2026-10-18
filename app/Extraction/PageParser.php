@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace App\Extraction;
 
 use Dom\HTMLDocument;
-use GuzzleHttp\Psr7\Uri;
-use GuzzleHttp\Psr7\UriResolver;
-use InvalidArgumentException;
 
 /**
  * Reads the metadata of a fetched HTML page (Open Graph, Twitter cards, plain meta tags, icons) and its
@@ -38,6 +35,7 @@ final class PageParser
             text: ReadableText::from($html),
             schemaTypes: $structured->types(),
             price: Offers::priceIn($structured->nodes) ?? MarkupPrice::of($document),
+            iconUrls: PageIcons::of($document, $response->url),
         );
     }
 
@@ -79,17 +77,7 @@ final class PageParser
      */
     private function absolute(string $base, ?string $reference): ?string
     {
-        if ($reference === null || trim($reference) === '') {
-            return null;
-        }
-
-        try {
-            $url = (string)UriResolver::resolve(new Uri($base), new Uri(trim($reference)));
-        } catch (InvalidArgumentException) {
-            return null;
-        }
-
-        return preg_match('#^https?://#i', $url) === 1 ? $url : null;
+        return AbsoluteUrl::of($base, $reference);
     }
 
     private function limit(?string $value, int $characters): ?string

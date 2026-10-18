@@ -39,6 +39,25 @@ final class Images
     }
 
     /**
+     * An .ico with one square picture of each size.
+     */
+    public static function ico(int ...$sizes): string
+    {
+        $icon = new Imagick;
+
+        foreach ($sizes as $size) {
+            $frame = new Imagick;
+            $frame->newImage($size, $size, new ImagickPixel('red'));
+            $frame->setImageFormat('ico');
+            $icon->addImage($frame);
+        }
+
+        $icon->setFormat('ico');
+
+        return $icon->getImagesBlob();
+    }
+
+    /**
      * A JPEG with a minimal EXIF block that carries a GPS latitude.
      */
     public static function jpegWithGps(): string

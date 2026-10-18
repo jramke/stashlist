@@ -15,4 +15,7 @@ enum FileRole: string
     case Preview = 'preview';
     case Screenshot = 'screenshot';
     case Og = 'og';
+
+    /** The icon of the site a link points to, made small, from the site itself. */
+    case Favicon = 'favicon';
 }
