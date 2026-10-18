@@ -139,6 +139,6 @@ final class StashController extends Controller
             undoUrl: route('stashes.deletion.destroy', $stash, absolute: false),
         )->flash();
 
-        return to_route('stashes.index');
+        return $this->backToFeed();
     }
 }

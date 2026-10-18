@@ -24,6 +24,6 @@ final class StashDeletionController extends Controller
 
         ToastData::success(Lang::string('Restored.'))->flash();
 
-        return to_route('stashes.index');
+        return $this->backToFeed();
     }
 }

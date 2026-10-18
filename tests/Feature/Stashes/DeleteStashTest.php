@@ -49,6 +49,32 @@ test('deleting starts an undo window and the stash is still there', function () 
         ->toBeTrue();
 });
 
+test('deleting from the feed comes back to the feed with its search, deleting from the stash page to the plain feed', function () {
+    $this
+        ->actingAs($this->user)
+        ->from('/stashes?q=flour&type=note')
+        ->delete("/stashes/{$this->stash->id}")
+        ->assertRedirect('/stashes?q=flour&type=note');
+
+    $this
+        ->actingAs($this->user)
+        ->from("/stashes/{$this->stash->id}")
+        ->delete("/stashes/{$this->stash->id}")
+        ->assertRedirect('/stashes');
+
+    $this
+        ->actingAs($this->user)
+        ->from('https://elsewhere.example/stashes')
+        ->delete("/stashes/{$this->stash->id}/deletion")
+        ->assertRedirect('/stashes');
+
+    $this
+        ->actingAs($this->user)
+        ->from('/stashes?q=flour')
+        ->delete("/stashes/{$this->stash->id}/deletion")
+        ->assertRedirect('/stashes?q=flour');
+});
+
 test('a stash in its undo window is gone from the feed and its page, and comes back with the undo', function () {
     $other = Stash::factory()->for($this->user)->create(['title' => 'Stays']);
     $titles = fn () => array_column(
