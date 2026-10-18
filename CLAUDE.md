@@ -31,7 +31,7 @@ ddev artisan stashlist:reembed [--to=text_v2] [--user=ID] [--dry-run]   # embed 
 ddev artisan stashlist:reconcile-index [--dry-run]   # remove ghost documents, queue missing ones, list failed index tasks
 ddev artisan stashlist:small-thumbs [--user=ID] [--dry-run]   # make the small (400 px) thumbnail of pictures processed before it existed (run once after deploying it)
 ddev artisan stashlist:favicons [--user=ID] [--dry-run]   # queue the fetch of the site icon of every link that has none (run once after deploying it; new links get theirs in the pipeline)
-node scripts/make-icons.mjs   # on the HOST (it drives the Chrome installed on the Mac): makes public/favicon.png|ico, public/icons/*, public/og.png from public/favicon.svg, the one source of the app icon
+node scripts/make-icons.mjs   # on the HOST (it drives the Chrome installed on the Mac): makes public/favicon.png|ico, public/icons/*, public/og.png, extension/public/icon/* and raycast/assets/extension-icon.png from public/favicon.svg, the one source of the app icon
 ddev artisan stashlist:search-eval --user=ID    # score the search on your own queries (storage/app/search-eval.json)
 ddev artisan stashlist:search-spike --docs=1000000   # measure the engine on synthetic documents with vectors
 ddev npm run build && ddev npm run check:bundle   # the JavaScript of a first visit to the feed must stay under 170 KiB gzipped (CI runs it too; 150 until the zag machines, see docs/PROGRESS.md)

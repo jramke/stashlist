@@ -13,6 +13,8 @@ The zips land in `extension/.output/`: `stashlist-extension-<version>-chrome.zip
 
 The listing already exists: ID `flpkpkopodpmfiobdcdhffgphjibolka`. Upload the new zip to that item from the same developer account. Keep the name, refresh description, screenshots, privacy policy URL and the permission texts below. The new permissions are narrower than the old manifest (which ran a script on every page), so users get no new consent prompt.
 
+The icons are drawn from `public/favicon.svg` by `node scripts/make-icons.mjs` (on the Mac), which writes `extension/public/icon/{16,32,48,128}.png`; build the zip after it. The 128 px file in the package is the store icon, so the update brings the new one. The screenshots (below) and the promo tiles the listing may have (small 440 x 280, marquee 1400 x 560) still show the old mark and the old logo of the web app: take them again. Google's image guide asks for the 128 px icon with the artwork at 96 px inside 16 px of transparent padding; ours fills the canvas, as the old one did.
+
 To get the same extension ID in an unpacked build, put the listing's public key (developer dashboard, Package, "View public key") into the manifest as `key` in `extension/wxt.config.ts`. Nobody but you can fetch it.
 
 ### Permission justifications
