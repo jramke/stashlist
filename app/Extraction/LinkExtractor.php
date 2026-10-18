@@ -35,11 +35,15 @@ final readonly class LinkExtractor
      */
     public function extract(Stash $stash, ?string $previousHash): ?ExtractionResult
     {
-        $response = $this->http->get((string)$stash->url, [
-            'text/html' => self::PAGE_LIMIT,
-            'application/xhtml+xml' => self::PAGE_LIMIT,
-            'image/*' => self::IMAGE_LIMIT,
-        ]);
+        try {
+            $response = $this->http->get((string)$stash->url, [
+                'text/html' => self::PAGE_LIMIT,
+                'application/xhtml+xml' => self::PAGE_LIMIT,
+                'image/*' => self::IMAGE_LIMIT,
+            ]);
+        } catch (FetchFailed $failure) {
+            return $this->otherThing($stash, $failure) ?? throw $failure;
+        }
 
         $hash = hash(algo: 'sha256', data: $response->body);
 
@@ -81,6 +85,35 @@ final readonly class LinkExtractor
             description: $page->description,
             text: $page->text,
             colors: $image?->colors,
+        );
+    }
+
+    /**
+     * A link to something that is not a page or a picture (a PDF, a spreadsheet, a video file) is worth keeping as
+     * it is: a video file is a video, anything else a file named as its address names it. Nothing failed. A
+     * response that does not say what it is stays a failure.
+     */
+    private function otherThing(Stash $stash, FetchFailed $failure): ?ExtractionResult
+    {
+        $type = $failure->mediaType;
+
+        if ($failure->reason !== 'unsupported_type' || $type === null || $type === 'unknown') {
+            return null;
+        }
+
+        $hash = hash(algo: 'sha256', data: (string)$stash->url.$type);
+
+        if (str_starts_with($type, 'video/')) {
+            return new ExtractionResult(hash: $hash, subtype: 'video', meta: ['mime' => $type]);
+        }
+
+        $name = basename((string)parse_url((string)$stash->url, PHP_URL_PATH));
+
+        return new ExtractionResult(
+            hash: $hash,
+            type: StashType::File,
+            meta: ['mime' => $type],
+            title: $name === '' ? null : mb_substr(rawurldecode($name), start: 0, length: 200),
         );
     }
 

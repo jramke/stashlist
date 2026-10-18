@@ -1,0 +1,40 @@
+{
+    "colors": [
+        "#fff",
+        "#FFFFFF",
+        "#f80c",
+        "#ff8800cc",
+        "rgb(230, 57, 70)",
+        "rgba(230, 57, 70, 0.5)",
+        "rgb(230 57 70)",
+        "rgb(230 57 70 / 50%)",
+        "hsl(355, 78%, 56%)",
+        "hsl(355deg 78% 56%)",
+        "hsla(355, 78%, 56%, .5)",
+        "hwb(355 10% 20%)",
+        "lab(52% 40 20)",
+        "lch(52% 45 30)",
+        "oklab(0.63 0.2 0.1)",
+        "oklch(0.7, 50%, 120)",
+        "oklch(0.7 0.1 200)",
+        "oklch(70% 0.1 200 / 0.5)",
+        "oklch(70% none 200)"
+    ],
+    "text": [
+        "red",
+        "tomato",
+        "salmon",
+        "Rebeccapurple",
+        "snow",
+        "sourdough",
+        "#12345",
+        "#ggg",
+        "rgb(1, 2)",
+        "rgb(1, 2, 3, 4, 5)",
+        "rgb(a, b, c)",
+        "hsl(1 2 3",
+        "color(srgb 1 0 0)",
+        "remember to call mum",
+        "oklch"
+    ]
+}

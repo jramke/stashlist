@@ -252,10 +252,7 @@ test('permanent failures mark the stash and keep it', function (Response|string 
 })->with([
     'page is gone' => [fn () => new Response(404, ['Content-Type' => 'text/html'], 'nope'), 'fetch_gone'],
     'host is private' => ['blocked', 'fetch_blocked'],
-    'unsupported type' => [
-        fn () => new Response(200, ['Content-Type' => 'application/pdf'], '%PDF'),
-        'unsupported_type',
-    ],
+    'a response that does not say what it is' => [fn () => new Response(200, [], 'who knows'), 'unsupported_type'],
     'text served as image' => [
         fn () => new Response(200, ['Content-Type' => 'image/png'], 'not a png'),
         'unsupported_type',
@@ -269,6 +266,48 @@ test('permanent failures mark the stash and keep it', function (Response|string 
         ),
         'image_unreadable',
     ],
+]);
+
+test('a link to a PDF is a file, named as its address names it, and nothing failed', function () {
+    $stash = link_stash('https://bakeclub.example/files/Sourdough%20guide.pdf?download=1');
+    $stash->forceFill(['title' => null])->save();
+    FakeWeb::install(DNS, [new Response(200, ['Content-Type' => 'application/pdf'], '%PDF')]);
+
+    dispatch(new ExtractContent($stash->id, $stash->user_id));
+
+    $fresh = $stash->fresh();
+
+    expect($fresh->type)
+        ->toBe(StashType::File)
+        ->and(StashEnrichment::findOrFail($stash->id)->title)
+        ->toBe('Sourdough guide.pdf')
+        ->and($fresh->meta['mime'])
+        ->toBe('application/pdf')
+        ->and($fresh->ai_status)
+        ->not
+        ->toBe(AiStatus::Failed)
+        ->and($fresh->ai_error)
+        ->toBeNull();
+});
+
+test('a link to a video file stays a link and is a video, and other things are files', function (
+    string $type,
+    ?string $subtype,
+    StashType $expected,
+) {
+    $stash = link_stash('https://bakeclub.example/media/thing');
+    FakeWeb::install(DNS, [new Response(200, ['Content-Type' => $type], 'bytes')]);
+
+    dispatch(new ExtractContent($stash->id, $stash->user_id));
+
+    $fresh = $stash->fresh();
+
+    expect($fresh->type)->toBe($expected)->and($fresh->subtype)->toBe($subtype);
+})->with([
+    'a video file' => ['video/mp4', 'video', StashType::Link],
+    'a spreadsheet' => ['text/csv', null, StashType::File],
+    'an archive' => ['application/zip', null, StashType::File],
+    'a sound' => ['audio/mpeg', null, StashType::File],
 ]);
 
 test('a server error is tried again later, not marked as failed', function () {

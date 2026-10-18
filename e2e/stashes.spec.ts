@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 import { box, capture, drainQueue, filterBy, menu, register } from './support';
 
 /** The card of a stash in the feed, found by what it says: what it is, and its title or its text. */
@@ -397,6 +398,33 @@ test('pressing a card while the focus is elsewhere does not scroll the page to t
 
     await page.mouse.move(180, 20);
     await page.mouse.up();
+});
+
+test('the box and the server agree on what is a color: written out, and a color name is a word', async ({
+    page,
+}) => {
+    // The samples the server's classifier is tested with.
+    const samples = JSON.parse(
+        readFileSync('tests/fixtures/input-colors.json', 'utf8'),
+    ) as { colors: string[]; text: string[] };
+
+    await register(page);
+
+    for (const color of samples.colors) {
+        await box(page).fill(color);
+        await expect(
+            page.getByRole('button', { name: /Stash color/ }),
+            color,
+        ).toBeVisible();
+    }
+
+    for (const text of samples.text) {
+        await box(page).fill(text);
+        await expect(
+            page.getByRole('button', { name: /Stash note/ }),
+            text,
+        ).toBeVisible();
+    }
 });
 
 test('a link to a private address fails safely, shows it on the card and can be tried again', async ({

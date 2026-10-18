@@ -15,6 +15,8 @@ final class FetchFailed extends RuntimeException
         string $message,
         public readonly string $reason,
         public readonly bool $retryable,
+        /** The media type that was refused, for a response of a type we do not read. */
+        public readonly ?string $mediaType = null,
     ) {
         parent::__construct($message);
     }
@@ -38,7 +40,12 @@ final class FetchFailed extends RuntimeException
 
     public static function unsupportedType(string $type): self
     {
-        return new self("Unsupported content type {$type}.", reason: 'unsupported_type', retryable: false);
+        return new self(
+            "Unsupported content type {$type}.",
+            reason: 'unsupported_type',
+            retryable: false,
+            mediaType: $type,
+        );
     }
 
     public static function tooManyRedirects(): self

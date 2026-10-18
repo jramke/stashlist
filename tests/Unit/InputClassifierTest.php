@@ -32,7 +32,7 @@ test('input is classified', function (string $input, StashType $type, string $va
     'rgba color' => ['rgba(230, 57, 70, 0.5)', StashType::Color, 'rgba(230, 57, 70, 0.5)'],
     'hsl color' => ['hsl(355, 78%, 56%)', StashType::Color, 'hsl(355, 78%, 56%)'],
     'oklch color' => ['oklch(0.7, 50%, 120)', StashType::Color, 'oklch(0.7, 50%, 120)'],
-    'named color' => ['Rebeccapurple', StashType::Color, 'rebeccapurple'],
+    'a color name is a word' => ['Rebeccapurple', StashType::Note, 'Rebeccapurple'],
     'plain text' => ['remember to call mum', StashType::Note, 'remember to call mum'],
     'text containing a url' => [
         'read https://example.com/post later',
@@ -57,4 +57,21 @@ test('empty input is an empty note', function () {
     $classified = new InputClassifier()->classify("  \n ");
 
     expect($classified->type)->toBe(StashType::Note)->and($classified->value)->toBeEmpty();
+});
+
+test('what counts as a color is the same here and in the box', function () {
+    /** @var array{colors: list<string>, text: list<string>} $samples */
+    $samples = json_decode(
+        (string)file_get_contents(dirname(__DIR__).'/fixtures/input-colors.json'),
+        associative: true,
+    );
+    $classifier = new InputClassifier;
+
+    foreach ($samples['colors'] as $color) {
+        expect($classifier->classify($color)->type)->toBe(StashType::Color, $color);
+    }
+
+    foreach ($samples['text'] as $text) {
+        expect($classifier->classify($text)->type)->toBe(StashType::Note, $text);
+    }
 });
