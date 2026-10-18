@@ -10,6 +10,7 @@ use App\Extraction\DerivedImage;
 use App\Extraction\FetchFailed;
 use App\Extraction\ImageExtractor;
 use App\Extraction\SafeHttp;
+use App\Images\ColorBuckets;
 use App\Images\InvalidImage;
 use App\Models\Stash;
 use App\Models\StashEnrichment;
@@ -83,7 +84,12 @@ final class DeriveCapturedImage implements ShouldQueue
 
         StashEnrichment::query()->updateOrCreate(
             ['stash_id' => $stash->id],
-            ['user_id' => $stash->user_id, 'colors' => $derived->colors],
+            [
+                'user_id' => $stash->user_id,
+                'colors' => $derived->colors,
+                // The color filter and the search read the names, so a picture the client sent is found by them too.
+                'color_names' => ColorBuckets::values($derived->colors),
+            ],
         );
     }
 

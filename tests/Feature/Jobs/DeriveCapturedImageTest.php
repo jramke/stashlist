@@ -51,6 +51,9 @@ test('the picture the client sent becomes thumbnails and preview, and its colors
         ->toBe(['og', 'preview', 'thumb', 'thumb_small'])
         ->and(array_column((array)StashEnrichment::query()->findOrFail($this->stash->id)->colors, 'hex'))
         ->toContain('#ff0000')
+        // The color filter and the search read the names.
+        ->and(StashEnrichment::query()->findOrFail($this->stash->id)->color_names)
+        ->toContain('red', 'blue')
         ->and($web->requestCount())
         ->toBe(0);
 });

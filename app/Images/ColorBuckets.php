@@ -41,6 +41,17 @@ final class ColorBuckets
     }
 
     /**
+     * The same names as the strings the database and the search index keep.
+     *
+     * @param  list<array{hex: string, pct: float|int}>|null  $colors
+     * @return list<string>
+     */
+    public static function values(?array $colors): array
+    {
+        return array_map(static fn (ColorName $name): string => $name->value, self::names($colors));
+    }
+
+    /**
      * The name of one color. Null for something that is not a hex color.
      */
     public static function nameOf(string $hex): ?ColorName
