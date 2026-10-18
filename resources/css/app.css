@@ -5,8 +5,6 @@
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
-@custom-variant dark (&:is(.dark *));
-
 @theme {
     --font-sans:
         'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
@@ -44,10 +42,22 @@
     --color-border: var(--border);
     --color-input: var(--input);
     --color-ring: var(--ring);
+
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+
+    /* The three widths of the content grid (see `content-grid` below). */
+    --spacing-reading: 38rem;
+    --spacing-breakout: 52rem;
+    --spacing-breakout-lg: 70rem;
+
+    --animate-stash-in: stash-in 280ms var(--ease-out) both;
+    --animate-chip-in: chip-in 140ms var(--ease-out) both;
+    --animate-note-in: note-in 200ms var(--ease-out) both;
+    --animate-panel-in: panel-in 160ms var(--ease-out) both;
 }
 
 :root {
-    --background: oklch(1 0 0);
+    --background: oklch(0.985 0.002 95);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.145 0 0);
@@ -63,34 +73,11 @@
     --accent-foreground: oklch(0.205 0 0);
     --destructive: oklch(0.577 0.245 27.325);
     --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
+    --border: oklch(0.145 0 0 / 0.1);
+    --input: oklch(0.145 0 0 / 0.14);
     --ring: oklch(0.708 0 0);
     --radius: 0.625rem;
     color-scheme: light;
-}
-
-.dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
-    color-scheme: dark;
 }
 
 @layer base {
@@ -101,68 +88,315 @@
     body {
         @apply bg-background text-foreground;
     }
-}
 
-/* The hero of the front page (components/hero.tsx): icons that float, burst when clicked and fly into the vault. */
-@keyframes hero-float {
-    0%,
-    100% {
-        translate: 0 0;
-    }
-    50% {
-        translate: 0 -6px;
+    h1,
+    h2 {
+        text-wrap: balance;
     }
 }
 
-@keyframes hero-poof {
-    0% {
-        scale: 1;
-        opacity: 1;
-        box-shadow: 0 0 0 0
-            color-mix(in oklab, var(--foreground) 35%, transparent);
-    }
-    40% {
-        scale: 1.25;
-        opacity: 1;
-        box-shadow: 0 0 0 14px
-            color-mix(in oklab, var(--foreground) 0%, transparent);
-    }
-    100% {
-        scale: 0.2;
-        opacity: 0;
-        box-shadow: 0 0 0 0 transparent;
-        translate: var(--hero-dx, 0) var(--hero-dy, 0);
-    }
-}
-
-@keyframes hero-shimmer {
-    0% {
-        box-shadow: inset 0 0 0 0
-            color-mix(in oklab, var(--foreground) 0%, transparent);
-    }
-    40% {
-        box-shadow: inset 0 0 40px 0
-            color-mix(in oklab, var(--foreground) 22%, transparent);
-    }
-    100% {
-        box-shadow: inset 0 0 0 0
-            color-mix(in oklab, var(--foreground) 0%, transparent);
-    }
-}
-
-@keyframes hero-return {
+/* The motion of the app (plan: nothing that is used all day animates). A new stash lands in the feed, a word
+   becomes a chip, a short note replaces the last one, a rarely opened panel fades up. */
+@keyframes stash-in {
     from {
-        scale: 0.2;
         opacity: 0;
+        transform: translateY(10px) scale(0.98);
     }
-    to {
-        scale: 1;
-        opacity: 1;
+}
+
+@keyframes chip-in {
+    from {
+        opacity: 0;
+        transform: scale(0.88);
+    }
+}
+
+@keyframes note-in {
+    from {
+        opacity: 0;
+        filter: blur(2px);
+        transform: translateY(3px);
+    }
+}
+
+@keyframes panel-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px) scale(0.98);
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .hero-motion {
-        animation: none !important;
+    .animate-stash-in,
+    .animate-chip-in,
+    .animate-note-in,
+    .animate-panel-in {
+        animation-name: fade-in;
+    }
+}
+
+/* A button with a little body: a lit top edge, a gradient that is lighter on top, and an edge a shade lighter
+   than the face. Hover lightens it, pressing sinks the highlight and the whole button by a hair. The colors are
+   registered so the gradient fades between states instead of jumping. Variants set --btn-base and the mix. */
+@property --btn-bg {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: transparent;
+}
+
+@property --btn-lift {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 1px;
+}
+
+@layer components {
+    .btn-3d {
+        --btn-bg: var(--btn-base);
+        --btn-lift: 1px;
+        position: relative;
+        isolation: isolate;
+        background-color: var(--btn-bg);
+        border-color: var(--btn-edge);
+        box-shadow: var(--btn-shadow, none);
+        transition:
+            --btn-bg 150ms var(--ease-out),
+            --btn-lift 120ms var(--ease-out),
+            border-color 150ms var(--ease-out),
+            box-shadow 150ms var(--ease-out),
+            color 150ms var(--ease-out),
+            transform 120ms var(--ease-out);
+    }
+
+    .btn-3d::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        border-radius: inherit;
+        pointer-events: none;
+        box-shadow: inset 0 var(--btn-lift) 0 0 var(--btn-shine);
+        background: linear-gradient(to top, var(--btn-from), var(--btn-to));
+        transition: opacity 150ms var(--ease-out);
+    }
+
+    .btn-3d:active:not(:disabled) {
+        --btn-bg: color-mix(
+            in oklab,
+            var(--btn-base),
+            var(--btn-mix) var(--btn-press)
+        );
+        --btn-lift: 0px;
+        transform: scale(0.98);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        .btn-3d:hover:not(:disabled):not(:active) {
+            --btn-bg: color-mix(
+                in oklab,
+                var(--btn-base),
+                var(--btn-mix) var(--btn-hover)
+            );
+        }
+    }
+
+    /* Dark faces: lit from above, so the top edge and the top of the gradient are lighter. */
+    .btn-default,
+    .btn-destructive {
+        --btn-mix: white;
+        --btn-hover: 8%;
+        --btn-press: 12%;
+        --btn-edge: color-mix(in oklab, var(--btn-bg), white 20%);
+        --btn-shine: color-mix(in oklab, var(--btn-bg), white 35%);
+        --btn-from: var(--btn-bg);
+        --btn-to: color-mix(in oklab, var(--btn-bg), white 20%);
+        --btn-shadow: 0 1px 2px oklch(0.145 0 0 / 0.18);
+    }
+
+    .btn-default {
+        --btn-base: var(--primary);
+        color: var(--primary-foreground);
+    }
+
+    .btn-destructive {
+        --btn-base: var(--destructive);
+        color: white;
+    }
+
+    /* Light faces: white paper with a soft edge and a hairline shadow. */
+    .btn-secondary,
+    .btn-outline,
+    .btn-ghost {
+        --btn-base: oklch(1 0 0);
+        --btn-mix: black;
+        --btn-hover: 2.5%;
+        --btn-press: 5%;
+        --btn-edge: oklch(0.145 0 0 / 0.16);
+        --btn-shine: oklch(1 0 0);
+        --btn-from: color-mix(in oklab, var(--btn-bg), black 4%);
+        --btn-to: var(--btn-bg);
+        --btn-shadow: 0 1px 2px oklch(0.145 0 0 / 0.08);
+        color: var(--foreground);
+    }
+
+    /* A ghost has no body until it is pointed at or focused. */
+    .btn-ghost:not(:hover, :focus-visible, [aria-expanded='true']) {
+        --btn-bg: transparent;
+        --btn-shadow: none;
+        border-color: transparent;
+        background-color: transparent;
+    }
+
+    .btn-ghost:not(:hover, :focus-visible, [aria-expanded='true'])::after {
+        opacity: 0;
+    }
+
+    @media (hover: none) {
+        .btn-ghost:not(:focus-visible, :active, [aria-expanded='true']) {
+            --btn-bg: transparent;
+            --btn-shadow: none;
+            border-color: transparent;
+            background-color: transparent;
+        }
+
+        .btn-ghost:not(:focus-visible, :active, [aria-expanded='true'])::after {
+            opacity: 0;
+        }
+    }
+
+    .btn-ghost {
+        color: var(--muted-foreground);
+    }
+
+    @media (hover: hover) {
+        .btn-ghost:hover {
+            color: var(--foreground);
+        }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn-3d,
+    .btn-3d::after {
+        transition-duration: 0.01ms;
+    }
+
+    .btn-3d:active:not(:disabled) {
+        transform: none;
+    }
+}
+
+/* The grid of the public pages. Text sits in the middle column at reading width; a block can ask for more room
+   with `breakout` or `breakout-lg`, or for all of it with `full-width`. */
+@utility content-grid {
+    --content-grid-padding: 2rem;
+    --breakout-size: calc(
+        (var(--spacing-breakout) - var(--spacing-reading)) / 2
+    );
+    --breakout-lg-size: calc(
+        (var(--spacing-breakout-lg) - var(--spacing-reading)) / 2
+    );
+    display: grid;
+    grid-template-columns:
+        [full-width-start] minmax(var(--content-grid-padding), 1fr)
+        [breakout-lg-start] minmax(0, var(--breakout-lg-size))
+        [breakout-start] minmax(0, var(--breakout-size))
+        [content-start]
+        min(100% - (var(--content-grid-padding) * 2), var(--spacing-reading))
+        [content-end]
+        minmax(0, var(--breakout-size)) [breakout-end]
+        minmax(0, var(--breakout-lg-size)) [breakout-lg-end]
+        minmax(var(--content-grid-padding), 1fr) [full-width-end];
+
+    /* Weightless, so `breakout` and the others win whatever the order of the rules. */
+    :where(& > *) {
+        grid-column: content;
+    }
+}
+
+@utility breakout {
+    grid-column: breakout;
+}
+
+@utility breakout-lg {
+    grid-column: breakout-lg;
+}
+
+@utility full-width {
+    grid-column: full-width;
+}
+
+/* One size of type on the public pages: the hierarchy is weight, color and space, never size. Unlayered on
+   purpose, so it beats the size utilities of every component placed inside. */
+.one-size {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+}
+
+.one-size * {
+    font-size: inherit;
+    line-height: inherit;
+}
+
+/* The vault of the front page: icons that float, puff into the logo when pressed and fly into it. */
+@keyframes float {
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(var(--float-from, -2deg)) scale(1);
+    }
+    50% {
+        transform: translate(var(--float-x, 3px), -5px)
+            rotate(var(--float-to, 4deg)) scale(var(--float-scale, 1.06));
+    }
+}
+
+@keyframes puff {
+    from {
+        opacity: 0.9;
+        transform: translate(-50%, -50%) scale(0.3);
+    }
+    to {
+        opacity: 0;
+        transform: translate(
+                calc(-50% + var(--puff-x)),
+                calc(-50% + var(--puff-y))
+            )
+            scale(1.5);
+    }
+}
+
+@keyframes logo-in {
+    from {
+        opacity: 0;
+        transform: scale(0.4);
+    }
+    60% {
+        transform: scale(1.12);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@theme {
+    --animate-float: float var(--float-duration, 2.6s) ease-in-out infinite;
+    --animate-puff: puff 520ms var(--ease-out) forwards;
+    --animate-logo-in: logo-in 320ms var(--ease-out) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-float {
+        animation: none;
+    }
+
+    .animate-puff {
+        display: none;
     }
 }

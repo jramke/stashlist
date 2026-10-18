@@ -1,4 +1,3 @@
-import { ThemeToggle } from '@/components/theme-toggle';
 import { Toaster } from '@/components/ui/sonner';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
@@ -22,12 +21,11 @@ void createInertiaApp({
         return (
             <>
                 {app}
-                <ThemeToggle className="fixed bottom-4 left-4 z-50" />
                 <Toaster />
             </>
         );
     },
     progress: {
-        color: '#4B5563',
+        color: '#a3a3a3',
     },
 });

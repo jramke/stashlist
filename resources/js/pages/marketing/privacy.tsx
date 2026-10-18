@@ -77,8 +77,7 @@ export default function Privacy({ privacy }: Props) {
                         Technical records: the web server and the application
                         log requests and errors for operating the service. A
                         session cookie keeps you signed in and a second one
-                        protects forms; your light or dark choice is stored in
-                        your browser. There is no advertising and no tracking
+                        protects forms. There is no advertising and no tracking
                         across sites.
                     </p>
                 </Section>
