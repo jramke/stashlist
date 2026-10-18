@@ -325,6 +325,41 @@ test('collections can be created, filled, renamed and removed', async ({
     await expect(page.getByLabel('Name of Pantry')).toHaveCount(0);
 });
 
+test('a chip is gone the moment it is taken off, and stays gone when a word is typed before the server answers', async ({
+    page,
+}) => {
+    await register(page);
+    await capture(page, 'buy sourdough flour');
+    await filterBy(page, 'notes');
+    await expect(
+        page.getByRole('button', { name: 'Remove Notes' }),
+    ).toBeVisible();
+    await expect(page).toHaveURL(/type=note/);
+
+    // A slow server: the next request starts before the last one is back.
+    await page.route(/\/stashes(\?|$)/, async (route) => {
+        if (route.request().headers()['x-inertia'] !== undefined) {
+            await new Promise((resolve) => setTimeout(resolve, 700));
+        }
+
+        await route.continue();
+    });
+
+    await box(page).press('Backspace');
+    // The chips follow the box at once; the server is only asked.
+    await expect(
+        page.getByRole('button', { name: 'Remove Notes' }),
+    ).toHaveCount(0, { timeout: 400 });
+
+    await box(page).fill('flour');
+    await expect(page).toHaveURL(/q=flour/);
+    await expect(page).not.toHaveURL(/type=/);
+    await expect(
+        page.getByRole('button', { name: 'Remove Notes' }),
+    ).toHaveCount(0);
+    await expect(card(page, /buy sourdough flour/)).toBeVisible();
+});
+
 test('a link to a private address fails safely, shows it on the card and can be tried again', async ({
     page,
 }) => {

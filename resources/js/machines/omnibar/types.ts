@@ -39,12 +39,6 @@ export interface Row {
     action: RowAction;
 }
 
-/** The chips change before the server has answered; when its answer arrives (new `filters`), it wins. */
-export interface Guess {
-    base: Filters;
-    next: Filters;
-}
-
 /** What the box sends to the server to stash: the typed or dropped thing, with the chips that come along. */
 export type StashPayload = {
     input?: string;
@@ -53,11 +47,11 @@ export type StashPayload = {
     collection_ids: number[];
 };
 
-/** The box asks the page for the feed; the page answers with `failed` if the request did not come back. */
+/** The box asks the page for the feed; the page says `settled` when the request is over, whatever came of it. */
 export interface VisitRequest {
     url: string;
     replace: boolean;
-    failed: () => void;
+    settled: () => void;
 }
 
 /** The box asks the page to stash something; the page reports how it went. */
@@ -120,7 +114,7 @@ export type OmnibarEvent =
     | { type: 'SEARCH.FIRE'; mode: SearchMode }
     | { type: 'FILTERS.SYNC' }
     | { type: 'SHARE.SYNC' }
-    | { type: 'VISIT.FAILED' }
+    | { type: 'VISIT.END'; visit: number }
     | { type: 'STASH.SUCCESS' }
     | { type: 'STASH.FAILURE'; message: string }
     | { type: 'STASH.SETTLED' };
@@ -137,11 +131,14 @@ export interface OmnibarSchema {
         /** Something that can be stashed is being dragged over the page. */
         dragging: boolean;
         error: string | null;
-        guess: Guess | null;
+        /** The filters the box has asked for and the server has not answered yet: the chips follow them at once. */
+        guess: Filters | null;
     };
     refs: {
         /** What the feed was last asked for. An answer that echoes it is ours; anything else came from outside. */
         requested: string;
+        /** How many times the feed was asked for. A request that ends only speaks for its own number. */
+        visits: number;
         timers: number[];
         /** The request on its way carries text, which the box empties when it was saved. */
         sentText: boolean;

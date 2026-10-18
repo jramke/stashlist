@@ -23,7 +23,6 @@ import {
 import type {
     Chip,
     Filters,
-    Guess,
     OmnibarSchema,
     OmnibarState,
     Row,
@@ -86,7 +85,11 @@ function clearTimers({ refs }: P): void {
     refs.set('timers', []);
 }
 
-/** Asks for the feed with some filters changed. The query is whatever the box holds now. */
+/**
+ * Asks for the feed with some filters changed. The query is whatever the box holds now. The chips follow at once
+ * (`guess`) and the server's answer takes over when the request is over; a request that was cancelled by a newer
+ * one has nothing to say about the newer one's guess, which is what the number is for.
+ */
 function visit(
     { computed, context, prop, refs, send }: P,
     change: Partial<Filters>,
@@ -95,14 +98,16 @@ function visit(
 ): void {
     const shown = computed('shown');
     const next = { ...shown, ...change };
+    const number = refs.get('visits') + 1;
 
+    refs.set('visits', number);
     refs.set('requested', next.q ?? '');
-    context.set('guess', { base: prop('filters'), next });
+    context.set('guess', next);
 
     prop('onVisit')({
         url: feedUrl(shown, change, mode),
         replace,
-        failed: () => send({ type: 'VISIT.FAILED' }),
+        settled: () => send({ type: 'VISIT.END', visit: number }),
     });
 }
 
@@ -314,7 +319,7 @@ export const machine = createMachine<OmnibarSchema>({
             highlight: bindable<number>(() => ({ defaultValue: -1 })),
             dragging: bindable<boolean>(() => ({ defaultValue: false })),
             error: bindable<string | null>(() => ({ defaultValue: null })),
-            guess: bindable<Guess | null>(() => ({
+            guess: bindable<Filters | null>(() => ({
                 defaultValue: null,
             })),
         };
@@ -323,19 +328,14 @@ export const machine = createMachine<OmnibarSchema>({
     refs({ prop }) {
         return {
             requested: prop('filters').q ?? '',
+            visits: 0,
             timers: [],
             sentText: false,
         };
     },
 
     computed: {
-        shown: ({ context, prop }) => {
-            const guess = context.get('guess');
-
-            return guess !== null && guess.base === prop('filters')
-                ? guess.next
-                : prop('filters');
-        },
+        shown: ({ context, prop }) => context.get('guess') ?? prop('filters'),
         kind: ({ context }) => classify(context.get('text')),
         chips: ({ computed, prop }) =>
             chipsOf(computed('shown'), prop('tags'), prop('collections')),
@@ -366,7 +366,7 @@ export const machine = createMachine<OmnibarSchema>({
     on: {
         'FILTERS.SYNC': { actions: ['adoptQuery'] },
         'SHARE.SYNC': { actions: ['adoptShare'] },
-        'VISIT.FAILED': { actions: ['forgetGuess'] },
+        'VISIT.END': { actions: ['forgetGuess'] },
         'ROW.HOVER': { actions: ['highlightRow'] },
         'DRAG.OVER': { actions: ['dragOver'] },
         'DRAG.LEAVE': { actions: ['dragLeave'] },
@@ -561,8 +561,10 @@ export const machine = createMachine<OmnibarSchema>({
                     dom.getInputEl(params.scope)?.focus();
                 }
             },
-            forgetGuess({ context }) {
-                context.set('guess', null);
+            forgetGuess({ context, event, refs }) {
+                if (event.type === 'VISIT.END' && event.visit === refs.get('visits')) {
+                    context.set('guess', null);
+                }
             },
             dragOver({ context }) {
                 context.set('dragging', true);

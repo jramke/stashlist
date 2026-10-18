@@ -19,7 +19,7 @@ import { ImagePlus, Link2, Search, X } from 'lucide-react';
 import { useId } from 'react';
 
 /** Asks for the feed. The list is a merge prop (infinite scroll appends pages); a new query starts it over. */
-function visitFeed({ url, replace, failed }: VisitRequest) {
+function visitFeed({ url, replace, settled }: VisitRequest) {
     router.get(
         url,
         {},
@@ -29,8 +29,7 @@ function visitFeed({ url, replace, failed }: VisitRequest) {
             preserveState: true,
             preserveScroll: true,
             replace,
-            onCancel: failed,
-            onError: failed,
+            onFinish: settled,
         },
     );
 }
