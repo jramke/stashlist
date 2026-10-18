@@ -61,3 +61,18 @@ test('it needs an existing user and a readable dump', function () {
 
     $this->artisan('stashlist:import-old', ['dump' => OLD_DUMP_FILE])->assertFailed();
 });
+
+test('it reads a SQLite file of the old app as well as a dump', function () {
+    $file = tempnam(sys_get_temp_dir(), 'old-db');
+    new PDO("sqlite:{$file}")->exec(file_get_contents(OLD_DUMP_FILE));
+
+    try {
+        $this
+            ->artisan('stashlist:import-old', ['dump' => $file, '--user' => $this->user->id, '--old-user' => 'u1'])
+            ->assertSuccessful();
+    } finally {
+        unlink($file);
+    }
+
+    expect(Stash::query()->where('user_id', $this->user->id)->count())->toBe(4);
+});

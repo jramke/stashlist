@@ -15,7 +15,7 @@ use Illuminate\Console\Command;
 use RuntimeException;
 
 #[Signature('stashlist:import-old
-    {dump : Path to the SQL dump of the old app}
+    {dump : Path to the SQL dump or SQLite file of the old app}
     {--user= : Id of the user here who receives the saves}
     {--old-user= : Id of the user in the dump, when the dump holds several}
     {--dry-run : Only count what would be imported}')]

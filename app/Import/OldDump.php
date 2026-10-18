@@ -6,14 +6,16 @@ namespace App\Import;
 
 use Generator;
 use PDO;
+use Pdo\Sqlite;
 use PDOException;
 use RuntimeException;
 
 /**
- * Reads the old app's SQL dump (the Turso/SQLite `.dump` of its database) by loading it into a throwaway
- * in-memory SQLite database. Only the `save` table is read; users, sessions, OAuth accounts and groups in the
+ * Reads the old app's database: either a SQL dump (the Turso/SQLite `.dump`), loaded into a throwaway in-memory
+ * SQLite database, or the SQLite file itself, opened read-only. Only the `save` table is read; users, sessions, OAuth accounts and groups in the
  * dump are left alone.
  */
+// @mago-expect lint:cyclomatic-complexity
 final class OldDump
 {
     private readonly PDO $db;
@@ -23,15 +25,24 @@ final class OldDump
      */
     public function __construct(string $path)
     {
-        $sql = is_file($path) ? file_get_contents($path) : false;
+        $head = is_file($path) ? file_get_contents($path, length: 15) : false;
 
-        if ($sql === false) {
+        if ($head === false) {
             throw new RuntimeException("Cannot read the dump at {$path}.");
         }
 
         try {
-            $this->db = new PDO('sqlite::memory:', options: [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-            $this->db->exec($sql);
+            $this->db = $head === 'SQLite format 3'
+                ? new PDO("sqlite:{$path}", options: [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    Sqlite::ATTR_OPEN_FLAGS => Sqlite::OPEN_READONLY,
+                ])
+                : new PDO('sqlite::memory:', options: [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+
+            if ($head !== 'SQLite format 3') {
+                $this->db->exec((string)file_get_contents($path));
+            }
+
             $this->db->query('SELECT 1 FROM save LIMIT 1');
         } catch (PDOException $exception) {
             throw new RuntimeException(
