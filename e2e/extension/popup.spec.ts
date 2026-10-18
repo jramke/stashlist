@@ -31,8 +31,18 @@ test('the popup stashes the page with its text, a tag and a picture', async ({
     await expect(
         web.getByRole('button', { name: 'Remove bread' }),
     ).toBeVisible();
-    await web.getByText('Text of the page').click();
-    await expect(web.getByText('living culture of wild yeast')).toBeVisible();
+    // Open it, and again if the page was redrawn (it is tagged while it is read) and shut it on the way.
+    const text = web.locator('details').filter({ hasText: 'Text of the page' });
+
+    await expect(async () => {
+        if (!(await text.evaluate((node: HTMLDetailsElement) => node.open))) {
+            await text.locator('summary').click();
+        }
+
+        await expect(web.getByText('living culture of wild yeast')).toBeVisible(
+            { timeout: 1000 },
+        );
+    }).toPass({ timeout: 10_000 });
 });
 
 test('the popup knows a page that is stashed already', async ({
