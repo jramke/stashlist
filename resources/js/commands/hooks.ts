@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { actions, type Handler } from './actions';
 import type { ActionId, Scope } from './catalog';
 
@@ -9,7 +9,9 @@ import type { ActionId, Scope } from './catalog';
 export function useAction(id: ActionId, handler: Handler): void {
     const latest = useRef(handler);
 
-    useEffect(() => {
+    // A layout effect, not a passive one: the keys are heard by a listener of the document, which React does not
+    // wait for, so the handler of the render that just ended has to be in place before the next key can arrive.
+    useLayoutEffect(() => {
         latest.current = handler;
     });
 
