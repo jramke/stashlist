@@ -3,6 +3,7 @@ import { useAction, useScope } from '@/commands/hooks';
 import { AccountMenu } from '@/components/account-menu';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { ShortcutSheet } from '@/components/shortcut-sheet';
+import { trackInput } from '@/lib/input';
 import { home } from '@/routes';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -37,6 +38,7 @@ export default function AppLayout({ children }: { children?: ReactNode }) {
 
     // The keyboard: the actions of the app are bound for as long as the frame is on screen.
     useEffect(() => actions.attach(document), []);
+    useEffect(() => trackInput(), []);
     useScope('page', !onFeed);
     useScope('sheet', help);
     useAction('shortcuts.toggle', () => setHelp((value) => !value));

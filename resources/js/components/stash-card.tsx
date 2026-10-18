@@ -34,6 +34,7 @@ import {
     type LucideIcon,
 } from 'lucide-react';
 import {
+    memo,
     useId,
     useRef,
     type MouseEvent,
@@ -79,7 +80,46 @@ type Props = {
  * one line below. The picture grows a little under the pointer and when the keyboard is on the card. All of what
  * the card is doing is a machine (`machines/stash-card`); this file only draws it.
  */
-export function StashCard({
+export const StashCard = memo(Card, sameCard);
+
+/**
+ * Whether a card has anything new to show. The props a list hands in are new objects with new functions on
+ * every render, so they are compared by what they say (the attributes), not by identity: a key press in a long
+ * feed then redraws the two cards that changed and not all of them.
+ */
+function sameCard(before: Props, after: Props): boolean {
+    return (
+        before.stash === after.stash &&
+        before.fresh === after.fresh &&
+        before.highlighted === after.highlighted &&
+        before.peek === after.peek &&
+        before.inert === after.inert &&
+        before.className === after.className &&
+        sameAttributes(before.itemProps, after.itemProps)
+    );
+}
+
+function sameAttributes(
+    before: Record<string, unknown> | undefined,
+    after: Record<string, unknown> | undefined,
+): boolean {
+    if (before === undefined || after === undefined) {
+        return before === after;
+    }
+
+    const keys = Object.keys(after);
+
+    return (
+        keys.length === Object.keys(before).length &&
+        keys.every(
+            (key) =>
+                typeof after[key] === 'function' ||
+                Object.is(before[key], after[key]),
+        )
+    );
+}
+
+function Card({
     stash,
     fresh = false,
     highlighted = false,
@@ -137,7 +177,7 @@ export function StashCard({
             {...merged}
             {...(inert ? {} : { href })}
             className={cn(
-                'group/card relative block aspect-square scroll-mt-24 scroll-mb-4 overflow-hidden rounded-[1.25rem] bg-surface text-foreground transition-[background-color,box-shadow,transform] duration-150 outline-none select-none hover:bg-surface-hover active:scale-[0.985] data-[fresh]:animate-stash-in data-[highlighted]:ring-3 data-[highlighted]:ring-ring/60 data-[peek]:bg-surface-hover',
+                'group/card relative block aspect-square scroll-mt-24 scroll-mb-4 overflow-hidden rounded-[1.25rem] bg-surface text-foreground transition-[background-color,box-shadow,transform] duration-150 outline-none select-none [content-visibility:auto] hover:bg-surface-hover active:scale-[0.985] data-[fresh]:animate-stash-in data-[highlighted]:ring-3 data-[highlighted]:ring-ring/60 data-[peek]:bg-surface-hover keyboard:transition-none',
                 className,
             )}
         >
@@ -162,7 +202,7 @@ function CardBody({ api }: { api: StashCardApi }) {
         <div {...api.getSurfaceProps()} className="absolute inset-0">
             <span
                 {...api.getIndicatorProps()}
-                className="absolute top-3 left-3 z-10 text-foreground/40 transition-colors group-hover/card:text-foreground/60 group-data-[peek]/card:text-foreground/60"
+                className="absolute top-3 left-3 z-10 text-foreground/40 transition-colors group-hover/card:text-foreground/60 group-data-[peek]/card:text-foreground/60 keyboard:transition-none"
             >
                 <Indicator className="size-4" strokeWidth={1.75} />
                 <span className="sr-only">{api.indicator.label}</span>
@@ -182,7 +222,7 @@ function CardBody({ api }: { api: StashCardApi }) {
             <p
                 {...api.getTitleProps()}
                 className={cn(
-                    'absolute inset-x-3 bottom-3 truncate text-center text-[13px] leading-5 font-medium text-foreground/80 transition-colors group-hover/card:text-foreground group-data-[peek]/card:text-foreground data-[empty]:hidden',
+                    'absolute inset-x-3 bottom-3 truncate text-center text-[13px] leading-5 font-medium text-foreground/80 transition-colors group-hover/card:text-foreground group-data-[peek]/card:text-foreground data-[empty]:hidden keyboard:transition-none',
                     face.kind === 'swatch' && 'font-mono text-xs tracking-wide',
                 )}
             >
@@ -221,7 +261,7 @@ function Face({ api, face }: { api: StashCardApi; face: CardFace }) {
     return (
         <div
             {...api.getMediaProps()}
-            className="absolute inset-x-3.5 top-9 bottom-9 grid grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)] place-items-center transition-transform duration-200 ease-out group-hover/card:scale-[1.06] group-data-[peek]/card:scale-[1.06]"
+            className="absolute inset-x-3.5 top-9 bottom-9 grid grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)] place-items-center transition-transform duration-200 ease-out group-hover/card:scale-[1.06] group-data-[peek]/card:scale-[1.06] keyboard:transition-none"
         >
             {face.kind === 'photo' && <PhotoFace api={api} face={face} />}
             {face.kind === 'swatch' && (

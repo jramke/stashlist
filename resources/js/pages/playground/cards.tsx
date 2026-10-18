@@ -176,6 +176,9 @@ function LostPictures() {
     );
 }
 
+/** How many cards the live grid holds: the last one is for finding out what a long feed costs. */
+const COUNTS = [25, 100, 400] as const;
+
 const WIDTHS = {
     narrow: 'max-w-[22rem]',
     medium: 'max-w-3xl',
@@ -185,62 +188,73 @@ const WIDTHS = {
 /** The real list: one tab stop, arrows through rows and columns, Home and End, Enter. */
 function LiveGrid() {
     const [width, setWidth] = useState<keyof typeof WIDTHS>('wide');
+    const [count, setCount] = useState<(typeof COUNTS)[number]>(COUNTS[0]);
     const [opened, setOpened] = useState<number | null>(null);
-    const items = useMemo(
-        () =>
-            [
-                stash({
-                    type: 'note',
-                    title: null,
-                    body: 'buy sourdough flour',
-                }),
-                ...SUBTYPES.map((name, index) =>
-                    subtype(name, index % 2 === 0),
-                ),
-                stash({ type: 'color', title: null, body: '#e63946' }),
-                ...PLAIN_SITES.map(([title, domain]) =>
-                    stash({ title, domain, url: `https://${domain}/x` }),
-                ),
-                stash({
-                    type: 'image',
-                    title: 'IMG_2041.jpg',
-                    url: null,
-                    domain: null,
-                    ...art(900, 1200, 190),
-                }),
-                stash({ type: 'note', title: null, body: LONG_NOTE }),
-                stash({ type: 'color', title: null, body: '#264653' }),
-                stash({
-                    type: 'file',
-                    title: 'invoice-2026-10.pdf',
-                    url: null,
-                    domain: null,
-                }),
-                stash({
-                    title: 'Still being read',
-                    fetching: true,
-                    ai_status: 'pending',
-                }),
-                stash({
-                    title: 'Being tagged',
-                    tagging: true,
-                    ai_status: 'processing',
-                }),
-                stash({
-                    title: null,
-                    ai_status: 'failed',
-                    ai_error: 'The page could not be read.',
-                }),
-                stash({
-                    type: 'note',
-                    title: null,
-                    body: 'call the plumber',
-                    subtype: 'quote',
-                }),
-                // The list needs a value of its own for every item.
-            ].map((item, index) => ({ ...item, id: 9000 + index })),
+    const base = useMemo(
+        () => [
+            stash({
+                type: 'note',
+                title: null,
+                body: 'buy sourdough flour',
+            }),
+            ...SUBTYPES.map((name, index) => subtype(name, index % 2 === 0)),
+            stash({ type: 'color', title: null, body: '#e63946' }),
+            ...PLAIN_SITES.map(([title, domain]) =>
+                stash({ title, domain, url: `https://${domain}/x` }),
+            ),
+            stash({
+                type: 'image',
+                title: 'IMG_2041.jpg',
+                url: null,
+                domain: null,
+                ...art(900, 1200, 190),
+            }),
+            stash({ type: 'note', title: null, body: LONG_NOTE }),
+            stash({ type: 'color', title: null, body: '#264653' }),
+            stash({
+                type: 'file',
+                title: 'invoice-2026-10.pdf',
+                url: null,
+                domain: null,
+            }),
+            stash({
+                title: 'Still being read',
+                fetching: true,
+                ai_status: 'pending',
+            }),
+            stash({
+                title: 'Being tagged',
+                tagging: true,
+                ai_status: 'processing',
+            }),
+            stash({
+                title: null,
+                ai_status: 'failed',
+                ai_error: 'The page could not be read.',
+            }),
+            stash({
+                type: 'note',
+                title: null,
+                body: 'call the plumber',
+                subtype: 'quote',
+            }),
+        ],
         [],
     );
+    // The list needs a value of its own for every item, and more of them than there are fixtures when asked.
+    const items = useMemo(() => {
+        const list: Stash[] = [];
+
+        for (let index = 0; index < count; index++) {
+            const item = base[index % base.length];
+
+            if (item !== undefined) {
+                list.push({ ...item, id: 9000 + index });
+            }
+        }
+
+        return list;
+    }, [base, count]);
     const grid = useStashGrid(items, (id) => setOpened(id));
 
     return (
@@ -258,6 +272,16 @@ function LiveGrid() {
                         </Button>
                     ),
                 )}
+                {COUNTS.map((amount) => (
+                    <Button
+                        key={amount}
+                        size="xs"
+                        variant={count === amount ? 'default' : 'outline'}
+                        onClick={() => setCount(amount)}
+                    >
+                        {amount} cards
+                    </Button>
+                ))}
                 <span>
                     {grid.columns} columns
                     {opened !== null && ` · opened #${opened}`}
