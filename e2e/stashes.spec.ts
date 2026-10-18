@@ -1,9 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
 import { box, capture, drainQueue, filterBy, menu, register } from './support';
 
-/** The card of a stash in the feed, found by what it shows. */
+/** The card of a stash in the feed, found by what it says: what it is, and its title or its text. */
 function card(page: Page, text: string | RegExp) {
-    return page.getByRole('link', { name: text });
+    return page.getByRole('option', { name: text });
 }
 
 /** From a stash back to the feed through the link at the top. */
@@ -27,22 +27,16 @@ test('notes and colors are saved, found by search and narrowed by type', async (
     await expect(box(page)).toHaveValue('');
 
     await expect(card(page, /buy sourdough flour/)).toBeVisible();
-    await expect(
-        page.getByRole('img', { name: 'color', exact: true }),
-    ).toBeVisible();
+    await expect(page.locator('[data-card][data-type="color"]')).toBeVisible();
     drainQueue();
 
     await box(page).fill('sourdough');
     await expect(page).toHaveURL(/q=sourdough/);
     await expect(card(page, /buy sourdough flour/)).toBeVisible();
-    await expect(
-        page.getByRole('img', { name: 'color', exact: true }),
-    ).toHaveCount(0);
+    await expect(page.locator('[data-card][data-type="color"]')).toHaveCount(0);
 
     await box(page).fill('');
-    await expect(
-        page.getByRole('img', { name: 'color', exact: true }),
-    ).toBeVisible();
+    await expect(page.locator('[data-card][data-type="color"]')).toBeVisible();
 
     // "colors" is a type: Tab turns it into a chip in the box.
     await filterBy(page, 'colors');
@@ -50,9 +44,7 @@ test('notes and colors are saved, found by search and narrowed by type', async (
     await expect(
         page.getByRole('button', { name: 'Remove Colors' }),
     ).toBeVisible();
-    await expect(
-        page.getByRole('img', { name: 'color', exact: true }),
-    ).toBeVisible();
+    await expect(page.locator('[data-card][data-type="color"]')).toBeVisible();
     await expect(card(page, /buy sourdough flour/)).toHaveCount(0);
 
     // Backspace at the start takes the last chip off again.
@@ -101,7 +93,8 @@ test('a stash can be edited, tagged and found again through its tag', async ({
 
     await page.getByLabel('Add a tag').fill('Baking');
     await page.getByLabel('Add a tag').press('Enter');
-    await expect(page.getByText('Baking')).toBeVisible();
+    // Exactly: with smart features on, the model may add tags and a summary that mention baking too.
+    await expect(page.getByText('Baking', { exact: true })).toBeVisible();
 
     await toFeed(page);
     await expect(card(page, /Flour list/)).toBeVisible();
@@ -127,7 +120,9 @@ test('a stash shows the others that share its tags under "More like this"', asyn
         await card(page, text).click();
         await page.getByLabel('Add a tag').fill(tag);
         await page.getByLabel('Add a tag').press('Enter');
-        await expect(page.getByText(tag).first()).toBeVisible();
+        await expect(
+            page.getByText(tag, { exact: true }).first(),
+        ).toBeVisible();
         await toFeed(page);
     }
 
@@ -138,9 +133,7 @@ test('a stash shows the others that share its tags under "More like this"', asyn
     await expect(
         page.getByRole('link', { name: /feed the starter/ }),
     ).toBeVisible();
-    await expect(
-        page.getByRole('link', { name: /call the plumber/ }),
-    ).toHaveCount(0);
+    // Not asserted: with smart features on, stashes with a similar meaning are listed too.
 });
 
 test('a deleted stash can be brought back during the undo window', async ({
@@ -170,10 +163,10 @@ test('the feed works from the keyboard: move, open, delete, undo', async ({
     await capture(page, 'buy sourdough flour');
     await capture(page, 'call the plumber');
 
-    // The box is ready on arrival; the arrow key goes into the stashes.
+    // The box is ready on arrival; the arrow key goes into the stashes, where the first card is highlighted.
     await expect(box(page)).toBeFocused();
     await page.keyboard.press('ArrowDown');
-    await expect(page.locator('[data-card]:focus')).toHaveCount(1);
+    await expect(page.locator('[data-card][data-highlighted]')).toHaveCount(1);
 
     await page.keyboard.press('Backspace');
     await expect(page.getByText('Deleted.')).toBeVisible();
@@ -185,13 +178,71 @@ test('the feed works from the keyboard: move, open, delete, undo', async ({
     await expect(page.getByText('Restored.')).toBeVisible();
     await expect(page.locator('[data-card]')).toHaveCount(2);
 
-    // "/" comes back to the box from anywhere, Escape leaves a stash.
-    await page.locator('[data-card]').first().focus();
+    // Enter opens the highlighted card, Escape comes back, and "/" is the box again.
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(/\/stashes\/\d+$/);
     await page.keyboard.press('Escape');
     await expect(page).toHaveURL(/\/stashes$/);
     await page.keyboard.press('/');
+    await expect(box(page)).toBeFocused();
+});
+
+test('the grid is one list: arrows go through rows and columns, Home and End jump, Up leaves it', async ({
+    page,
+}) => {
+    await register(page);
+
+    for (const text of [
+        'one',
+        'two',
+        'three',
+        'four',
+        'five',
+        'six',
+        'seven',
+    ]) {
+        await capture(page, text);
+    }
+
+    const columns = await page.evaluate(
+        () =>
+            getComputedStyle(
+                document.querySelector('[data-stash-grid]')!,
+            ).gridTemplateColumns.split(' ').length,
+    );
+    expect(columns).toBeGreaterThan(1);
+
+    const highlighted = page.locator('[data-card][data-highlighted]');
+
+    // Tab from the box is one stop for the whole grid; the newest stash, the first card, is highlighted.
+    await page.keyboard.press('Tab');
+    await expect(highlighted).toHaveAttribute('aria-label', /seven/);
+
+    await page.keyboard.press('ArrowRight');
+    await expect(highlighted).toHaveAttribute('aria-label', /six/);
+
+    await page.keyboard.press('End');
+    await expect(highlighted).toHaveAttribute('aria-label', /one/);
+
+    await page.keyboard.press('Home');
+    await expect(highlighted).toHaveAttribute('aria-label', /seven/);
+
+    // A row down is `columns` cards on, when there is one.
+    await page.keyboard.press('ArrowDown');
+
+    if (columns < 7) {
+        await expect(highlighted).not.toHaveAttribute('aria-label', /seven/);
+    }
+
+    // Home, then up from the first row: back to the box.
+    await page.keyboard.press('Home');
+    await page.keyboard.press('ArrowUp');
+    await expect(box(page)).toBeFocused();
+
+    // Down again and Escape: also back to the box.
+    await page.keyboard.press('ArrowDown');
+    await expect(highlighted).toHaveCount(1);
+    await page.keyboard.press('Escape');
     await expect(box(page)).toBeFocused();
 });
 

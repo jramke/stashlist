@@ -7,6 +7,25 @@ export function focusBox(): boolean {
     return box !== null;
 }
 
+/** The list of cards, as the feed marks it. */
+const GRID = '[data-stash-grid]';
+
+/** Puts the focus on the list of cards, which highlights the first one if none is. */
+export function focusGrid(): boolean {
+    const grid = document.querySelector<HTMLElement>(GRID);
+
+    grid?.focus();
+
+    return grid !== null;
+}
+
+/** Whether the focus is in the list of cards, where the list handles the arrow keys itself. */
+export function inGrid(): boolean {
+    return (
+        document.querySelector(GRID)?.contains(document.activeElement) ?? false
+    );
+}
+
 const NOT_TEXT = [
     'button',
     'checkbox',

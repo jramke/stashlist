@@ -1,20 +1,14 @@
 import StashController from '@/actions/App/Http/Controllers/StashController';
 import { useAction, useScope } from '@/commands/hooks';
 import { Omnibar } from '@/components/omnibar';
-import { StashCard } from '@/components/stash-card';
-import { Spinner } from '@/components/ui/spinner';
+import { StashGrid } from '@/components/stash-grid';
 import { useFlashNote } from '@/hooks/use-flash-note';
-import {
-    directionOf,
-    focusCard,
-    focusedCard,
-    moveTo,
-    neighbour,
-} from '@/lib/grid';
-import { focusBox } from '@/lib/keys';
+import { onFirstRow, useStashGrid } from '@/hooks/use-stash-grid';
+import { focusBox, inGrid } from '@/lib/keys';
+import { show } from '@/routes/stashes';
 import type { Scroll } from '@/types';
-import { Head, InfiniteScroll, router, usePoll } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { Head, router, usePoll } from '@inertiajs/react';
+import { useEffect, useMemo, useState } from 'react';
 
 type Props = {
     stashes: Scroll<App.Data.StashData>;
@@ -71,36 +65,33 @@ export default function Index({ stashes, filters, tags, share }: Props) {
         return () => clearTimeout(timer);
     }, [freshAfter]);
 
-    // The keyboard in the feed (the keys are in the catalog): arrows or j and k move between the cards, Backspace
-    // deletes, Cmd+Z takes it back.
+    const visible = useMemo(
+        () => stashes.data.filter((stash) => !gone.includes(stash.id)),
+        [stashes.data, gone],
+    );
+    const grid = useStashGrid(visible, (id) => router.visit(show(id).url));
+
+    // The keyboard in the feed (the keys are in the catalog). The arrow keys, Home, End and Enter are the list's
+    // own; j and k go a row, Backspace deletes, Cmd+Z takes it back, Escape goes back to the box.
     useScope('feed');
-    useAction('card.move', (event) => {
-        const direction = directionOf(event?.key ?? '');
-
-        if (direction === undefined) {
-            return;
-        }
-
-        const card = focusedCard();
-
-        if (card === null) {
-            focusCard('first');
-        } else if (direction === 'up' && neighbour('up') === null) {
-            // Off the top row: back into the box.
+    useAction('grid.down', () => grid.api.highlightNext());
+    useAction('grid.up', () => {
+        // Up from the first row is the way back to the box.
+        if (onFirstRow(grid.api)) {
             focusBox();
         } else {
-            moveTo(neighbour(direction));
+            grid.api.highlightPrevious();
         }
     });
     useAction('card.delete', {
         run: () => {
-            const card = focusedCard();
+            const value = grid.api.highlightedValue;
 
-            if (card !== null) {
-                remove(card);
+            if (value !== null) {
+                remove(Number(value));
             }
         },
-        enabled: () => focusedCard() !== null,
+        enabled: () => inGrid() && grid.api.highlightedValue !== null,
     });
     useAction('stash.undo', {
         run: () => {
@@ -112,17 +103,16 @@ export default function Index({ stashes, filters, tags, share }: Props) {
     });
 
     /** Takes the card off the screen now and asks the server; the note in the box offers the undo. */
-    function remove(card: HTMLElement) {
-        const id = Number(card.dataset.stash);
-        // The focus goes to the card that takes its place.
-        const next =
-            neighbour('right') ??
-            neighbour('down') ??
-            neighbour('left') ??
-            neighbour('up');
+    function remove(id: number) {
+        const at = visible.findIndex((stash) => stash.id === id);
+        // The keyboard goes to the card that takes its place.
+        const next = visible[at + 1] ?? visible[at - 1];
+
+        if (next !== undefined) {
+            grid.api.highlightValue(String(next.id));
+        }
 
         setGone((ids) => [...ids, id]);
-        requestAnimationFrame(() => next?.focus());
         router.delete(StashController.destroy.url(id), {
             preserveScroll: true,
             preserveState: true,
@@ -138,7 +128,6 @@ export default function Index({ stashes, filters, tags, share }: Props) {
         filters.collection !== null ||
         filters.color !== null ||
         filters.tags.length > 0;
-    const visible = stashes.data.filter((stash) => !gone.includes(stash.id));
 
     return (
         <>
@@ -165,25 +154,13 @@ export default function Index({ stashes, filters, tags, share }: Props) {
                             : 'Nothing here yet. Paste a link, a color or a note above, or press / and start typing.'}
                     </p>
                 ) : (
-                    <InfiniteScroll
-                        data="stashes"
-                        className="columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4"
-                        loading={
-                            <div className="flex justify-center py-6">
-                                <Spinner />
-                            </div>
-                        }
-                    >
-                        {visible.map((stash) => (
-                            <StashCard
-                                key={stash.id}
-                                stash={stash}
-                                fresh={
-                                    freshAfter !== null && stash.id > freshAfter
-                                }
-                            />
-                        ))}
-                    </InfiniteScroll>
+                    <StashGrid
+                        grid={grid}
+                        stashes={visible}
+                        freshAfter={freshAfter}
+                        scrollKey="stashes"
+                        onLeaveTop={focusBox}
+                    />
                 )}
             </div>
         </>

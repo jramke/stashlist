@@ -229,7 +229,7 @@ function MoreLikeThis({ stashes }: { stashes: App.Data.StashData[] }) {
     return (
         <section className="grid gap-3">
             <h2 className="text-xs text-muted-foreground">More like this</h2>
-            <div className="columns-1 gap-4 sm:columns-2">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {stashes.map((stash) => (
                     <StashCard key={stash.id} stash={stash} />
                 ))}

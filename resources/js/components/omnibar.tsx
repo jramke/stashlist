@@ -5,7 +5,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useModKey } from '@/hooks/use-mod-key';
 import { classify } from '@/lib/classify';
 import { feedUrl, type SearchMode } from '@/lib/feed-url';
-import { focusCard } from '@/lib/grid';
+import { focusGrid } from '@/lib/keys';
 import { play } from '@/lib/sound';
 import { cn } from '@/lib/utils';
 import { store } from '@/routes/stashes';
@@ -620,7 +620,7 @@ export function Omnibar({
                 setHighlight((value) => Math.min(value + 1, rows.length - 1));
             } else if (!text.includes('\n')) {
                 event.preventDefault();
-                focusCard('first');
+                focusGrid();
             }
         } else if (event.key === 'ArrowUp' && visible && highlight >= 0) {
             event.preventDefault();

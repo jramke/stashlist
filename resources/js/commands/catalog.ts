@@ -1,5 +1,5 @@
 import { goBack } from '@/lib/back';
-import { focusBox, isTextField } from '@/lib/keys';
+import { focusBox, focusGrid, inGrid, isTextField } from '@/lib/keys';
 import { setSoundEnabled, soundEnabled } from '@/lib/sound';
 import { notify } from '@/lib/toast';
 import { index as collections } from '@/routes/collections';
@@ -198,12 +198,55 @@ export const catalog = define([
     },
 
     {
+        id: 'grid.enter',
+        label: 'Into your stashes',
+        category: 'Your stashes',
+        hotkeys: ['ArrowDown', 'J'],
+        scopes: ['feed'],
+        hidden: true,
+        // Out of a field and out of the grid: the first card. Inside the grid the list moves itself.
+        when: () => !inGrid(),
+        run: () => {
+            focusGrid();
+        },
+    },
+    {
+        id: 'grid.down',
+        label: 'A row down (j)',
+        category: 'Your stashes',
+        hotkeys: ['J'],
+        scopes: ['feed'],
+        hidden: true,
+        when: inGrid,
+    },
+    {
+        id: 'grid.up',
+        label: 'A row up (k)',
+        category: 'Your stashes',
+        hotkeys: ['K'],
+        scopes: ['feed'],
+        hidden: true,
+        when: inGrid,
+    },
+    {
+        id: 'grid.leave',
+        label: 'Out of the stashes, back to the box',
+        category: 'Your stashes',
+        hotkeys: ['Escape'],
+        scopes: ['feed'],
+        hidden: true,
+        when: inGrid,
+        run: () => {
+            focusBox();
+        },
+    },
+    {
         id: 'card.move',
         label: 'Move (j and k work too)',
         category: 'Your stashes',
-        hotkeys: ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'J', 'K'],
+        hotkeys: ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'],
         show: ['ArrowLeft', 'ArrowUp', 'ArrowDown', 'ArrowRight'],
-        scopes: ['feed'],
+        local: true,
     },
     {
         id: 'card.open',
