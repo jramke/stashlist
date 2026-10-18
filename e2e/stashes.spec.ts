@@ -76,6 +76,41 @@ test('a color word becomes a chip and goes back to a word with one Backspace', a
     await expect(page).not.toHaveURL(/color=/);
 });
 
+test('the box offers a menu to a click, takes a row with the arrows, and peels back one layer per Escape', async ({
+    page,
+}) => {
+    await register(page);
+
+    // A click in the empty box opens the menu; the arrows choose a row and Enter turns it into a chip.
+    await box(page).click();
+    await expect(
+        page.getByRole('option', { name: /Stash an image from your device/ }),
+    ).toBeVisible();
+    await box(page).press('ArrowDown');
+    await box(page).press('ArrowDown');
+    await expect(
+        page.getByRole('option', { name: /Unsorted/ }),
+    ).toHaveAttribute('aria-selected', 'true');
+    await box(page).press('Enter');
+    await expect(
+        page.getByRole('button', { name: 'Remove Unsorted' }),
+    ).toBeVisible();
+    await expect(page).toHaveURL(/collection=none/);
+    await expect(page.getByRole('option')).toHaveCount(0);
+
+    // Typing offers what the word could become. Escape closes the list, then clears the text, then lets go.
+    await box(page).fill('col');
+    await expect(page.getByRole('option', { name: /Colors/ })).toBeVisible();
+    await box(page).press('Escape');
+    await expect(page.getByRole('option')).toHaveCount(0);
+    await expect(box(page)).toHaveValue('col');
+    await box(page).press('Escape');
+    await expect(box(page)).toHaveValue('');
+    await expect(page).not.toHaveURL(/q=/);
+    await box(page).press('Escape');
+    await expect(box(page)).not.toBeFocused();
+});
+
 test('a stash can be edited, tagged and found again through its tag', async ({
     page,
 }) => {
