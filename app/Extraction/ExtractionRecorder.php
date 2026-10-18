@@ -26,11 +26,7 @@ final class ExtractionRecorder
                     'title' => $result->title,
                     'description' => $result->description,
                     'extracted_text' => $result->text,
-                    'colors' => $result->colors,
-                    'color_names' => array_map(
-                        static fn (ColorName $name): string => $name->value,
-                        ColorBuckets::names($result->colors),
-                    ),
+                    ...self::colors($result),
                     'extract_hash' => $result->hash,
                     'extracted_at' => now(),
                 ],
@@ -42,5 +38,26 @@ final class ExtractionRecorder
                 'meta' => [...($stash->meta ?? []), ...$result->meta],
             ])->save();
         });
+    }
+
+    /**
+     * The colors of the picture this run looked at. A run that looked at none (the client's own picture was kept,
+     * or the page has no picture) leaves the colors made from the picture the stash has.
+     *
+     * @return array{colors: list<array{hex: string, pct: float}>, color_names: list<string>}|array{}
+     */
+    private static function colors(ExtractionResult $result): array
+    {
+        if ($result->colors === null) {
+            return [];
+        }
+
+        return [
+            'colors' => $result->colors,
+            'color_names' => array_map(
+                static fn (ColorName $name): string => $name->value,
+                ColorBuckets::names($result->colors),
+            ),
+        ];
     }
 }

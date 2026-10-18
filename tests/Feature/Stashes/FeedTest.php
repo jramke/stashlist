@@ -204,6 +204,22 @@ test('the detail page shows my stash and refuses other users', function () {
     $this->actingAs($this->user)->get("/stashes/{$other->id}")->assertNotFound();
 });
 
+test('the detail page of a picture says which page it was on', function () {
+    $stash = Stash::factory()
+        ->for($this->user)
+        ->create(['type' => StashType::Image, 'meta' => ['source_url' => 'https://blog.example/cats']]);
+    $plain = Stash::factory()->for($this->user)->create(['type' => StashType::Image]);
+
+    $this
+        ->actingAs($this->user)
+        ->get("/stashes/{$stash->id}")
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('detail.source_url', 'https://blog.example/cats'));
+    $this
+        ->actingAs($this->user)
+        ->get("/stashes/{$plain->id}")
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('detail.source_url', null));
+});
+
 test('the detail page shows the stored icon of the site and never hands over the address the site gave', function () {
     $stash = Stash::factory()
         ->for($this->user)

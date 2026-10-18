@@ -13,7 +13,7 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 /**
  * Everything the detail view needs on top of the card: the whole text, a larger preview image, where the
- * page came from and which collections the stash is in. Build it from a stash with `enrichment`,
+ * page came from (and for a picture, the page it was on) and which collections the stash is in. Build it from a stash with `enrichment`,
  * `thumbnail`, `visibleTags`, `collections`, `highlights` and `files` loaded.
  */
 #[TypeScript]
@@ -31,6 +31,7 @@ final readonly class StashDetailData
         public ?string $excerpt,
         public ?ThumbnailData $preview,
         public ?string $site_name,
+        public ?string $source_url,
         public array $collection_ids,
         public array $highlights,
     ) {}
@@ -49,6 +50,7 @@ final readonly class StashDetailData
                 ? null
                 : new ThumbnailData($storage->url($preview), $preview->width, $preview->height),
             site_name: is_string($meta['site_name'] ?? null) ? $meta['site_name'] : null,
+            source_url: is_string($meta['source_url'] ?? null) ? $meta['source_url'] : null,
             collection_ids: array_values(
                 $stash->collections->map(static fn ($collection): int => $collection->id)->all(),
             ),

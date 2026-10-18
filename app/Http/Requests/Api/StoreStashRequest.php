@@ -31,6 +31,8 @@ final class StoreStashRequest extends FormRequest
             'type' => ['nullable', Rule::in(['link', 'note', 'image', 'color'])],
             'url' => ['nullable', 'string', 'max:2048', 'url:http,https'],
             'title' => ['nullable', 'string', 'max:500'],
+            // The page a picture was on: kept with an image stash, which has no address of its own.
+            'source_url' => ['nullable', 'string', 'max:2048', 'url:http,https'],
             'body' => ['nullable', 'string', 'max:100000'],
             'tags' => ['nullable', 'array', 'max:50'],
             'tags.*' => ['nullable', 'string', 'max:100'],
@@ -121,6 +123,7 @@ final class StoreStashRequest extends FormRequest
             collectionIds: array_values(array_map(intval(...), $this->array('collection_ids'))),
             capture: $this->has('capture') ? $this->capturedPage() : null,
             screenshot: $screenshot instanceof UploadedFile ? $screenshot : null,
+            sourceUrl: CleanText::nullable($this->nullableString('source_url')),
         );
     }
 

@@ -326,6 +326,63 @@ test('an image alone is an image stash', function () {
     Queue::assertPushedWithChain(ExtractContent::class, [IndexStash::class]);
 });
 
+test('an image keeps the page it was on as its source', function () {
+    $this
+        ->withToken($this->token)
+        ->post(
+            '/api/v1/stashes',
+            [
+                'title' => 'A cat on a wall',
+                'source_url' => 'https://blog.example/cats',
+                'image' => UploadedFile::fake()->createWithContent('cat.png', Images::make('png', 300, 200)),
+            ],
+            ['Accept' => 'application/json'],
+        )
+        ->assertCreated()
+        ->assertJson(['type' => 'image', 'title' => 'A cat on a wall', 'url' => null]);
+
+    expect(Stash::query()->sole()->meta)->toBe(['source_url' => 'https://blog.example/cats']);
+});
+
+test('an image saved by its own address keeps the page too', function () {
+    save([
+        'type' => 'image',
+        'url' => 'https://cdn.example/cat.jpg',
+        'source_url' => 'https://blog.example/cats',
+    ])
+        ->assertCreated()
+        ->assertJson(['type' => 'image', 'url' => 'https://cdn.example/cat.jpg']);
+
+    expect(Stash::query()->sole()->meta)->toBe(['source_url' => 'https://blog.example/cats']);
+});
+
+test('only an image has a source: a link is its own address', function () {
+    save(['url' => 'https://example.com/post', 'source_url' => 'https://blog.example/cats'])->assertCreated();
+
+    expect(Stash::query()->sole()->meta)->toBeNull();
+});
+
+test('the source of a picture is a web address', function (string $source) {
+    $this
+        ->withToken($this->token)
+        ->post(
+            '/api/v1/stashes',
+            [
+                'source_url' => $source,
+                'image' => UploadedFile::fake()->createWithContent('cat.png', Images::make('png', 300, 200)),
+            ],
+            ['Accept' => 'application/json'],
+        )
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('source_url');
+
+    expect(Stash::count())->toBe(0);
+})->with([
+    'a script' => 'javascript:alert(1)',
+    'a file' => 'file:///etc/passwd',
+    'too long' => 'https://x.example/'.str_repeat('a', 2100),
+]);
+
 test('the sizes of what a client may send are capped', function () {
     $tooLong = str_repeat('x', 200_001);
 

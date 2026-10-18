@@ -125,6 +125,43 @@ test('the server does not fetch the page picture when the client sent one', func
     expect($web->urls())->toBe(['https://bakeclub.example/post'])->and(stored_roles($this->stash))->toBeEmpty();
 });
 
+test('the page picture is not fetched when the address the client named already gave one, and its colors stay', function () {
+    $web = FakeWeb::install(CAPTURE_DNS, [
+        FakeWeb::image(Images::make('png', 800, 600, 'red', 'blue')),
+        FakeWeb::html('article'),
+    ]);
+    $this->stash->forceFill(['meta' => ['image_url' => 'https://cdn.example/clicked.png']])->save();
+
+    derive($this->stash);
+    dispatch_sync(new ExtractContent($this->stash->id, $this->stash->user_id));
+
+    expect($web->urls())
+        ->toBe(['https://cdn.example/clicked.png', 'https://bakeclub.example/post'])
+        ->and(array_column((array)StashEnrichment::query()->findOrFail($this->stash->id)->colors, 'hex'))
+        ->toContain('#ff0000');
+});
+
+test('the page picture is the fallback when the address the client named gave nothing', function () {
+    $web = FakeWeb::install(CAPTURE_DNS, [
+        new Response(404),
+        FakeWeb::html('article'),
+        FakeWeb::image(Images::make('png', 640, 480)),
+    ]);
+    $this->stash->forceFill(['meta' => ['image_url' => 'https://cdn.example/clicked.png']])->save();
+
+    derive($this->stash);
+    dispatch_sync(new ExtractContent($this->stash->id, $this->stash->user_id));
+
+    expect($web->urls())
+        ->toBe([
+            'https://cdn.example/clicked.png',
+            'https://bakeclub.example/post',
+            'https://bakeclub.example/img/starter.jpg',
+        ])
+        ->and(stored_roles($this->stash))
+        ->toContain('og', 'thumb');
+});
+
 test('the page picture by its address wins over a screenshot, which the extension sends with it', function () {
     $web = FakeWeb::install(CAPTURE_DNS, [FakeWeb::image(Images::make('png', 800, 600, 'red', 'blue'))]);
     $this->stash->forceFill(['meta' => ['image_url' => 'https://cdn.example/og.png']])->save();

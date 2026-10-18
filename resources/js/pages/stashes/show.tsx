@@ -37,8 +37,34 @@ const bodyFields = {
 /** How often the page asks again while the stash is still being read or tagged. */
 const POLL_INTERVAL = 3000;
 
+const ORIGINAL_LINK =
+    'flex w-fit max-w-full items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground';
+
+/** The page a picture was on, as long as it is a web address that is safe to link to. */
+function sourceOf(detail: App.Data.StashDetailData): {
+    address: string;
+    host: string;
+} | null {
+    const address = detail.source_url;
+
+    if (address === null || !/^https?:\/\//i.test(address)) {
+        return null;
+    }
+
+    try {
+        return {
+            address,
+            host: new URL(address).hostname.replace(/^www\./, ''),
+        };
+    } catch {
+        return null;
+    }
+}
+
 export default function Show({ detail, similar }: Props) {
     const { stash } = detail;
+    const source = sourceOf(detail);
+    const original = stash.url ?? source?.address ?? null;
     const { note, clear } = useFlashNote();
     const waiting = stash.fetching || stash.tagging;
     const { start, stop } = usePoll(
@@ -58,11 +84,11 @@ export default function Show({ detail, similar }: Props) {
     useScope('stash');
     useAction('stash.open-original', {
         run: () => {
-            if (stash.url !== null) {
-                window.open(stash.url, '_blank', 'noopener,noreferrer');
+            if (original !== null) {
+                window.open(original, '_blank', 'noopener,noreferrer');
             }
         },
-        enabled: () => stash.url !== null,
+        enabled: () => original !== null,
     });
     useAction('stash.add-tag', () =>
         document.querySelector<HTMLElement>('[data-tag-input]')?.focus(),
@@ -125,7 +151,7 @@ export default function Show({ detail, similar }: Props) {
                             href={stash.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex w-fit max-w-full items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+                            className={ORIGINAL_LINK}
                         >
                             {stash.favicon !== null && (
                                 <img
@@ -141,6 +167,20 @@ export default function Show({ detail, similar }: Props) {
                             </span>
                             <ExternalLink className="size-3.5 shrink-0" />
                             <Keys action="stash.open-original" />
+                        </a>
+                    )}
+                    {source !== null && (
+                        <a
+                            href={source.address}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={ORIGINAL_LINK}
+                        >
+                            <span className="truncate">From {source.host}</span>
+                            <ExternalLink className="size-3.5 shrink-0" />
+                            {stash.url === null && (
+                                <Keys action="stash.open-original" />
+                            )}
                         </a>
                     )}
                     {(stash.summary ?? stash.description) !== null && (

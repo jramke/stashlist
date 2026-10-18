@@ -67,15 +67,17 @@ final readonly class CaptureStash
     }
 
     /**
-     * What the client captured about a link: its capture block, or just the pictures it sent along.
+     * Where a picture came from, for the images only: a link is its own address, a note or a color has no source.
+     *
+     * @return array{source_url: string}|null
      */
-    private function capturedPage(CapturePayload $payload): ?CapturedPage
+    private function sourceMeta(StashDraft $draft, CapturePayload $payload): ?array
     {
-        if ($payload->capture === null && $payload->image === null && $payload->screenshot === null) {
+        if ($draft->type !== StashType::Image || $payload->sourceUrl === null) {
             return null;
         }
 
-        return $payload->capture ?? new CapturedPage;
+        return ['source_url' => $payload->sourceUrl];
     }
 
     private function existing(User $user, StashDraft $draft): ?Stash
@@ -99,6 +101,7 @@ final readonly class CaptureStash
             'url' => $draft->url,
             'url_hash' => $draft->urlHash,
             'domain' => $draft->domain,
+            'meta' => $this->sourceMeta($draft, $payload),
             'content_hash' => ContentHash::of(
                 $draft->type,
                 $draft->url,
@@ -120,7 +123,7 @@ final readonly class CaptureStash
 
         $this->collections->add($stash, $payload->collectionIds);
 
-        $page = $draft->type === StashType::Link ? $this->capturedPage($payload) : null;
+        $page = $draft->type === StashType::Link ? $payload->capturedPage() : null;
 
         if ($page !== null) {
             $this->captured->apply($stash, $page, $payload->image, $payload->screenshot);
