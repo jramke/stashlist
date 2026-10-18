@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 import { show } from '@/routes/stashes';
 import { Link } from '@inertiajs/react';
 import {
@@ -11,6 +11,7 @@ import {
     TriangleAlert,
     type LucideIcon,
 } from 'lucide-react';
+import { useState } from 'react';
 
 const typeIcons = {
     link: Link2,
@@ -20,22 +21,33 @@ const typeIcons = {
     color: Palette,
 } satisfies Record<App.Enums.StashType, LucideIcon>;
 
-const MAX_TAGS_ON_CARD = 3;
-
-/** A stash as a card in the feed. */
-export function StashCard({ stash }: { stash: App.Data.StashData }) {
+/**
+ * A stash as a card in the feed: the picture, a title, where it came from. Nothing else, so the feed reads as a
+ * wall of what you saved. `fresh` plays the entrance of a stash that was just saved.
+ */
+export function StashCard({
+    stash,
+    fresh = false,
+}: {
+    stash: App.Data.StashData;
+    fresh?: boolean;
+}) {
     const Icon = typeIcons[stash.type];
-    const tags = stash.tags.slice(0, MAX_TAGS_ON_CARD);
 
     return (
         <Link
             href={show(stash.id)}
             prefetch
-            className="group mb-4 block break-inside-avoid overflow-hidden rounded-xl border bg-card text-card-foreground transition-colors outline-none hover:border-foreground/30 focus-visible:ring-3 focus-visible:ring-ring/50"
+            data-card
+            data-stash={stash.id}
+            className={cn(
+                'group mb-4 block scroll-mt-24 break-inside-avoid overflow-hidden rounded-2xl border bg-card text-card-foreground transition-[border-color,transform,box-shadow] duration-150 outline-none focus-visible:border-foreground/40 focus-visible:shadow-md active:scale-[0.985] [@media(hover:hover)]:hover:border-foreground/25',
+                fresh && 'animate-stash-in',
+            )}
         >
             <Cover stash={stash} />
 
-            <div className="grid gap-2 p-3">
+            <div className="grid gap-1.5 px-3.5 py-3">
                 {stash.title !== null && (
                     <h3 className="line-clamp-2 text-sm leading-snug font-medium">
                         {stash.title}
@@ -43,45 +55,34 @@ export function StashCard({ stash }: { stash: App.Data.StashData }) {
                 )}
 
                 {stash.type === 'note' && stash.body !== null && (
-                    <p className="line-clamp-8 text-sm whitespace-pre-wrap text-muted-foreground">
+                    <p className="line-clamp-8 text-sm leading-relaxed whitespace-pre-wrap text-foreground/80">
                         {stash.body}
                     </p>
                 )}
 
-                {(stash.summary ?? stash.description) !== null &&
-                    stash.type === 'link' && (
-                        <p className="line-clamp-3 text-xs text-muted-foreground">
-                            {stash.summary ?? stash.description}
-                        </p>
-                    )}
-
-                {tags.length > 0 && (
-                    <ul className="flex flex-wrap gap-1">
-                        {tags.map((tag) => (
-                            <li key={tag.id}>
-                                <Badge variant="secondary">{tag.name}</Badge>
-                            </li>
-                        ))}
-                    </ul>
+                {stash.type === 'color' && (
+                    <p className="font-mono text-xs text-muted-foreground uppercase">
+                        {stash.body}
+                    </p>
                 )}
 
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <Icon
                         className="size-3.5 shrink-0"
                         role="img"
                         aria-label={stash.type}
                     />
                     <span className="truncate">{stash.domain}</span>
-                    <span className="ml-auto flex items-center gap-2">
+                    <span className="ml-auto flex shrink-0 items-center gap-2">
                         {stash.fetching && (
                             <span className="flex items-center gap-1">
-                                <Loader2 className="size-3.5 animate-spin" />
+                                <Loader2 className="size-3 animate-spin" />
                                 Fetching
                             </span>
                         )}
                         {!stash.fetching && stash.tagging && (
                             <span className="flex items-center gap-1">
-                                <Loader2 className="size-3.5 animate-spin" />
+                                <Loader2 className="size-3 animate-spin" />
                                 Tagging
                             </span>
                         )}
@@ -90,7 +91,7 @@ export function StashCard({ stash }: { stash: App.Data.StashData }) {
                                 className="flex items-center gap-1 text-destructive"
                                 title={stash.ai_error ?? undefined}
                             >
-                                <TriangleAlert className="size-3.5" />
+                                <TriangleAlert className="size-3" />
                                 Failed
                             </span>
                         )}
@@ -101,19 +102,31 @@ export function StashCard({ stash }: { stash: App.Data.StashData }) {
     );
 }
 
-/** The picture of a card: the thumbnail, the color itself, or a quiet gradient while there is nothing yet. */
+/** The picture of a card: the thumbnail, the color itself, or a quiet tint while there is nothing yet. */
 function Cover({ stash }: { stash: App.Data.StashData }) {
+    const [loaded, setLoaded] = useState(false);
+
     if (stash.thumbnail !== null) {
         const { url, width, height } = stash.thumbnail;
 
         return (
             <img
+                ref={(node) => {
+                    // A picture from the cache is there before React is.
+                    if (node?.complete) {
+                        setLoaded(true);
+                    }
+                }}
                 src={url}
                 alt=""
                 width={width ?? undefined}
                 height={height ?? undefined}
                 loading="lazy"
-                className="w-full bg-muted object-cover"
+                onLoad={() => setLoaded(true)}
+                className={cn(
+                    'w-full bg-muted object-cover outline -outline-offset-1 outline-black/10 transition-opacity duration-200',
+                    loaded ? 'opacity-100' : 'opacity-0',
+                )}
                 // The main color of the picture fills the space until the picture has loaded.
                 style={{ backgroundColor: stash.colors[0]?.hex }}
             />
@@ -123,7 +136,7 @@ function Cover({ stash }: { stash: App.Data.StashData }) {
     if (stash.type === 'color') {
         return (
             <div
-                className="h-28"
+                className="h-32"
                 style={{ backgroundColor: stash.body ?? undefined }}
             />
         );
@@ -133,12 +146,12 @@ function Cover({ stash }: { stash: App.Data.StashData }) {
         return null;
     }
 
-    return <div className="h-24" style={{ background: gradient(stash.id) }} />;
+    return <div className="h-20" style={{ background: tint(stash.id) }} />;
 }
 
-/** The same stash always gets the same gradient, so no column is needed to remember it. */
-function gradient(id: number): string {
+/** The same stash always gets the same tint, so no column is needed to remember it. */
+function tint(id: number): string {
     const hue = (id * 47) % 360;
 
-    return `linear-gradient(135deg, hsl(${hue} 30% 28%), hsl(${(hue + 40) % 360} 30% 18%))`;
+    return `linear-gradient(135deg, hsl(${hue} 45% 94%), hsl(${(hue + 40) % 360} 45% 88%))`;
 }
