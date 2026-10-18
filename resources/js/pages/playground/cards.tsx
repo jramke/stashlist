@@ -506,6 +506,44 @@ export default function Cards() {
                 </Section>
 
                 <Section
+                    title="Prices"
+                    description="A price the page states sits at the top right, next to what the pipeline is doing. No locale: the same text on the server and in the browser."
+                >
+                    {(
+                        [
+                            ['euros', '39.90', 'EUR'],
+                            ['dollars, thousands', '1299.00', 'USD'],
+                            ['whole, no cents', '30.00', 'GBP'],
+                            ['yen', '4980', 'JPY'],
+                            ['a code, no sign', '299', 'SEK'],
+                            ['no currency', '12.5', null],
+                        ] as const
+                    ).map(([label, amount, currency]) => (
+                        <Case
+                            key={label}
+                            label={label}
+                            stash={stash({
+                                subtype: 'product',
+                                title: 'Cast iron skillet 26 cm',
+                                price: { amount, currency },
+                                ...art(1200, 630, 65),
+                            })}
+                        />
+                    ))}
+                    <Case
+                        label="price and a phase"
+                        stash={stash({
+                            subtype: 'product',
+                            title: 'Cast iron skillet 26 cm',
+                            tagging: true,
+                            ai_status: 'processing',
+                            price: { amount: '39.90', currency: 'EUR' },
+                            ...art(1200, 630, 65),
+                        })}
+                    />
+                </Section>
+
+                <Section
                     title="Titles"
                     description="One line, centered, cut off with an ellipsis. Without a title the site stands in; a note has none."
                 >

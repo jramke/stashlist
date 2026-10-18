@@ -5,6 +5,7 @@ import {
     indicatorOf,
     initialMedia,
     phaseOf,
+    priceOf,
     statusesOf,
     titleOf,
 } from './face';
@@ -48,6 +49,7 @@ export const machine = createMachine<StashCardSchema>({
                 phaseOf(prop('stash')),
                 context.get('arrived'),
             ),
+        price: ({ prop }) => priceOf(prop('stash')),
         busy: ({ prop }) => {
             const phase = phaseOf(prop('stash'));
 

@@ -39,6 +39,7 @@ export function stash(overrides: Partial<Stash> = {}): Stash {
         created_at: '2026-10-18T10:00:00.000Z',
         fetching: false,
         tagging: false,
+        price: null,
         ...overrides,
     };
 }
@@ -151,6 +152,9 @@ export function subtype(
         title,
         domain,
         url: `https://${domain}/example`,
+        ...(name === 'product'
+            ? { price: { amount: '39.90', currency: 'EUR' } }
+            : {}),
         ...(withPicture ? art(1200, 630, SUBTYPE_HUES[name]) : {}),
     });
 }

@@ -8,6 +8,7 @@ export {
     indicatorOf,
     initialMedia,
     phaseOf,
+    priceOf,
     statusesOf,
     titleOf,
 } from './face';

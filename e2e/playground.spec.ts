@@ -22,6 +22,14 @@ test('the card playground opens without a word in the console, runs its pipeline
     await expect(page.getByRole('heading', { name: 'Phases' })).toBeVisible();
     await expect(page.locator('[data-card]').first()).toBeVisible();
 
+    // The price a page states, short and the same everywhere: no locale, no cents when there are none.
+    await expect(
+        page.getByText('€39.90', { exact: true }).first(),
+    ).toBeVisible();
+    await expect(page.getByText('$1,299', { exact: true })).toBeVisible();
+    await expect(page.getByText('£30', { exact: true })).toBeVisible();
+    await expect(page.getByText('SEK 299', { exact: true })).toBeVisible();
+
     // A stash that fails its pipeline: the same card, in another phase.
     const live = page.locator('section').filter({
         has: page.getByRole('heading', { name: 'The pipeline, live' }),

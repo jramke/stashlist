@@ -34,6 +34,7 @@ export function connect<T extends PropTypes>(
         title: computed('title'),
         indicator: computed('indicator'),
         statuses: computed('statuses'),
+        price: computed('price'),
 
         getRootProps() {
             return normalize.element({
@@ -123,6 +124,12 @@ export function connect<T extends PropTypes>(
                 ...parts.indicator.attrs(scope.id),
                 'data-glyph': indicator.glyph,
                 title: indicator.label,
+            });
+        },
+        getPriceProps() {
+            return normalize.element({
+                ...parts.price.attrs(scope.id),
+                'data-price': computed('price') ?? undefined,
             });
         },
         getStatusesProps() {

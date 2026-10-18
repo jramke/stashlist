@@ -90,6 +90,8 @@ export interface StashCardSchema {
         title: string | null;
         indicator: CardIndicator;
         statuses: CardStatus[];
+        /** What the page says it costs, as short text. */
+        price: string | null;
         busy: boolean;
     };
     tag: 'busy' | 'settled';
@@ -121,6 +123,8 @@ export interface StashCardApi<T extends PropTypes = PropTypes> {
     title: string | null;
     indicator: CardIndicator;
     statuses: CardStatus[];
+    /** The price the page states, as short text, or null. */
+    price: string | null;
     getRootProps(): T['element'];
     getSurfaceProps(): T['element'];
     getMediaProps(): T['element'];
@@ -132,6 +136,7 @@ export interface StashCardApi<T extends PropTypes = PropTypes> {
     getFileProps(): T['element'];
     getTitleProps(): T['element'];
     getIndicatorProps(): T['element'];
+    getPriceProps(): T['element'];
     getStatusesProps(): T['element'];
     getStatusProps(status: CardStatus): T['element'];
 }

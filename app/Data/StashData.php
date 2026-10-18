@@ -44,6 +44,7 @@ final readonly class StashData
         public string $created_at,
         public bool $fetching,
         public bool $tagging,
+        public ?PriceData $price,
     ) {}
 
     public static function fromModel(Stash $stash, StashStorage $storage): self
@@ -84,6 +85,7 @@ final readonly class StashData
             created_at: $stash->created_at?->toIso8601String() ?? '',
             fetching: Progress::isFetching($stash),
             tagging: Progress::isTagging($stash),
+            price: PriceData::fromMeta($stash->meta['price'] ?? null),
         );
     }
 

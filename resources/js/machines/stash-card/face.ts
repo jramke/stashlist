@@ -205,13 +205,55 @@ export function statusesOf(
     }
 }
 
+const CURRENCY_SIGNS: Record<string, string> = {
+    EUR: '€',
+    USD: '$',
+    GBP: '£',
+    JPY: '¥',
+    CNY: '¥',
+    INR: '₹',
+    KRW: '₩',
+    CAD: 'CA$',
+    AUD: 'A$',
+    NZD: 'NZ$',
+    MXN: 'MX$',
+    BRL: 'R$',
+};
+
+/**
+ * The price at the top right of a card, as short as it can be: "€39.90", "$1,299", "CHF 120". It does not ask the
+ * browser for its locale (the page is also drawn on the server, and the two must say the same), so the groups
+ * of thousands are commas.
+ */
+export function priceOf(stash: Stash): string | null {
+    if (stash.price === null) {
+        return null;
+    }
+
+    const [whole = '', decimals = ''] = stash.price.amount.split('.');
+    const trimmed = decimals.replace(/0+$/, '');
+    const cents = trimmed === '' ? '' : trimmed.padEnd(2, '0');
+    const number = `${whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}${cents === '' ? '' : `.${cents}`}`;
+    const currency = stash.price.currency;
+
+    if (currency === null) {
+        return number;
+    }
+
+    const sign = CURRENCY_SIGNS[currency];
+
+    return sign === undefined
+        ? `${currency}\u00a0${number}`
+        : `${sign}${number}`;
+}
+
 /** How a screen reader hears the card: what it is, what it is called, what is going on. */
 export function describe(stash: Stash, phase: CardPhase): string {
     // A note has no title: it is its text, and the text is its name.
     const name =
         titleOf(stash) ??
         (stash.type === 'note' ? (stash.body ?? '').slice(0, 80) : '');
-    const parts = [GLYPH_LABELS[glyphOf(stash)], name];
+    const parts = [GLYPH_LABELS[glyphOf(stash)], name, priceOf(stash) ?? ''];
 
     if (phase === 'fetching') {
         parts.push('being fetched');

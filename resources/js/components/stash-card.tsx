@@ -219,6 +219,14 @@ function CardBody({ api }: { api: StashCardApi }) {
                 {...api.getStatusesProps()}
                 className="absolute top-3 right-3 z-10 flex items-center gap-1.5 text-foreground/45"
             >
+                {api.price !== null && (
+                    <span
+                        {...api.getPriceProps()}
+                        className="text-[11px] leading-4 font-medium whitespace-nowrap text-foreground/55 tabular-nums transition-colors group-hover/card:text-foreground/75 group-data-[peek]/card:text-foreground/75 keyboard:transition-none"
+                    >
+                        {api.price}
+                    </span>
+                )}
                 {api.statuses.map((status) => (
                     <Status key={status.kind} api={api} status={status} />
                 ))}

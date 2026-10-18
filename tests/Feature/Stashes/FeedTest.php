@@ -275,3 +275,31 @@ test('a card gets both thumbnails as an srcset, the small one first, and only th
                 ->toBeNull();
         });
 });
+
+test('a card carries the price its page states, and none when the meta has nothing usable', function () {
+    $priced = Stash::factory()->for($this->user)->create([
+        'url' => 'https://shop.example/pan',
+        'domain' => 'shop.example',
+        'meta' => ['price' => ['amount' => '39.90', 'currency' => 'EUR']],
+    ]);
+    $broken = Stash::factory()->for($this->user)->create([
+        'url' => 'https://shop.example/lid',
+        'domain' => 'shop.example',
+        'meta' => ['price' => ['amount' => 'ask us']],
+    ]);
+    $plain = Stash::factory()->for($this->user)->create(['url' => 'https://example.com/a', 'domain' => 'example.com']);
+
+    $this
+        ->actingAs($this->user)
+        ->get('/stashes')
+        ->assertInertia(function (AssertableInertia $page) use ($priced, $broken, $plain) {
+            $cards = collect($page->toArray()['props']['stashes']['data'])->keyBy('id');
+
+            expect($cards[$priced->id]['price'])
+                ->toBe(['amount' => '39.90', 'currency' => 'EUR'])
+                ->and($cards[$broken->id]['price'])
+                ->toBeNull()
+                ->and($cards[$plain->id]['price'])
+                ->toBeNull();
+        });
+});
