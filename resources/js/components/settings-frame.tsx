@@ -1,3 +1,5 @@
+import { FlashNote } from '@/components/flash-note';
+import { useFlashNote } from '@/hooks/use-flash-note';
 import { cn } from '@/lib/utils';
 import { index as exports } from '@/routes/exports';
 import { edit as profile } from '@/routes/profile';
@@ -24,27 +26,31 @@ export function SettingsFrame({
     children: ReactNode;
 }) {
     const currentUrl = usePage().url;
+    const { note, clear } = useFlashNote();
 
     return (
         <div className="mx-auto grid max-w-2xl gap-8">
-            <nav aria-label="Settings" className="flex gap-4 text-sm">
-                {sections.map((section) => (
-                    <Link
-                        key={section.href}
-                        href={section.href}
-                        aria-current={
-                            currentUrl === section.href ? 'page' : undefined
-                        }
-                        className={cn(
-                            'text-muted-foreground hover:text-foreground',
-                            currentUrl === section.href &&
-                                'font-medium text-foreground',
-                        )}
-                    >
-                        {section.label}
-                    </Link>
-                ))}
-            </nav>
+            <div className="flex items-center gap-4">
+                <nav aria-label="Settings" className="flex gap-4 text-sm">
+                    {sections.map((section) => (
+                        <Link
+                            key={section.href}
+                            href={section.href}
+                            aria-current={
+                                currentUrl === section.href ? 'page' : undefined
+                            }
+                            className={cn(
+                                'text-muted-foreground hover:text-foreground',
+                                currentUrl === section.href &&
+                                    'font-medium text-foreground',
+                            )}
+                        >
+                            {section.label}
+                        </Link>
+                    ))}
+                </nav>
+                <FlashNote note={note} onDone={clear} className="ml-auto" />
+            </div>
 
             <header className="grid gap-1">
                 <h1 className="text-2xl font-medium">{title}</h1>

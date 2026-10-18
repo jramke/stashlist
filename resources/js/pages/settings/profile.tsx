@@ -1,6 +1,7 @@
 import AccountController from '@/actions/App/Http/Controllers/Settings/AccountController';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import SmartFeaturesController from '@/actions/App/Http/Controllers/Settings/SmartFeaturesController';
+import { ConfirmButton } from '@/components/confirm-button';
 import InputError from '@/components/input-error';
 import { SettingsFrame } from '@/components/settings-frame';
 import { Button } from '@/components/ui/button';
@@ -105,11 +106,7 @@ export default function Profile() {
 
                     <Form
                         {...AccountController.destroy.form()}
-                        onBefore={() =>
-                            confirm(
-                                'Delete your account and everything in it? This cannot be undone.',
-                            )
-                        }
+                        id="delete-account"
                         className="grid gap-3"
                     >
                         {({ processing, errors }) => (
@@ -134,15 +131,25 @@ export default function Profile() {
                                     <InputError message={errors.confirmation} />
                                 </div>
 
-                                <Button
-                                    type="submit"
+                                <ConfirmButton
                                     variant="destructive"
                                     className="w-fit"
                                     disabled={processing}
+                                    confirmLabel="Everything goes. Delete?"
+                                    onConfirm={() => {
+                                        const form =
+                                            document.getElementById(
+                                                'delete-account',
+                                            );
+
+                                        if (form instanceof HTMLFormElement) {
+                                            form.requestSubmit();
+                                        }
+                                    }}
                                 >
                                     {processing && <Spinner />}
                                     Delete my account
-                                </Button>
+                                </ConfirmButton>
                             </>
                         )}
                     </Form>

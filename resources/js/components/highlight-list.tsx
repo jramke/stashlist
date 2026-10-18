@@ -1,4 +1,5 @@
 import HighlightController from '@/actions/App/Http/Controllers/HighlightController';
+import { ConfirmButton } from '@/components/confirm-button';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, router } from '@inertiajs/react';
@@ -47,25 +48,23 @@ export function HighlightList({
                                 Open on the page
                             </a>
                         )}
-                        <Button
+                        <ConfirmButton
                             variant="ghost"
                             size="sm"
                             className="ml-auto"
                             aria-label="Delete this highlight"
-                            onClick={() => {
-                                if (confirm('Delete this highlight?')) {
-                                    router.delete(
-                                        HighlightController.destroy.url(
-                                            highlight.id,
-                                        ),
-                                        { preserveScroll: true },
-                                    );
-                                }
-                            }}
+                            onConfirm={() =>
+                                router.delete(
+                                    HighlightController.destroy.url(
+                                        highlight.id,
+                                    ),
+                                    { preserveScroll: true },
+                                )
+                            }
                         >
                             <Trash2 />
                             Delete
-                        </Button>
+                        </ConfirmButton>
                     </div>
                 </li>
             ))}

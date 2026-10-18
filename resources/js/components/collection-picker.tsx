@@ -1,9 +1,10 @@
 import StashCollectionController from '@/actions/App/Http/Controllers/StashCollectionController';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 import { router, usePage } from '@inertiajs/react';
+import { Check } from 'lucide-react';
+import { useState } from 'react';
 
-/** Tick the collections a stash belongs to; every change is saved at once. */
+/** The collections as pills; press one to put the stash in it or take it out. Every press is saved at once. */
 export function CollectionPicker({
     stashId,
     selected,
@@ -12,6 +13,14 @@ export function CollectionPicker({
     selected: number[];
 }) {
     const { collections } = usePage().props;
+    const [ids, setIds] = useState(selected);
+    const [known, setKnown] = useState(selected);
+
+    // The server's list wins whenever it arrives.
+    if (selected !== known) {
+        setKnown(selected);
+        setIds(selected);
+    }
 
     if (collections.length === 0) {
         return (
@@ -21,34 +30,44 @@ export function CollectionPicker({
         );
     }
 
-    function toggle(collectionId: number, checked: boolean) {
-        const next = checked
-            ? [...selected, collectionId]
-            : selected.filter((id) => id !== collectionId);
+    function toggle(collectionId: number) {
+        const next = ids.includes(collectionId)
+            ? ids.filter((id) => id !== collectionId)
+            : [...ids, collectionId];
 
+        setIds(next);
         router.put(
             StashCollectionController.update.url(stashId),
             { collection_ids: next },
-            { preserveScroll: true },
+            { preserveScroll: true, preserveState: true, async: true },
         );
     }
 
     return (
-        <ul className="grid gap-2">
-            {collections.map((collection) => (
-                <li key={collection.id} className="flex items-center gap-2">
-                    <Checkbox
-                        id={`collection-${collection.id}`}
-                        checked={selected.includes(collection.id)}
-                        onCheckedChange={(checked) =>
-                            toggle(collection.id, checked)
-                        }
-                    />
-                    <Label htmlFor={`collection-${collection.id}`}>
-                        {collection.name}
-                    </Label>
-                </li>
-            ))}
+        <ul className="flex flex-wrap gap-1.5">
+            {collections.map((collection) => {
+                const on = ids.includes(collection.id);
+
+                return (
+                    <li key={collection.id}>
+                        <button
+                            type="button"
+                            role="checkbox"
+                            aria-checked={on}
+                            onClick={() => toggle(collection.id)}
+                            className={cn(
+                                'inline-flex h-7 items-center gap-1.5 rounded-full border px-3 text-sm transition-[background-color,border-color,color,transform] duration-150 outline-none focus-visible:ring-2 focus-visible:ring-ring/50 active:scale-95',
+                                on
+                                    ? 'border-foreground bg-foreground text-background'
+                                    : 'border-foreground/10 text-muted-foreground hover:border-foreground/25 hover:text-foreground',
+                            )}
+                        >
+                            {on && <Check className="-ml-1 size-3.5" />}
+                            {collection.name}
+                        </button>
+                    </li>
+                );
+            })}
         </ul>
     );
 }

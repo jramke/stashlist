@@ -1,22 +1,24 @@
 import StashController from '@/actions/App/Http/Controllers/StashController';
 import StashReprocessController from '@/actions/App/Http/Controllers/StashReprocessController';
 import { CollectionPicker } from '@/components/collection-picker';
+import { FlashNote } from '@/components/flash-note';
 import { HighlightList } from '@/components/highlight-list';
-import InputError from '@/components/input-error';
+import { InlineField } from '@/components/inline-field';
+import { Kbd } from '@/components/kbd';
 import { StashCard } from '@/components/stash-card';
 import { TagEditor } from '@/components/tag-editor';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
-import { Textarea } from '@/components/ui/textarea';
 import { useAuthUser } from '@/hooks/use-auth-user';
+import { useFlashNote } from '@/hooks/use-flash-note';
+import { useModKey } from '@/hooks/use-mod-key';
 import { aiErrorMessage } from '@/lib/ai-status';
+import { goBack } from '@/lib/back';
+import { isTyping } from '@/lib/keys';
 import { index } from '@/routes/stashes';
-import { Deferred, Form, Head, Link, router, usePoll } from '@inertiajs/react';
+import { Deferred, Head, router, usePoll } from '@inertiajs/react';
 import { ArrowLeft, ExternalLink, RotateCw, Trash2 } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 type Props = {
     detail: App.Data.StashDetailData;
@@ -24,26 +26,32 @@ type Props = {
     similar?: App.Data.StashData[];
 };
 
-const bodyLabels = {
-    link: 'Comment',
-    note: 'Text',
-    image: 'Comment',
-    file: 'Comment',
-    color: 'Color',
-} satisfies Record<App.Enums.StashType, string>;
+const bodyFields = {
+    link: { label: 'Comment', placeholder: 'Add a comment' },
+    note: { label: 'Text', placeholder: 'Write something' },
+    image: { label: 'Comment', placeholder: 'Add a comment' },
+    file: { label: 'Comment', placeholder: 'Add a comment' },
+    color: { label: 'Color', placeholder: 'A color, like #e63946' },
+} satisfies Record<App.Enums.StashType, { label: string; placeholder: string }>;
 
 /** How often the page asks again while the stash is still being read or tagged. */
 const POLL_INTERVAL = 3000;
 
 export default function Show({ detail, similar }: Props) {
     const { stash } = detail;
-    const heading = stash.title ?? (stash.type === 'note' ? 'Note' : 'Color');
+    const { note, clear } = useFlashNote();
+    const mod = useModKey();
     const waiting = stash.fetching || stash.tagging;
     const { start, stop } = usePoll(
         POLL_INTERVAL,
         { only: ['detail'] },
         { autoStart: false },
     );
+    const latest = useRef(stash);
+
+    useEffect(() => {
+        latest.current = stash;
+    });
 
     useEffect(() => {
         if (waiting) {
@@ -53,31 +61,99 @@ export default function Show({ detail, similar }: Props) {
         }
     }, [waiting, start, stop]);
 
+    // The keys of one stash: o opens the original, t goes to the tags, Cmd+Backspace deletes.
+    useEffect(() => {
+        function keyDown(event: KeyboardEvent) {
+            if (event.defaultPrevented) {
+                return;
+            }
+
+            const current = latest.current;
+
+            if (
+                (event.metaKey || event.ctrlKey) &&
+                event.key === 'Backspace' &&
+                !isTyping(event.target)
+            ) {
+                event.preventDefault();
+                router.delete(StashController.destroy.url(current.id));
+            } else if (
+                !event.metaKey &&
+                !event.ctrlKey &&
+                !event.altKey &&
+                !isTyping(event.target)
+            ) {
+                if (event.key === 't') {
+                    event.preventDefault();
+                    document
+                        .querySelector<HTMLElement>('[data-tag-input]')
+                        ?.focus();
+                } else if (event.key === 'o' && current.url !== null) {
+                    window.open(current.url, '_blank', 'noopener,noreferrer');
+                }
+            }
+        }
+
+        document.addEventListener('keydown', keyDown);
+
+        return () => document.removeEventListener('keydown', keyDown);
+    }, []);
+
     return (
         <>
-            <Head title={heading} />
+            <Head
+                title={
+                    stash.title ?? (stash.type === 'note' ? 'Note' : 'Color')
+                }
+            />
 
-            <div className="mx-auto grid max-w-3xl gap-6">
-                <Link
-                    href={index()}
-                    className="flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-                >
-                    <ArrowLeft className="size-4" />
-                    Stashes
-                </Link>
+            <div className="mx-auto grid max-w-2xl gap-8">
+                <div className="flex h-6 items-center">
+                    <a
+                        href={index().url}
+                        onClick={(event) => {
+                            if (
+                                event.button === 0 &&
+                                !(
+                                    event.metaKey ||
+                                    event.ctrlKey ||
+                                    event.shiftKey
+                                )
+                            ) {
+                                event.preventDefault();
+                                goBack();
+                            }
+                        }}
+                        className="flex items-center gap-1.5 rounded text-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+                    >
+                        <ArrowLeft className="size-4" />
+                        Stashes
+                        <Kbd>Esc</Kbd>
+                    </a>
+                    <FlashNote note={note} onDone={clear} className="ml-auto" />
+                </div>
 
                 <Preview detail={detail} />
 
                 <header className="grid gap-2">
-                    <h1 className="text-2xl font-medium break-words">
-                        {heading}
-                    </h1>
+                    <InlineField
+                        url={StashController.update.url(stash.id)}
+                        name="title"
+                        initial={stash.title ?? ''}
+                        label="Title"
+                        placeholder={
+                            stash.type === 'link' || stash.type === 'image'
+                                ? 'Untitled'
+                                : 'Add a title'
+                        }
+                        className="text-2xl font-medium"
+                    />
                     {stash.url !== null && (
                         <a
                             href={stash.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex w-fit max-w-full items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+                            className="flex w-fit max-w-full items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
                         >
                             {detail.favicon_url !== null && (
                                 <img
@@ -93,71 +169,36 @@ export default function Show({ detail, similar }: Props) {
                                 {detail.site_name ?? stash.domain ?? stash.url}
                             </span>
                             <ExternalLink className="size-3.5 shrink-0" />
+                            <Kbd>o</Kbd>
                         </a>
                     )}
                     {(stash.summary ?? stash.description) !== null && (
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm leading-relaxed text-muted-foreground">
                             {stash.summary ?? stash.description}
                         </p>
                     )}
                 </header>
 
-                <Separator />
+                <InlineField
+                    url={StashController.update.url(stash.id)}
+                    name="body"
+                    initial={detail.full_body ?? ''}
+                    label={bodyFields[stash.type].label}
+                    placeholder={bodyFields[stash.type].placeholder}
+                    multiline
+                    className="text-sm leading-relaxed"
+                />
 
-                <Form
-                    {...StashController.update.form.patch(stash.id)}
-                    options={{ preserveScroll: true }}
-                    className="grid gap-4"
-                >
-                    {({ processing, errors }) => (
-                        <>
-                            <div className="grid gap-2">
-                                <Label htmlFor="title">Title</Label>
-                                <Input
-                                    id="title"
-                                    name="title"
-                                    defaultValue={stash.title ?? ''}
-                                    placeholder="Leave empty to use the page's own title"
-                                    maxLength={500}
-                                />
-                                <InputError message={errors.title} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="body">
-                                    {bodyLabels[stash.type]}
-                                </Label>
-                                <Textarea
-                                    id="body"
-                                    name="body"
-                                    defaultValue={detail.full_body ?? ''}
-                                    rows={stash.type === 'note' ? 8 : 3}
-                                />
-                                <InputError message={errors.body} />
-                            </div>
-
-                            <Button
-                                type="submit"
-                                className="w-fit"
-                                disabled={processing}
-                            >
-                                {processing && <Spinner />}
-                                Save
-                            </Button>
-                        </>
-                    )}
-                </Form>
-
-                <Separator />
-
-                <section className="grid gap-3">
-                    <h2 className="text-sm font-medium">Tags</h2>
+                <section className="grid gap-2">
+                    <h2 className="text-xs text-muted-foreground">Tags</h2>
                     <TagEditor stashId={stash.id} tags={stash.tags} />
                     <SmartStatus stash={stash} />
                 </section>
 
-                <section className="grid gap-3">
-                    <h2 className="text-sm font-medium">Collections</h2>
+                <section className="grid gap-2">
+                    <h2 className="text-xs text-muted-foreground">
+                        Collections
+                    </h2>
                     <CollectionPicker
                         stashId={stash.id}
                         selected={detail.collection_ids}
@@ -166,25 +207,12 @@ export default function Show({ detail, similar }: Props) {
 
                 {detail.highlights.length > 0 && (
                     <section className="grid gap-3">
-                        <h2 className="text-sm font-medium">Highlights</h2>
+                        <h2 className="text-xs text-muted-foreground">
+                            Highlights
+                        </h2>
                         <HighlightList highlights={detail.highlights} />
                     </section>
                 )}
-
-                <Separator />
-
-                <section className="flex flex-wrap items-center gap-4">
-                    <Button
-                        variant="destructive"
-                        className="ml-auto"
-                        onClick={() =>
-                            router.delete(StashController.destroy.url(stash.id))
-                        }
-                    >
-                        <Trash2 />
-                        Delete
-                    </Button>
-                </section>
 
                 <Deferred data="similar" fallback={<></>}>
                     <MoreLikeThis stashes={similar ?? []} />
@@ -200,6 +228,21 @@ export default function Show({ detail, similar }: Props) {
                         </p>
                     </details>
                 )}
+
+                <div className="flex border-t pt-4">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-muted-foreground"
+                        onClick={() =>
+                            router.delete(StashController.destroy.url(stash.id))
+                        }
+                    >
+                        <Trash2 />
+                        Delete
+                        <Kbd className="ml-1">{mod}⌫</Kbd>
+                    </Button>
+                </div>
             </div>
         </>
     );
@@ -213,7 +256,7 @@ function MoreLikeThis({ stashes }: { stashes: App.Data.StashData[] }) {
 
     return (
         <section className="grid gap-3">
-            <h2 className="text-sm font-medium">More like this</h2>
+            <h2 className="text-xs text-muted-foreground">More like this</h2>
             <div className="columns-1 gap-4 sm:columns-2">
                 {stashes.map((stash) => (
                     <StashCard key={stash.id} stash={stash} />
@@ -232,7 +275,7 @@ function SmartStatus({ stash }: { stash: App.Data.StashData }) {
     if (stash.tagging) {
         return (
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Spinner />
+                <Spinner className="size-3.5" />
                 Making a summary and tags…
             </p>
         );
@@ -297,7 +340,7 @@ function Preview({ detail }: { detail: App.Data.StashDetailData }) {
                 alt=""
                 width={preview.width ?? undefined}
                 height={preview.height ?? undefined}
-                className="max-h-[70svh] w-full rounded-xl border bg-muted object-contain"
+                className="max-h-[70svh] w-full rounded-2xl border bg-muted object-contain outline -outline-offset-1 outline-black/10"
             />
         );
     }
@@ -305,7 +348,7 @@ function Preview({ detail }: { detail: App.Data.StashDetailData }) {
     if (stash.type === 'color') {
         return (
             <div
-                className="h-48 rounded-xl border"
+                className="h-48 rounded-2xl border"
                 style={{ backgroundColor: detail.full_body ?? undefined }}
             />
         );

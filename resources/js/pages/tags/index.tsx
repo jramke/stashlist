@@ -1,16 +1,20 @@
 import TagController from '@/actions/App/Http/Controllers/TagController';
+import { ConfirmButton } from '@/components/confirm-button';
+import { FlashNote } from '@/components/flash-note';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useFlashNote } from '@/hooks/use-flash-note';
 import { index as stashes } from '@/routes/stashes';
 import { Form, Head, Link, router } from '@inertiajs/react';
 import { Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
 type Props = {
     tags: App.Data.TagData[];
 };
 
-/** Folds the tag into another one: pick the other tag from the list. */
+/** Folds the tag into another one: pick the other tag, then say yes right where the list was. */
 function MergeInto({
     tag,
     others,
@@ -18,29 +22,49 @@ function MergeInto({
     tag: App.Data.TagData;
     others: App.Data.TagData[];
 }) {
+    const [target, setTarget] = useState<App.Data.TagData | null>(null);
+
+    if (target !== null) {
+        return (
+            <span className="flex items-center gap-1 pt-0.5 text-sm">
+                <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => {
+                        router.post(
+                            TagController.merge.url(tag.id),
+                            { into: target.id },
+                            { preserveScroll: true },
+                        );
+                        setTarget(null);
+                    }}
+                >
+                    Merge into {target.name}
+                </Button>
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setTarget(null)}
+                >
+                    Cancel
+                </Button>
+            </span>
+        );
+    }
+
     return (
         <select
             aria-label={`Merge ${tag.name} into`}
             defaultValue=""
             className="h-9 max-w-32 rounded-md border bg-transparent px-2 text-sm"
             onChange={(event) => {
-                const target = others.find(
-                    (other) => other.id === Number(event.target.value),
+                setTarget(
+                    others.find(
+                        (other) => other.id === Number(event.target.value),
+                    ) ?? null,
                 );
                 event.target.value = '';
-
-                if (
-                    target !== undefined &&
-                    confirm(
-                        `Merge "${tag.name}" into "${target.name}"? The tag "${tag.name}" goes away and its stashes get "${target.name}".`,
-                    )
-                ) {
-                    router.post(
-                        TagController.merge.url(tag.id),
-                        { into: target.id },
-                        { preserveScroll: true },
-                    );
-                }
             }}
         >
             <option value="" disabled>
@@ -58,13 +82,18 @@ function MergeInto({
 }
 
 export default function Index({ tags }: Props) {
+    const { note, clear } = useFlashNote();
+
     return (
         <>
             <Head title="Tags" />
 
             <div className="mx-auto grid max-w-2xl gap-8">
                 <header className="grid gap-1">
-                    <h1 className="text-2xl font-medium">Tags</h1>
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-2xl font-medium">Tags</h1>
+                        <FlashNote note={note} onDone={clear} />
+                    </div>
                     <p className="text-sm text-muted-foreground">
                         Rename a tag to change it on every stash, or merge it
                         into another. Deleting a tag only removes it from the
@@ -124,27 +153,20 @@ export default function Index({ tags }: Props) {
                                     <MergeInto tag={tag} others={tags} />
                                 )}
 
-                                <Button
+                                <ConfirmButton
                                     variant="ghost"
                                     size="icon"
                                     aria-label={`Delete ${tag.name}`}
-                                    onClick={() => {
-                                        if (
-                                            confirm(
-                                                `Delete the tag "${tag.name}"? The stashes stay.`,
-                                            )
-                                        ) {
-                                            router.delete(
-                                                TagController.destroy.url(
-                                                    tag.id,
-                                                ),
-                                                { preserveScroll: true },
-                                            );
-                                        }
-                                    }}
+                                    confirmLabel="?"
+                                    onConfirm={() =>
+                                        router.delete(
+                                            TagController.destroy.url(tag.id),
+                                            { preserveScroll: true },
+                                        )
+                                    }
                                 >
                                     <Trash2 />
-                                </Button>
+                                </ConfirmButton>
                             </li>
                         ))}
                     </ul>

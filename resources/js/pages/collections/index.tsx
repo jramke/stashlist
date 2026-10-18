@@ -1,14 +1,18 @@
 import CollectionController from '@/actions/App/Http/Controllers/CollectionController';
+import { ConfirmButton } from '@/components/confirm-button';
+import { FlashNote } from '@/components/flash-note';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
+import { useFlashNote } from '@/hooks/use-flash-note';
 import { index as stashes } from '@/routes/stashes';
 import { Form, Head, Link, router, usePage } from '@inertiajs/react';
 import { Trash2 } from 'lucide-react';
 
 export default function Index() {
     const { collections } = usePage().props;
+    const { note, clear } = useFlashNote();
 
     return (
         <>
@@ -16,7 +20,10 @@ export default function Index() {
 
             <div className="mx-auto grid max-w-2xl gap-8">
                 <header className="grid gap-1">
-                    <h1 className="text-2xl font-medium">Collections</h1>
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-2xl font-medium">Collections</h1>
+                        <FlashNote note={note} onDone={clear} />
+                    </div>
                     <p className="text-sm text-muted-foreground">
                         A stash can be in several collections, or in none.
                     </p>
@@ -107,28 +114,23 @@ export default function Index() {
                                             ? 'stash'
                                             : 'stashes'}
                                     </Link>
-                                    <Button
+                                    <ConfirmButton
                                         variant="ghost"
                                         size="sm"
                                         className="ml-auto"
-                                        onClick={() => {
-                                            if (
-                                                confirm(
-                                                    `Delete the collection "${collection.name}"? The stashes in it stay.`,
-                                                )
-                                            ) {
-                                                router.delete(
-                                                    CollectionController.destroy.url(
-                                                        collection.id,
-                                                    ),
-                                                    { preserveScroll: true },
-                                                );
-                                            }
-                                        }}
+                                        confirmLabel="The stashes stay. Delete?"
+                                        onConfirm={() =>
+                                            router.delete(
+                                                CollectionController.destroy.url(
+                                                    collection.id,
+                                                ),
+                                                { preserveScroll: true },
+                                            )
+                                        }
                                     >
                                         <Trash2 />
                                         Delete
-                                    </Button>
+                                    </ConfirmButton>
                                 </div>
                             </li>
                         ))}

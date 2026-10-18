@@ -1,4 +1,5 @@
 import TokenController from '@/actions/App/Http/Controllers/Settings/TokenController';
+import { ConfirmButton } from '@/components/confirm-button';
 import InputError from '@/components/input-error';
 import { SettingsFrame } from '@/components/settings-frame';
 import { Button } from '@/components/ui/button';
@@ -84,28 +85,23 @@ export default function Tokens({ tokens }: Props) {
                                             : `Last used ${new Date(token.last_used_at).toLocaleString()}`}
                                     </span>
                                 </div>
-                                <Button
+                                <ConfirmButton
                                     variant="ghost"
                                     size="sm"
                                     aria-label={`Revoke ${token.name}`}
-                                    onClick={() => {
-                                        if (
-                                            confirm(
-                                                `Revoke "${token.name}"? Apps using it stop working.`,
-                                            )
-                                        ) {
-                                            router.delete(
-                                                TokenController.destroy.url(
-                                                    token.id,
-                                                ),
-                                                { preserveScroll: true },
-                                            );
-                                        }
-                                    }}
+                                    confirmLabel="Apps using it stop. Revoke?"
+                                    onConfirm={() =>
+                                        router.delete(
+                                            TokenController.destroy.url(
+                                                token.id,
+                                            ),
+                                            { preserveScroll: true },
+                                        )
+                                    }
                                 >
                                     <Trash2 />
                                     Revoke
-                                </Button>
+                                </ConfirmButton>
                             </li>
                         ))}
                     </ul>
