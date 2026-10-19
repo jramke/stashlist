@@ -2,7 +2,13 @@ import AppLogoIcon from '@/components/app-logo-icon';
 import { loadPoof, warmPoof } from '@/lib/poof';
 import { cn } from '@/lib/utils';
 import type { Rive } from '@rive-app/canvas-lite';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import {
+    useEffect,
+    useRef,
+    useState,
+    type CSSProperties,
+    type ReactNode,
+} from 'react';
 
 /** Eight bits of smoke for when the animation cannot be loaded. */
 const PUFFS = Array.from({ length: 8 }, (_, i) => {
@@ -127,12 +133,14 @@ export function LogoPoof({
                                 key={index}
                                 aria-hidden="true"
                                 className="pointer-events-none absolute top-1/2 left-1/2 animate-puff rounded-full bg-foreground/25"
-                                style={{
-                                    width: puff.size,
-                                    height: puff.size,
-                                    ['--puff-x' as string]: `${puff.x}px`,
-                                    ['--puff-y' as string]: `${puff.y}px`,
-                                }}
+                                style={
+                                    {
+                                        width: puff.size,
+                                        height: puff.size,
+                                        '--puff-x': `${puff.x}px`,
+                                        '--puff-y': `${puff.y}px`,
+                                    } as CSSProperties
+                                }
                             />
                         ))}
                 </>
