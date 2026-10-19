@@ -14,6 +14,8 @@ export default defineConfig({
         }),
         inertia(),
         react(),
+        // scripts/check-compiler.mjs runs this compiler over the sources (`npm run check`) and fails when it skips a
+        // function, which the build never reports. Keep its options in step with these.
         babel({
             presets: [reactCompilerPreset()],
         }),

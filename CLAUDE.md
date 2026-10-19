@@ -18,12 +18,12 @@ ddev composer dev         # php artisan dev: serve + queue + pail logs + vite + 
 ddev vite                 # only the Vite dev server, proxied at https://vite.stashlist.ddev.site
 ddev npm run build        # vite build + SSR bundle (bootstrap/ssr)
 
-ddev composer test        # everything CI runs: mago format --check, lint, analyze; typescript:transform; prettier --check + tsc; php artisan test
+ddev composer test        # everything CI runs: mago format --check, lint, analyze; typescript:transform; prettier --check + tsc + the compiler check; php artisan test
 ddev artisan test --filter=ProfileUpdateTest   # single test / file (Pest)
 ddev composer lint        # mago lint+analyze with --fix --unsafe --potentially-unsafe, then mago format (rewrites code)
 ddev composer format      # mago format (PHP only)
 ddev npm run format       # prettier --write . (non-PHP files only); pass files with `-- <file>...`
-ddev npm run check        # prettier --check + tsc --noEmit
+ddev npm run check        # prettier --check + tsc --noEmit + scripts/check-compiler.mjs (fails when the React Compiler skips a function, see Tooling decisions)
 ddev artisan typescript:transform   # regenerate the PHP -> TypeScript types
 ddev artisan scout:sync-index-settings   # push the index settings of config/scout.php to Meilisearch (run on every deploy)
 ddev artisan scout:import 'App\Models\Stash'   # index every stash again from the database (stashlist:reindex does the same, per user too)
@@ -50,6 +50,7 @@ A `PostToolUse` hook (`.claude/hooks/format.sh`) formats every file you write or
 - **PHP: Mago only** (`mago.toml`) for format, lint and analyze. No Pint or PHPStan. Config and `database/migrations` are excluded from lint/analyze but still formatted; `tests` is excluded from analyze. There is no baseline: fix issues in code, or use an inline `// @mago-expect lint:<rule>` / `// @mago-expect analysis:<code>` for framework-magic false positives (see `routes/console.php`, `app/Models/User.php`). Mago cannot see Facade macros, so prefer real methods over macros (e.g. `Route::get(..., Inertia::render())` instead of `Route::inertia`).
 - **JS: npm** (not pnpm), plain `vite` (not Vite Plus). `.npmrc` sets `ignore-scripts=true`.
 - **Prettier** formats everything except PHP (`.prettierignore`), with `prettier-plugin-organize-imports` and `prettier-plugin-tailwindcss` (sorts classes in `cn`/`clsx`/`cva`). There is no JS linter.
+- **React Compiler** (`babel-plugin-react-compiler` through `@rolldown/plugin-babel`, set up in `vite.config.ts`) skips a function it cannot compile and says nothing: the build logs no skip. `scripts/check-compiler.mjs`, the last step of `npm run check`, runs the same compiler over `resources/js` and fails on every skipped component or hook. Make it compile, or write `'use no memo';` as the first statement of the function with the reason above it (a skip that is written down passes). Known and only listed, not failed: with `@babel/core` 8 the compiler (1.0.0) skips every function whose props are destructured with a default (`{ label = 'x' }`), because Babel 8 took `AssignmentPattern` out of the `LVal` alias (react/react#36956, open); pinning `@babel/core` to 7 fixes it, see the entry of 2026-10-19 in `docs/PROGRESS.md`.
 - **Light mode only.** `:root` in `resources/css/app.css` holds the shadcn variables (borders are slightly transparent black, so they sit on any surface); there is no `.dark` block, no theme hook and no toggle. The `dark:` classes of generated shadcn components were removed; do not add dark styles back, and strip `dark:` from components the registry adds.
 
 ## Architecture

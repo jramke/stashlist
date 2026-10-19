@@ -7,7 +7,8 @@
         "build": "vite build && vite build --ssr",
         "dev": "vite",
         "format": "sh -c 'prettier --write --ignore-unknown ${@:-.}' --",
-        "check": "prettier --check . && tsc --noEmit",
+        "check": "prettier --check . && tsc --noEmit && npm run check:compiler",
+        "check:compiler": "node scripts/check-compiler.mjs",
         "check:bundle": "node scripts/check-bundle-size.mjs",
         "e2e": "playwright test"
     },
