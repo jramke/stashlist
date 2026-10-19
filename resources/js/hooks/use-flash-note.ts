@@ -25,10 +25,10 @@ export function useFlashNote(): {
     const timer = useRef<number>(undefined);
 
     useEffect(() => {
-        sinks++;
+        sinks += 1;
 
         return () => {
-            sinks--;
+            sinks -= 1;
             clearTimeout(timer.current);
         };
     }, []);
