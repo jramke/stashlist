@@ -63,6 +63,84 @@ export async function filterBy(page: Page, word: string): Promise<void> {
 }
 
 /**
+ * Holds the requests of one method to matching addresses for a while before they reach the server, so there is
+ * time to do something else while one is out.
+ */
+export async function holdRequests(
+    page: Page,
+    address: RegExp,
+    method: string,
+    milliseconds: number,
+): Promise<void> {
+    await page.route(address, async (route) => {
+        if (route.request().method() === method) {
+            await new Promise((resolve) => setTimeout(resolve, milliseconds));
+        }
+
+        await route.continue();
+    });
+}
+
+/**
+ * Notes what a control shows at every frame from now on: the text of a field, or whether a checkbox is checked
+ * (`aria-checked`). The function it returns ends the watch a few frames later and says what the control showed,
+ * one value after the other: a value that comes back for a moment is in the list.
+ */
+export async function watch(
+    control: Locator,
+    reading: 'text' | 'checked' = 'text',
+): Promise<() => Promise<string[]>> {
+    const probe = await control.evaluateHandle((node, what) => {
+        const read = () => {
+            if (what === 'checked') {
+                return node.getAttribute('aria-checked') ?? '';
+            }
+
+            if (!(
+                node instanceof HTMLInputElement ||
+                node instanceof HTMLTextAreaElement
+            )) {
+                throw new Error('Not a text field.');
+            }
+
+            return node.value;
+        };
+
+        const shown = [read()];
+        let running = true;
+        const frame = () => {
+            const now = read();
+
+            if (now !== shown[shown.length - 1]) {
+                shown.push(now);
+            }
+
+            if (running) {
+                requestAnimationFrame(frame);
+            }
+        };
+
+        requestAnimationFrame(frame);
+
+        return {
+            stop: async () => {
+                for (let i = 0; i < 4; i++) {
+                    await new Promise((resolve) =>
+                        requestAnimationFrame(resolve),
+                    );
+                }
+
+                running = false;
+
+                return shown;
+            },
+        };
+    }, reading);
+
+    return () => probe.evaluate((watching) => watching.stop());
+}
+
+/**
  * Background jobs (index writes, extraction) run on the queue. In CI the queue is synchronous and there is
  * nothing to wait for; locally a worker runs until the queue is empty.
  */

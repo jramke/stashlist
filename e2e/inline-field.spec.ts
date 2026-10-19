@@ -1,5 +1,5 @@
-import { expect, test, type Locator, type Page } from '@playwright/test';
-import { capture, register } from './support';
+import { expect, test, type Page } from '@playwright/test';
+import { capture, holdRequests, register, watch } from './support';
 
 /** Signs up, stashes a note and opens it: the stash page, where the title and the text save themselves. */
 async function openNote(page: Page, text: string): Promise<void> {
@@ -7,66 +7,13 @@ async function openNote(page: Page, text: string): Promise<void> {
     await capture(page, text);
     await page.getByRole('option', { name: text }).click();
     await expect(page).toHaveURL(/\/stashes\/\d+$/);
+    // The page is built again once, a moment after it opens, and a node watched or a text typed before that is
+    // lost with the first one: wait until the network is quiet.
+    await page.waitForLoadState('networkidle');
 }
 
 /** The requests that save a field of the stash page. */
 const SAVES = /\/stashes\/\d+$/;
-
-/** Holds every save for a while before it reaches the server, so there is time to type while one is out. */
-async function holdSaves(page: Page, milliseconds: number): Promise<void> {
-    await page.route(SAVES, async (route) => {
-        if (route.request().method() === 'PATCH') {
-            await new Promise((resolve) => setTimeout(resolve, milliseconds));
-        }
-
-        await route.continue();
-    });
-}
-
-/**
- * Notes what a field shows at every frame from now on. The function it returns ends the watch a few frames later
- * and says what the field showed, one value after the other: a text that comes back for a moment is in the list.
- */
-async function watch(field: Locator): Promise<() => Promise<string[]>> {
-    const probe = await field.evaluateHandle((node) => {
-        if (!(
-            node instanceof HTMLInputElement ||
-            node instanceof HTMLTextAreaElement
-        )) {
-            throw new Error('Not a text field.');
-        }
-
-        const shown = [node.value];
-        let running = true;
-        const frame = () => {
-            if (node.value !== shown[shown.length - 1]) {
-                shown.push(node.value);
-            }
-
-            if (running) {
-                requestAnimationFrame(frame);
-            }
-        };
-
-        requestAnimationFrame(frame);
-
-        return {
-            stop: async () => {
-                for (let i = 0; i < 4; i++) {
-                    await new Promise((resolve) =>
-                        requestAnimationFrame(resolve),
-                    );
-                }
-
-                running = false;
-
-                return shown;
-            },
-        };
-    });
-
-    return () => probe.evaluate((watching) => watching.stop());
-}
 
 test('the title shows what was typed from the first key to the answer of the server', async ({
     page,
@@ -115,7 +62,7 @@ test('text typed while a save is on its way is kept, and saved after it', async 
     await openNote(page, 'buy sourdough flour');
     const title = page.getByLabel('Title', { exact: true });
 
-    await holdSaves(page, 600);
+    await holdRequests(page, SAVES, 'PATCH', 600);
 
     const out = page.waitForRequest((request) => request.method() === 'PATCH');
     await title.fill('Sour');
@@ -151,7 +98,7 @@ test('the old text put back while a save is on its way is saved too', async ({
     await expect(page).toHaveTitle(/Old/);
 
     // Short enough for the answer to come back before the put-back is saved, which is 700 ms after it was typed.
-    await holdSaves(page, 200);
+    await holdRequests(page, SAVES, 'PATCH', 200);
 
     const out = page.waitForRequest((request) => request.method() === 'PATCH');
     await title.fill('Older');
