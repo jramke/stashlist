@@ -661,6 +661,10 @@ export const machine = createMachine<OmnibarSchema>({
 
             // A keyboard is at hand on a desktop: the box is ready. On a phone it would only pop the keyboard up.
             focusOnStart({ prop, scope }) {
+                if (prop('autoFocus') === false) {
+                    return;
+                }
+
                 if (
                     prop('initial') !== null ||
                     scope.getWin().matchMedia('(pointer: fine)').matches

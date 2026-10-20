@@ -1,3 +1,4 @@
+import { AppHeader } from '@/components/app-header';
 import { FlashNote } from '@/components/flash-note';
 import { Kbd } from '@/components/kbd';
 import { buttonVariants } from '@/components/ui/button-variants';
@@ -15,7 +16,7 @@ import {
 import { store } from '@/routes/stashes';
 import { router, usePage } from '@inertiajs/react';
 import { normalizeProps, useMachine } from '@zag-js/react';
-import { ImagePlus, Link2, Search, X } from 'lucide-react';
+import { ImagePlus, Link2, X } from 'lucide-react';
 import { useId } from 'react';
 
 /** Asks for the feed. The list is a merge prop (infinite scroll appends pages); a new query starts it over. */
@@ -49,16 +50,18 @@ function stashIt({ payload, succeeded, failed, settled }: StashRequest) {
 }
 
 /**
- * The one box of the feed. Type to search; the words that name a color, a type, a tag or a collection turn
- * into chips. Paste or drop a link, a color, an image or a note to stash it: Enter saves a link or a color
- * code, Ctrl or Cmd with Enter saves whatever is typed. What it is doing and what comes next is the machine in
- * `machines/omnibar`; this draws it.
+ * The one box of the feed, and with it the bar at the top of the page: the mark of the app is the front of the
+ * box, the menu of the account its end, and the line under all of it. Type to search; the words that name a
+ * color, a type, a tag or a collection turn into chips. Paste or drop a link, a color, an image or a note to
+ * stash it: Enter saves a link or a color code, Ctrl or Cmd with Enter saves whatever is typed. What it is doing
+ * and what comes next is the machine in `machines/omnibar`; this draws it.
  */
 export function Omnibar({
     filters,
     tags,
     initial,
     note,
+    autoFocus,
     onNoteDone,
     onStashed,
 }: {
@@ -66,6 +69,7 @@ export function Omnibar({
     tags: App.Data.TagData[];
     initial: string | null;
     note: App.Data.ToastData | null;
+    autoFocus?: boolean;
     onNoteDone: () => void;
     onStashed: () => void;
 }) {
@@ -78,6 +82,7 @@ export function Omnibar({
         collections,
         initial,
         note,
+        autoFocus,
         onVisit: visitFeed,
         onStash: stashIt,
         onNoteDone,
@@ -88,32 +93,33 @@ export function Omnibar({
     const api = connect(service, normalizeProps);
 
     return (
-        <div {...api.getRootProps()} className="sticky top-3 z-30 mb-6">
-            <div
-                {...api.getFieldProps()}
-                className={cn(
-                    'relative rounded-2xl border bg-card shadow-sm transition-[border-color,box-shadow] duration-150 focus-within:border-foreground/25 focus-within:shadow-md',
-                    api.dragging && 'border-foreground/40 shadow-md',
-                )}
-            >
-                <div className="flex items-start gap-3 px-4 py-3.5">
+        <AppHeader
+            className="sticky top-0 z-30 mb-6 has-[[data-dragging]]:border-foreground/40 has-[[data-omnibar-input]:focus]:border-foreground/40"
+            badge={
+                api.leading.kind === 'search' ? null : (
                     <span
                         {...api.getLeadingProps()}
-                        className="mt-0.5 flex size-5 shrink-0 items-center justify-center text-muted-foreground"
+                        aria-hidden
+                        className="absolute -right-1.5 -bottom-1 grid size-3.5 animate-chip-in place-items-center rounded-full bg-background text-muted-foreground ring-1 ring-foreground/15"
                     >
                         {api.leading.kind === 'swatch' ? (
                             <span
-                                className="size-4 rounded-full border border-foreground/15"
+                                className="size-2.5 rounded-full"
                                 style={{ background: api.leading.color }}
                             />
-                        ) : api.leading.kind === 'link' ? (
-                            <Link2 className="size-4" />
                         ) : (
-                            <Search className="size-4" />
+                            <Link2 className="size-2.5" />
                         )}
                     </span>
-
-                    <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 gap-y-1">
+                )
+            }
+        >
+            <div {...api.getRootProps()} className="relative min-w-0 flex-1">
+                <div
+                    {...api.getFieldProps()}
+                    className="flex items-start gap-3"
+                >
+                    <div className="flex min-h-11 min-w-0 flex-1 flex-wrap items-center gap-x-1.5 gap-y-1 py-2.5">
                         {api.chips.map((chip) => (
                             <span
                                 key={chip.key}
@@ -144,7 +150,7 @@ export function Omnibar({
 
                     <div
                         {...api.getSlotProps()}
-                        className="flex h-6 shrink-0 items-center gap-2 text-sm"
+                        className="flex h-11 shrink-0 items-center gap-2 text-sm"
                     >
                         {api.slot === 'stashing' ? (
                             <span className="inline-flex animate-note-in items-center gap-1.5 text-muted-foreground">
@@ -190,7 +196,7 @@ export function Omnibar({
                 {api.dragging && (
                     <div
                         {...api.getDropProps()}
-                        className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-2xl bg-card/90 text-sm text-muted-foreground backdrop-blur-[2px]"
+                        className="pointer-events-none absolute inset-0 flex items-center justify-center bg-background/90 text-sm text-muted-foreground backdrop-blur-[2px]"
                     >
                         <ImagePlus className="mr-2 size-4" />
                         Drop to stash
@@ -243,9 +249,9 @@ export function Omnibar({
                         )}
                     </div>
                 )}
-            </div>
 
-            <input {...api.getPickerProps()} className="hidden" />
-        </div>
+                <input {...api.getPickerProps()} className="hidden" />
+            </div>
+        </AppHeader>
     );
 }

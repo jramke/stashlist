@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { box, register } from './support';
+import { box, capture, register } from './support';
 
 /** Counts the sound sources the page creates, which is as close to hearing it as a test gets. */
 async function countVoices(page: Page) {
@@ -82,9 +82,9 @@ test('with reduced motion the app starts quiet, and m turns it on', async ({
     await box(page).pressSequentially('hi');
     expect(await voices(page)).toBe(before);
 
-    // Out of the box, then the shortcut.
-    await page.keyboard.press('Escape');
-    await page.keyboard.press('Escape');
+    // Onto a card, then the shortcut: with nothing selected the letters are typed into the box instead.
+    await capture(page, 'a note');
+    await page.keyboard.press('ArrowDown');
     await page.keyboard.press('m');
     await expect(page.getByText('Sounds on')).toBeVisible();
 

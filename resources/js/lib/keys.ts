@@ -50,3 +50,59 @@ export function isTextField(target: EventTarget | null): boolean {
         (target instanceof HTMLElement && target.isContentEditable)
     );
 }
+
+/** Places that keep their letters for themselves: the list of cards, a menu, a dialog, the list of the box. */
+const OWN_KEYS =
+    '[data-stash-grid], [role=menu], [role=dialog], [role=listbox]';
+
+/**
+ * Whether the letters typed now are for the box: the feed has one, and the focus is on nothing that wants them (the
+ * page itself, or a button or a link that is not part of a list or a menu). The letter shortcuts stand aside
+ * then, and `typeIntoBox` moves the focus.
+ */
+export function typesIntoBox(): boolean {
+    if (document.querySelector('[data-omnibar-input]') === null) {
+        return false;
+    }
+
+    const active = document.activeElement;
+
+    if (
+        active === null ||
+        active === document.body ||
+        active === document.documentElement
+    ) {
+        return true;
+    }
+
+    return (
+        (active instanceof HTMLButtonElement ||
+            active instanceof HTMLAnchorElement) &&
+        active.closest(OWN_KEYS) === null
+    );
+}
+
+/**
+ * A letter typed with nothing to take it goes to the box: it gets the focus, and the key that was pressed lands in
+ * it, because the browser puts the character where the focus is when the key goes up. Keys with Ctrl, Cmd or Alt
+ * are shortcuts, not text (AltGr is how some keyboards type a character), and a key that something else already
+ * answered (a hotkey) is left alone.
+ */
+export function typeIntoBox(event: KeyboardEvent): void {
+    const command =
+        (event.ctrlKey || event.metaKey || event.altKey) &&
+        !event.getModifierState('AltGraph');
+
+    if (
+        event.defaultPrevented ||
+        event.isComposing ||
+        command ||
+        event.key.length !== 1 ||
+        event.key === ' ' ||
+        !typesIntoBox()
+    ) {
+        return;
+    }
+
+    focusBox();
+}

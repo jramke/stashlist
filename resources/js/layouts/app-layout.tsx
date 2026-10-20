@@ -1,19 +1,24 @@
 import { actions } from '@/commands/actions';
 import { useAction, useScope } from '@/commands/hooks';
-import { AccountMenu } from '@/components/account-menu';
-import AppLogoIcon from '@/components/app-logo-icon';
-import { ShortcutSheet } from '@/components/shortcut-sheet';
+import { AppHeader } from '@/components/app-header';
 import { trackInput } from '@/lib/input';
-import { home } from '@/routes';
-import { Link, router, usePage } from '@inertiajs/react';
-import { useEffect, useState, type ReactNode } from 'react';
+import { typeIntoBox } from '@/lib/keys';
+import { router, usePage } from '@inertiajs/react';
+import { lazy, Suspense, useEffect, useState, type ReactNode } from 'react';
+
+// The sheet is for the person who presses ?, so the first visit does not carry it.
+const ShortcutSheet = lazy(() =>
+    import('@/components/shortcut-sheet').then((module) => ({
+        default: module.ShortcutSheet,
+    })),
+);
 
 /**
- * The frame of every page for a signed-in user: a logo, a small menu and the page. Nothing else; the box on the
- * feed does the searching, and the keyboard does the rest of the navigating.
+ * The frame of every page for a signed-in user: the bar with the logo and the small menu, and the page. Nothing
+ * else; the box on the feed is part of the bar there (the feed draws it, see `components/omnibar.tsx`) and does
+ * the searching, and the keyboard does the rest of the navigating.
  */
 export default function AppLayout({ children }: { children?: ReactNode }) {
-    const { name } = usePage().props;
     const { component } = usePage();
     const [help, setHelp] = useState(false);
     const onFeed = component === 'stashes/index';
@@ -39,6 +44,13 @@ export default function AppLayout({ children }: { children?: ReactNode }) {
     // The keyboard: the actions of the app are bound for as long as the frame is on screen.
     useEffect(() => actions.attach(document), []);
     useEffect(() => trackInput(), []);
+
+    // Letters typed with nothing to take them go to the box (only the feed has one).
+    useEffect(() => {
+        document.addEventListener('keydown', typeIntoBox);
+
+        return () => document.removeEventListener('keydown', typeIntoBox);
+    }, []);
     useScope('page', !onFeed);
     useScope('sheet', help);
     useAction('shortcuts.toggle', () => setHelp((value) => !value));
@@ -46,23 +58,19 @@ export default function AppLayout({ children }: { children?: ReactNode }) {
 
     return (
         <div className="min-h-svh bg-background text-foreground">
-            <header className="mx-auto flex max-w-7xl items-center px-4 pt-4 pb-2 md:px-6">
-                <Link
-                    href={home()}
-                    className="flex items-center gap-2 rounded-lg font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-                >
-                    <AppLogoIcon className="size-5" />
-                    {name}
-                </Link>
+            <div className="mx-auto max-w-7xl px-4 md:px-6">
+                {!onFeed && <AppHeader withName />}
 
-                <AccountMenu className="ml-auto" />
-            </header>
+                <main className={onFeed ? 'pb-24' : 'pt-6 pb-24'}>
+                    {children}
+                </main>
+            </div>
 
-            <main className="mx-auto max-w-7xl px-4 pt-2 pb-24 md:px-6">
-                {children}
-            </main>
-
-            {help && <ShortcutSheet onClose={() => setHelp(false)} />}
+            {help && (
+                <Suspense>
+                    <ShortcutSheet onClose={() => setHelp(false)} />
+                </Suspense>
+            )}
         </div>
     );
 }

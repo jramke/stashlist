@@ -539,15 +539,17 @@ test('a key belongs to a place: stash keys are silent on the feed, the sheet com
     await register(page);
     await capture(page, 'buy sourdough flour');
 
-    // Out of the box. Stash keys do nothing on the feed.
+    // Out of the box, with nothing selected, the letters are typed into the box: no stash key does anything.
     await page.keyboard.press('Escape');
     await expect(box(page)).not.toBeFocused();
-    await page.keyboard.press('t');
-    await page.keyboard.press('o');
-    await expect(page).toHaveURL(/\/stashes$/);
+    await page.keyboard.type('to');
+    await expect(box(page)).toHaveValue('to');
     await expect(page.getByLabel('Add a tag')).toHaveCount(0);
+    await box(page).fill('');
+    await expect(page).toHaveURL(/\/stashes$/);
 
-    // g then c goes to the collections, from anywhere that is not a field.
+    // Onto the cards the letters are shortcuts: g then c goes to the collections (and from every page without a box).
+    await page.keyboard.press('ArrowDown');
     await page.keyboard.press('g');
     await page.keyboard.press('c');
     await expect(page).toHaveURL(/\/collections$/);

@@ -70,6 +70,8 @@ export interface OmnibarProps extends CommonProperties {
     collections: App.Data.CollectionData[];
     /** Text that comes with the visit (the share sheet): it fills the box and takes the focus. */
     initial?: string | null | undefined;
+    /** Whether the box takes the focus when it appears (on a desktop). Unsaid, it does; the feed says no when the keyboard goes back to a card. */
+    autoFocus?: boolean | undefined;
     /** The server's last note, shown in the box where the change was made. */
     note?: App.Data.ToastData | null | undefined;
     onVisit: (request: VisitRequest) => void;

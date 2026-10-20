@@ -1,3 +1,4 @@
+import { typesIntoBox } from '@/lib/keys';
 import type { HotkeyStore, Platform } from '@zag-js/hotkeys';
 import { catalog, type ActionDef, type ActionId, type Scope } from './catalog';
 
@@ -162,13 +163,19 @@ class Actions {
             }
 
             def.hotkeys.forEach((hotkey, index) => {
+                // A bare letter (or a sequence that starts with one) stands aside while the letters are for the box.
+                const letter = /^[a-z]$/i.test(
+                    hotkey.split('>')[0]?.trim() ?? '',
+                );
+
                 store.register({
                     id: index === 0 ? def.id : `${def.id}#${index}`,
                     hotkey,
                     label: def.label,
                     category: def.category,
                     scopes: def.scopes ?? ['*'],
-                    enabled: () => this.canDo(def.id),
+                    enabled: () =>
+                        this.canDo(def.id) && !(letter && typesIntoBox()),
                     action: (event) => {
                         this.doIt(def.id, event);
                     },
