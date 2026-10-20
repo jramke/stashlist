@@ -26,3 +26,8 @@ export function openedHere(): number | null {
         ? opened.id
         : null;
 }
+
+/** The person went to the box on their own: the card they came from is no longer where the keyboard should go. */
+export function forgetOpened(): void {
+    opened = null;
+}

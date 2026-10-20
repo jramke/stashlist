@@ -1,5 +1,9 @@
+import { forgetOpened } from '@/lib/opened';
+
 /** Focuses the one box that searches and stashes, if this page has it. */
 export function focusBox(): boolean {
+    forgetOpened();
+
     const box = document.querySelector<HTMLElement>('[data-omnibar-input]');
 
     box?.focus();

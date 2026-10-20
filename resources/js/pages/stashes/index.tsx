@@ -88,7 +88,12 @@ export default function Index({ stashes, filters, tags, share }: Props) {
     useEffect(() => {
         const id = openedHere();
 
-        if (id !== null && visible.some((stash) => stash.id === id)) {
+        // Only while nothing has the focus: a person who was quicker (a `/` for the box) keeps what they chose.
+        const free =
+            document.activeElement === null ||
+            document.activeElement === document.body;
+
+        if (free && id !== null && visible.some((stash) => stash.id === id)) {
             grid.api.highlightValue(String(id));
             focusGrid();
         }
