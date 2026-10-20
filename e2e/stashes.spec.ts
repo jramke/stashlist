@@ -577,3 +577,35 @@ test('a key belongs to a place: stash keys are silent on the feed, the sheet com
     await page.keyboard.press('Escape');
     await expect(page).toHaveURL(/\/stashes$/);
 });
+
+test('the first suggestion is lit, Enter takes it, and the arrow keys never go above it', async ({
+    page,
+}) => {
+    await register(page);
+
+    await box(page).fill('bl');
+    const blue = page.getByRole('option', { name: /blue/ });
+    const black = page.getByRole('option', { name: /black/ });
+    await expect(blue).toHaveAttribute('aria-selected', 'true');
+    await expect(black).toHaveAttribute('aria-selected', 'false');
+
+    await box(page).press('ArrowDown');
+    await expect(black).toHaveAttribute('aria-selected', 'true');
+    await box(page).press('ArrowUp');
+    await box(page).press('ArrowUp');
+    await expect(blue).toHaveAttribute('aria-selected', 'true');
+
+    // Enter takes the lit one.
+    await box(page).press('Enter');
+    await expect(
+        page.getByRole('button', { name: 'Remove blue' }),
+    ).toBeVisible();
+    await expect(box(page)).toHaveValue('');
+
+    // Typing again lights the first one of the new list.
+    await box(page).fill('not');
+    await expect(page.getByRole('option', { name: /Notes/ })).toHaveAttribute(
+        'aria-selected',
+        'true',
+    );
+});

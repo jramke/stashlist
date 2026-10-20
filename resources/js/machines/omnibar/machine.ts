@@ -443,7 +443,19 @@ export const machine = createMachine<OmnibarSchema>({
 
                 clearTimers(params);
                 context.set('text', event.value);
-                context.set('highlight', -1);
+                // The first suggestion is the one Tab and Enter take, so it is the one that is lit.
+                context.set(
+                    'highlight',
+                    suggestionsOf(
+                        event.value,
+                        classify(event.value),
+                        params.computed('shown'),
+                        params.prop('tags'),
+                        params.prop('collections'),
+                    ).length > 0
+                        ? 0
+                        : -1,
+                );
                 scheduleSearch(params, event.value);
             },
             typedWhileStashing({ context, event }) {
@@ -491,8 +503,13 @@ export const machine = createMachine<OmnibarSchema>({
                     Math.min(index + 1, last),
                 );
             },
-            highlightPrevious({ context }) {
-                context.set('highlight', (index) => index - 1);
+            highlightPrevious(params) {
+                // Among suggestions the first row is the top: it is lit by default, and there is nothing above it.
+                const floor = listOf(params).suggesting ? 0 : -1;
+
+                params.context.set('highlight', (index) =>
+                    Math.max(index - 1, floor),
+                );
             },
             highlightRow({ context, event }) {
                 if (event.type === 'ROW.HOVER') {
