@@ -54,10 +54,6 @@ export default function AppLayout({ children }: { children?: ReactNode }) {
         return () => document.removeEventListener('keydown', typeIntoBox);
     }, []);
     useScope('page', !onFeed);
-    useScope('sheet', help);
-    useAction('shortcuts.toggle', () => showSheet(!help));
-    useAction('shortcuts.close', () => showSheet(false));
-
     function showSheet(open: boolean) {
         setHelp(open);
 
@@ -65,6 +61,10 @@ export default function AppLayout({ children }: { children?: ReactNode }) {
             setSheetUsed(true);
         }
     }
+
+    useScope('sheet', help);
+    useAction('shortcuts.toggle', () => showSheet(!help));
+    useAction('shortcuts.close', () => showSheet(false));
 
     return (
         <div className="min-h-svh bg-background text-foreground">
