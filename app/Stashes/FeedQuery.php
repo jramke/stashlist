@@ -34,6 +34,10 @@ final class FeedQuery
             $query->where('type', $filters->type->value);
         }
 
+        if ($filters->subtype !== null) {
+            $query->where('subtype', $filters->subtype->value);
+        }
+
         if ($filters->status !== null) {
             $query->where('ai_status', $filters->status->value);
         }

@@ -9,6 +9,7 @@ use App\Enums\AiStatus;
 use App\Enums\ColorName;
 use App\Enums\SearchMode;
 use App\Enums\StashType;
+use App\Enums\Subtype;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -21,6 +22,7 @@ final class IndexStashRequest extends FormRequest
     {
         return [
             'type' => ['nullable', Rule::enum(StashType::class)],
+            'subtype' => ['nullable', Rule::enum(Subtype::class)],
             'status' => ['nullable', Rule::enum(AiStatus::class)],
             'tag' => ['nullable', 'array', 'max:10'],
             'tag.*' => ['integer', 'min:1'],
@@ -50,6 +52,7 @@ final class IndexStashRequest extends FormRequest
             status: AiStatus::tryFrom($this->string('status')->toString()),
             q: $text === '' ? null : $text,
             color: ColorName::tryFrom($this->string('color')->toString()),
+            subtype: Subtype::tryFrom($this->string('subtype')->toString()),
         );
     }
 }

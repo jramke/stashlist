@@ -86,6 +86,10 @@ final class StashSearch
             $search->where('type', $filters->type->value);
         }
 
+        if ($filters->subtype !== null) {
+            $search->where('subtype', $filters->subtype->value);
+        }
+
         if ($filters->color !== null) {
             $search->where('colors', $filters->color->value);
         }

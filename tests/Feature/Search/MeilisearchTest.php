@@ -212,3 +212,16 @@ test('pictures are narrowed by the color they were filed under', function () {
         ->and(found($this->user, text: 'sneakers'))
         ->toEqualCanonicalizing([$red->id, $blue->id]);
 });
+
+test('links are narrowed by their kind', function () {
+    $article = indexed_stash($this->user, ['title' => 'Bread notes', 'subtype' => 'article']);
+    $recipe = indexed_stash($this->user, ['title' => 'Bread loaf', 'subtype' => 'recipe']);
+    $this->meili->settle();
+
+    expect(found($this->user, text: 'bread', filters: new FeedFiltersData(subtype: App\Enums\Subtype::Recipe)))
+        ->toBe([$recipe->id])
+        ->and(found($this->user, text: 'bread', filters: new FeedFiltersData(subtype: App\Enums\Subtype::Video)))
+        ->toBeEmpty()
+        ->and(found($this->user, text: 'bread'))
+        ->toEqualCanonicalizing([$article->id, $recipe->id]);
+});
