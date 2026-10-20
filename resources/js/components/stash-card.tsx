@@ -183,6 +183,7 @@ function Card({
         <Root
             {...merged}
             {...(inert ? {} : { href })}
+            data-stash-id={stash.id}
             className={cn(
                 'group/card relative block aspect-square scroll-mt-24 scroll-mb-4 overflow-hidden rounded-[1.25rem] bg-surface text-foreground transition-[background-color,box-shadow,transform] duration-150 outline-none select-none [content-visibility:auto] hover:bg-surface-hover active:scale-[0.985] data-[fresh]:animate-stash-in data-[highlighted]:ring-3 data-[highlighted]:ring-ring/60 data-[peek]:bg-surface-hover keyboard:transition-none',
                 className,

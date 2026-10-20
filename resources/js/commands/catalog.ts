@@ -264,6 +264,28 @@ export const catalog = define([
         scopes: ['feed'],
     },
     {
+        id: 'card.open-link',
+        label: 'Open the link',
+        category: 'Your stashes',
+        hotkeys: ['O'],
+        scopes: ['feed'],
+    },
+    {
+        id: 'card.copy',
+        label: 'Copy the link, color or text',
+        category: 'Your stashes',
+        hotkeys: ['C'],
+        scopes: ['feed'],
+    },
+    {
+        id: 'card.menu',
+        label: 'Open the menu (right-click works too)',
+        category: 'Your stashes',
+        hotkeys: ['shift+F10', 'ContextMenu'],
+        show: ['shift+F10'],
+        scopes: ['feed'],
+    },
+    {
         id: 'stash.undo',
         label: 'Undo a delete',
         category: 'Your stashes',

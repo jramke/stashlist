@@ -4,7 +4,10 @@ import { Omnibar } from '@/components/omnibar';
 import { StashGrid } from '@/components/stash-grid';
 import { useFlashNote } from '@/hooks/use-flash-note';
 import { onFirstRow, useStashGrid } from '@/hooks/use-stash-grid';
-import { focusBox, inGrid } from '@/lib/keys';
+import { useStashMenu } from '@/hooks/use-stash-menu';
+import { focusBox, focusGrid, inGrid } from '@/lib/keys';
+import { openedHere, rememberOpened } from '@/lib/opened';
+import { copyOf, copyStash, hasLink, openLink } from '@/lib/stash-actions';
 import { show } from '@/routes/stashes';
 import type { Scroll } from '@/types';
 import { Head, router, usePoll } from '@inertiajs/react';
@@ -69,7 +72,28 @@ export default function Index({ stashes, filters, tags, share }: Props) {
         () => stashes.data.filter((stash) => !gone.includes(stash.id)),
         [stashes.data, gone],
     );
-    const grid = useStashGrid(visible, (id) => router.visit(show(id).url));
+    const grid = useStashGrid(visible, open);
+    /** The card the keyboard is on. */
+    const highlighted = () =>
+        visible.find((stash) => String(stash.id) === grid.api.highlightedValue);
+    const { onContextMenu, openHighlighted, menu } = useStashMenu({
+        stashes: visible,
+        highlightedId: () => highlighted()?.id ?? null,
+        onHighlight: (id) => grid.api.highlightValue(String(id)),
+        onOpen: open,
+        onDelete: remove,
+    });
+
+    // Back from a stash the keyboard is on the card that was opened.
+    useEffect(() => {
+        const id = openedHere();
+
+        if (id !== null && visible.some((stash) => stash.id === id)) {
+            grid.api.highlightValue(String(id));
+            focusGrid();
+        }
+        // Once, when the feed is shown.
+    }, []);
 
     // The keyboard in the feed (the keys are in the catalog). The arrow keys, Home, End and Enter are the list's
     // own; j and k go a row, Backspace deletes, Cmd+Z takes it back, Escape goes back to the box.
@@ -93,6 +117,40 @@ export default function Index({ stashes, filters, tags, share }: Props) {
         },
         enabled: () => inGrid() && grid.api.highlightedValue !== null,
     });
+    useAction('card.open-link', {
+        run: () => {
+            const stash = highlighted();
+
+            if (stash !== undefined) {
+                openLink(stash);
+            }
+        },
+        enabled: () => {
+            const stash = highlighted();
+
+            return inGrid() && stash !== undefined && hasLink(stash);
+        },
+    });
+    useAction('card.copy', {
+        run: () => {
+            const stash = highlighted();
+
+            if (stash !== undefined) {
+                void copyStash(stash);
+            }
+        },
+        enabled: () => {
+            const stash = highlighted();
+
+            return inGrid() && stash !== undefined && copyOf(stash) !== null;
+        },
+    });
+    useAction('card.menu', {
+        run: () => {
+            openHighlighted();
+        },
+        enabled: () => inGrid() && highlighted() !== undefined,
+    });
     useAction('stash.undo', {
         run: () => {
             if (note?.undo_url) {
@@ -101,6 +159,12 @@ export default function Index({ stashes, filters, tags, share }: Props) {
         },
         enabled: () => note?.undo_url != null,
     });
+
+    /** Goes to the stash and remembers the card, so the keyboard is back on it when the person returns. */
+    function open(id: number) {
+        rememberOpened(id);
+        router.visit(show(id).url);
+    }
 
     /** Takes the card off the screen now and asks the server; the note in the box offers the undo. */
     function remove(id: number) {
@@ -139,6 +203,8 @@ export default function Index({ stashes, filters, tags, share }: Props) {
                     tags={tags}
                     initial={share}
                     note={note}
+                    // Back from a stash the keyboard goes to the card that was opened, not to the box.
+                    autoFocus={openedHere() === null}
                     onNoteDone={clear}
                     onStashed={() =>
                         setFreshAfter(
@@ -160,8 +226,11 @@ export default function Index({ stashes, filters, tags, share }: Props) {
                         freshAfter={freshAfter}
                         scrollKey="stashes"
                         onLeaveTop={focusBox}
+                        onContextMenu={onContextMenu}
                     />
                 )}
+
+                {menu}
             </div>
         </>
     );

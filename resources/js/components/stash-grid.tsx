@@ -17,6 +17,7 @@ export function StashGrid({
     scrollKey,
     inert = false,
     onLeaveTop,
+    onContextMenu,
 }: {
     grid: Grid;
     stashes: Stash[];
@@ -28,6 +29,8 @@ export function StashGrid({
     inert?: boolean;
     /** The keyboard went up from the first row: out of the grid. */
     onLeaveTop: () => void;
+    /** A right-click, a long press or the Menu key on the cards (the feed's menu). */
+    onContextMenu?: (event: MouseEvent) => void;
 }) {
     const { api } = grid;
     const content = api.getContentProps();
@@ -63,7 +66,7 @@ export function StashGrid({
     });
 
     return (
-        <div {...api.getRootProps()}>
+        <div {...api.getRootProps()} onContextMenu={onContextMenu}>
             <span {...api.getLabelProps()} className="sr-only">
                 Your stashes
             </span>
