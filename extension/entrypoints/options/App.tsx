@@ -21,6 +21,7 @@ import {
 import { explain } from '@/lib/stash-tab';
 import type { Collection, Defaults } from '@/lib/types';
 import { useEffect, useRef, useState } from 'react';
+import { AutoStash } from './AutoStash';
 
 type Status = { tone: 'muted' | 'error'; text: string } | null;
 
@@ -352,6 +353,8 @@ export function App() {
                     </Note>
                 )}
             </section>
+
+            <AutoStash />
 
             <section className="grid gap-3">
                 <h2 className="text-sm font-medium">Stashed pages</h2>

@@ -87,13 +87,25 @@ export default function Extension({ marketing }: Props) {
                     </p>
                 </Section>
 
+                <Section title="Stash what you save">
+                    <p>
+                        Optional. Turn on GitHub, X or YouTube in the settings
+                        and a star, a bookmark or a saved video is stashed too,
+                        the moment you press it. Each site is allowed on its
+                        own, and nothing is read or sent on a site you did not
+                        turn on.
+                    </p>
+                </Section>
+
                 <Section title="What it can see">
                     <p>
                         It reads a page only when you ask: a click, the shortcut
-                        or the menu. There is no script on every page and
-                        nothing is sent in the background, except a check every
-                        half hour for highlights you made elsewhere. The
-                        addresses of pages you visit never leave your browser.
+                        or the menu. Only if you turn on showing highlights, or
+                        stashing what you save on a site, is there a script on a
+                        page, and only on the pages that setting covers. Nothing
+                        is sent in the background, except a check every half
+                        hour for highlights you made elsewhere. The addresses of
+                        pages you visit never leave your browser.
                     </p>
                 </Section>
 

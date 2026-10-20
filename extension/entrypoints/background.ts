@@ -1,3 +1,4 @@
+import { readSavedItem, stashSaved } from '@/lib/auto-stash/stash';
 import { highlightSelection } from '@/lib/highlights/create';
 import { syncHighlights } from '@/lib/highlights/sync';
 import { isBadgeOn, isSaved, syncSaved } from '@/lib/saved';
@@ -69,6 +70,15 @@ export default defineBackground(() => {
     });
 
     browser.contextMenus.onClicked.addListener(onMenuClick);
+
+    // Something was saved on a site the person turned "Stash when I save" on for (entrypoints/auto-stash.ts).
+    browser.runtime.onMessage.addListener((message, sender) => {
+        const item = readSavedItem(message);
+
+        if (item !== null && sender.id === browser.runtime.id) {
+            void run(sender.tab?.id, () => stashSaved(item));
+        }
+    });
 
     // The browser flows cannot click the browser's own menu: the end-to-end build lets them call the same handler.
     if (import.meta.env.MODE === 'e2e') {
