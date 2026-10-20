@@ -162,6 +162,8 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [x] Type to search: a letter typed on the feed with nothing to take it focuses the box and lands in it (`typeIntoBox`); the bare-letter hotkeys stand aside then and come back with the focus on the grid
 - [x] Back from a stash, the keyboard is on the card that was opened (`lib/opened.ts`)
 - [x] Browser flows: `e2e/keyboard.spec.ts` (the bar, the account menu from the keyboard, type to search, the focus coming back, the card menu and its keys)
+- [x] A `?` as the first key of an empty box shows the shortcuts (`onHelp`; the box lets go, so Escape closes the sheet)
+- [x] One look for the floating things (2026-10-20): the account menu, the card menu, the box's list and the shortcut sheet share `.pop`, `.pop-item`, `.pop-label` and `.pop-sep` in `app.css`: no border, a hairline from the shadow, a faint blur, a tint for the highlighted row and plain glyphs for keys
 - [ ] Long press on iOS Safari for the card menu (Base UI's `ContextMenu.Trigger` does it, the feed does not use the trigger; nothing is only in the menu, so it is a nicety)
 - [ ] Look at the new bar on a phone and at the sticky bar over a long feed (not tried on a device)
 

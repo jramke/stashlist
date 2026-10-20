@@ -163,6 +163,15 @@ export function connect<T extends PropTypes>(
                             type: 'INPUT.ENTER',
                             modifier: event.metaKey || event.ctrlKey,
                         });
+                    } else if (
+                        event.key === '?' &&
+                        field.value === '' &&
+                        !(event.metaKey || event.ctrlKey || event.altKey)
+                    ) {
+                        // The first key of an empty box is a shortcut; the box lets go, so Escape closes the list.
+                        event.preventDefault();
+                        field.blur();
+                        prop('onHelp')?.();
                     } else if (event.key === 'ArrowDown') {
                         if (visible) {
                             event.preventDefault();

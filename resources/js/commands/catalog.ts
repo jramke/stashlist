@@ -169,6 +169,13 @@ export const catalog = define([
         local: true,
     },
     {
+        id: 'box.help',
+        label: 'Show the shortcuts, as the first key of an empty box',
+        category: 'The box',
+        hotkeys: ['?'],
+        local: true,
+    },
+    {
         id: 'box.filter',
         label: 'Turn the suggestion into a filter',
         category: 'The box',

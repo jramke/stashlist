@@ -1,3 +1,4 @@
+import { actions } from '@/commands/actions';
 import { AppHeader } from '@/components/app-header';
 import { FlashNote } from '@/components/flash-note';
 import { Kbd } from '@/components/kbd';
@@ -88,6 +89,7 @@ export function Omnibar({
         onNoteDone,
         onStashed,
         onLeave: focusGrid,
+        onHelp: () => actions.run('shortcuts.toggle'),
         onTake: () => play('pop'),
     });
     const api = connect(service, normalizeProps);
@@ -206,20 +208,17 @@ export function Omnibar({
                 {api.visible && (
                     <div
                         {...api.getPopupProps()}
-                        className="absolute inset-x-0 top-full mt-2 overflow-hidden rounded-xl border bg-popover shadow-lg"
+                        className="pop absolute inset-x-0 top-full mt-2 overflow-hidden"
                     >
                         <ul
                             {...api.getListProps()}
-                            className="max-h-72 overflow-y-auto p-1.5"
+                            className="max-h-72 overflow-y-auto"
                         >
                             {api.rows.map((row, index) => (
                                 <li
                                     key={row.key}
                                     {...api.getRowProps(row, index)}
-                                    className={cn(
-                                        'flex cursor-default items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm',
-                                        index === api.highlight && 'bg-muted',
-                                    )}
+                                    className="pop-item"
                                 >
                                     {row.swatch !== undefined && (
                                         <span
@@ -240,11 +239,11 @@ export function Omnibar({
                         {api.suggesting && (
                             <p
                                 {...api.getHintProps()}
-                                className="flex items-center gap-1.5 border-t px-3 py-2 text-xs text-muted-foreground"
+                                className="mt-1 flex items-center gap-1.5 border-t border-foreground/[0.07] px-2.5 pt-2 pb-1 text-xs text-muted-foreground"
                             >
-                                <Kbd>Tab</Kbd> make it a filter
+                                <Kbd>Tab</Kbd> to filter
                                 <Kbd className="ml-2">↑</Kbd>
-                                <Kbd>↓</Kbd> choose
+                                <Kbd>↓</Kbd> to choose
                             </p>
                         )}
                     </div>

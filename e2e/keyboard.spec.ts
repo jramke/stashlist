@@ -209,3 +209,25 @@ test('a card has a menu: right-click, the Menu key, and the same actions as keys
     // The request is on the server's queue of work after the card is gone; give it room on a busy machine.
     await expect(page.getByText('Deleted.')).toBeVisible({ timeout: 15_000 });
 });
+
+test('a ? as the first key of an empty box shows the shortcuts, and is a character after that', async ({
+    page,
+}) => {
+    await register(page);
+    const sheet = page.getByRole('region', { name: 'Keyboard shortcuts' });
+
+    await expect(box(page)).toBeFocused();
+    await page.keyboard.press('?');
+    await expect(sheet).toBeVisible();
+    await expect(box(page)).toHaveValue('');
+
+    // The box let go, so one Escape closes the sheet.
+    await page.keyboard.press('Escape');
+    await expect(sheet).toHaveCount(0);
+
+    // After another character it is a ? like any other.
+    await box(page).focus();
+    await page.keyboard.type('why?');
+    await expect(box(page)).toHaveValue('why?');
+    await expect(sheet).toHaveCount(0);
+});

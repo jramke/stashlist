@@ -82,6 +82,8 @@ export interface OmnibarProps extends CommonProperties {
     onStashed?: (() => void) | undefined;
     /** Arrow down from the last line of the box: the person wants the cards. */
     onLeave?: (() => void) | undefined;
+    /** A `?` was typed as the first key of an empty box: it is the shortcut for the list of shortcuts, not a character. */
+    onHelp?: (() => void) | undefined;
     /** Something typed became a filter. */
     onTake?: (() => void) | undefined;
 }

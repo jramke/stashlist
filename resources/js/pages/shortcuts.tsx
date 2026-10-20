@@ -18,6 +18,8 @@ const descriptions: Record<string, string> = {
     'sound.toggle': 'The clicks and chimes of the app.',
     'shortcuts.toggle':
         'The short list, over the page. This page has the whole list with a few words on each key.',
+    'box.help':
+        'A ? typed into an empty box shows the shortcuts instead of being a character. After any other character it is a ?.',
     'box.stash-link':
         'A link or a color code is stashed with Enter alone. Anything else needs ⌘ or Ctrl with Enter, so a search typed by habit never becomes a note.',
     'box.filter':
