@@ -6,21 +6,46 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useFlashNote } from '@/hooks/use-flash-note';
 import { index as stashes } from '@/routes/stashes';
+import { index as tagsIndex } from '@/routes/tags';
 import { Form, Head, Link, router } from '@inertiajs/react';
 import { Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 type Props = {
     tags: App.Data.TagData[];
+    paging: App.Data.PagingData;
+    q: string | null;
+    /** Every tag, for the merge picker: only there once somebody asked for it. */
+    options?: App.Data.TagData[];
 };
 
-/** Folds the tag into another one: pick the other tag, then say yes right where the list was. */
+/** The address of a page of the list, with the search that is on. */
+function pageUrl(page: number, q: string | null): string {
+    const query: Record<string, string | number> = {};
+
+    if (q !== null) {
+        query.q = q;
+    }
+
+    if (page > 1) {
+        query.page = page;
+    }
+
+    return tagsIndex({ query }).url;
+}
+
+/**
+ * Folds the tag into another one: type the name of the other tag (the list of names is a datalist of the page, asked
+ * for when the field is first used), then say yes right where the list was.
+ */
 function MergeInto({
     tag,
-    others,
+    options,
+    load,
 }: {
     tag: App.Data.TagData;
-    others: App.Data.TagData[];
+    options: App.Data.TagData[] | undefined;
+    load: () => void;
 }) {
     const [target, setTarget] = useState<App.Data.TagData | null>(null);
 
@@ -53,36 +78,74 @@ function MergeInto({
         );
     }
 
+    /** Takes what is typed for a tag when it is the whole name of another one. */
+    const take = (field: HTMLInputElement) => {
+        const wanted = field.value.trim().toLowerCase();
+        const found = options?.find(
+            (other) =>
+                other.id !== tag.id && other.name.toLowerCase() === wanted,
+        );
+
+        if (found !== undefined) {
+            setTarget(found);
+            field.value = '';
+        }
+    };
+
     return (
-        <select
+        <Input
             aria-label={`Merge ${tag.name} into`}
-            defaultValue=""
-            className="h-9 max-w-32 rounded-md border bg-transparent px-2 text-sm"
+            list="tag-options"
+            placeholder="Merge into…"
+            autoComplete="off"
+            className="h-9 w-32"
+            onFocus={load}
             onChange={(event) => {
-                setTarget(
-                    others.find(
-                        (other) => other.id === Number(event.target.value),
-                    ) ?? null,
-                );
-                event.target.value = '';
+                // A name picked from the list of the browser is taken at once; typing waits for Enter or the end
+                // of the field, because "garden" is also the start of "garden tools".
+                if (
+                    event.nativeEvent instanceof InputEvent &&
+                    event.nativeEvent.inputType === 'insertReplacementText'
+                ) {
+                    take(event.currentTarget);
+                }
             }}
-        >
-            <option value="" disabled>
-                Merge into…
-            </option>
-            {others
-                .filter((other) => other.id !== tag.id)
-                .map((other) => (
-                    <option key={other.id} value={other.id}>
-                        {other.name}
-                    </option>
-                ))}
-        </select>
+            onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    take(event.currentTarget);
+                }
+            }}
+            onBlur={(event) => take(event.currentTarget)}
+        />
     );
 }
 
-export default function Index({ tags }: Props) {
+export default function Index({ tags, paging, q, options }: Props) {
     const { note, clear } = useFlashNote();
+    const timer = useRef<number>(undefined);
+
+    /** Looks for the words after a short pause, from the first page, and keeps the field and the scroll as they are. */
+    function search(text: string) {
+        clearTimeout(timer.current);
+        timer.current = window.setTimeout(() => {
+            const wanted = text.trim();
+
+            router.get(tagsIndex().url, wanted === '' ? {} : { q: wanted }, {
+                only: ['tags', 'paging', 'q'],
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            });
+        }, 250);
+    }
+
+    /** The names for the merge fields are fetched once, when the first of them is used. */
+    function loadOptions() {
+        if (options === undefined) {
+            router.reload({ only: ['options'] });
+        }
+    }
 
     return (
         <>
@@ -101,9 +164,23 @@ export default function Index({ tags }: Props) {
                     </p>
                 </header>
 
+                {(paging.total > 0 || q !== null) && (
+                    <Input
+                        type="search"
+                        name="q"
+                        aria-label="Search tags"
+                        placeholder="Search tags"
+                        autoComplete="off"
+                        defaultValue={q ?? ''}
+                        onChange={(event) => search(event.target.value)}
+                    />
+                )}
+
                 {tags.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
-                        No tags yet. Add one on a stash.
+                        {q === null
+                            ? 'No tags yet. Add one on a stash.'
+                            : `No tag has "${q}" in its name.`}
                     </p>
                 ) : (
                     <ul className="grid gap-2">
@@ -149,8 +226,12 @@ export default function Index({ tags }: Props) {
                                         : 'stashes'}
                                 </Link>
 
-                                {tags.length > 1 && (
-                                    <MergeInto tag={tag} others={tags} />
+                                {paging.total > 1 && (
+                                    <MergeInto
+                                        tag={tag}
+                                        options={options}
+                                        load={loadOptions}
+                                    />
                                 )}
 
                                 <ConfirmButton
@@ -170,6 +251,55 @@ export default function Index({ tags }: Props) {
                             </li>
                         ))}
                     </ul>
+                )}
+
+                {options !== undefined && (
+                    <datalist id="tag-options">
+                        {options.map((option) => (
+                            <option key={option.id} value={option.name} />
+                        ))}
+                    </datalist>
+                )}
+
+                {paging.total > 0 && (
+                    <nav
+                        aria-label="Pages"
+                        className="flex items-center gap-4 text-sm text-muted-foreground"
+                    >
+                        <span>
+                            {paging.total.toLocaleString('en')}{' '}
+                            {paging.total === 1 ? 'tag' : 'tags'}
+                            {q === null ? '' : ` with "${q}"`}
+                        </span>
+
+                        {paging.last_page > 1 && (
+                            <span className="ml-auto flex items-center gap-3">
+                                {paging.page > 1 ? (
+                                    <Link
+                                        href={pageUrl(paging.page - 1, q)}
+                                        className="hover:text-foreground"
+                                    >
+                                        Previous
+                                    </Link>
+                                ) : (
+                                    <span className="opacity-50">Previous</span>
+                                )}
+                                <span>
+                                    Page {paging.page} of {paging.last_page}
+                                </span>
+                                {paging.page < paging.last_page ? (
+                                    <Link
+                                        href={pageUrl(paging.page + 1, q)}
+                                        className="hover:text-foreground"
+                                    >
+                                        Next
+                                    </Link>
+                                ) : (
+                                    <span className="opacity-50">Next</span>
+                                )}
+                            </span>
+                        )}
+                    </nav>
                 )}
             </div>
         </>

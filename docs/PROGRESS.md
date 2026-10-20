@@ -165,6 +165,7 @@ Ships when `composer test` is green on MariaDB and an isolation test proves user
 - [x] A `?` as the first key of an empty box shows the shortcuts (`onHelp`; the box lets go, so Escape closes the sheet)
 - [x] One look for the floating things (2026-10-20): the account menu, the card menu, the box's list and the shortcut sheet share `.pop`, `.pop-item`, `.pop-label` and `.pop-sep` in `app.css`: no border, a hairline from the shadow, a faint blur, a tint for the highlighted row and plain glyphs for keys
 - [x] The shortcut sheet is Base UI's `Drawer` (from the bottom, modal, swipe down to close) instead of an inline panel
+- [x] The tags page: 50 tags a page, a search by name (as you type, from the first page), a count and Previous/Next; the merge target is typed (datalist of every tag, fetched on first use) because a select of every tag on every row does not scale (the developer has about 1,600 tags)
 - [ ] Long press on iOS Safari for the card menu (Base UI's `ContextMenu.Trigger` does it, the feed does not use the trigger; nothing is only in the menu, so it is a nicety)
 - [ ] Look at the new bar on a phone and at the sticky bar over a long feed (not tried on a device)
 
