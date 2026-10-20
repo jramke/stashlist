@@ -1,5 +1,5 @@
 import { BASE_URL } from '../support';
-import { expect, test } from './fixture';
+import { expect, test, type Extension } from './fixture';
 import { connect, openExtensionPage } from './helpers';
 
 /** A post on X: the bookmark button turns into the one that undoes it, as on the real site. */
@@ -17,7 +17,26 @@ function post(handle: string, id: string, text: string): string {
 const FIRST = 'Sourdough starters like warm kitchens';
 const SECOND = 'Rye needs a longer rest than wheat';
 
-test('a bookmark on a site that is turned on stashes the post', async ({
+/** The page scripts the extension has registered, asked of its service worker. */
+function registered(extension: Extension): Promise<string[]> {
+    return extension.worker.evaluate(async () => {
+        const { chrome } = globalThis as unknown as {
+            chrome: {
+                scripting: {
+                    getRegisteredContentScripts: () => Promise<
+                        { id: string }[]
+                    >;
+                };
+            };
+        };
+
+        return (await chrome.scripting.getRegisteredContentScripts()).map(
+            ({ id }) => id,
+        );
+    });
+}
+
+test('a bookmark on X is stashed from the install on, and not once the site is turned off', async ({
     extension,
 }) => {
     const { web } = await connect(extension);
@@ -30,19 +49,20 @@ test('a bookmark on a site that is turned on stashes the post', async ({
         }),
     );
 
+    // Nothing was turned on: every site is on, and its script is registered by the browser.
+    await expect
+        .poll(() => registered(extension))
+        .toEqual(
+            expect.arrayContaining([
+                'auto-stash-github',
+                'auto-stash-x',
+                'auto-stash-youtube',
+            ]),
+        );
+
     const options = await openExtensionPage(extension, 'options.html');
-    const x = options.getByRole('checkbox', { name: /^X/ });
-    await expect(x).not.toBeChecked();
-
-    // Open before it is turned on: the script is put into this tab right away.
-    const open = await extension.context.newPage();
-    await open.goto('https://x.com/home');
-    await options.bringToFront();
-    await x.click();
-    await expect(x).toBeChecked();
-
-    await options.reload();
-    await expect(options.getByRole('checkbox', { name: /^X/ })).toBeChecked();
+    const x = () => options.getByRole('checkbox', { name: /^X/ });
+    await expect(x()).toBeChecked();
 
     // The save runs in the background after the click; look again until the feed has it.
     async function stashed(text: string): Promise<void> {
@@ -54,13 +74,32 @@ test('a bookmark on a site that is turned on stashes the post', async ({
         }).toPass({ timeout: 15_000 });
     }
 
-    await open.bringToFront();
+    const open = await extension.context.newPage();
+    await open.goto('https://x.com/home');
     await open.getByRole('button', { name: 'Bookmark' }).click();
     await stashed(FIRST);
 
-    // A page opened after it was turned on gets the script from the browser itself.
+    // Turned off: the script of that site goes, the others stay, and the choice is kept.
+    await options.bringToFront();
+    await x().click();
+    await expect(x()).not.toBeChecked();
+    await expect
+        .poll(() => registered(extension))
+        .not.toContain('auto-stash-x');
+    expect(await registered(extension)).toContain('auto-stash-github');
+
+    await options.reload();
+    await expect(x()).not.toBeChecked();
+
+    // Turned on again: a tab that is open already gets the script at once.
     const later = await extension.context.newPage();
     await later.goto('https://x.com/bob/status/456');
+    await options.bringToFront();
+    await x().click();
+    await expect(x()).toBeChecked();
+    await expect.poll(() => registered(extension)).toContain('auto-stash-x');
+
+    await later.bringToFront();
     await later.getByRole('button', { name: 'Bookmark' }).click();
     await stashed(SECOND);
 });

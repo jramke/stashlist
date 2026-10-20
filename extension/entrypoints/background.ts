@@ -1,3 +1,9 @@
+import {
+    isAutoStashing,
+    syncAutoStash,
+    watchAutoStash,
+} from '@/lib/auto-stash/access';
+import { platformForHost, type SavedItem } from '@/lib/auto-stash/platforms';
 import { readSavedItem, stashSaved } from '@/lib/auto-stash/stash';
 import { highlightSelection } from '@/lib/highlights/create';
 import { syncHighlights } from '@/lib/highlights/sync';
@@ -71,12 +77,15 @@ export default defineBackground(() => {
 
     browser.contextMenus.onClicked.addListener(onMenuClick);
 
-    // Something was saved on a site the person turned "Stash when I save" on for (entrypoints/auto-stash.ts).
+    // "Stash when I save": the page scripts follow the person's choices (a site is on until it is turned off), and
+    // the scripts report what was saved (entrypoints/auto-stash.ts).
+    void syncAutoStash().catch(() => undefined);
+    watchAutoStash();
     browser.runtime.onMessage.addListener((message, sender) => {
         const item = readSavedItem(message);
 
         if (item !== null && sender.id === browser.runtime.id) {
-            void run(sender.tab?.id, () => stashSaved(item));
+            void stashWhenOn(sender.tab?.id, item);
         }
     });
 
@@ -85,6 +94,18 @@ export default defineBackground(() => {
         Object.assign(globalThis, { stashlistMenu: onMenuClick });
     }
 });
+
+/** Only a site that is on counts: a tab that was open when the site was turned off still has the script. */
+async function stashWhenOn(
+    tabId: number | undefined,
+    item: SavedItem,
+): Promise<void> {
+    const platform = platformForHost(new URL(item.url).hostname);
+
+    if (platform !== null && (await isAutoStashing(platform))) {
+        await run(tabId, () => stashSaved(item));
+    }
+}
 
 async function onMenuClick(
     info: Browser.contextMenus.OnClickData,

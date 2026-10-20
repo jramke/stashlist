@@ -1,16 +1,10 @@
-import { Note } from '@/components/ui';
-import {
-    isAutoStashing,
-    turnOffAutoStash,
-    turnOnAutoStash,
-} from '@/lib/auto-stash/access';
+import { isAutoStashing, setAutoStash } from '@/lib/auto-stash/access';
 import { PLATFORMS, type Platform } from '@/lib/auto-stash/platforms';
 import { useEffect, useState } from 'react';
 
-/** "Stash when I save": one checkbox per site, each asking the browser for that one site. */
+/** "Stash when I save": on for every site until the person unticks it. */
 export function AutoStash() {
     const [on, setOn] = useState<Record<string, boolean>>({});
-    const [refused, setRefused] = useState<Platform | null>(null);
 
     useEffect(() => {
         void Promise.all(
@@ -22,22 +16,8 @@ export function AutoStash() {
     }, []);
 
     async function toggle(platform: Platform, checked: boolean): Promise<void> {
-        setRefused(null);
-
-        if (!checked) {
-            await turnOffAutoStash(platform);
-            setOn({ ...on, [platform.id]: false });
-
-            return;
-        }
-
-        const granted = await turnOnAutoStash(platform);
-
-        setOn({ ...on, [platform.id]: granted });
-
-        if (!granted) {
-            setRefused(platform);
-        }
+        setOn({ ...on, [platform.id]: checked });
+        await setAutoStash(platform, checked);
     }
 
     return (
@@ -45,9 +25,9 @@ export function AutoStash() {
             <h2 className="text-sm font-medium">Stash when I save</h2>
 
             <p className="text-sm text-muted-foreground">
-                Stash it too when you save something on a site you turn on here.
-                Each needs access to that one site. Only the thing you saved is
-                sent to Stashlist, when you save it.
+                When you save something on one of these sites, it is stashed
+                too. Only the thing you saved is sent to Stashlist, at the
+                moment you press the button. Untick a site to stop.
             </p>
 
             {PLATFORMS.map((platform) => (
@@ -58,7 +38,7 @@ export function AutoStash() {
                     <input
                         type="checkbox"
                         className="mt-1"
-                        checked={on[platform.id] === true}
+                        checked={on[platform.id] ?? true}
                         onChange={(event) =>
                             void toggle(platform, event.target.checked)
                         }
@@ -71,13 +51,6 @@ export function AutoStash() {
                     </span>
                 </label>
             ))}
-
-            {refused !== null && (
-                <Note tone="error">
-                    Without access to {refused.label} the extension cannot see
-                    what you save there.
-                </Note>
-            )}
         </section>
     );
 }

@@ -13,7 +13,12 @@ const EXPECTED = {
         'storage',
     ],
     optional_permissions: ['tabs'],
-    host_permissions: ['https://stashlist.app/*'],
+    host_permissions: [
+        'https://stashlist.app/*',
+        'https://github.com/*',
+        'https://x.com/*',
+        'https://www.youtube.com/*',
+    ],
     optional_host_permissions: ['https://*/*', 'http://*/*'],
 };
 

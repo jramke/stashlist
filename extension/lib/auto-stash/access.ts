@@ -1,77 +1,94 @@
 import { browser } from 'wxt/browser';
-import { originsOf, type Platform } from './platforms';
+import { storage } from 'wxt/utils/storage';
+import { originsOf, PLATFORMS, type Platform } from './platforms';
+
+/** The sites the person turned off. Every other site is on: the extension has the right to see them from the install. */
+const offItem = storage.defineItem<string[]>('sync:auto-stash-off', {
+    fallback: [],
+});
 
 const scriptId = (platform: Platform): string => `auto-stash-${platform.id}`;
 
-/** Whether the page script is on for a site: registered, and the browser still lets it run there. */
 export async function isAutoStashing(platform: Platform): Promise<boolean> {
-    const [registered, allowed] = await Promise.all([
-        browser.scripting.getRegisteredContentScripts({
-            ids: [scriptId(platform)],
-        }),
-        browser.permissions.contains({ origins: originsOf(platform) }),
-    ]);
-
-    return registered.length > 0 && allowed;
+    return !(await offItem.getValue()).includes(platform.id);
 }
+
+/** Only writes the choice; the background (`watchAutoStash`) makes the scripts follow it. */
+export async function setAutoStash(
+    platform: Platform,
+    on: boolean,
+): Promise<void> {
+    const off = (await offItem.getValue()).filter((id) => id !== platform.id);
+
+    await offItem.setValue(on ? off : [...off, platform.id]);
+}
+
+let running: Promise<unknown> = Promise.resolve();
 
 /**
- * Turns it on for a site. The browser asks the person to allow that one site, so call this from a click; it
- * returns false when they said no. Tabs of the site that are open already get the script now.
+ * Makes the page scripts match the choices: one is registered for every site that is on and none for a site that
+ * is off. Tabs of a site that was just registered get the script now. Runs one after the other, because two
+ * registrations of the same script are an error, and the background calls it whenever it starts.
  */
-export async function turnOnAutoStash(platform: Platform): Promise<boolean> {
-    const origins = originsOf(platform);
+export function syncAutoStash(): Promise<unknown> {
+    running = running.then(sync, sync);
 
-    if (!(await browser.permissions.request({ origins }))) {
-        return false;
-    }
-
-    if (
-        (
-            await browser.scripting.getRegisteredContentScripts({
-                ids: [scriptId(platform)],
-            })
-        ).length === 0
-    ) {
-        await browser.scripting.registerContentScripts([
-            {
-                id: scriptId(platform),
-                js: ['auto-stash.js'],
-                matches: origins,
-                runAt: 'document_idle',
-                persistAcrossSessions: true,
-            },
-        ]);
-    }
-
-    for (const tab of await browser.tabs.query({ url: origins })) {
-        if (tab.id !== undefined) {
-            // Registered and injected both: the script runs once (it marks the page).
-            void browser.scripting
-                .executeScript({
-                    target: { tabId: tab.id },
-                    files: ['/auto-stash.js'],
-                })
-                .catch(() => undefined);
-        }
-    }
-
-    return true;
+    return running;
 }
 
-/** Turns it off for a site and gives the permission back. */
-export async function turnOffAutoStash(platform: Platform): Promise<void> {
-    if (
-        (
-            await browser.scripting.getRegisteredContentScripts({
-                ids: [scriptId(platform)],
-            })
-        ).length > 0
-    ) {
-        await browser.scripting.unregisterContentScripts({
-            ids: [scriptId(platform)],
-        });
-    }
+/** Follows a change of the choices, also one made on another device of the same browser account. */
+export function watchAutoStash(): void {
+    offItem.watch(() => void syncAutoStash());
+}
 
-    await browser.permissions.remove({ origins: originsOf(platform) });
+async function sync(): Promise<void> {
+    const off = await offItem.getValue();
+    const registered = new Set(
+        (await browser.scripting.getRegisteredContentScripts()).map(
+            ({ id }) => id,
+        ),
+    );
+
+    await Promise.allSettled(
+        PLATFORMS.map(async (platform) => {
+            const id = scriptId(platform);
+            const origins = originsOf(platform);
+
+            if (off.includes(platform.id)) {
+                if (registered.has(id)) {
+                    await browser.scripting.unregisterContentScripts({
+                        ids: [id],
+                    });
+                }
+
+                return;
+            }
+
+            if (registered.has(id)) {
+                return;
+            }
+
+            await browser.scripting.registerContentScripts([
+                {
+                    id,
+                    js: ['auto-stash.js'],
+                    matches: origins,
+                    runAt: 'document_idle',
+                    persistAcrossSessions: true,
+                },
+            ]);
+
+            for (const tab of await browser.tabs.query({ url: origins })) {
+                if (tab.id !== undefined) {
+                    // Registered and injected both: the script runs once (it marks the page).
+                    void browser.scripting
+                        .executeScript({
+                            target: { tabId: tab.id },
+                            files: ['/auto-stash.js'],
+                        })
+                        .catch(() => undefined);
+                }
+            }
+        }),
+    );
 }
