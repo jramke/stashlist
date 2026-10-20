@@ -39,6 +39,18 @@ const TYPES: { value: App.Enums.StashType; label: string }[] = [
     { value: 'color', label: 'Colors' },
 ];
 
+/** The kinds of link a page can be (what the card's corner icon says), as filters; "other" is left out. */
+const SUBTYPES: { value: App.Enums.Subtype; label: string }[] = [
+    { value: 'article', label: 'Articles' },
+    { value: 'product', label: 'Products' },
+    { value: 'video', label: 'Videos' },
+    { value: 'social', label: 'Social' },
+    { value: 'repo', label: 'Repos' },
+    { value: 'paper', label: 'Papers' },
+    { value: 'recipe', label: 'Recipes' },
+    { value: 'quote', label: 'Quotes' },
+];
+
 export function isColorName(word: string): word is App.Enums.ColorName {
     return colorNames.some((name) => name === word);
 }
@@ -106,6 +118,16 @@ export function chipsOf(
                 TYPES.find((type) => type.value === shown.type)?.label ??
                 shown.type,
             without: { type: null },
+        });
+    }
+
+    if (shown.subtype !== null) {
+        chips.push({
+            key: `subtype:${shown.subtype}`,
+            label:
+                SUBTYPES.find((subtype) => subtype.value === shown.subtype)
+                    ?.label ?? shown.subtype,
+            without: { subtype: null },
         });
     }
 
@@ -206,6 +228,22 @@ export function suggestionsOf(
                         filter(`type:${type.value}`, 'Type', type.label, rest, {
                             type: type.value,
                         }),
+                    );
+                }
+            }
+        }
+
+        if (shown.subtype === null) {
+            for (const subtype of SUBTYPES) {
+                if (matches(subtype.label, needle)) {
+                    found.push(
+                        filter(
+                            `subtype:${subtype.value}`,
+                            'Kind',
+                            subtype.label,
+                            rest,
+                            { subtype: subtype.value },
+                        ),
                     );
                 }
             }

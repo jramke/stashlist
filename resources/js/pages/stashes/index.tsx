@@ -193,6 +193,7 @@ export default function Index({ stashes, filters, tags, share }: Props) {
     const filtered =
         filters.q !== null ||
         filters.type !== null ||
+        filters.subtype !== null ||
         filters.status !== null ||
         filters.collection !== null ||
         filters.color !== null ||

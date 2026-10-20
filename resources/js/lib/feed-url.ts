@@ -20,6 +20,7 @@ export function feedUrl(
     return index({
         query: {
             type: next.type ?? undefined,
+            subtype: next.subtype ?? undefined,
             status: searching ? undefined : (next.status ?? undefined),
             collection: next.collection ?? undefined,
             tag: next.tags.length > 0 ? [...next.tags] : undefined,

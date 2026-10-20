@@ -609,3 +609,27 @@ test('the first suggestion is lit, Enter takes it, and the arrow keys never go a
         'true',
     );
 });
+
+test('the kind of a link is a filter too: articles, products, videos and the like', async ({
+    page,
+}) => {
+    await register(page);
+    await capture(page, 'buy sourdough flour');
+
+    await box(page).fill('arti');
+    const articles = page.getByRole('option', { name: /Articles/ });
+    await expect(articles).toBeVisible();
+    await expect(articles).toContainText('Kind');
+    await box(page).press('Tab');
+
+    await expect(
+        page.getByRole('button', { name: 'Remove Articles' }),
+    ).toBeVisible();
+    await expect(page).toHaveURL(/subtype=article/);
+    await expect(page.getByText('Nothing matches.')).toBeVisible();
+
+    // The chip goes with one Backspace, and the note is back.
+    await box(page).press('Backspace');
+    await expect(page).not.toHaveURL(/subtype=/);
+    await expect(card(page, /buy sourdough flour/)).toBeVisible();
+});
