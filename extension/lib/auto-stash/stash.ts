@@ -22,7 +22,7 @@ export function readSavedItem(message: unknown): SavedItem | null {
         return null;
     }
 
-    const { url, title, text } = item as Record<string, unknown>;
+    const { url, title, text, imageUrl } = item as Record<string, unknown>;
 
     if (typeof url !== 'string' || url.length > MAX_URL || !isStashable(url)) {
         return null;
@@ -36,6 +36,14 @@ export function readSavedItem(message: unknown): SavedItem | null {
 
     if (typeof text === 'string' && text.trim() !== '') {
         read.text = text.slice(0, MAX_TEXT);
+    }
+
+    if (
+        typeof imageUrl === 'string' &&
+        imageUrl.length <= MAX_URL &&
+        isStashable(imageUrl)
+    ) {
+        read.imageUrl = imageUrl;
     }
 
     return read;
@@ -52,11 +60,14 @@ export async function stashSaved(item: SavedItem): Promise<SaveResult> {
         request.title = item.title;
     }
 
-    if (item.text !== undefined) {
+    if (item.text !== undefined || item.imageUrl !== undefined) {
         request.capture = {
             source: 'extension',
             version: version(),
-            content_markdown: item.text,
+            ...(item.text === undefined ? {} : { content_markdown: item.text }),
+            ...(item.imageUrl === undefined
+                ? {}
+                : { image_url: item.imageUrl }),
         };
     }
 

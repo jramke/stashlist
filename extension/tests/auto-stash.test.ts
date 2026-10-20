@@ -76,72 +76,166 @@ describe('GitHub', () => {
         expect(press('button', repo, 'github')).toBeNull();
     });
 
-    // The form around the button was not part of the copied markup: its action is the one every star form on
-    // GitHub has.
-    const listed = `<article><div><h2><a href="/konradmichalik/typo3-ai-mate">typo3-ai-mate</a></h2>
-        <form class="js-social-form" action="/konradmichalik/typo3-ai-mate/star" method="post">
-            <button data-ga-click="Repository, click star button, action:explore#index; text:Star"
-                data-aria-prefix="Star this repository" aria-label="Star this repository (102)" type="submit"
-                class="js-toggler-target btn-sm btn BtnGroup-item"><svg class="octicon octicon-star"><path d="M8 .25"/></svg>
-                <span class="d-inline">Star</span> <span class="Counter js-social-count">102</span></button>
-        </form>
-        <form class="js-social-form" action="/other/repo/unstar" method="post">
-            <button aria-label="Unstar this repository (5)" type="submit">Starred</button>
-        </form></div></article>`;
+    // A card of the explore page: both forms are in the markup and one is hidden, each with its own button for
+    // the lists of stars next to it.
+    const listed = `<article class="border rounded">
+        <h3 class="f3"><a href="/in2code-de" class="Link">in2code-de</a> /
+            <a href="/in2code-de/powermail" class="Link text-bold">powermail</a></h3>
+        <div class="js-toggler-container js-social-container starring-container d-flex">
+            <div class="starred BtnGroup">
+                <form class="js-social-form" data-turbo="false" action="/in2code-de/powermail/unstar" method="post">
+                    <input type="hidden" name="context" value="other">
+                    <button data-ga-click="Repository, click unstar button, action:explore#index; text:Unstar"
+                        aria-label="Starred, click to unstar this repository (102)" type="submit" class="btn-sm btn BtnGroup-item">
+                        <svg class="octicon octicon-star-fill"><path d="M8 .25"/></svg><span class="d-inline">Starred</span>
+                        <span id="repo-stars-counter-unstar" class="Counter js-social-count">102</span></button>
+                </form>
+                <user-list-menu><select-panel><dialog-helper>
+                    <button id="details-user-list-68707214-starred-button" aria-haspopup="dialog" type="button"><svg><path d="m4.427 7.427"/></svg></button>
+                </dialog-helper></select-panel></user-list-menu>
+            </div>
+            <div class="unstarred BtnGroup">
+                <form class="js-social-form" data-turbo="false" action="/in2code-de/powermail/star" method="post">
+                    <input type="hidden" name="context" value="other">
+                    <button data-ga-click="Repository, click star button, action:explore#index; text:Star"
+                        data-aria-prefix="Star this repository" aria-label="Star this repository (102)" type="submit"
+                        class="js-toggler-target btn-sm btn BtnGroup-item">
+                        <svg class="octicon octicon-star"><path d="M8 .25"/></svg><span class="d-inline">Star</span>
+                        <span id="repo-stars-counter-star" class="Counter js-social-count">102</span></button>
+                </form>
+                <user-list-menu><select-panel><dialog-helper>
+                    <button id="details-user-list-68707214-unstarred-button" aria-haspopup="dialog" type="button"><svg><path d="m4.427 7.427"/></svg></button>
+                </dialog-helper></select-panel></user-list-menu>
+            </div>
+        </div>
+        <a href="/topics/typo3" class="topic-tag">typo3</a></article>`;
+    const explore = { ...repo, pathname: '/explore' };
 
     it('stashes the repository starred from a list, not the page it is on', () => {
         load(listed);
 
-        expect(
-            press(
-                '.js-social-count',
-                { ...repo, pathname: '/explore' },
-                'github',
-            ),
-        ).toEqual({ url: 'https://github.com/konradmichalik/typo3-ai-mate' });
+        expect(press('#repo-stars-counter-star', explore, 'github')).toEqual({
+            url: 'https://github.com/in2code-de/powermail',
+        });
     });
 
-    it('ignores the button that undoes the star in a list', () => {
+    it('ignores the button that undoes the star in a list, the buttons for lists and the links of the card', () => {
         load(listed);
 
-        expect(press('[action$="/unstar"] button', repo, 'github')).toBeNull();
+        expect(press('.starred form button', explore, 'github')).toBeNull();
+        expect(
+            press(
+                '#details-user-list-68707214-unstarred-button svg',
+                explore,
+                'github',
+            ),
+        ).toBeNull();
+        expect(press('.topic-tag', explore, 'github')).toBeNull();
+        expect(press('h3 a', explore, 'github')).toBeNull();
     });
 });
 
 describe('X', () => {
     const home = { origin: 'https://x.com', pathname: '/home', search: '' };
-    // The buttons are the ones copied from the feed, a post's own page and an answer; the rest of the post is the
-    // markup X has had for years (an article, a time that links to the post, the text).
     const BUTTON = (label: string, testid = 'bookmark') =>
         `<button aria-label="${label}" role="button" data-testid="${testid}" type="button"><div dir="ltr"><div>
             <svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M4 4.5C4 3.12"></path></g></svg></div></div></button>`;
-    const post = (button: string) => `
-        <article data-testid="tweet">
-            <div data-testid="User-Name">Ada <span>@ada</span></div>
-            <a href="/ada/status/123"><time datetime="2026-10-20">1h</time></a>
-            <div data-testid="tweetText">Hello   there</div>
-            <div role="group">${button}</div>
-        </article>
-        <article data-testid="tweet">
-            <a href="/bob/status/456"><time>2h</time></a>
-            ${BUTTON('Lesezeichen')}
+    const POEM = `<div dir="auto" lang="en" data-testid="tweetText"><span>Tabs [wip for </span><a dir="ltr"
+        href="https://t.co/fNgOi2HoCx" target="_blank" role="link"><span aria-hidden="true">https://</span>gems.design</a><span>]</span></div>`;
+    const VIDEO = (
+        id: string,
+    ) => `<div data-testid="tweetPhoto"><div data-testid="placementTracking"><div data-testid="videoPlayer">
+        <div data-testid="videoComponent"><video preload="none" aria-label="Eingebettetes Video" playsinline
+        poster="https://pbs.twimg.com/amplify_video_thumb/${id}/img/poster.jpg" src="blob:https://x.com/6ba0ca19"></video></div></div></div></div>`;
+    // A post of the timeline, as X draws it: avatar, name, handle and time (the time is the link to the post),
+    // the buttons of the post, the text and the media, the row with the counts and the bookmark button.
+    const post = (
+        handle: string,
+        id: string,
+        parts: { text?: string; media?: string; bookmark?: string } = {},
+    ) => `
+        <article role="article" tabindex="0" data-testid="tweet">
+            <div data-testid="Tweet-User-Avatar"><a href="/${handle}" aria-hidden="true" role="link" tabindex="-1">
+                <img alt="" draggable="true" src="https://pbs.twimg.com/profile_images/1/a_normal.jpg"></a></div>
+            <div data-testid="User-Name">
+                <a href="/${handle}" role="link"><span>Name</span><svg aria-label="Verifizierter Account" data-testid="icon-verified"><g><path d="M20.396 11"></path></g></svg></a>
+                <a href="/${handle}" role="link" tabindex="-1"><span>@${handle}</span></a><span aria-hidden="true">·</span>
+                <a href="/${handle}/status/${id}" dir="ltr" aria-label="vor 4 Stunden" role="link"><time datetime="2026-10-20T13:14:35.000Z">4 Std.</time></a>
+            </div>
+            <button aria-label="Grok-Aktionen" role="button" type="button"></button>
+            <button aria-expanded="false" aria-haspopup="menu" aria-label="Mehr" role="button" data-testid="caret" type="button"></button>
+            ${parts.text ?? ''}${parts.media ?? ''}
+            <div aria-label="3 Antworten, 88 „Gefällt mir“-Angaben" role="group">
+                <button aria-label="3 Antworten." role="button" data-testid="reply" type="button"></button>
+                <button aria-label="88 „Gefällt mir“-Angaben." role="button" data-testid="like" type="button"></button>
+                <a href="/${handle}/status/${id}/analytics" aria-label="2665 Mal angezeigt" role="link"></a>
+                ${parts.bookmark ?? BUTTON('Lesezeichen')}
+                <button aria-expanded="false" aria-haspopup="menu" aria-label="Post teilen" role="button" type="button"></button>
+            </div>
         </article>`;
 
-    it('stashes the post of the bookmark button with the text the page shows', () => {
-        load(post(BUTTON('Lesezeichen')));
+    it('stashes the post of the bookmark button with the text and the still of its video', () => {
+        load(
+            `${post('other', '1')}${post('CJfromJBW', '2112532936847139122', { text: POEM, media: VIDEO('21125') })}`,
+        );
 
-        expect(press('article button', home, 'x')).toEqual({
-            url: 'https://x.com/ada/status/123',
-            title: '@ada on X: Hello   there',
-            text: 'Hello   there',
+        expect(
+            press(
+                'article:nth-child(2) [data-testid="bookmark"] svg',
+                home,
+                'x',
+            ),
+        ).toEqual({
+            url: 'https://x.com/CJfromJBW/status/2112532936847139122',
+            title: '@CJfromJBW on X: Tabs [wip for https://gems.design]',
+            text: 'Tabs [wip for https://gems.design]',
+            imageUrl:
+                'https://pbs.twimg.com/amplify_video_thumb/21125/img/poster.jpg',
         });
     });
 
-    it('does not depend on the words of the button, only on what it is', () => {
-        load(post(BUTTON('103 Lesezeichen. Lesezeichen')));
+    it('stashes an answer with its text and a post without any text with its picture', () => {
+        load(
+            `${post('ikramhsakib', '2112569970488156547', { text: '<div data-testid="tweetText"><span>Cool work</span></div>' })}
+            ${post('oguzyagizkara', '2112524525917143529', { media: '<div data-testid="tweetPhoto"><img alt="" src="https://pbs.twimg.com/media/Gx.jpg"></div>' })}`,
+        );
 
-        expect(press('article svg', home, 'x')).toMatchObject({
+        expect(
+            press(
+                'article:nth-child(1) button[data-testid="bookmark"]',
+                home,
+                'x',
+            ),
+        ).toEqual({
+            url: 'https://x.com/ikramhsakib/status/2112569970488156547',
+            title: '@ikramhsakib on X: Cool work',
+            text: 'Cool work',
+        });
+        expect(
+            press(
+                'article:nth-child(2) button[data-testid="bookmark"]',
+                home,
+                'x',
+            ),
+        ).toEqual({
+            url: 'https://x.com/oguzyagizkara/status/2112524525917143529',
+            title: '@oguzyagizkara on X',
+            imageUrl: 'https://pbs.twimg.com/media/Gx.jpg',
+        });
+    });
+
+    it('does not take the picture of the avatar, and does not depend on the words of the button', () => {
+        load(
+            post('ada', '123', {
+                text: '<div data-testid="tweetText">Hello</div>',
+                bookmark: BUTTON('103 Lesezeichen. Lesezeichen'),
+            }),
+        );
+
+        expect(press('[data-testid="bookmark"] svg', home, 'x')).toEqual({
             url: 'https://x.com/ada/status/123',
+            title: '@ada on X: Hello',
+            text: 'Hello',
         });
     });
 
@@ -158,7 +252,11 @@ describe('X', () => {
     });
 
     it('ignores removing a bookmark and a button that is on no post', () => {
-        load(post(BUTTON('Lesezeichen entfernen', 'removeBookmark')));
+        load(
+            post('ada', '123', {
+                bookmark: BUTTON('Lesezeichen entfernen', 'removeBookmark'),
+            }),
+        );
 
         expect(press('[data-testid="removeBookmark"]', home, 'x')).toBeNull();
 
@@ -199,10 +297,17 @@ describe('YouTube', () => {
         <div class="ytLockupMetadataViewModelMenuButton" data-video="${video}"><button-view-model>
             <button aria-label="Mehr Aktionen"><span><svg viewBox="0 0 24 24"><path d="M12 4a2 2 0 100 4"></path></svg></span></button>
         </button-view-model></div>`;
-    // The video around a menu button is not part of the copied markup: a box with the links to one video.
+    // A video of the home feed: the thumbnail and the title link to it, the channel does not, the menu button is last.
     const lockup = (video: string) => `
-        <yt-lockup-view-model><a href="/watch?v=${video}&pp=abc"><img alt=""></a>
-            <div><a href="/watch?v=${video}&pp=abc">A title</a>${opener(video)}</div></yt-lockup-view-model>`;
+        <yt-lockup-view-model class="ytd-rich-item-renderer lockup ytLockupViewModelWrapper"><div class="ytLockupViewModelHost">
+            <a href="/watch?v=${video}&amp;t=598s" class="ytLockupViewModelContentImage" tabindex="-1" aria-hidden="true">
+                <yt-thumbnail-view-model><img alt="" src="https://i.ytimg.com/vi/${video}/hq720.jpg"></yt-thumbnail-view-model></a>
+            <div class="ytLockupViewModelMetadata"><yt-lockup-metadata-view-model class="ytLockupMetadataViewModelHost">
+                <div class="ytLockupMetadataViewModelAvatar"><yt-avatar-shape><div aria-label="Zu Kanal „DIE ZEIT “" role="button" tabindex="0"></div></yt-avatar-shape></div>
+                <div class="ytLockupMetadataViewModelTextContainer"><h3 title="A title"><a href="/watch?v=${video}&amp;t=598s" class="ytLockupMetadataViewModelTitle"><span role="text">A title</span></a></h3>
+                    <div class="ytLockupMetadataViewModelMetadata"><a href="/@zeit">DIE ZEIT </a></div></div>
+                ${opener(video)}
+            </yt-lockup-metadata-view-model></div></div></yt-lockup-view-model>`;
 
     it('stashes the video when Save under it is pressed, before any playlist is chosen', () => {
         document.title = 'A talk - YouTube';
@@ -351,6 +456,23 @@ describe('the message to the background', () => {
             title: 't'.repeat(300),
             text: 'x'.repeat(20_000),
         });
+    });
+
+    it('keeps a picture that is a web address and drops any other', () => {
+        const picture = 'https://pbs.twimg.com/media/Gx.jpg';
+
+        expect(
+            readSavedItem({
+                type: AUTO_STASH,
+                item: { ...item, imageUrl: picture },
+            }),
+        ).toEqual({ ...item, imageUrl: picture });
+        expect(
+            readSavedItem({
+                type: AUTO_STASH,
+                item: { ...item, imageUrl: 'javascript:alert(1)' },
+            }),
+        ).toEqual(item);
     });
 
     it('is refused when it is not ours or not a web address', () => {

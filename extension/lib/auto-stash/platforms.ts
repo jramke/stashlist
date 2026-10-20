@@ -17,6 +17,8 @@ export type SavedItem = {
     title?: string;
     /** What the page shows of it, for a site whose pages a server cannot read (a post on X). */
     text?: string;
+    /** The picture the page shows with it, for the same sites. */
+    imageUrl?: string;
 };
 
 /** The part of `location` a rule looks at. */
@@ -96,12 +98,21 @@ const x: Platform = {
         const text = post
             ?.querySelector('[data-testid="tweetText"]')
             ?.textContent?.trim();
+        // The picture of the post, or the still of its video (the video's own `src` is a blob).
+        const image =
+            post
+                ?.querySelector('[data-testid="tweetPhoto"] img')
+                ?.getAttribute('src') ??
+            post
+                ?.querySelector('[data-testid="tweetPhoto"] video')
+                ?.getAttribute('poster');
         const by = `@${match[1]} on X`;
 
         return {
             url: `${page.origin}/${match[1]}/status/${match[2]}`,
             title: text ? `${by}: ${text.slice(0, 100)}` : by,
             ...(text ? { text } : {}),
+            ...(image ? { imageUrl: image } : {}),
         };
     },
 };
