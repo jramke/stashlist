@@ -1,186 +1,102 @@
-import type { ActionId } from '@/commands/catalog';
-import { Keys } from '@/components/keys';
-import { setSoundEnabled, useSoundEnabled } from '@/lib/sound';
+import { whenIdle } from '@/lib/idle';
 import { cn } from '@/lib/utils';
-import { logout, privacy } from '@/routes';
-import { index as collections } from '@/routes/collections';
-import { edit as profile } from '@/routes/profile';
-import { index as tags } from '@/routes/tags';
-import { Link, usePage } from '@inertiajs/react';
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { usePage } from '@inertiajs/react';
+import { useEffect, useRef, useState, type ComponentType } from 'react';
 
-/**
- * The few places that are not the feed, behind the initial of the person. A plain disclosure with arrow keys:
- * a menu this small needs no popup library.
- */
-export function AccountMenu({ className }: { className?: string }) {
-    const { auth } = usePage().props;
-    const sounds = useSoundEnabled();
-    const [open, setOpen] = useState(false);
-    const root = useRef<HTMLDivElement>(null);
-    const button = useRef<HTMLButtonElement>(null);
+export type AccountMenuPopupProps = {
+    name: string;
+    className?: string | undefined;
+    /** The person pressed the button before the menu was there: it opens as soon as it is. */
+    defaultOpen: boolean;
+};
 
-    useEffect(() => {
-        if (!open) {
-            return;
-        }
+/** The button behind the initial of the person; the menu's trigger wears the same look. */
+export const accountButtonClass =
+    'flex size-8 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground uppercase transition-[transform,color,background-color] duration-150 outline-none hover:bg-foreground/10 hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-95 data-[popup-open]:bg-foreground/10 data-[popup-open]:text-foreground';
 
-        const outside = (event: PointerEvent) => {
-            if (
-                event.target instanceof Node &&
-                !root.current?.contains(event.target)
-            ) {
-                setOpen(false);
-            }
-        };
+type Popup = ComponentType<AccountMenuPopupProps>;
 
-        document.addEventListener('pointerdown', outside);
-
-        return () => document.removeEventListener('pointerdown', outside);
-    }, [open]);
-
-    // Opened from the keyboard, the first item takes the focus.
-    useEffect(() => {
-        if (open && root.current?.dataset.keyboard === 'true') {
-            root.current
-                .querySelector<HTMLElement>('[role^=menuitem]')
-                ?.focus();
-        }
-    }, [open]);
-
-    function items(): HTMLElement[] {
-        return Array.from(
-            root.current?.querySelectorAll<HTMLElement>('[role^=menuitem]') ??
-                [],
-        );
-    }
-
-    function keyDown(event: KeyboardEvent<HTMLDivElement>) {
-        const all = items();
-        const at = all.findIndex((item) => item === document.activeElement);
-
-        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-            event.preventDefault();
-
-            if (root.current !== null) {
-                root.current.dataset.keyboard = 'true';
-            }
-
-            if (!open) {
-                setOpen(true);
-
-                return;
-            }
-
-            const step = event.key === 'ArrowDown' ? 1 : -1;
-            all[(at + step + all.length) % all.length]?.focus();
-        } else if (event.key === 'Escape' && open) {
-            event.preventDefault();
-            setOpen(false);
-            button.current?.focus();
-        } else if (event.key === 'Tab') {
-            setOpen(false);
-        }
-    }
-
-    const name = auth.user?.name ?? '';
-
-    return (
-        <div
-            ref={root}
-            className={cn('relative', className)}
-            onKeyDown={keyDown}
-        >
-            <button
-                ref={button}
-                type="button"
-                aria-label="Menu"
-                aria-haspopup="menu"
-                aria-expanded={open}
-                onClick={(event) => {
-                    if (root.current !== null) {
-                        // A click with a pointer reports detail 1 or more; Enter and Space report 0.
-                        root.current.dataset.keyboard = String(
-                            event.detail === 0,
-                        );
-                    }
-
-                    setOpen((value) => !value);
-                }}
-                className="flex size-8 items-center justify-center rounded-full border bg-card text-xs font-medium text-muted-foreground uppercase transition-[transform,color] duration-150 outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-95"
-            >
-                {name.slice(0, 1) || '·'}
-            </button>
-
-            {open && (
-                <div
-                    role="menu"
-                    aria-label="Menu"
-                    onClick={() => setOpen(false)}
-                    className="absolute top-full right-0 z-40 mt-2 w-52 origin-top-right animate-panel-in rounded-xl border bg-popover p-1.5 text-sm shadow-lg"
-                >
-                    <p className="truncate px-2 py-1.5 text-xs text-muted-foreground">
-                        {name}
-                    </p>
-                    <MenuLink href={collections().url} action="go.collections">
-                        Collections
-                    </MenuLink>
-                    <MenuLink href={tags().url} action="go.tags">
-                        Tags
-                    </MenuLink>
-                    <MenuLink href={profile().url} action="go.settings">
-                        Settings
-                    </MenuLink>
-                    <MenuLink href={privacy().url}>Privacy</MenuLink>
-                    <button
-                        type="button"
-                        role="menuitemcheckbox"
-                        aria-checked={sounds}
-                        onClick={() => setSoundEnabled(!sounds)}
-                        className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left outline-none hover:bg-muted focus-visible:bg-muted"
-                    >
-                        Sounds
-                        <span className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground">
-                            {sounds ? 'On' : 'Off'}
-                            <Keys action="sound.toggle" />
-                        </span>
-                    </button>
-                    <div className="my-1 h-px bg-border" />
-                    <Link
-                        href={logout()}
-                        as="button"
-                        role="menuitem"
-                        className="flex w-full items-center rounded-lg px-2 py-1.5 text-left text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:bg-muted focus-visible:text-foreground"
-                    >
-                        Log out
-                    </Link>
-                </div>
-            )}
-        </div>
+/** Fetches the menu, once; the module is kept for the next page. The compiler cannot lower `import()` inside a component. */
+function loadPopup(): Promise<Popup> {
+    return import('./account-menu-popup').then(
+        (module) => (loaded = module.AccountMenuPopup),
     );
 }
 
-function MenuLink({
-    href,
-    action,
-    children,
-}: {
-    href: string;
-    action?: ActionId;
-    children: string;
-}) {
+/** The menu once it is loaded, kept for the next page: the frame mounts again and must not flash the plain button. */
+let loaded: Popup | null = null;
+
+/**
+ * The few places that are not the feed, behind the initial of the person. The menu itself is Base UI's, which is
+ * a chunk of its own that is fetched when the browser is idle after the page (`account-menu-popup.tsx`): until
+ * then this is the plain button, and a press on it opens the menu as soon as it is there.
+ */
+export function AccountMenu({ className }: { className?: string }) {
+    const { auth } = usePage().props;
+    const name = auth.user?.name ?? '';
+    const [Popup, setPopup] = useState<Popup | null>(() => loaded);
+    const [pressed, setPressed] = useState(false);
+    const button = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        if (Popup !== null) {
+            return;
+        }
+
+        let mounted = true;
+        const fetchPopup = () =>
+            void loadPopup().then((component) => {
+                if (!mounted) {
+                    return;
+                }
+
+                // The menu's own button replaces this one: somebody who tabbed onto it keeps the focus.
+                const focused = document.activeElement === button.current;
+
+                setPopup(() => component);
+
+                if (focused) {
+                    queueMicrotask(() =>
+                        document
+                            .querySelector<HTMLElement>('[aria-label=Menu]')
+                            ?.focus(),
+                    );
+                }
+            });
+
+        if (pressed) {
+            fetchPopup();
+
+            return () => {
+                mounted = false;
+            };
+        }
+
+        const cancel = whenIdle(fetchPopup);
+
+        return () => {
+            mounted = false;
+            cancel();
+        };
+    }, [Popup, pressed]);
+
+    if (Popup !== null) {
+        return (
+            <Popup name={name} className={className} defaultOpen={pressed} />
+        );
+    }
+
     return (
-        <Link
-            href={href}
-            role="menuitem"
-            className="flex items-center gap-2 rounded-lg px-2 py-1.5 outline-none hover:bg-muted focus-visible:bg-muted"
+        <button
+            ref={button}
+            type="button"
+            aria-label="Menu"
+            aria-haspopup="menu"
+            aria-expanded={false}
+            onClick={() => setPressed(true)}
+            className={cn(accountButtonClass, className)}
         >
-            {children}
-            {action !== undefined && (
-                <span className="ml-auto">
-                    <Keys action={action} />
-                </span>
-            )}
-        </Link>
+            {name.slice(0, 1) || '·'}
+        </button>
     );
 }
