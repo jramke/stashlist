@@ -291,6 +291,46 @@
     }
 }
 
+/* Everything that floats over the page speaks one language: the account menu, the menu of a card, the box's list and
+   the shortcut sheet. No border: a hairline made by the shadow, a long soft fall-off, and a faint blur of what is
+   behind. Rows are quiet (a tint, no pill of color), keys are plain glyphs at the end of the row, and the text is
+   the size of the cards'. */
+@layer components {
+    .pop {
+        @apply rounded-xl bg-popover/95 p-1 text-[13px] text-popover-foreground backdrop-blur-xl outline-none;
+        box-shadow:
+            0 0 0 1px oklch(0.145 0 0 / 0.07),
+            0 1px 2px oklch(0.145 0 0 / 0.05),
+            0 14px 34px -10px oklch(0.145 0 0 / 0.18);
+    }
+
+    .pop-item {
+        @apply flex cursor-default items-center gap-2.5 rounded-lg px-2.5 py-1.5 outline-none select-none;
+    }
+
+    .pop-item[data-highlighted] {
+        background-color: oklch(0.145 0 0 / 0.06);
+    }
+
+    .pop-label {
+        @apply truncate px-2.5 pt-1.5 pb-1 text-xs text-muted-foreground;
+    }
+
+    .pop-sep {
+        @apply mx-2.5 my-1 h-px;
+        background-color: oklch(0.145 0 0 / 0.07);
+    }
+}
+
+/* Not in a layer, so it beats the utilities of the key cap: inside a floating surface a key is a plain glyph. */
+.pop kbd {
+    border-color: transparent;
+    background-color: transparent;
+    min-width: 0;
+    padding-inline: 0.125rem;
+    color: oklch(0.145 0 0 / 0.5);
+}
+
 @media (prefers-reduced-motion: reduce) {
     .btn-3d,
     .btn-3d::after {

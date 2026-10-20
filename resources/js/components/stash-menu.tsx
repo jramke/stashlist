@@ -18,9 +18,6 @@ export type StashMenuProps = {
     onDelete: (id: number) => void;
 };
 
-const itemClass =
-    'flex cursor-default items-center gap-2 rounded-lg px-2 py-1.5 outline-none select-none data-[highlighted]:bg-muted';
-
 /**
  * The menu of one stash (Base UI's context menu): everything the keys do on a card, for the pointer. The feed
  * decides when it opens, with a right-click, a long press or the Menu key, and hands in the card and the place
@@ -57,7 +54,7 @@ export function StashMenu({
 
                             return false;
                         }}
-                        className="w-56 origin-(--transform-origin) animate-panel-in rounded-xl border bg-popover p-1.5 text-sm shadow-lg outline-none"
+                        className="pop w-52 origin-(--transform-origin) animate-panel-in"
                     >
                         <Entry
                             action="card.open"
@@ -82,7 +79,7 @@ export function StashMenu({
                             </Entry>
                         )}
 
-                        <ContextMenu.Separator className="my-1 h-px bg-border" />
+                        <ContextMenu.Separator className="pop-sep" />
 
                         <Entry
                             action="card.delete"
@@ -112,7 +109,11 @@ function Entry({
     return (
         <ContextMenu.Item
             onClick={onSelect}
-            className={cn(itemClass, danger && 'text-destructive')}
+            className={cn(
+                'pop-item',
+                danger &&
+                    'text-destructive data-[highlighted]:bg-destructive/10',
+            )}
         >
             {children}
             <span className="ml-auto">

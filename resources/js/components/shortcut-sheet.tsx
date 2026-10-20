@@ -12,7 +12,7 @@ export function ShortcutSheet({ onClose }: { onClose: () => void }) {
     return (
         <section
             aria-label="Keyboard shortcuts"
-            className="fixed inset-x-4 bottom-4 z-50 mx-auto max-h-[70svh] max-w-2xl animate-panel-in overflow-y-auto rounded-2xl border bg-popover p-5 shadow-xl"
+            className="pop fixed inset-x-4 bottom-4 z-50 mx-auto max-h-[70svh] max-w-2xl animate-panel-in overflow-y-auto rounded-2xl p-5 text-sm"
         >
             <div className="mb-4 flex items-center gap-4">
                 <h2 className="text-sm font-medium">Keyboard shortcuts</h2>

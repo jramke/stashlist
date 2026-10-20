@@ -14,9 +14,6 @@ import { Menu } from '@base-ui/react/menu';
 import { Link, router } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 
-const itemClass =
-    'flex cursor-default items-center gap-2 rounded-lg px-2 py-1.5 outline-none select-none data-[highlighted]:bg-muted';
-
 /** The menu behind the initial of the person: Base UI's menu, with the places that are not the feed. */
 export function AccountMenuPopup({
     name,
@@ -36,9 +33,9 @@ export function AccountMenuPopup({
 
             <Menu.Portal>
                 <Menu.Positioner align="end" sideOffset={8} className="z-50">
-                    <Menu.Popup className="w-52 origin-(--transform-origin) animate-panel-in rounded-xl border bg-popover p-1.5 text-sm shadow-lg outline-none">
+                    <Menu.Popup className="pop w-52 origin-(--transform-origin) animate-panel-in">
                         <Menu.Group>
-                            <Menu.GroupLabel className="truncate px-2 py-1.5 text-xs text-muted-foreground">
+                            <Menu.GroupLabel className="pop-label">
                                 {name}
                             </Menu.GroupLabel>
                         </Menu.Group>
@@ -57,7 +54,7 @@ export function AccountMenuPopup({
                         <Menu.CheckboxItem
                             checked={sounds}
                             onCheckedChange={setSoundEnabled}
-                            className={itemClass}
+                            className="pop-item"
                         >
                             Sounds
                             <span className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -66,14 +63,11 @@ export function AccountMenuPopup({
                             </span>
                         </Menu.CheckboxItem>
 
-                        <Menu.Separator className="my-1 h-px bg-border" />
+                        <Menu.Separator className="pop-sep" />
 
                         <Menu.Item
                             onClick={() => router.post(logout().url)}
-                            className={cn(
-                                itemClass,
-                                'text-muted-foreground data-[highlighted]:text-foreground',
-                            )}
+                            className="pop-item text-muted-foreground data-[highlighted]:text-foreground"
                         >
                             Log out
                         </Menu.Item>
@@ -98,7 +92,7 @@ function Entry({
         <Menu.LinkItem
             closeOnClick
             render={<Link href={href} />}
-            className={itemClass}
+            className="pop-item"
         >
             {children}
             {action !== undefined && (
