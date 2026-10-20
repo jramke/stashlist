@@ -14,6 +14,7 @@ use App\Http\Controllers\SearchEngineFilesController;
 use App\Http\Controllers\ShareController;
 use App\Http\Controllers\ShortcutsController;
 use App\Http\Controllers\SocialLoginController;
+use App\Http\Controllers\StashBodyController;
 use App\Http\Controllers\StashCollectionController;
 use App\Http\Controllers\StashController;
 use App\Http\Controllers\StashDeletionController;
@@ -48,6 +49,7 @@ Route::middleware('auth')->group(function () {
     Route::post('stashes', [StashController::class, 'store'])->middleware('throttle:capture')->name('stashes.store');
     Route::get('stashes', [StashController::class, 'index'])->middleware('throttle:search')->name('stashes.index');
     Route::resource('stashes', StashController::class)->only(['show', 'update', 'destroy']);
+    Route::get('stashes/{stash}/body', StashBodyController::class)->name('stashes.body');
 
     Route::delete('stashes/{stash}/deletion', [StashDeletionController::class, 'destroy'])->name(
         'stashes.deletion.destroy',

@@ -36,6 +36,8 @@ final readonly class StashData
         public ?string $url,
         public ?string $domain,
         public ?string $body,
+        /** The feed carries the start of a long text only (see BODY_PREVIEW_LENGTH); the whole text is at `stashes.body`. */
+        public bool $body_cut,
         public AiStatus $ai_status,
         public ?string $ai_error,
         public ?ThumbnailData $thumbnail,
@@ -69,6 +71,7 @@ final readonly class StashData
             body: $stash->body === null
                 ? null
                 : Str::limit($stash->body, self::BODY_PREVIEW_LENGTH, preserveWords: true),
+            body_cut: $stash->body !== null && mb_strlen($stash->body) > self::BODY_PREVIEW_LENGTH,
             ai_status: $stash->ai_status,
             ai_error: $stash->ai_error,
             thumbnail: $thumb === null

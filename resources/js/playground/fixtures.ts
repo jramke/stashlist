@@ -31,6 +31,7 @@ export function stash(overrides: Partial<Stash> = {}): Stash {
         url: 'https://example.com/a-page',
         domain: 'example.com',
         body: null,
+        body_cut: false,
         ai_status: 'done',
         ai_error: null,
         thumbnail: null,

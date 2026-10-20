@@ -37,6 +37,7 @@ test("bob cannot reach alice's stash", function (string $method, Closure $uri, a
         ->toBe($this->stash->title);
 })->with([
     'show' => ['GET', fn ($t) => "/stashes/{$t->stash->id}", []],
+    'read the text' => ['GET', fn ($t) => "/stashes/{$t->stash->id}/body", []],
     'update' => ['PATCH', fn ($t) => "/stashes/{$t->stash->id}", ['title' => 'hijacked']],
     'destroy' => ['DELETE', fn ($t) => "/stashes/{$t->stash->id}", []],
     'undo deletion' => ['DELETE', fn ($t) => "/stashes/{$t->stash->id}/deletion", []],
