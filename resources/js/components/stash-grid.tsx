@@ -82,6 +82,14 @@ export function StashGrid({
                         return;
                     }
 
+                    // Cmd or Ctrl with Enter is the card's own key (open the link), not the list's Enter (open the card).
+                    if (
+                        event.key === 'Enter' &&
+                        (event.metaKey || event.ctrlKey)
+                    ) {
+                        return;
+                    }
+
                     content.onKeyDown?.(event);
                 }}
             >

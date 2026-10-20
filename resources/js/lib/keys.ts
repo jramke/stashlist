@@ -1,14 +1,27 @@
 import { forgetOpened } from '@/lib/opened';
 
-/** Focuses the one box that searches and stashes, if this page has it. */
-export function focusBox(): boolean {
+/**
+ * Focuses the one box that searches and stashes, if this page has it. What is in it is selected, so the next key
+ * starts again; `select: false` leaves the caret at the end instead (for a letter that is typed into it).
+ */
+export function focusBox(select = true): boolean {
     forgetOpened();
 
-    const box = document.querySelector<HTMLElement>('[data-omnibar-input]');
+    const box = document.querySelector('[data-omnibar-input]');
 
-    box?.focus();
+    if (!(box instanceof HTMLTextAreaElement)) {
+        return false;
+    }
 
-    return box !== null;
+    box.focus();
+
+    if (select) {
+        box.select();
+    } else {
+        box.setSelectionRange(box.value.length, box.value.length);
+    }
+
+    return true;
 }
 
 /** The list of cards, as the feed marks it. */
@@ -108,5 +121,5 @@ export function typeIntoBox(event: KeyboardEvent): void {
         return;
     }
 
-    focusBox();
+    focusBox(false);
 }

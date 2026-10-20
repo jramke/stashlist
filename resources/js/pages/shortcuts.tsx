@@ -25,8 +25,9 @@ const descriptions: Record<string, string> = {
     'box.filter':
         'The words that name a color, a type, a tag or a collection can become a filter, shown as a chip in the box.',
     'card.delete':
-        'The card goes at once; the note in the box offers the undo.',
-    'card.open-link': 'Opens the address of the stash in a new tab.',
+        'The card goes at once and the note in the box offers the undo. It takes ⌘ or Ctrl so that a stray key never deletes.',
+    'card.open-link':
+        'Opens the address of the stash in a new tab. Enter on its own opens the stash.',
     'card.copy':
         'A link copies its address, a color its code and a note its text.',
     'card.menu':

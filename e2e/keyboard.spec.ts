@@ -168,7 +168,7 @@ test('a card has a menu: right-click, the Menu key, and the same actions as keys
     await page.keyboard.press('ArrowRight');
     await page.keyboard.press('c');
     await expect.poll(() => clipboard(page)).toBe('https://example.test/sofa');
-    await page.keyboard.press('o');
+    await page.keyboard.press('Control+Enter');
     await expect
         .poll(() =>
             page.evaluate(() =>
@@ -231,4 +231,33 @@ test('a ? as the first key of an empty box shows the shortcuts, and is a charact
     await page.keyboard.type('why?');
     await expect(box(page)).toHaveValue('why?');
     await expect(sheet).toHaveCount(0);
+});
+
+test('going back to the box selects what is in it, and typing into it from nowhere adds to it', async ({
+    page,
+}) => {
+    await register(page);
+    await capture(page, 'buy sourdough flour');
+
+    await box(page).fill('sour');
+    await box(page).blur();
+    await expect(box(page)).not.toBeFocused();
+
+    // A key that is typed from nowhere carries on at the end of the text.
+    await page.keyboard.type('d');
+    await expect(box(page)).toHaveValue('sourd');
+
+    // "/" selects it all, so the next key starts again.
+    await box(page).blur();
+    await page.keyboard.press('/');
+    await page.keyboard.type('chair');
+    await expect(box(page)).toHaveValue('chair');
+
+    // Out of the cards and back into the box works the same way.
+    await page.keyboard.press('ArrowDown');
+    await expect(grid(page)).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(box(page)).toBeFocused();
+    await page.keyboard.type('x');
+    await expect(box(page)).toHaveValue('x');
 });

@@ -262,17 +262,18 @@ export const catalog = define([
     },
     {
         id: 'card.delete',
-        label: 'Delete (x works too)',
+        label: 'Delete',
         category: 'Your stashes',
-        hotkeys: ['Backspace', 'Delete', 'X'],
-        show: ['Backspace'],
+        hotkeys: ['mod+Backspace', 'mod+Delete'],
+        show: ['mod+Backspace'],
         scopes: ['feed'],
+        inFields: false,
     },
     {
         id: 'card.open-link',
         label: 'Open the link',
         category: 'Your stashes',
-        hotkeys: ['O'],
+        hotkeys: ['mod+Enter'],
         scopes: ['feed'],
     },
     {

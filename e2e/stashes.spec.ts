@@ -205,7 +205,7 @@ test('the feed works from the keyboard: move, open, delete, undo', async ({
     await page.keyboard.press('ArrowDown');
     await expect(page.locator('[data-card][data-highlighted]')).toHaveCount(1);
 
-    await page.keyboard.press('Backspace');
+    await page.keyboard.press('Control+Backspace');
     await expect(page.getByText('Deleted.')).toBeVisible();
     await expect(page.locator('[data-card]')).toHaveCount(1);
 
