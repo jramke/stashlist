@@ -41,9 +41,21 @@ const github: Platform = {
     action: 'Star a repository',
     hosts: ['github.com'],
     saved(target, page) {
-        // The button that stars sits in a form that posts to `/<owner>/<repo>/star`; the one that undoes it, to `/unstar`.
-        const form = target.closest('form[action$="/star"]');
-        const action = form?.getAttribute('action');
+        // The page of a repository: one button, labelled "Star <owner>/<repo>" (the one that undoes it says "Unstar").
+        const label = target
+            .closest('button[data-testid="star-button"]')
+            ?.getAttribute('aria-label');
+        const repo =
+            label == null ? null : /^Star (\S+\/\S+)$/.exec(label)?.[1];
+
+        if (repo != null) {
+            return { url: `${page.origin}/${repo}` };
+        }
+
+        // Lists (explore, trending, search): a form that posts to `/<owner>/<repo>/star`; the one that undoes it, to `/unstar`.
+        const action = target
+            .closest('form[action$="/star"]')
+            ?.getAttribute('action');
 
         if (action == null || target.closest('button') === null) {
             return null;
@@ -100,31 +112,98 @@ const youtube: Platform = {
     action: 'Save a video',
     hosts: ['www.youtube.com'],
     saved(target, page) {
-        // A playlist ticked in the Save popup, read before the page ticks it.
-        const row = target.closest(
-            'ytd-playlist-add-to-option-renderer, yt-list-item-view-model',
-        );
-        const box = row?.querySelector('[role="checkbox"], #checkbox');
+        // Opening the menu of a video in a list: the menu is drawn apart from the video, so remember whose it is.
+        const opener = target.closest('.ytLockupMetadataViewModelMenuButton');
 
-        if (box?.getAttribute('aria-checked') !== 'false') {
+        if (opener !== null) {
+            menuVideo = videoAround(opener);
+
             return null;
         }
 
-        const id =
-            page.pathname === '/watch'
-                ? new URLSearchParams(page.search).get('v')
-                : /^\/shorts\/([\w-]+)/.exec(page.pathname)?.[1];
+        const remembered = menuVideo;
+        menuVideo = null;
 
-        if (id == null || id === '') {
+        // "Save" under the video: pressing it opens the playlists, and that is already a save.
+        const save = target.closest('#flexible-item-buttons button');
+        // "Save to playlist" and "Save to Watch later" in the menu of a video, found by their icons: the words change with the language.
+        const entry = target.closest('yt-list-item-view-model');
+        const id =
+            save !== null && hasIcon(save, BOOKMARK)
+                ? videoOf(page)
+                : entry !== null &&
+                    (hasIcon(entry, BOOKMARK) || hasIcon(entry, CLOCK))
+                  ? (remembered ?? videoOf(page))
+                  : null;
+
+        if (id === null) {
             return null;
         }
 
         return {
             url: `${page.origin}/watch?v=${encodeURIComponent(id)}`,
-            title: target.ownerDocument.title.replace(/ - YouTube$/, ''),
+            // The title of the tab is the video's only on its own page.
+            ...(id === videoOf(page)
+                ? {
+                      title: target.ownerDocument.title.replace(
+                          / - YouTube$/,
+                          '',
+                      ),
+                  }
+                : {}),
         };
     },
 };
+
+// The paths YouTube draws its icons with, as far as they tell one from the other.
+const BOOKMARK = 'M19 2H5a2 2 0 00-2 2v16.887';
+const CLOCK =
+    'M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1Zm0 2a9 9 0 110 18.001A9 9 0 0112 3Zm0 3a1 1 0 00-1 1v5.565';
+
+/** The video whose menu was opened last, until the next click. */
+let menuVideo: string | null = null;
+
+function hasIcon(within: Element, icon: string): boolean {
+    return [...within.querySelectorAll('path')].some((path) =>
+        path.getAttribute('d')?.startsWith(icon),
+    );
+}
+
+/** The id of the video a page or a link is about. */
+function videoIn(address: string): string | null {
+    const url = new URL(address, 'https://www.youtube.com');
+
+    return (
+        (url.pathname === '/watch'
+            ? url.searchParams.get('v')
+            : /^\/shorts\/([\w-]+)/.exec(url.pathname)?.[1]) || null
+    );
+}
+
+function videoOf(page: Where): string | null {
+    return videoIn(`${page.pathname}${page.search}`);
+}
+
+/** The one video in the nearest box around an element that has any link to a video; null when that box has several. */
+function videoAround(element: Element): string | null {
+    for (
+        let box = element.parentElement;
+        box !== null;
+        box = box.parentElement
+    ) {
+        const ids = new Set(
+            [...box.querySelectorAll('a[href]')]
+                .map((link) => videoIn(link.getAttribute('href') ?? ''))
+                .filter((id) => id !== null),
+        );
+
+        if (ids.size > 0) {
+            return ids.size === 1 ? ([...ids][0] ?? null) : null;
+        }
+    }
+
+    return null;
+}
 
 export const PLATFORMS: Platform[] = [github, x, youtube];
 
