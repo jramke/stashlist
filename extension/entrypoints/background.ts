@@ -77,8 +77,8 @@ export default defineBackground(() => {
 
     browser.contextMenus.onClicked.addListener(onMenuClick);
 
-    // "Stash when I save": the page scripts follow the person's choices (a site is on until it is turned off), and
-    // the scripts report what was saved (entrypoints/auto-stash.ts).
+    // "Stash when I save": the page scripts follow the sites the person allowed, and report what was saved there
+    // (entrypoints/auto-stash.ts).
     void syncAutoStash().catch(() => undefined);
     watchAutoStash();
     browser.runtime.onMessage.addListener((message, sender) => {

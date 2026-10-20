@@ -1,6 +1,5 @@
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'wxt';
-import { originsOf, PLATFORMS } from './lib/auto-stash/platforms';
 
 const e2e = process.env.STASHLIST_E2E === '1';
 
@@ -25,11 +24,7 @@ export default defineConfig({
         ],
         // The browser flows (e2e/) build with STASHLIST_E2E=1: the test pages are not on a host the extension is
         // allowed on, and nothing can click the permission prompt.
-        // Besides the hosted Stashlist, the sites "Stash when I save" watches (GitHub, X, YouTube): on from the
-        // install, off per site on the options page.
-        host_permissions: e2e
-            ? ['<all_urls>']
-            : ['https://stashlist.app/*', ...PLATFORMS.flatMap(originsOf)],
+        host_permissions: e2e ? ['<all_urls>'] : ['https://stashlist.app/*'],
         // The check on the icon for pages that are saved already needs the address of every tab: asked for when the
         // person turns it on, never at install.
         optional_permissions: ['tabs'],

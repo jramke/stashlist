@@ -36,7 +36,10 @@ function registered(extension: Extension): Promise<string[]> {
     });
 }
 
-test('a bookmark on X is stashed from the install on, and not once the site is turned off', async ({
+// The end-to-end build may read every page and cannot give that back, so every site is allowed from the start:
+// what the flow shows is the part after the permission (the scripts follow it, the button is seen, the post is
+// stashed). The prompt itself is the browser's.
+test('a bookmark on X is stashed on a page that was open and on one opened later', async ({
     extension,
 }) => {
     const { web } = await connect(extension);
@@ -49,7 +52,7 @@ test('a bookmark on X is stashed from the install on, and not once the site is t
         }),
     );
 
-    // Nothing was turned on: every site is on, and its script is registered by the browser.
+    // The background registers a script for every site that is allowed.
     await expect
         .poll(() => registered(extension))
         .toEqual(
@@ -60,9 +63,12 @@ test('a bookmark on X is stashed from the install on, and not once the site is t
             ]),
         );
 
+    // The options page tells the same, for the sites and for all of them.
     const options = await openExtensionPage(extension, 'options.html');
-    const x = () => options.getByRole('checkbox', { name: /^X/ });
-    await expect(x()).toBeChecked();
+    await expect(options.getByRole('checkbox', { name: /^X/ })).toBeChecked();
+    await expect(
+        options.getByRole('checkbox', { name: 'All sites', exact: true }),
+    ).toBeChecked();
 
     // The save runs in the background after the click; look again until the feed has it.
     async function stashed(text: string): Promise<void> {
@@ -79,27 +85,8 @@ test('a bookmark on X is stashed from the install on, and not once the site is t
     await open.getByRole('button', { name: 'Bookmark' }).click();
     await stashed(FIRST);
 
-    // Turned off: the script of that site goes, the others stay, and the choice is kept.
-    await options.bringToFront();
-    await x().click();
-    await expect(x()).not.toBeChecked();
-    await expect
-        .poll(() => registered(extension))
-        .not.toContain('auto-stash-x');
-    expect(await registered(extension)).toContain('auto-stash-github');
-
-    await options.reload();
-    await expect(x()).not.toBeChecked();
-
-    // Turned on again: a tab that is open already gets the script at once.
     const later = await extension.context.newPage();
     await later.goto('https://x.com/bob/status/456');
-    await options.bringToFront();
-    await x().click();
-    await expect(x()).toBeChecked();
-    await expect.poll(() => registered(extension)).toContain('auto-stash-x');
-
-    await later.bringToFront();
     await later.getByRole('button', { name: 'Bookmark' }).click();
     await stashed(SECOND);
 });

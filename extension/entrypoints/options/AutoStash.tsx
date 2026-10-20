@@ -1,46 +1,108 @@
-import { isAutoStashing, setAutoStash } from '@/lib/auto-stash/access';
+import { Note } from '@/components/ui';
+import {
+    isAutoStashing,
+    turnOffAutoStash,
+    turnOnAutoStash,
+} from '@/lib/auto-stash/access';
 import { PLATFORMS, type Platform } from '@/lib/auto-stash/platforms';
 import { useEffect, useState } from 'react';
+import { browser } from 'wxt/browser';
 
-/** "Stash when I save": on for every site until the person unticks it. */
+/** "Stash when I save": a checkbox for every site and one for all of them. Off until the person ticks it. */
 export function AutoStash() {
     const [on, setOn] = useState<Record<string, boolean>>({});
+    const [refused, setRefused] = useState<Platform[]>([]);
 
     useEffect(() => {
-        void Promise.all(
-            PLATFORMS.map(
-                async (platform) =>
-                    [platform.id, await isAutoStashing(platform)] as const,
-            ),
-        ).then((entries) => setOn(Object.fromEntries(entries)));
+        const read = (): void => {
+            void Promise.all(
+                PLATFORMS.map(
+                    async (platform) =>
+                        [platform.id, await isAutoStashing(platform)] as const,
+                ),
+            ).then((entries) => setOn(Object.fromEntries(entries)));
+        };
+
+        read();
+        // Giving back "every site" for the highlights takes these with it, and the browser's own page can too.
+        browser.permissions.onAdded.addListener(read);
+        browser.permissions.onRemoved.addListener(read);
+
+        return () => {
+            browser.permissions.onAdded.removeListener(read);
+            browser.permissions.onRemoved.removeListener(read);
+        };
     }, []);
 
-    async function toggle(platform: Platform, checked: boolean): Promise<void> {
-        setOn({ ...on, [platform.id]: checked });
-        await setAutoStash(platform, checked);
+    /** Turns sites on or off in one go: one question to the browser, whatever the number of sites. */
+    async function toggle(
+        platforms: Platform[],
+        checked: boolean,
+    ): Promise<void> {
+        setRefused([]);
+
+        if (!checked) {
+            await turnOffAutoStash(platforms);
+            setOn({
+                ...on,
+                ...Object.fromEntries(platforms.map(({ id }) => [id, false])),
+            });
+
+            return;
+        }
+
+        const granted = await turnOnAutoStash(platforms);
+
+        setOn({
+            ...on,
+            ...Object.fromEntries(platforms.map(({ id }) => [id, granted])),
+        });
+
+        if (!granted) {
+            setRefused(platforms);
+        }
     }
+
+    const count = PLATFORMS.filter(({ id }) => on[id] === true).length;
 
     return (
         <section className="grid gap-3">
             <h2 className="text-sm font-medium">Stash when I save</h2>
 
             <p className="text-sm text-muted-foreground">
-                When you save something on one of these sites, it is stashed
-                too. Only the thing you saved is sent to Stashlist, at the
-                moment you press the button. Untick a site to stop.
+                Stash it too when you save something on a site you turn on here.
+                The browser asks to allow the sites you pick. Only the thing you
+                saved is sent to Stashlist, when you save it.
             </p>
+
+            <label className="flex items-center gap-2 text-sm font-medium">
+                <input
+                    type="checkbox"
+                    checked={count === PLATFORMS.length}
+                    ref={(box) => {
+                        if (box !== null) {
+                            box.indeterminate =
+                                count > 0 && count < PLATFORMS.length;
+                        }
+                    }}
+                    onChange={(event) =>
+                        void toggle(PLATFORMS, event.target.checked)
+                    }
+                />
+                All sites
+            </label>
 
             {PLATFORMS.map((platform) => (
                 <label
                     key={platform.id}
-                    className="flex items-start gap-2 text-sm"
+                    className="flex items-start gap-2 pl-6 text-sm"
                 >
                     <input
                         type="checkbox"
                         className="mt-1"
-                        checked={on[platform.id] ?? true}
+                        checked={on[platform.id] === true}
                         onChange={(event) =>
-                            void toggle(platform, event.target.checked)
+                            void toggle([platform], event.target.checked)
                         }
                     />
                     <span>
@@ -51,6 +113,14 @@ export function AutoStash() {
                     </span>
                 </label>
             ))}
+
+            {refused.length > 0 && (
+                <Note tone="error">
+                    Without access to{' '}
+                    {refused.map(({ label }) => label).join(', ')} the extension
+                    cannot see what you save there.
+                </Note>
+            )}
         </section>
     );
 }

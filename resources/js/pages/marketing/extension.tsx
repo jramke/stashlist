@@ -89,24 +89,23 @@ export default function Extension({ marketing }: Props) {
 
                 <Section title="Stash what you save">
                     <p>
-                        A star on GitHub, a bookmark on X and a saved video on
-                        YouTube are stashed too, the moment you press the
-                        button. It is on for those three sites from the start
-                        and you can turn each one off in the settings. Only the
-                        thing you saved is sent, and nothing is sent from a site
-                        you turned off.
+                        Optional. Turn on GitHub, X or YouTube in the settings
+                        and a star, a bookmark or a saved video is stashed too,
+                        the moment you press it. Each site is allowed on its
+                        own, and nothing is read or sent on a site you did not
+                        turn on.
                     </p>
                 </Section>
 
                 <Section title="What it can see">
                     <p>
                         It reads a page only when you ask: a click, the shortcut
-                        or the menu. The exceptions are the three sites above,
-                        where a script sees the button you press, and showing
-                        highlights, which you turn on yourself. Nothing is sent
-                        in the background, except a check every half hour for
-                        highlights you made elsewhere. The addresses of pages
-                        you visit never leave your browser.
+                        or the menu. Only if you turn on showing highlights, or
+                        stashing what you save on a site, is there a script on a
+                        page, and only on the pages that setting covers. Nothing
+                        is sent in the background, except a check every half
+                        hour for highlights you made elsewhere. The addresses of
+                        pages you visit never leave your browser.
                     </p>
                 </Section>
 

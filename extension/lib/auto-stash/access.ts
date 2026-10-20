@@ -1,34 +1,44 @@
 import { browser } from 'wxt/browser';
-import { storage } from 'wxt/utils/storage';
 import { originsOf, PLATFORMS, type Platform } from './platforms';
 
-/** The sites the person turned off. Every other site is on: the extension has the right to see them from the install. */
-const offItem = storage.defineItem<string[]>('sync:auto-stash-off', {
-    fallback: [],
-});
+/**
+ * "Stash when I save" is on for a site exactly when the browser lets the extension see that site. The options page
+ * asks for the permission or gives it back, and the background (`watchAutoStash`) makes the page scripts follow, so
+ * the switch cannot disagree with the browser, also when the permission is taken away from the browser's own page.
+ */
 
 const scriptId = (platform: Platform): string => `auto-stash-${platform.id}`;
 
+const originsOfAll = (platforms: Platform[]): string[] =>
+    platforms.flatMap(originsOf);
+
 export async function isAutoStashing(platform: Platform): Promise<boolean> {
-    return !(await offItem.getValue()).includes(platform.id);
+    return browser.permissions.contains({ origins: originsOf(platform) });
 }
 
-/** Only writes the choice; the background (`watchAutoStash`) makes the scripts follow it. */
-export async function setAutoStash(
-    platform: Platform,
-    on: boolean,
-): Promise<void> {
-    const off = (await offItem.getValue()).filter((id) => id !== platform.id);
+/**
+ * Asks the browser to allow these sites, all in one question. Call it from a click; it returns false when the
+ * person said no. A site that is allowed already is not asked again.
+ */
+export async function turnOnAutoStash(platforms: Platform[]): Promise<boolean> {
+    return browser.permissions.request({ origins: originsOfAll(platforms) });
+}
 
-    await offItem.setValue(on ? off : [...off, platform.id]);
+/**
+ * Gives the permission for these sites back. Giving back "every site" (the highlights' switch) takes them with it,
+ * which the background sees as well.
+ */
+export async function turnOffAutoStash(platforms: Platform[]): Promise<void> {
+    await browser.permissions.remove({ origins: originsOfAll(platforms) });
 }
 
 let running: Promise<unknown> = Promise.resolve();
 
 /**
- * Makes the page scripts match the choices: one is registered for every site that is on and none for a site that
- * is off. Tabs of a site that was just registered get the script now. Runs one after the other, because two
- * registrations of the same script are an error, and the background calls it whenever it starts.
+ * Makes the page scripts match the permissions: one is registered for every site that is allowed and none for a
+ * site that is not. Tabs of a site that was just registered get the script now. Runs one after the other, because
+ * two registrations of the same script are an error, and the background calls it whenever it starts (a script
+ * registered by an older version may be gone after an update).
  */
 export function syncAutoStash(): Promise<unknown> {
     running = running.then(sync, sync);
@@ -36,13 +46,13 @@ export function syncAutoStash(): Promise<unknown> {
     return running;
 }
 
-/** Follows a change of the choices, also one made on another device of the same browser account. */
+/** Follows the permissions, whoever changes them. */
 export function watchAutoStash(): void {
-    offItem.watch(() => void syncAutoStash());
+    browser.permissions.onAdded.addListener(() => void syncAutoStash());
+    browser.permissions.onRemoved.addListener(() => void syncAutoStash());
 }
 
 async function sync(): Promise<void> {
-    const off = await offItem.getValue();
     const registered = new Set(
         (await browser.scripting.getRegisteredContentScripts()).map(
             ({ id }) => id,
@@ -53,8 +63,9 @@ async function sync(): Promise<void> {
         PLATFORMS.map(async (platform) => {
             const id = scriptId(platform);
             const origins = originsOf(platform);
+            const allowed = await browser.permissions.contains({ origins });
 
-            if (off.includes(platform.id)) {
+            if (!allowed) {
                 if (registered.has(id)) {
                     await browser.scripting.unregisterContentScripts({
                         ids: [id],
