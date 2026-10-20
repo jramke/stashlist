@@ -131,3 +131,13 @@ test('the analytics script is on the page only when it is set up', function () {
 
     $this->get('/')->assertSee('src="https://stats.example/script.js" data-website-id="abc-123"', escape: false);
 });
+
+test('the front page is also at /homepage, for people who are signed in too', function () {
+    $this->get('/homepage')->assertInertia(fn (AssertableInertia $page) => $page->component('marketing/home'));
+
+    $this
+        ->actingAs(User::factory()->create())
+        ->get('/homepage')
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page->component('marketing/home'));
+});

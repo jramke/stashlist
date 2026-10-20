@@ -24,6 +24,7 @@ use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+Route::get('homepage', [HomeController::class, 'homepage'])->name('homepage');
 Route::get('privacy', PrivacyController::class)->name('privacy');
 Route::get('pricing', [MarketingController::class, 'pricing'])->name('pricing');
 Route::get('extension', [MarketingController::class, 'extension'])->name('extension');

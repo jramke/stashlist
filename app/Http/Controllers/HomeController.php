@@ -21,6 +21,15 @@ final class HomeController extends Controller
             return to_route('stashes.index');
         }
 
+        return $this->homepage();
+    }
+
+    /**
+     * The front page for anyone, signed in or not (`/` sends a signed-in user to their feed). Its canonical address
+     * is still `/`.
+     */
+    public function homepage(): Response
+    {
         return Inertia::render('marketing/home', ['marketing' => MarketingData::resolve()]);
     }
 }
