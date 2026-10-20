@@ -98,3 +98,87 @@ test('deleting a tag removes it from its stashes and keeps the stashes', functio
         ->and(Stash::query()->find($stash->id))
         ->not->toBeNull();
 });
+
+test('the tags page shows fifty tags at a time and says where it is', function () {
+    Tag::factory()
+        ->count(120)
+        ->for($this->user)
+        ->sequence(
+            fn ($sequence) => [
+                'name' => sprintf('tag %03d', $sequence->index),
+                'slug' => sprintf('tag %03d', $sequence->index),
+            ],
+        )
+        ->create();
+
+    $this
+        ->actingAs($this->user)
+        ->get('/tags')
+        ->assertInertia(
+            fn (AssertableInertia $page) => $page
+                ->has('tags', 50)
+                ->where('paging', ['page' => 1, 'last_page' => 3, 'total' => 120]),
+        );
+
+    $this
+        ->actingAs($this->user)
+        ->get('/tags?page=3')
+        ->assertInertia(
+            fn (AssertableInertia $page) => $page->has('tags', 20)->where('paging.page', 3),
+        );
+});
+
+test('a page that is gone leads to the last one', function () {
+    Tag::factory()->count(60)->for($this->user)->create();
+
+    $this->actingAs($this->user)->get('/tags?page=9')->assertRedirect('/tags?page=2');
+});
+
+test('tags are searched by the words in their names, and a percent sign is only a percent sign', function () {
+    foreach (['kitchen garden', 'garage', 'sofa', '100% cotton'] as $name) {
+        Tag::factory()->for($this->user)->create(['name' => $name, 'slug' => $name]);
+    }
+
+    $names = fn (AssertableInertia $page): array => array_column($page->toArray()['props']['tags'], 'name');
+
+    $this
+        ->actingAs($this->user)
+        ->get('/tags?q=GAR')
+        ->assertInertia(function (AssertableInertia $page) use ($names) {
+            expect($names($page))->toEqualCanonicalizing(['kitchen garden', 'garage']);
+
+            $page->where('q', 'GAR')->where('paging.total', 2);
+        });
+
+    $this
+        ->actingAs($this->user)
+        ->get('/tags?q=%25')
+        ->assertInertia(fn (AssertableInertia $page) => expect($names($page))->toBe(['100% cotton']));
+
+    $this
+        ->actingAs($this->user)
+        ->get('/tags?q=nothing')
+        ->assertInertia(fn (AssertableInertia $page) => $page->has('tags', 0)->where('paging.total', 0));
+});
+
+test('the tags of other people are neither listed nor found', function () {
+    Tag::factory()->create(['name' => 'garage', 'slug' => 'garage']);
+
+    $this
+        ->actingAs($this->user)
+        ->get('/tags?q=garage')
+        ->assertInertia(fn (AssertableInertia $page) => $page->has('tags', 0));
+});
+
+test('the list of every tag for the merge picker is sent only when asked for', function () {
+    Tag::factory()->count(3)->for($this->user)->create();
+
+    $this
+        ->actingAs($this->user)
+        ->get('/tags')
+        ->assertInertia(
+            fn (AssertableInertia $page) => $page
+                ->missing('options')
+                ->reloadOnly('options', fn (AssertableInertia $reload) => $reload->has('options', 3)),
+        );
+});
