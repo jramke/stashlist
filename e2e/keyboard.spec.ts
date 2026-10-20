@@ -214,12 +214,13 @@ test('a ? as the first key of an empty box shows the shortcuts, and is a charact
     page,
 }) => {
     await register(page);
-    const sheet = page.getByRole('region', { name: 'Keyboard shortcuts' });
+    const sheet = page.getByRole('dialog', { name: 'Keyboard shortcuts' });
 
     await expect(box(page)).toBeFocused();
     await page.keyboard.press('?');
     await expect(sheet).toBeVisible();
-    await expect(box(page)).toHaveValue('');
+    // The drawer is modal: the page behind it is out of the accessibility tree, so the box is found by its mark.
+    await expect(page.locator('[data-omnibar-input]')).toHaveValue('');
 
     // The box let go, so one Escape closes the sheet.
     await page.keyboard.press('Escape');

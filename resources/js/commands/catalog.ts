@@ -131,9 +131,7 @@ export const catalog = define([
         scopes: ['page'],
         // A menu or the shortcut sheet that is open takes the Escape for itself.
         when: () =>
-            document.querySelector(
-                '[role=menu], [aria-label="Keyboard shortcuts"]',
-            ) === null,
+            document.querySelector('[role=menu], [role=dialog]') === null,
         run: goBack,
     },
     {

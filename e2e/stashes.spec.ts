@@ -565,7 +565,7 @@ test('a key belongs to a place: stash keys are silent on the feed, the sheet com
     // Escape lets go of the field first, and the sheet has the next one.
     await page.keyboard.press('Escape');
     await page.keyboard.press('?');
-    const sheet = page.getByRole('region', { name: 'Keyboard shortcuts' });
+    const sheet = page.getByRole('dialog', { name: 'Keyboard shortcuts' });
     await expect(sheet).toBeVisible();
     await expect(sheet.getByText('Undo a delete')).toBeVisible();
     await expect(sheet.getByText('Open the original')).toBeVisible();

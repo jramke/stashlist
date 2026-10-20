@@ -21,6 +21,8 @@ const ShortcutSheet = lazy(() =>
 export default function AppLayout({ children }: { children?: ReactNode }) {
     const { component } = usePage();
     const [help, setHelp] = useState(false);
+    // Once the sheet has been opened it stays mounted, closed, so that it can slide out.
+    const [sheetUsed, setSheetUsed] = useState(false);
     const onFeed = component === 'stashes/index';
 
     // Back from a stash shows the feed as it was left, instantly; then it asks again, because the stash may have
@@ -53,8 +55,16 @@ export default function AppLayout({ children }: { children?: ReactNode }) {
     }, []);
     useScope('page', !onFeed);
     useScope('sheet', help);
-    useAction('shortcuts.toggle', () => setHelp((value) => !value));
-    useAction('shortcuts.close', () => setHelp(false));
+    useAction('shortcuts.toggle', () => showSheet(!help));
+    useAction('shortcuts.close', () => showSheet(false));
+
+    function showSheet(open: boolean) {
+        setHelp(open);
+
+        if (open) {
+            setSheetUsed(true);
+        }
+    }
 
     return (
         <div className="min-h-svh bg-background text-foreground">
@@ -66,9 +76,12 @@ export default function AppLayout({ children }: { children?: ReactNode }) {
                 </main>
             </div>
 
-            {help && (
+            {sheetUsed && (
                 <Suspense>
-                    <ShortcutSheet onClose={() => setHelp(false)} />
+                    <ShortcutSheet
+                        open={help}
+                        onClose={() => showSheet(false)}
+                    />
                 </Suspense>
             )}
         </div>
