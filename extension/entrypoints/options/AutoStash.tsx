@@ -24,11 +24,14 @@ export function AutoStash() {
         };
 
         read();
-        // Giving back "every site" for the highlights takes these with it, and the browser's own page can too.
+        // The choices live in storage (also changed in another options tab) and the browser's own page can take a
+        // permission away.
+        browser.storage.onChanged.addListener(read);
         browser.permissions.onAdded.addListener(read);
         browser.permissions.onRemoved.addListener(read);
 
         return () => {
+            browser.storage.onChanged.removeListener(read);
             browser.permissions.onAdded.removeListener(read);
             browser.permissions.onRemoved.removeListener(read);
         };

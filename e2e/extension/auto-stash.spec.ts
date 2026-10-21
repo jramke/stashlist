@@ -36,10 +36,10 @@ function registered(extension: Extension): Promise<string[]> {
     });
 }
 
-// The end-to-end build may read every page and cannot give that back, so every site is allowed from the start:
-// what the flow shows is the part after the permission (the scripts follow it, the button is seen, the post is
-// stashed). The prompt itself is the browser's.
-test('a bookmark on X is stashed on a page that was open and on one opened later', async ({
+// The end-to-end build may read every page and cannot give that back, which is what a broader permission looks
+// like (all sites, for the highlights): the browser allows the three sites, and still nothing is on until the
+// person ticks it. The prompt itself is the browser's.
+test('a bookmark on X is stashed once the site is turned on, and not after it is turned off', async ({
     extension,
 }) => {
     const { web } = await connect(extension);
@@ -52,23 +52,21 @@ test('a bookmark on X is stashed on a page that was open and on one opened later
         }),
     );
 
-    // The background registers a script for every site that is allowed.
-    await expect
-        .poll(() => registered(extension))
-        .toEqual(
-            expect.arrayContaining([
-                'auto-stash-github',
-                'auto-stash-x',
-                'auto-stash-youtube',
-            ]),
-        );
-
-    // The options page tells the same, for the sites and for all of them.
+    // Allowed is not on: nothing is registered and nothing is ticked.
     const options = await openExtensionPage(extension, 'options.html');
-    await expect(options.getByRole('checkbox', { name: /^X/ })).toBeChecked();
-    await expect(
-        options.getByRole('checkbox', { name: 'All sites', exact: true }),
-    ).toBeChecked();
+    const x = options.getByRole('checkbox', { name: /^X/ });
+    const all = options.getByRole('checkbox', {
+        name: 'All sites',
+        exact: true,
+    });
+    await expect(x).not.toBeChecked();
+    await expect(all).not.toBeChecked();
+    expect(await registered(extension)).toEqual([]);
+
+    // One site: only its script.
+    await x.click();
+    await expect(x).toBeChecked();
+    await expect.poll(() => registered(extension)).toEqual(['auto-stash-x']);
 
     // The save runs in the background after the click; look again until the feed has it.
     async function stashed(text: string): Promise<void> {
@@ -85,8 +83,32 @@ test('a bookmark on X is stashed on a page that was open and on one opened later
     await open.getByRole('button', { name: 'Bookmark' }).click();
     await stashed(FIRST);
 
+    // All sites: every script, and the box is ticked.
+    await options.bringToFront();
+    await all.click();
+    await expect(all).toBeChecked();
+    await expect
+        .poll(() => registered(extension))
+        .toEqual(
+            expect.arrayContaining([
+                'auto-stash-github',
+                'auto-stash-x',
+                'auto-stash-youtube',
+            ]),
+        );
+
     const later = await extension.context.newPage();
     await later.goto('https://x.com/bob/status/456');
     await later.getByRole('button', { name: 'Bookmark' }).click();
     await stashed(SECOND);
+
+    // Off again, although the browser still allows every page: unticked, no scripts, and it stays so.
+    await options.bringToFront();
+    await all.click();
+    await expect(all).not.toBeChecked();
+    await expect(x).not.toBeChecked();
+    await expect.poll(() => registered(extension)).toEqual([]);
+
+    await options.reload();
+    await expect(all).not.toBeChecked();
 });
