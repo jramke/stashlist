@@ -32,7 +32,10 @@ export default defineConfig({
         optional_host_permissions: ['https://*/*', 'http://*/*'],
         commands: {
             quick_clip: {
-                suggested_key: { default: 'Alt+Shift+S' },
+                suggested_key: {
+                    default: 'Ctrl+Shift+S',
+                    mac: 'Command+Shift+S',
+                },
                 description: 'Stash page without the popup',
             },
             highlight_selection: {

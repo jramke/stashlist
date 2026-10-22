@@ -55,12 +55,14 @@ export default function Extension({ marketing }: Props) {
 
                 <Section title="Stash">
                     <p>
-                        Press <Key>Alt</Key>+<Key>Shift</Key>+<Key>S</Key> on
-                        any page and it is stashed at once with your defaults,
-                        or click the button to change the title, tags and
-                        collections first. The page is read in your own browser,
-                        as you see it, so pages behind a login and pages built
-                        with JavaScript work. A tick on the icon says it worked.
+                        Press <Key>⌘</Key>+<Key>Shift</Key>+<Key>S</Key> (
+                        <Key>Ctrl</Key>+<Key>Shift</Key>+<Key>S</Key> on Windows
+                        and Linux) on any page and it is stashed at once with
+                        your defaults, or click the button to change the title,
+                        tags and collections first. The page is read in your own
+                        browser, as you see it, so pages behind a login and
+                        pages built with JavaScript work. A tick on the icon
+                        says it worked.
                     </p>
                     <p>
                         Right-click for more. <em>Stash link</em> keeps a link

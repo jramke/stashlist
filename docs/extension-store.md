@@ -49,7 +49,7 @@ Long description:
 
 > Stashlist is a place for everything worth keeping: pages, notes, images, colors. This extension saves what you are looking at in one gesture.
 >
-> - Click the button to stash the page. Change the title, add tags (your own tags are suggested while you type) and pick collections first, or press Alt+Shift+S to stash it at once with your defaults.
+> - Click the button to stash the page. Change the title, add tags (your own tags are suggested while you type) and pick collections first, or press Cmd+Shift+S (Ctrl+Shift+S on Windows and Linux) to stash it at once with your defaults.
 > - Right-click for more: Stash link, Stash color… (pick any color on your screen) and Stash image, which looks at the page around the picture: the page's own picture (the photo on a product page) stashes the page with it, any other picture is stashed as a picture, titled by its caption, with a link back to the page.
 > - The page is read in your browser, as you see it: pages behind a login and pages built with JavaScript work, and the text, picture and screenshot come with it.
 > - Select text and press Alt+Shift+H (or right-click, Highlight selection) to mark a passage. It stays in Stashlist with a link that opens the page right at it, and you can have it painted on the page every time you come back (optional, you choose it in the settings).

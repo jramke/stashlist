@@ -20,10 +20,17 @@ import {
 } from '@/lib/settings';
 import { explain } from '@/lib/stash-tab';
 import type { Collection, Defaults } from '@/lib/types';
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { AutoStash } from './AutoStash';
 
 type Status = { tone: 'muted' | 'error'; text: string } | null;
+
+/** The keys of the quick stash on this computer, as the manifest suggests them (the person may have changed them). */
+function stashKeys(): string[] {
+    return /Mac/i.test(navigator.userAgent)
+        ? ['⌘', 'Shift', 'S']
+        : ['Ctrl', 'Shift', 'S'];
+}
 
 /** Where the person says which Stashlist to talk to, with which token, and what the shortcut and the menu stash with. */
 export function App() {
@@ -207,10 +214,16 @@ export function App() {
             <header className="grid gap-1">
                 <h1 className="text-xl font-medium">Stashlist</h1>
                 <p className="text-sm text-muted-foreground">
-                    Press <kbd className="rounded border px-1 text-xs">Alt</kbd>
-                    +<kbd className="rounded border px-1 text-xs">Shift</kbd>+
-                    <kbd className="rounded border px-1 text-xs">S</kbd> on any
-                    page to stash it without opening the popup.
+                    Press{' '}
+                    {stashKeys().map((key, index) => (
+                        <Fragment key={key}>
+                            {index > 0 && '+'}
+                            <kbd className="rounded border px-1 text-xs">
+                                {key}
+                            </kbd>
+                        </Fragment>
+                    ))}{' '}
+                    on any page to stash it without opening the popup.
                 </p>
             </header>
 
