@@ -38,7 +38,7 @@ export function AppHeader({
                 className="flex h-11 shrink-0 items-center gap-2 rounded-lg font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
             >
                 <span className="relative flex">
-                    <AppLogoMark className="size-6" />
+                    <AppLogoMark className="size-5" />
                     {badge}
                 </span>
                 {withName && name}

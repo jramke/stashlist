@@ -6,32 +6,6 @@
 </g>
 </g>
 <defs>
-<filter id="filter0_dii_2003_18" x="8.54458" y="2.6" width="104.8" height="118.8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-<feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dx="2" dy="3"/>
-<feGaussianBlur stdDeviation="3.2"/>
-<feComposite in2="hardAlpha" operator="out"/>
-<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.27 0"/>
-<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2003_18"/>
-<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2003_18" result="shape"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dx="2" dy="2"/>
-<feGaussianBlur stdDeviation="2"/>
-<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
-<feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.34 0"/>
-<feBlend mode="normal" in2="shape" result="effect2_innerShadow_2003_18"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dx="-2" dy="-2"/>
-<feGaussianBlur stdDeviation="1"/>
-<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
-<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0"/>
-<feBlend mode="normal" in2="effect2_innerShadow_2003_18" result="effect3_innerShadow_2003_18"/>
-</filter>
-<linearGradient id="paint0_linear_2003_18" x1="45.9525" y1="35.9863" x2="64.7488" y2="71.8948" gradientUnits="userSpaceOnUse">
-<stop stop-color="#3D3D3D"/>
-<stop offset="1" stop-color="white"/>
-</linearGradient>
 <clipPath id="clip0_2003_18">
 <rect width="118" height="118" fill="white"/>
 </clipPath>
